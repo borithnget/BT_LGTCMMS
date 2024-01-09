@@ -1,0 +1,370 @@
+﻿@model IEnumerable<BT_KimMex.Models.PurchaseOrderResponseReport>
+@{
+    Layout = null;
+    int isFinance = ViewBag.isFinance;
+    var maxPayment = Model.OrderByDescending(s => s.countPayment).Select(s => s.countPayment).FirstOrDefault();
+   maxPayment= maxPayment == 0 ? 1 : maxPayment;
+
+
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>PurchaseOrderResponse</title>
+</head>
+<body>
+    <table style="width: 100%; border-collapse: collapse;" id="table1">
+        <tr>
+            <td colspan="10" style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">PO Information</td>
+            <td colspan="2" style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">PO Amount</td>
+            <td colspan="4" style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">PO Term</td>
+            <td colspan="3" style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Note</td>
+            @if (isFinance == 1)
+            {
+                <td colspan="2" style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Receiving Slip</td>
+                <td colspan="8" style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Forwarder Information</td>
+
+                <td colspan="8" style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Invoice Information</td>
+                <td colspan="2" style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Payment</td>
+                <td colspan="@maxPayment" style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Paid Date</td>
+                <td colspan="3" style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Document Submital to FA</td>
+            }
+        </tr>
+        <tr>
+            <!-- PO Information -->
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">No.</td>
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">PO Number</td>
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">MR Number</td>
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">PR Number</td>
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Issued Date</td>
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Released Date</td>
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">SO #</td>
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Project</td>
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Project Manager</td>
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Supplier</td>
+            <!-- PO Amount -->
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Before VAT</td>
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">VAT</td>
+            <!-- PO Term -->
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Payment term</td>
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Incoterms</td>
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">
+                Delivery Time (W)
+            </td>
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Shipment</td>
+
+            <!-- Note -->
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Prepare by</td>
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Status</td>
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">
+                Note
+                <br /><span style="color:red;">remark from Purchaser</span>
+            </td>
+
+            <!-- IF Finance-->
+            @if (isFinance == 1)
+            {
+                <!-- PO TERM -->
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Sending Date</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Returning Date</td>
+                <!-- Forwarder Information -->
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Weight (KGS)</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Volume (CBM)</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Forwarder</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Mode of Transpot</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Shipping Mode</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Consignee</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Transportation fee <br />(EST)</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Import Duty <br /> (EST)</td>
+
+                <!-- Invoice Information -->
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Preparing Date</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Inv Date</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Inv Number (Shipper)</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Inv Amount</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">VAT Amount</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Inv Number <br />(Forwarder)</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Transportation fee </td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Import duty </td>
+                <!-- Payment -->
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Paid</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Balance</td>
+                <!-- Paid Date -->
+                for (int i = 1; i <= maxPayment; i++)
+                {
+                    <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">@i</td>
+                }
+                <!-- Document Submital to FA-->
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">FA Received Date</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Submit Via</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle;">Note</td>
+
+            }
+
+
+        </tr>
+        @if (Model == null)
+        {
+            <tr>
+                <td colspan="16">No Data</td>
+            </tr>
+        }
+        else
+        {
+            int count = 1;
+            foreach (var item in Model)
+            {
+                var projectManager = string.Empty;
+                foreach (var pm in item.project.projectProjectManagers)
+                {
+                    projectManager = string.Format("{0}<span>{1}</span><br/>", projectManager, BT_KimMex.Class.CommonFunctions.GetUserFullnamebyUserId(pm.project_manager_id));
+                }
+                string releasedDate = Convert.ToBoolean(item.poReport.po.is_check) ? Convert.ToDateTime(item.poReport.po.checked_date).ToString("MM/dd/yy") : Convert.ToDateTime(item.poReport.po.approved_date).ToString("MM/dd/yy");
+    <tr>
+        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@count</td>
+        <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@item.poReport.po_report_number</td>
+        <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@item.poReport.mr.ir_no</td>
+        <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@item.poReport.pr.purchase_requisition_number</td>
+        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@Convert.ToDateTime(item.poReport.po.created_date).ToString("MM/dd/yy")</td>
+        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@releasedDate</td>
+        <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@item.project.project_no</td>
+        <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@item.project.project_full_name</td>
+        <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle; ">@Html.Raw(projectManager)</td>
+        <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@item.poReport.supplier_entity.supplier_name</td>
+        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", item.poReport.pod.amount_before_vat)</td>
+        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", item.poReport.pod.amount)</td>
+        <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@item.supplierQuote.payment</td>
+        <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@item.supplierQuote.incoterm</td>
+        <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@item.supplierQuote.delivery</td>
+        <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@item.supplierQuote.shipment</td>
+        <!-- Note -->
+        <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@item.poReport.created_by</td>
+        <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@item.poReport.po_status</td>
+        <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle; "></td>
+
+        @if (isFinance == 1)
+        {
+            var invoice = item.invoices.FirstOrDefault();
+
+
+            <!-- Receiving Slip -->
+            <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle; ">
+                @*@foreach (var grn in item.received)
+                {
+                    if (grn.sending_date.HasValue)
+                    {
+                        <span>@Convert.ToDateTime(grn.sending_date).ToString("dd-MM-yyyy")</span><br />
+                    }
+
+                }*@
+                @if (item.poReport.po.checked_date.HasValue)
+                {
+                    <span>@BT_KimMex.Class.CommonClass.ToLocalTime(Convert.ToDateTime(item.poReport.po.checked_date)).ToString("dd-MM-yyyy")</span><br />
+                }
+                else
+                {
+                    <span>@BT_KimMex.Class.CommonClass.ToLocalTime(Convert.ToDateTime(item.poReport.po.approved_date)).ToString("dd-MM-yyyy")</span><br />
+                }
+            </td>
+            <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle; ">
+                @foreach (var grn in item.received)
+                {
+                    if (grn.checked_date.HasValue)
+                    {
+                        <span>@BT_KimMex.Class.CommonClass.ToLocalTime(Convert.ToDateTime(grn.checked_date)).ToString("dd-MM-yyyy")</span><br />
+                    }
+
+                }
+            </td>
+            <!-- Forwarder information -->
+            <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+            <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle; "></td>
+            <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+            <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle; "></td>
+            <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+            <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle; "></td>
+            <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle; "></td>
+            <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+
+            <!-- Invoice Information -->
+            if (invoice == null)
+            {
+
+
+                <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+                <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle; "></td>
+                <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+                <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle; "></td>
+                <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+                <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle; "></td>
+                <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+                <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+                <!-- Payment -->
+                <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+                <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+                <!-- Paid Date -->
+                for (int i = 0; i < maxPayment; i++)
+                {
+                    <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+                }
+                <!-- Document Submital to FA-->
+                <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+                <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+                <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+
+
+
+            }
+            else
+            {
+                <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@Convert.ToDateTime(invoice.created_at).ToString("dd-MM-yyyy")</td>
+                <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@Convert.ToDateTime(invoice.invoice_date).ToString("dd-MM-yyyy")</td>
+                <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@invoice.invoice_number_shipper</td>
+                <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; text-align:center;vertical-align:middle;">@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", invoice.invoice_amount)</td>
+                <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; text-align: center; vertical-align: middle;">@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", invoice.invoice_vat_amount)</td>
+                <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@invoice.invoice_number_forwarder</td>
+                <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; text-align: center; vertical-align: middle; ">@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", invoice.transporation_fee)</td>
+                <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@invoice.import_duty</td>
+                <!-- Payment -->
+
+                <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; text-align: center; vertical-align: middle;">@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", invoice.paid_amount)</td>
+                <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; text-align: center; vertical-align: middle;">@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", invoice.balance)</td>
+
+                <!-- Paid Date -->
+                if (invoice.payments != null)
+                {
+                    var payments = invoice.payments.OrderBy(s => s.payment_date).ToList();
+                    for (int i = 0; i < payments.Count(); i++)
+                    {
+                        string paymentDate = Convert.ToDateTime(payments[i].payment_date).ToString("dd-MM-yyyy");
+                        <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@paymentDate</td>
+                    }
+                    for (int i = 0; i < maxPayment - payments.Count(); i++)
+                    {
+                        <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle; "></td>
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < maxPayment; i++)
+                    {
+                        <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+                    }
+                }
+
+
+
+                <!-- Document Submital to FA-->
+                if (invoice.document == null)
+                {
+                    <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+                    <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+                    <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+                }
+                else
+                {
+                    <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@BT_KimMex.Class.CommonClass.ToLocalTime(Convert.ToDateTime(invoice.document.fa_received_date)).ToString("dd-MM-yyyy")</td>
+                    <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@invoice.document.submit_via</td>
+                    <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@invoice.document.note</td>
+                }
+
+            }
+
+        }
+    </tr>
+                count++;
+            }
+        }
+    </table>
+
+
+    <script type="text/javascript" src="~/Scripts/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript" src="~/Assets/plugins/TableExport/js/xlsx.core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js" integrity="sha512-csNcFYJniKjJxRWRV1R7fvnXrycHP6qDR21mgz1ZP55xY5d+aHLfo9/FcGDQLfn2IfngbAHd8LdfsagcCqgTcQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.6/shim.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.6/cpexcel.js"></script>
+
+    <script type="text/javascript" src="~/Assets/plugins/TableExport/js/tableexport.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/jQuery.print.min.js"></script>
+    <script type="text/javascript">
+
+
+    function exportTableToExcel(tableId, filename) {
+        let dataType = 'application/vnd.ms-excel';
+        let extension = '.xls';
+
+        let base64 = function (s) {
+            //return window.btoa(unescape(encodeURIComponent(s)))
+            //return window.btoa(unescape(escape(s)))
+            //return window.btoa(escape(s))
+
+            try {
+                return window.btoa(unescape(escape(s)));
+            }
+            catch (err) {
+                return window.btoa(unescape(encodeURIComponent(s)));
+            }
+
+        };
+
+        let template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>';
+        let render = function (template, content) {
+            return template.replace(/{(\w+)}/g, function (m, p) { return content[p]; });
+        };
+
+        let tableElement = document.getElementById(tableId);
+
+        let tableExcel = render(template, {
+            worksheet: filename,
+            table: tableElement.innerHTML.normalize('NFD').replace("–", "-")
+        });
+        //console.log(tableExcel);
+
+        filename = filename + extension;
+
+        if (navigator.msSaveOrOpenBlob) {
+            let blob = new Blob(
+                ['\ufeff', tableExcel],
+                { type: dataType }
+            );
+
+            navigator.msSaveOrOpenBlob(blob, filename);
+        } else {
+            let downloadLink = document.createElement("a");
+
+            document.body.appendChild(downloadLink);
+
+            downloadLink.href = 'data:' + dataType + ';base64,' + base64(tableExcel);
+
+            downloadLink.download = filename;
+
+            downloadLink.click();
+        }
+    }
+
+
+
+    //tableToExcel();
+
+    $(function () {
+        $("input[name='GridHtml']").val($("#myform").html());
+
+
+        exportTableToExcel('table1', 'Purchase Order Report');
+
+        if (navigator.userAgent.indexOf("Firefox") > 0) {
+            window.setTimeout(function () { window.close(); }, 1000);
+        } else {
+            //window.top.close();
+            window.history.back();
+        }
+        
+
+    });
+    </script>
+
+</body>
+</html>

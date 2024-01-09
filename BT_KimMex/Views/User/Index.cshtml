@@ -1,0 +1,171 @@
+﻿@model BT_KimMex.Models.UserRolesViewModel
+@{
+    ViewBag.Title = "UserList";
+}
+<style type="text/css">
+    table tr td{
+        vertical-align:middle !important;
+    }
+</style>
+
+<h3 class="title">User List</h3>
+<div class="table-responsive">
+    <table class="table table-bordered" id="userTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Login Name</th>
+                <th>Position</th>
+                <th>User Group</th>
+                <th>Telephone</th>
+                @*<th>Email</th>*@
+                <th>View</th>
+                <th>Edit</th>
+                <th>Reset Password</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+
+<!-- Bootstrap modal popup-->
+<div class="modal fade" id="myModal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to delete this user?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success delete-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            var userId;
+            InitialUserDataTable();
+
+            $('#userTable tbody').on('click', 'td a.delete-promp', function () {
+                userId = $(this).attr('id');
+                $('#myModal').modal('show');
+            });
+
+            $('.delete-confirm').click(function () {
+                if (userId != '') {
+                    $.ajax({
+                        url: "@Url.Action("Delete","Account")",
+                        data: {
+                            'id': userId,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#myModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been deleted!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "User")';
+                            }
+                            else if (da.result == "fail") {
+                                $.notify('Your data has been error while deleting!', { className: 'error' });
+                                
+                            }
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while deleting!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+            function InitialUserDataTable() {
+                var t = $('#userTable').DataTable({
+                    'paging': true,
+                    'ordering': true,
+                    'info': true,
+                    'autoWidth': false,
+                    "ajax": {
+                        "url": "@Url.Action("UserDataTable","User")",
+                        "type": "GET",
+                        "dataType": "json"
+                    },
+                    "columns": [
+                        { "data": "UserId" },
+                        { "data": "user_first_name" },
+                        { "data": "user_last_name" },
+                        { "data": "Username" },
+                        { "data": "position_name" },
+                        { "data": "Role" },
+                        { "data": "user_telephone" },
+                        //{ "data": "Email" },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    return '<a href="/User/Details/' + full.UserId + '" class="w3-button w3-tiny w3-green">View Detail</a>';
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    return '<a href="/Account/EditUser/' + full.UserId + '" class="w3-button w3-tiny w3-orange" >Edit</a>';
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    return '<a href="/Account/ResetPassword/' + full.UserId + '" class="w3-button w3-tiny w3-teal">Reset Password</a>';
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    console.log(full);
+                                    if (full.Role) {
+                                        var split_roles = full.Role.split(',');
+                                        var check = false;
+                                        for (var i = 0; i < split_roles.length; i++) {
+                                            if (split_roles[i] == "Admin")
+                                                check = true;
+                                        }
+                                        if (check == false)
+                                            return '<a href="javascript:void(0)" id="' + full.UserId + '" class="delete-promp w3-button w3-tiny w3-red">Delete</a>';
+                                    }
+                                    
+                                    return '';
+                                }
+                            }
+                        ],
+                    "order": [[1, "asc"]]
+                    });
+                t.on('order.dt search.dt', function () {
+                    t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                        cell.innerHTML = i + 1;
+                    });
+                }).draw();
+                $('select[name="userTable_length"]').addClass('datatable-control');
+                $('input[aria-controls="userTable"]').addClass('datatable-control');
+                $('#userTable_filter').append('<a href="@Url.Action("Register", "Account")" class="btn btn-default pull-left" style="margin-right:10px !important;">Add New</a>');
+            }
+        });
+    </script>
+}
+
+
+
+

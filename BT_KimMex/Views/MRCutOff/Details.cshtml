@@ -1,0 +1,157 @@
+﻿@model BT_KimMex.Models.MRCutOffViewModel
+@using BT_KimMex.Class
+@using Microsoft.AspNet.Identity;
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<form>
+    <h3 class="title">View Material Request Cut-off Detail</h3>
+    <div class="form-horizontal">
+        <div class="row">
+            <div class="col-md-6 col-lg-6">
+                <div class="form-group">
+                    <label class="col-md-4">Requested Date:</label>
+                    <label class="col-md-8">@Convert.ToDateTime(Model.created_at).ToString("dd/MM/yyyy")</label>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4">Purchase Requisition Number:</label>
+                    <label class="col-md-8">@Model.mr_cut_off_number</label>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4">Project <span class="text-danger">*</span>:</label>
+                    <label class="col-md-8">@Model.project_name</label>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4">Material Request Ref. <span class="text-danger">*</span>:</label>
+                    <label class="col-md-8">@Model.material_request_number</label>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-6">
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="table">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Item Code</th>
+                            <th>Item Name</th>
+                            <th>Unit Unit</th>
+                            <th>Requested Qty</th>
+                            <th>Cut-off Qty</th>
+                            <th>Variance Qty</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th>Approval Comment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int count = 1;
+
+                            foreach (var item in Model.mrCutOffDetail)
+                            {
+                                var name = "item" + count;
+                                decimal? varianceQTY = item.cut_off_qty - item.material_request_qty;
+                                <tr>
+                                    <td><input type="hidden" class="cut_off_detail_id" value="@item.cut_off_detail_id" /> @count</td>
+                                    <td class="text-center">@item.item_code</td>
+                                    <td>@item.item_name</td>
+                                    <td>@item.item_unit_name</td>
+                                    <td>@item.material_request_qty</td>
+                                    <td class="text-center">@item.cut_off_qty</td>
+                                    <td class="text-center">@varianceQTY</td>
+                                    <td>@item.cut_off_reason</td>
+                                    <td>@item.item_status</td>
+                                    <td>@item.approval_comment</td>
+                                </tr>
+                                count++;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    @*<input type="button" value="Submit" class="btn btn-default" onclick="approvalMRCutOff()" />*@
+                    @if (string.Compare(Model.mr_cut_off_status, Status.Pending) == 0 && (User.IsInRole(Role.SystemAdmin) || string.Compare(Model.created_by, User.Identity.GetUserId().ToString()) == 0))
+                    {
+                        <a href="javascript:void(0)" class="w3-button w3-tiny w3-deep-orange" id="btn-cancel-request">Request Cancel</a>
+                    }
+                    @if((User.IsInRole(Role.SystemAdmin) || ClsMRCutOff.IsMRCutOffSiteSupervisor(Model.mr_cut_off_id,User.Identity.GetUserId().ToString())) && string.Compare(Model.mr_cut_off_status, Status.Pending) == 0)
+                    {
+                        <a href="@Url.Action("Approval","MRCutOff",new { id = Model.mr_cut_off_id })" class="w3-button w3-tiny w3-teal">Approval</a>
+                    }
+                    <a href="javascript:history.back()" class="w3-button w3-tiny w3-red">Back</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<!-- cancel request modal popup-->
+<div class="modal fade" id="cancelRequestModal" tabindex="=-1" role="dialog" aria-labelledby="approveModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-warning">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to cancel this request?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" id="btn-cancel-yes">Yes</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            var cut_off_id = '@Model.mr_cut_off_id';
+            $('#btn-cancel-request').click(function () {
+                $('#cancelRequestModal').modal('show');
+            });
+            $('#btn-cancel-yes').click(function () {
+                if (cut_off_id != '') {
+                    $.ajax({
+                        url: "/MRCutOff/RequestCancel",
+                        data: {
+                            'id': cut_off_id,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#cancelRequestModal').modal('hide');
+                            if (da.result == "success") {
+                                alert('Your request has been cancelled successfully.');
+                                window.location.href = '@Url.Action("Index", "MRCutOff")';
+                            }
+                            else
+                                alert('Your data has been error while submitting.');
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.approve-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while approving!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+    }

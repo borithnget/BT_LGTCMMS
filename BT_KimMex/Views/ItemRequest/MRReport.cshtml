@@ -1,0 +1,49 @@
+﻿
+@{
+    ViewBag.Title = "MRReport";
+}
+
+<style type="text/css">
+    #export_excel_panel{
+        width:100% !important;
+        background-color:grey !important;
+    }
+    #export_excel_panel *{
+        font-family:"Century Gothic" !important;
+    }
+</style>
+
+@*<div class="row" id="export_excel_panel">
+    <div style="width:100% !important">
+        <img src="~/Assets/images/lotusgreeenteam.png" style="height:110px; width:400px; margin-top:10px; " />
+        <p style="color:red !important;"><b>Note that material sourcing time is at least 7 days.</b></p>
+    </div>
+</div>*@
+
+<div class="row" style="padding:10px !important;">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a href='javascript:void(0)' class='btn btn-sm btn-primary' onclick="printReport('ReportViewer1')"><i class="fa fa-print fa-lg" aria-hidden="true"></i> Print</a>
+            @*@using (Html.BeginForm("Export", "ItemRequest", FormMethod.Post))
+            {
+                <input type="hidden" name="GridHtml" />
+                <input type="submit" id="btnSubmit" value="Export" />
+            }*@
+        </div>
+        <div class="panel-body">
+            @Html.Partial("ReportController/MRreport")
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript" src="~/Scripts/custom/print-script.js"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            $("#btnSubmit").click(function () {
+                $("input[name='GridHtml']").val($("#export_excel_panel").html());
+            });
+        });
+    </script>
+}

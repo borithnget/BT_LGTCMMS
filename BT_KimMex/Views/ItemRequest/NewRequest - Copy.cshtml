@@ -1,0 +1,779 @@
+﻿@model BT_KimMex.Models.ItemRequestViewModel
+@{
+    ViewBag.Title = "NewRequest";
+}
+<style type="text/css">
+    .form-control{
+        padding:0px 0px !important;
+        height:auto !important;
+        font-size:13px !important;
+    }
+    #ir_table tr th{
+        vertical-align:middle !important;
+        text-align:center !important;
+    }
+    #ir_table tr td:first-child{
+        text-align:center !important;
+    }
+    #ir_table tr td{
+        vertical-align:middle !important;
+    }
+    #ir_table tr td:nth-child(5){
+        padding:0px !important;
+        width:200px !important;
+    }
+    #ir_table tr td:nth-child(3){
+        width:80px !important;
+        padding-left:1px !important;
+        padding-right:1px !important;
+    }
+    #ir_table tr td:nth-child(4){
+        width:100px !important;
+        padding-left:1px !important;
+        padding-right:1px !important;
+    }
+    #ir_table tr td:nth-child(6),#ir_table tr td:last-child{   
+        vertical-align:middle !important;
+        text-align:center !important;
+        width:30px !important;
+    }
+    #ir_table tr td label{
+        font-size:13px !important;
+    }
+</style>
+
+<h3 class="title">Create New Material Request</h3>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="row">
+        <div class="col-6 col-xl-6 col-lg-6 col-md-6 col-sm-6">
+            <div class="form-group row">
+                @Html.Label("PR Date:", htmlAttributes: new { @class = "col-md-3 col-form-label" })
+                <label class="col-md-9" id="ir_current_date">@Convert.ToDateTime(DateTime.Now).ToString("dd/MM/yyyy")</label>
+            </div>
+            <div class="form-group row">
+                @Html.LabelFor(model => model.ir_no, htmlAttributes: new { @class = "col-md-3 col-form-label" })
+                <label class="col-md-9" id="ir_no">@ViewBag.PurchaseRequisitionNumber</label>
+            </div>
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label">Project Name <strong style="color:red;">*</strong>:</label>
+                <div class="col-md-9">
+                    @Html.HiddenFor(model => model.boq_id)
+                    @Html.DropDownList("ir_project_id", ViewBag.ProjectID as SelectList, "Select Project", new { @class = "form-control", id = "ir_project_id", style = "width:300px !important;" })
+                    @Html.ValidationMessageFor(model => model.ir_project_id, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group row">
+                @Html.LabelFor(model => model.ir_purpose_id, htmlAttributes: new { @class = "col-md-3" })
+                <div class="col-md-9">
+                    <select class="form-control" id="ir_purpose_id" style = "width:300px !important;">
+                        <option selected disabled>Select purpose of request</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*<div class="row">
+        <div class="col-2 col-xl-2 col-lg-2 col-md-2 col-sm-2">Group</div>
+    </div>*@
+    @*<div class="row">
+        <div class="col-2 col-xl-2 col-lg-2 col-md-2 col-sm-2" style="padding-right:0px !important;">
+            <select class="form-control" id="job-category" name="job_category">
+                <option selected disabled>Select Job Category</option>
+            </select>
+        </div>
+        <div class="col-1 col-xl-1 col-lg-1 col-md-1 col-sm-1" style="padding-right:0px !important;">
+            <select class="form-control" name="product_group" id="product_group" onchange="initialCategoryProductSizeControl()">
+                <option selected disabled>Select Group</option>
+            </select>
+        </div>
+        <div class="col-1 col-xl-1 col-lg-1 col-md-1 col-sm-1" style="padding-right:0px !important;" onchange="initialProductTypeControl()">
+            <select class="form-control" name="product_category" id="product_category">
+                <option selected disabled>Select Category</option>
+            </select>
+        </div>
+        <div class="col-1 col-xl-1 col-lg-1 col-md-1 col-sm-1" style="padding-right:0px !important;">
+            <select class="form-control" name="product_type" id="product_type" onchange="initialBrandControl()">
+                <option selected disabled>Select Type</option>
+            </select>
+        </div>
+        <div class="col-1 col-xl-1 col-lg-1 col-md-1 col-sm-1" style="padding-right:0px !important;">
+            <select class="form-control" name="brand" id="brand">
+                <option selected disabled>Select Brand</option>
+            </select>
+        </div>
+        <div class="col-1 col-xl-1 col-lg-1 col-md-1 col-sm-1" style="padding-right:0px !important;">
+            <select class="form-control" name="product_size" id="product_size">
+                <option selected disabled>Select Size</option>
+            </select>
+        </div>
+        <div class="col-3 col-xl-3 col-lg-3 col-md-3 col-sm-3" style="padding-right:0px !important;">
+            <input class="form-control" id="product_description" onfocus="initialProductSuggestionControl()" />
+            <input type="hidden" id="product_sugguestion_id"/>
+        </div>
+        <div class="col-1 col-xl-1 col-lg-1 col-md-1 col-sm-1" style="padding-right:0px !important;">
+            <a class="btn btn-sm btn-primary btn-flat" id="btnadd">Add</a> <a class="btn btn-sm btn-danger btn-flat" id="btnclear">Clear</a>
+        </div>
+    </div>*@
+    <div class="row" style="vertical-align:middle !important; margin-bottom:10px !important;">
+        <div class="col-1 col-xl-1 col-lg-1 col-md-1 col-sm-1" style="padding-right:0px !important;">
+            <select class="form-control" name="product_group" id="product_group" onchange="initialCategoryProductSizeControl()" style="width:120px !important;">
+                <option selected disabled>Select Group</option>
+            </select>
+        </div>
+        <div class="col-2 col-xl-2 col-lg-2 col-md-2 col-sm-2" style="padding-right:0px !important;" onchange="initialProductTypeControl()">
+            <select class="form-control" name="product_category" id="product_category">
+                <option selected disabled>Select Category</option>
+            </select>
+        </div>
+        <div class="col-2 col-xl-2 col-lg-2 col-md-2 col-sm-2" style="padding-right:0px !important;">
+            <select class="form-control" name="product_type" id="product_type" onchange="initialBrandControl()">
+                <option selected disabled>Select Type</option>
+            </select>
+        </div>
+        <div class="col-2 col-xl-2 col-lg-2 col-md-2 col-sm-2" style="padding-right:0px !important;">
+            <select class="form-control" name="brand" id="brand">
+                <option selected disabled>Select Brand</option>
+            </select>
+        </div>
+        <div class="col-2 col-xl-2 col-lg-2 col-md-2 col-sm-2" style="padding-right:0px !important;">
+            <select class="form-control" name="product_size" id="product_size">
+                <option selected disabled>Select Size</option>
+            </select>
+        </div>
+        <div class="col-2 col-xl-2 col-lg-2 col-md-2 col-sm-2" style="padding-right:0px !important;">
+            <input class="form-control" id="product_description" onfocus="initialProductSuggestionControl()" />
+            <input type="hidden" id="product_sugguestion_id" />
+        </div>
+        <div class="col-1 col-xl-1 col-lg-1 col-md-1 col-sm-1" style="padding-right:0px !important;">
+            <a class="btn btn-sm btn-primary btn-flat" id="btnadd">Add</a> <a class="btn btn-sm btn-danger btn-flat" id="btnclear">Clear</a>
+        </div>
+    </div>
+    <div class="row" style="margin:10px !important;">
+        <table class="table table-bordered" id="ir_table">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Description</th>
+                    <th>Request Qty</th>
+                    <th>Unit</th>
+                    <th>Remark</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
+        </table>
+    </div>
+    <div class="row">
+        <div class="col-6 col-xl-6 col-lg-6 col-md-6 col-sm-6">
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label">Attachment Reference :</label>
+                <div class="col-md-9">
+                    <input type="file" class="form-control" name="attachment_reference" id="attachment_reference" style = "width:300px !important;" />
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-md-offset-3 col-md-9">
+                    <input type="button" id="btnCreate" value="Submit" class="btn btn-default" />
+                    <a href="@Url.Action("Index")" class="btn btn-default">Cancel</a>
+                </div>
+            </div>
+        </div>
+        </div>
+}
+
+@section scripts{
+    <script type="text/javascript">
+        var project_id;
+        $(function () {
+            initialJobCategoryControl();
+            initialGroupControl();
+            initialCategoryProductSizeControl();
+            initialProductTypeControl();
+            initialBrandControl();
+            initial_ir_purpose_dropdownlist();
+
+            $('#btnadd').click(function (e) {
+                e.preventDefault();
+                var jobcategoryid = $('#job-category').val();
+                var jobcategoryname = $("#job-category option:selected").text();
+                var itemId = $('#product_sugguestion_id').val();
+                var countrow = $('#ir_table tbody tr').length;
+                
+                if (jobcategoryid == null || jobcategoryid == undefined || jobcategoryid == "")
+                    return;
+                if (itemId == null || itemId == undefined || itemId == "")
+                    return;
+
+                if (countrow == 0) {
+                    var roman_number = String.fromCharCode(8543 + Number(1));
+                    $('#ir_table tbody').append(""+
+                        "<tr class='job job1' id='job1'>"+
+                            '<td>'+roman_number+'</td>' +
+                            '<td colspan="5"><input type="hidden" class="jobcategoryids" id="j1" value='+jobcategoryid+'>'+jobcategoryname+'</td>' +
+                            '<td><a href="javascript:void(0)" class="btn btn-sm btn-danger btn-flat" onclick="remove_ir_job_category_row(this)"><i class="fa fa-trash-o"></i></a></td>' +
+                        "</tr>"
+                        );
+                    $('#ir_table').find('tr').eq(1).after(""+
+                        '<tr class="job1">'+
+                            '<td></td>' +
+                            "<td><input type='hidden' class='item_id' id='1'/><label class='item_name'></label></td>" +
+                            "<td><input type='number' class='form-control ir_qty' value='" + Number(0) + "' placeholder='Request Quantity'/></td>" +
+                            "<td><select class='form-control item-unit'></select></td>" +
+                            "<td><textarea class='form-control item_remark' placeholder='Remark'></textarea></td>" +
+                            '<td><a href="javascript:void(0)" class="btn btn-sm btn-danger btn-flat" onclick=" remove_ir_item_row(this)"><i class="fa fa-trash-o"></i></a></td></td>' +
+                        '</tr>'
+                        );
+                    $('#ir_table tr').eq(1).find('td:nth-child(3)').attr('rowspan', 2);
+                } else {
+                    var isjobexist = false;
+                    var existjobrowindex = 0;
+                    var jobcategoryids = $('.jobcategoryids');
+                    for (var i = 0; i < jobcategoryids.length; i++) {
+                        var jobid = jobcategoryids[i].value;
+                        console.log(jobid + " " + jobcategoryid);
+                        if (jobcategoryid == jobid) {
+                            isjobexist = true;
+                            existjobrowindex = $('.job')[i].rowIndex;
+                            break;
+                        }
+                    }
+
+                    if (isjobexist) {
+                        
+                        var jobidname = $('#ir_table tr').eq(existjobrowindex).attr('id');
+                        var jobidnum=jobidname.replace(/[^\d]/g, '');
+                        var lastchildrowindex = $('.' + jobidname)[$('.' + jobidname).length - 1].rowIndex;
+                        $('#ir_table').find('tr').eq(lastchildrowindex).after("" +
+                            '<tr class="'+jobidname+'">' +
+                                //'<td>' + $('.'+jobidname).length + '</td>' +
+                                '<td></td>' +
+                                "<td><input type='hidden' class='item_id' id='"+jobidnum+"'/><label class='item_name'></label></td>" +
+                                "<td><input type='number' class='form-control ir_qty' value='" + Number(0) + "' placeholder='Request Quantity'/></td>" +
+                                "<td><select class='form-control item-unit'></select></td>" +
+                                "<td><textarea class='form-control item_remark' placeholder='Remark'></textarea></td>" +
+                                '<td><a href="javascript:void(0)" class="btn btn-sm btn-danger btn-flat" onclick=" remove_ir_item_row(this)"><i class="fa fa-trash-o"></i></a></td></td>' +
+                            '</tr>'
+                        );
+                        var classind = $('.' + jobidname)[0].rowIndex;
+                        var countjob = $('.' + jobidname).length;
+                        $('#ir_table tr').eq(classind).find('td:nth-child(3)').attr('rowspan', countjob);
+                        
+                    } else {
+                        //append last row
+                        var countjob = jobcategoryids.length;
+                        var countnext = Number(countjob) + 1;
+                        var roman_number = String.fromCharCode(8543 + Number(countnext));
+                        $('#ir_table tbody').append("" +
+                            "<tr class='job job" + countnext + "' id='job" + countnext + "'>" +
+                                '<td>' + roman_number + '</td>' +
+                                '<td colspan="5"><input type="hidden" class="jobcategoryids" id="j'+countnext+'" value=' + jobcategoryid + '>' + jobcategoryname + '</td>' +
+                                '<td><a href="javascript:void(0)" class="btn btn-sm btn-danger btn-flat" onclick="remove_ir_job_category_row(this)"><i class="fa fa-trash-o"></i></a></td>' +
+                            "</tr>"
+                            );
+                        countrow = $('#ir_table tbody tr').length;
+                        $('#ir_table').find('tr').eq(countrow).after("" +
+                            '<tr class="job' + countnext + '">' +
+                                '<td></td>' +
+                                "<td><input type='hidden' class='item_id' id='"+countnext+"'/><label class='item_name'></label></td>" +
+                                "<td><input type='number' class='form-control ir_qty' value='" + Number(0) + "' placeholder='Request Quantity'/></td>" +
+                                "<td><select class='form-control item-unit'></select></td>" +
+                                "<td><textarea class='form-control item_remark' placeholder='Remark'></textarea></td>" +
+                                '<td><a href="javascript:void(0)" class="btn btn-sm btn-danger btn-flat" onclick=" remove_ir_item_row(this)"><i class="fa fa-trash-o"></i></a></td></td>' +
+                            '</tr>'
+                            );
+                        countrow = $('#ir_table tbody tr').length;
+                        $('#ir_table tr').eq(countrow-1).find('td:nth-child(3)').attr('rowspan', 2);
+                    }
+                }
+                var ind = $('#ir_table tr').length-1;
+                $('#product_description').val('');
+                $('#product_sugguestion_id').val('');
+                if (itemId != "") {
+                    $.ajax({
+                        url: '/Product/GetProductDataByCode',
+                        type: "get",
+                        dataType: "json",
+                        async: false,
+                        data: { id: itemId },
+                        success: function (da) {
+                            $('#ir_table tr').eq(ind).find('select.item-unit').empty();
+                            if (da.data) {
+                                var item = da.data;
+                                console.log(item);
+                                $('#ir_table tr').eq(ind).find('input.item_id').val(itemId);
+                                $('#ir_table tr').eq(ind).find('label.item_name').text(item.product_code+" - "+item.product_name);
+                                $('#ir_table tr').eq(ind).find('input.ir_qty').val(Number(0));
+
+                                $('#ir_table tr').eq(ind).find('select.item-unit').append("<option value='" + item.product_unit + "'>" + item.unit_name + "</option>");
+
+                                if (item.uom1_id && item.uom1_qty) {
+                                    $('#ir_table tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom1_id + "'>" + item.uom1_id + "</option>");
+                                }
+                                if (item.uom2_id && item.uom2_qty) {
+                                    $('#ir_table tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom2_id + "'>" + item.uom2_id + "</option>");
+                                }
+                                if (item.uom3_id && item.uom3_qty) {
+                                    $('#ir_table tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom3_id + "'>" + item.uom3_id + "</option>");
+                                }
+                                if (item.uom4_id && item.uom4_qty) {
+                                    $('#ir_table tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom4_id + "'>" + item.uom4_id + "</option>");
+                                }
+                                if (item.uom5_id && item.uom5_qty) {
+                                    $('#ir_table tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom5_id + "'>" + item.uom5_id + "</option>");
+                                }
+
+                            } else {
+                                $('#ir_table tr').eq(ind).find('input.item_id').val(' ');
+                                $('#ir_table tr').eq(ind).find('label.item_name').text(' ');
+                                $('#ir_table tr').eq(ind).find('input.ir_qty').val(parseFloat(0).toFixed(2));
+                            }
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            $('#ir_table tr').eq(ind).find('select.item-unit').empty().append("<option disabled selected>Select Unit</option>");
+                            $('#ir_table tr').eq(ind).find('input.item_id').val(' ');
+                            $('#ir_table tr').eq(ind).find('label.item_name').text(' ');
+                            $('#ir_table tr').eq(ind).find('input.ir_qty').val(parseFloat(0).toFixed(2));
+                            alert(textStatus);
+                        }
+                    });
+                }
+
+            })
+
+            $('#btnclear').click(function (e) {
+                initialJobCategoryControl();
+                initialGroupControl();
+                initialCategoryProductSizeControl();
+                initialProductTypeControl();
+                initialBrandControl();
+                $('#product_sugguestion_id').val('');
+                $('#product_description').val('');
+            });
+            
+            $('#btnCreate').click(function (e) {
+                e.preventDefault();
+                var item_element = {};
+                var job_element = {};
+                var type_element = {};
+                var ir_item = [];
+                var ir_job = [];
+                var ir_type = [];
+                var ir_no = $('#ir_no').text();
+                var ir_project_id = $('#ir_project_id').val();
+                var ir_purpose = $('#ir_purpose_id').val();
+                var job_categories = $('.jobcategoryids');
+                var item_types = $('.item_type_id');
+                var items = $('.item_id');
+                var ir_qtys = $('.ir_qty');
+                //var ir_boq_balance = $('.item_qty');
+                var items_unit = $('.item-unit');
+                var item_remarks = $('.item_remark');
+                var att_id = "";
+                var isNullItemName = 0;
+                var isNullQty = 0;
+                var isNullUnit = 0;
+                var isNullJobCategory = 0;
+
+                for (var i = 0; i < job_categories.length; i++) {
+                    var job = job_categories[i].value;
+                    if (job == null || job == "" || job == undefined || job == "Select Job Category")
+                        isNullJobCategory++;
+                }
+
+                for (var i = 0; i < items.length; i++) {
+                    var item_id = items[i].value;
+                    var ir_qty = ir_qtys[i].value;
+                    if (item_id == null || item_id == "" || item_id == undefined)
+                        isNullItemName++;
+                }
+
+                for (var i = 0; i < items.length; i++) {
+                    var ir_qty = ir_qtys[i].value;
+                    if (ir_qty == null || ir_qty == "" || ir_qty == undefined || Number(ir_qty) == 0)
+                        isNullQty++;
+                }
+                for (var i = 0; i < items.length; i++) {
+                    var item_unit = items_unit[i].value;
+                    if (item_unit == null || item_unit == "" || item_unit == undefined || item_unit == "Select Unit")
+                        isNullUnit++;
+                }
+                if (ir_project_id == null || ir_project_id == "" || ir_project_id == undefined) {
+                    alert("Project name is required.");
+                    return;
+                }
+                if (isNullJobCategory > 0) {
+                    alert("Select all Job Category.");
+                    return;
+                }
+                if (items.length == 0) {
+                    alert("Item request are required.");
+                    return;
+                }
+                if (isNullItemName > 0) {
+                    alert("Item name are required.");
+                    return;
+                }
+                if (isNullQty > 0) {
+                    alert("Item request qty are required.");
+                    return
+                }
+                if (isNullUnit > 0) {
+                    alert('Item request unit are required.');
+                    return;
+                }
+
+                var form_data = new FormData();
+                var file_input = document.getElementById('attachment_reference');
+                if (file_input != undefined) {
+                    if (file_input.files.length > 0) {
+                        for (var i = 0; i < file_input.files.length; i++) {
+                            form_data.append(file_input.files[i].name, file_input.files[i]);
+                        }
+                        $.ajax({
+                            url: '@Url.Action("UploadAttachment","ItemRequest")',
+                            type: "POST",
+                            data: form_data,
+                            async: false,
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            success: function (da) {
+                                if (da.result == "success")
+                                    att_id = da.attachment_id;
+                            },
+                            error: function (xhr, error, status) {
+                                console.log(error, status);
+                            }
+                        });
+                    }
+                }
+
+                //else {
+                //    alert("Attachment Reference is required.");
+                //    return;
+                //}
+                for (var i = 0; i < items.length; i++) {
+                    item_element = {};
+                    var job_group = (items[i].id).replace(/[^\d]/g, '');
+                    var type_group = (items[i].id).substr((items[i].id).length - 2, 1);
+                    item_element.ir_item_id = items[i].value;
+                    item_element.ir_qty = ir_qtys[i].value;
+                    //item_element.boq_qty = ir_boq_balance[i].innerHTML;
+                    item_element.product_unit = items_unit[i].value;
+                    item_element.job_group = job_group;
+                    item_element.type_group = type_group;
+                    item_element.remark = item_remarks[i].value;
+                    ir_item.push(item_element);
+                }
+
+                for (var i = 0; i < item_types.length; i++) {
+                    type_element = {};
+                    var job_group = (item_types[i].id).replace(/[^\d]/g, '');
+                    var type_group = (item_types[i].id).replace(new RegExp('[0-9]'), '');
+                    type_element.job_group = job_group;
+                    type_element.type_group = type_group;
+                    type_element.item_type_id = item_types[i].value;
+                    ir_type.push(type_element);
+                }
+
+                for (var i = 0; i < job_categories.length; i++) {
+                    job_element = {};
+                    var job_group = (job_categories[i].id).replace(/[^\d]/g, '');
+                    job_element.ir_job_category_id = job_categories[i].value;
+                    job_element.job_group = job_group;
+                    ir_job.push(job_element);
+                }
+
+                var model = {
+                    ir_no: ir_no,
+                    ir_project_id: ir_project_id,
+                    ir_purpose_id: ir_purpose,
+                    att_id: att_id,
+                }
+                console.log(ir_job);
+                $.ajax({
+                    url: "@Url.Action("CreateItemRequest", "ItemRequest")",
+                    type: "post",
+                    dataType: "json",
+                    async: false,
+                    data: { model: model, ir1: ir_job, ir2: ir_item, irType: ir_type },
+                    success: function (da) {
+                        if (da.result == "success") {
+                            alert('Item Request has been saved successfully.');
+                            window.location.href = '@Url.Action("MyRequest", "ItemRequest")';
+                        } else {
+                            alert(da.message);
+                        }
+                    },
+                    error: function (err) {
+                        alert('Your data is error while saving!');
+                    }
+                });
+
+            });
+        });
+
+        /* ---- start custom function --- */
+        function initialJobCategoryControl() {
+            $('#job-category').empty().append("<option selected disabled>Select Job Category</option>");
+            $.ajax({
+                url: '/ItemRequest/GetBOQJobCategoryDropdownlist',
+                type: "get",
+                dataType: "json",
+                data: { id: null },
+                async: false,
+                success: function (da) {
+                    if (da.result == "success") {
+                        $.each(da.data, function (index, item) {
+                            $('#job-category').append("<option value='" + item.j_category_id + "'>" + item.j_category_name + "</option>");
+                        });
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Initial BOQ Job Category:' + textStatus);
+                }
+            });
+        }
+        function initialGroupControl() {
+            $('#product_group').empty().append("<option selected disabled>Select Group</option>");
+            $.ajax({
+                url: '/Class/GetClassDataDropdownlist',
+                type: "get",
+                dataType: "json",
+                async: false,
+                success: function (da) {
+                    if (da.result == "success") {
+                        //console.log(da);
+                        $.each(da.data, function (ind, item) {
+                            $('#product_group').append("" +
+                                "<option value='" + item.class_id + "'>" + item.class_name + "</option>"
+                            );
+                        });
+                    } else {
+                        alert('Error: '+ da.message);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Initial BOQ Item Type:' + textStatus);
+                }
+            });
+        }
+        function initialCategoryProductSizeControl() {
+            var groupId = $('#product_groupr').val();
+            $('#product_category').empty().append("<option selected disabled>Select Category</option>");
+            $('#product_type').empty().append("<option selected disabled>Select Product Type</option>");
+            $('#brand').empty().append("<option selected disabled>Select Brand</option>");
+            $('#product_size').empty().append("<option selected disabled>Select Product Size</option>");
+            $.ajax({
+                url: '/ProductCategory/GetCategoryDataDropdownlistbyClassId',
+                type: "get",
+                dataType: "json",
+                async: false,
+                data: { id: groupId },
+                success: function (da) {
+                    if (da.result == "success") {
+                        //console.log(da);
+                        $.each(da.data, function (ind, item) {
+                            $('#product_category').append("" +
+                                "<option value='" + item.p_category_id + "'>" + item.p_category_name + "</option>"
+                            );
+                        });
+                    } else {
+                        alert('Error:' + da.message);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Initial BOQ Item Type:' + textStatus);
+                }
+            });
+            $.ajax({
+                url: '/ProductSize/GetProductDataDropdownlistbyClassId',
+                type: "get",
+                dataType: "json",
+                async: false,
+                data: { id: groupId },
+                success: function (da) {
+                    if (da.result == "success") {
+                        //console.log(da);
+                        $.each(da.data, function (ind, item) {
+                            $('#product_size').append("" +
+                                "<option value='" + item.product_size_id + "'>" + item.product_size_name + "</option>"
+                            );
+                        });
+                    } else {
+                        alert('Initial BOQ Item Type:' + da.message);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Initial BOQ Item Type:' + textStatus);
+                }
+            });
+        }
+        function initialProductTypeControl() {
+            var categoryId = $('#product_category').val();
+            $('#product_type').empty().append("<option selected disabled>Select Product Type</option>");
+            $('#brand').empty().append("<option selected disabled>Select Brand</option>");
+            $.ajax({
+                url: '/ProductType/GetProductTypeListItemsbyCategoryId',
+                type: "get",
+                dataType: "json",
+                async: false,
+                data: { id: categoryId },
+                success: function (da) {
+                    //console.log(da.data);
+                    $.each(da.data, function (ind, item) {
+                        $('#product_type').append("" +
+                            "<option value='" + item.product_type_id + "'>" + item.product_type_name + "</option>"
+                        );
+                    });
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Initial Product Type:' + textStatus);
+                }
+            });
+        }
+        function initialBrandControl() {
+            var productTypeId = $('#product_type').val();
+            $('#brand').empty().append("<option selected disabled>Select Brand</option>");
+            $.ajax({
+                url: '/Brand/GetBrandListItemsbyCategoryId',
+                type: "get",
+                dataType: "json",
+                async: false,
+                data: { id: productTypeId },
+                success: function (da) {
+                    //console.log(da.data);
+                    $.each(da.data, function (ind, item) {
+                        $('#brand').append("" +
+                            "<option value='" + item.brand_id + "'>" + item.brand_name + "</option>"
+                        );
+                    });
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Initial Brand:' + textStatus);
+                }
+            });
+        }
+        function initialProductSuggestionControl() {
+            var classId = $('#product_group').val();
+            var categoryId = $('#product_category').val();
+            var productTypeId = $('#product_type').val();
+            var brands = $('#brand').val();
+            var productSizeId = $('#product_size').val();
+            $('#product_description').autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: "/Product/GetProductAutoSuggestName/",
+                        dataType: "json",
+                        data: { term: request.term, classId: classId, categoryId: categoryId, productTypeId: productTypeId, brandId: brands, productSizeId: productSizeId },
+                        success: function (data) {
+                            response(data);
+                        }
+                    });
+                },
+                select: function (event, ui) {
+                    console.log(ui);
+                    $('#product_sugguestion_id').val('');
+                    var selectedObj = ui.item;
+                    var item = (selectedObj.value).split(' ');
+                    $('#product_sugguestion_id').val(selectedObj.id);
+                }
+            })
+        }
+
+        function remove_ir_item_row(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var item_cls = $('#ir_table tr').eq(ind).attr('class').split(' ');
+            var item_id = $('#ir_table tr').eq(ind).attr('id');
+            var job_num = item_cls[0].replace(/[^\d]/g, '');
+            var arr_item_id = new Array();
+            var count_table_row = $('#ir_table tr').length;
+            var f_add, type_letter;
+
+            for (var i = 1; i <= count_table_row; i++) {
+                var id = $('#ir_table tr').eq(i).attr('id');
+                if (id != undefined && id.substr(0, id.length - 1) == "item" + job_num + type_letter)
+                    arr_item_id.push(id);
+            }
+            document.getElementById('ir_table').deleteRow(ind);
+            if (arr_item_id.length > 1) {
+                if (is_last_child)
+                    $('#ir_table tr').eq(ind - 1).find('td:nth-child(13)').html("<a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='" + f_add + "'><span class='glyphicon glyphicon-plus'></span></a>");
+                else {
+                    var deleted_index = arr_item_id.indexOf(item_id);
+                    arr_item_id.splice(deleted_index, 1);
+                    for (var i = 0; i < arr_item_id.length; i++)
+                        $('tr#' + arr_item_id[i]).find('td:first-child').html(Number(i + 1));
+                }
+            }
+            var classInd = $('.' + item_cls[0])[0].rowIndex;
+            var count_job_class = $('.' + item_cls[0]).length;
+            $('#ir_table tr').eq(classInd).find('td:nth-child(3)').attr('rowspan', count_job_class);
+        }
+        function remove_ir_job_category_row(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var job_class = $('#ir_table tr').eq(ind).attr('class').split(' ')[1];
+            var job_id = $('#ir_table tr').eq(ind).attr('id');
+            var job_class_count = $('.' + job_class).length;
+            var is_last_child = false;
+            var count_table_row = $('#ir_table tr').length;
+            var arr_job_category_row_id = new Array();
+            for (var i = 1; i <= count_table_row; i++) {
+                var id = $('#ir_table tr').eq(i).attr('class');
+                if (id != undefined && id==job_id)
+                    arr_job_category_row_id.push(id);
+            }
+
+            if (arr_job_category_row_id.length > 1) {
+                for (var i = 0; i < job_class_count; i++) {
+                    document.getElementById('ir_table').deleteRow(ind);
+                }
+                if (is_last_child) {
+                    
+                } else {
+                    var delete_index = arr_job_category_row_id.indexOf(job_id);
+                    arr_job_category_row_id.splice(delete_index, 1);
+                    for (var i = 0; i < arr_job_category_row_id.length; i++) {
+                        var roman_number = String.fromCharCode(8544 + Number(i));
+                        $('tr#' + arr_job_category_row_id[i] + ' td:first-child').html(roman_number);
+                    }
+                }
+            }
+        }
+        function initial_ir_purpose_dropdownlist(purpose_id) {
+            $.ajax({
+                url: '/ItemRequest/GetIRPurposeDropdownList',
+                type: "get",
+                dataType: "json",
+                success: function (da) {
+                    if (da.result == "success") {
+                        $('#ir_purpose_id').empty();
+                        $('#ir_purpose_id').append("" +
+                            "<option selected disabled>Select Purpose of Purchase</option>"
+                        );
+                        $.each(da.data, function (index, item) {
+                            $('#ir_purpose_id').append("" +
+                                        "<option value='" + item.ir_purpose_id + "'>" + item.purpose_description + "</option>"
+                                    );
+
+                        });
+                    } else {
+                        alert('Initial IR Purpose:' + da.message);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Initial IR Purpose:' + textStatus);
+                }
+            });
+        }
+        /* --- end custom function --- */
+    </script>
+    }

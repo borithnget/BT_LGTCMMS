@@ -1,0 +1,366 @@
+﻿@model BT_KimMex.Models.ItemQuoteSupplierViewModel
+@{
+    ViewBag.Title = "Item Price Detail";
+    List<BT_KimMex.Models.QuoteViewModel> items = new List<BT_KimMex.Models.QuoteViewModel>();
+    items = ViewBag.SupplierQuotes as List<BT_KimMex.Models.QuoteViewModel>;
+}
+<style type="text/css">
+    table tr td {
+        vertical-align: middle !important;
+        padding: 5px !important;
+    }
+
+        table tr td:nth-child(6), table tr td:last-child {
+            text-align: center !important;
+        }
+
+    .table-attachment tr td:first-child {
+        text-align: left !important;
+    }
+
+    .table-attachment tr td {
+        border: none !important;
+        text-align: left !important;
+    }
+
+    ul li {
+        list-style: none !important;
+        margin-bottom: 15px !important;
+    }
+
+        ul li:last-child {
+            margin-bottom: 0px !important;
+        }
+</style>
+<h3 class="title">Edit Item Price by Supplier</h3>
+
+<div class="form-horizontal">
+    @Html.HiddenFor(model => model.ItemId)
+    <div class="form-group">
+        <label class="col-md-2">Item Type:</label>
+        <label class="col-md-4">@Model.ItemTypeName</label>
+        <label class="col-md-2">Item Code:</label>
+        <label class="col-md-4">@Model.ItemCode</label>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2">Item Name:</label>
+        <label class="col-md-4">@Model.ItemName</label>
+        <label class="col-md-2">Unit:</label>
+        <label class="col-md-4">@Model.ItemUnit</label>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-bordered" id="supplierQuoteTable">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Quote No.</th>
+                    <th>Supplier Name</th>
+                    <th>Price ($)</th>
+                    <th style="width:320px !important;">Attachments</th>
+                    <th style="width:5% !important;"></th>
+                    <th style="width:5% !important;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    if (ViewBag.SupplierQuotes != null)
+                    {
+                        var quotes = ViewBag.SupplierQuotes as List<BT_KimMex.Models.QuoteViewModel>;
+                        if (quotes.Count() > 0)
+                        {
+                            int count = 1;
+                            foreach (var item in ViewBag.SupplierQuotes as List<BT_KimMex.Models.QuoteViewModel>)
+                            {
+                                string rowId = "i" + count.ToString();
+                                <tr id="@rowId">
+                                    <td>@count</td>
+                                    <td>
+                                        <input type="hidden" class="quote_id" value="@item.quote_id" />
+                                        <label class="quote_no">@item.quote_no</label>
+                                    </td>
+                                    <td>
+                                        <input type="hidden" class="suppliers" value="@item.supplier_id" />
+                                        @item.supplier_name
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control price" value="@item.price" />
+                                    </td>
+                                    <td>
+                                        @*@{string attachmentTableID = string.Format("attachmentTable{0}", count);}
+                                            <table class="table-attachment" id="@attachmentTableID">
+                                                @{
+                                                    var attachments = item.itemQuoteAttachments;
+                                                    foreach (var att in attachments)
+                                                    {
+                                                        <tr>
+                                                            <td><a class="title" href="/Quote/DownloadQuoteAttachment/?p=@(att.quote_attachment_id + att.quote_attachment_extension)&d=@att.quote_attachment_name">@att.quote_attachment_name</a></td>
+                                                            <td><a href="javascript:" class="pull-right text-danger remove-attachment" data-id="@att.quote_attachment_id"><i class="fa fa-trash-o" aria-hidden="true"></i></a></td>
+                                                        </tr>
+                                                    }
+                                                }
+                                                <tr>
+                                                    <td><input type="file" class="form-control attachments" /></td>
+                                                    <td></td>
+                                                </tr>
+                                            </table>*@
+                                        <ul style="padding-left: 0px;">
+
+                                            @{
+                                                var attachments = item.itemQuoteAttachments;
+                                                foreach (var att in attachments)
+                                                {
+                                                    <li>
+                                                        <a class="title" href="/Quote/DownloadQuoteAttachment/?p=@(att.quote_attachment_id + att.quote_attachment_extension)&d=@att.quote_attachment_name">@att.quote_attachment_name</a>
+                                                        <a href="javascript:" class="pull-right text-danger remove-attachment pull-right" data-id="@att.quote_attachment_id"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
+                                                    </li>
+                                                }
+                                            }
+                                            <li>
+                                                <input type="file" class="form-control attachments" />
+                                            </li>
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        @*<a href="javasctip:" class="btn-sm btn-default" onclick="removeRow(this)"><span class='glyphicon glyphicon-trash'></span></a>*@
+                                    </td>
+                                    <td>
+                                        @if (items.Count() == count)
+                                        {
+                                            <a href="javascript:" class="btn-sm btn-default" onclick="addRow(this)"><i class="fa fa-plus-square" aria-hidden="true"></i></a>
+                                        }
+                                    </td>
+                                </tr>
+                                                        count++;
+                                                    }
+                                                }
+
+                                                else
+                                                {
+                                                    <tr id="i1">
+                                                        <td>1</td>
+                                                        <td>
+                                                            <label class="quote_no"></label>
+                                                            <input type="hidden" class="quote_id" />
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" class="form-control supplier_name" id="sup1" onfocus='supplierAutoSuggest(this)' />
+                                                            <input type="hidden" class="suppliers" />
+                                                        </td>
+                                                        <td>
+                                                            <input type="number" class="form-control price" id="price" />
+                                                        </td>
+                                                        <td>
+                                                            <input type="file" class="form-control attachments" id="attachments" />
+                                                        </td>
+                                                        <td>
+                                                            <a href="javasctip:" class="btn-sm btn-default" onclick="removeRow(this)"><span class='glyphicon glyphicon-trash'></span></a>
+                                                        </td>
+                                                        <td>
+                                                            <a href="javascript:" class="btn-sm btn-default" onclick="addRow(this)"><span class='glyphicon glyphicon-plus'></span></a>
+                                                        </td>
+                                                    </tr>
+                                                    }
+                                                }
+
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="form-group">
+        <div class="col-md-2"></div>
+        <div class="col-md-10">
+            <input type="button" class="btn btn-default" value="Submit" id="btnSubmit" />
+            <a href="@Url.Action("ItemMaster")" class="btn btn-default">Back</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        var arrRemoveAttachment = [];
+        $(function () {
+            $('#btnSubmit').on('click', function (e) {
+                e.preventDefault();
+                var itemId = $('#ItemId').val();
+                var suppliers = $('.suppliers');
+                var quotes = $('.quote_id');
+                var prices = $('.price');
+                var attachments = $('.attachments');
+                var Quotes = [];
+                var Items = {};
+
+                for (var i = 0; i < suppliers.length; i++) {
+                    var Attachments = [];
+                    if (suppliers[i].value && Number(prices[i].value)) {
+                        Items = {};
+                        Items.QuoteID = quotes[i].value;
+                        Items.SupplierID = suppliers[i].value;
+                        Items.Price = Number(prices[i].value);
+
+                        var form_data = new FormData();
+                        var file_input = attachments[i];
+                        if (file_input.files.length > 0) {
+                            for (var i = 0; i < file_input.files.length; i++) {
+                                form_data = new FormData();
+                                form_data.append(file_input.files[i].name, file_input.files[i]);
+                                $.ajax({
+                                    url: '@Url.Action("UploadAttachmentbyItem", "Quote")',
+                                    type: "POST",
+                                    data: form_data,
+                                    async: false,
+                                    cache: false,
+                                    contentType: false,
+                                    processData: false,
+                                    success: function (da) {
+                                        if (da.result == "success")
+                                            Attachments.push(da.attachment_id);
+                                    },
+                                    error: function (xhr, error, status) {
+                                        console.log(error, status);
+                                    }
+                                });
+                            }
+                        }
+                        //} else {
+                        //    alert("There was error while uploading attachment...");
+                        //    return;
+                        //}
+
+                        Items.Attachments = Attachments;
+                        Quotes.push(Items);
+                    }
+                }
+
+                //deleteAttachment
+                if (arrRemoveAttachment.length > 0) {
+                    for (var i = 0; i < arrRemoveAttachment.length; i++) {
+                        var attId = arrRemoveAttachment[i];
+                        $.ajax({
+                            url: '@Url.Action("DeleteItemQuoteAttachment", "Quote")',
+                            type: 'POST',
+                            data: { id: attId }
+                        }).done(function (data) {
+                        }).fail(function () {
+                            alert("There is something wrong. Please try again.");
+                        })
+                    }
+                }
+
+                var model = {
+                    ItemId: itemId,
+                    Quotes: Quotes,
+                    removeAttachments: arrRemoveAttachment,
+                };
+                $.ajax({
+                    url: "@Url.Action("ItemPirceDetail", "Quote")",
+                    type: "post",
+                    dataType: "json",
+                    async: false,
+                    data: { model: model },
+                    success: function (da) {
+                        if (da.result == "success") {
+                            alert("Data has been saved succesfully.");
+                            window.location.href = '@Url.Action("ItemMaster")';
+                        }
+                        else {
+                            alert(da.message);
+                        }
+                    },
+                    error: function (err) {
+                        alert('Your data is error while saving!');
+                    }
+                });
+            });
+
+            $('a.remove-attachment').on('click', function (e) {
+                e.preventDefault();
+                var attachment = $(this).data('id');
+                arrRemoveAttachment.push(attachment);
+                $($(this)[0].parentNode).remove();
+                /*
+                var index = $(this)[0].parentNode.parentNode.rowIndex;
+                var tableId =$($(this)[0].parentNode.parentNode.parentNode.parentNode).attr('id');
+                document.getElementById(tableId).deleteRow(index);
+                */
+            });
+        });
+        function addRow(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            //ind = Number(ind) - 1;
+            var rowId = $('#supplierQuoteTable tr').eq(ind).attr('id').replace(/[^\d]/g, '');
+            var rowNumber = $('#supplierQuoteTable tr').eq(ind).find('td:first-child').text();
+            var supplierId = $('#supplierQuoteTable tr').eq(ind).find('input.suppliers').val();
+            var price = $('#supplierQuoteTable tr').eq(ind).find('input.price').val();
+            if (!supplierId || Number(price) <= 0)
+                return;
+            $('#supplierQuoteTable tr').eq(Number(rowId)).after("" +
+                "<tr id='i" + Number(Number(rowId) + 1) + "'>" +
+                "<td>" + Number(Number(rowNumber) + 1) + "</td>" +
+                "<td><input type='hidden' class='quote_id'/><label class='quote_no'></label></td>" +
+                "<td><input type='text' class='form-control supplier_name' id='sup" + Number(Number(rowId) + 1) + "' onfocus='supplierAutoSuggest(this)'/><input type='hidden' class='suppliers'/></td>" +
+                "<td><input type='number' class='form-control price'/></td>" +
+                "<td><input type='file' class='form-control attachments' multiple/></td>" +
+                '<td><a href="javasctip:" class="btn-sm btn-default" onclick="removeRow(this)"><span class="glyphicon glyphicon-trash"></span></a></td>' +
+                '<td><a href="javascript:" class="btn-sm btn-default" onclick="addRow(this)"><i class="fa fa-plus-square" aria-hidden="true"></i></a></td>' +
+                "</tr>"
+                );
+            $('#supplierQuoteTable tr').eq(ind).find('td:nth-child(7)').html('');
+        }
+        function removeRow(row) {
+            var arrItems = [];
+            var ind = row.parentNode.parentNode.rowIndex;
+            var isLastChild = $('#supplierQuoteTable tr').eq(ind).find('td:nth-child(7) a').length == 0 ? false : true;
+            var rowId = $('#supplierQuoteTable tr').eq(ind).attr('id');
+            var countRow = $('#supplierQuoteTable tr').length;
+            for (var i = 1; i <= countRow; i++) {
+                var id = $('#supplierQuoteTable tbody tr').eq(i).attr('id');
+                if (id != undefined)
+                    arrItems.push(id);
+            }
+            if (arrItems.length == 1)
+                return;
+            document.getElementById('supplierQuoteTable').deleteRow(ind);
+            if (isLastChild)
+                $('#supplierQuoteTable tr#' + arrItems[arrItems.length - 2]).find('td:nth-child(7)').html('<a href="javascript:" class="btn-sm btn-default" onclick="addRow(this)"><span class="glyphicon glyphicon-plus"></span></a>');
+            else {
+                var deleteIndex = arrItems.indexOf(rowId);
+                arrItems.splice(deleteIndex, 1);
+                for (var i = 0; i < arrItems.length; i++)
+                    $('tr#' + arrItems[i] + ' td:nth-child(1)').html(Number(i) + 1);
+            }
+        }
+        function supplierAutoSuggest(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var controlId = $('#supplierQuoteTable tr').eq(ind).find('input.supplier_name').attr('id');
+            $("#" + controlId).autocomplete({
+                source: '@Url.Action("GetSupplierAutoSuggestName", "Supplier")',
+                select: function (event, ui) {
+                    AutoCompleteSelectHandler(event, ui, ind);
+                    $(this).val('');
+                }
+            });
+            function AutoCompleteSelectHandler(event, ui, ind) {
+                var selectedObj = ui.item;
+                var supplier = selectedObj.id;
+                $('#supplierQuoteTable tr').eq(ind).find('input.suppliers').val('');
+                $('#supplierQuoteTable tr').eq(ind).find('input.quote_id').val('');
+                $('#supplierQuoteTable tr').eq(ind).find('label.quote_no').text('');
+                if (supplier != null) {
+                    $.ajax({
+                        url: '@Url.Action("GetSupplierIdbySupplierName","Supplier")',
+                        type: "get",
+                        dataType: "json",
+                        async: false,
+                        data: { name: supplier },
+                        success: function (da) {
+                            console.log(da);
+                            $('#supplierQuoteTable tr').eq(ind).find('input.suppliers').val(da.data.supplier_id);
+                            $('#supplierQuoteTable tr').eq(ind).find('input.quote_id').val(da.data.quote_id);
+                            $('#supplierQuoteTable tr').eq(ind).find('label.quote_no').text(da.data.quote_no);
+                        }
+                    });
+                }
+            }
+        }
+    </script>
+}

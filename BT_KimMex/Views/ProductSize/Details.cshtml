@@ -1,0 +1,92 @@
+﻿@model BT_KimMex.Models.ProductSizeViewModel
+@{
+    ViewBag.Title = "Details";
+}
+<div class="form-horizontal">
+    <h3 class="title">View Product Size Detail</h3>
+
+    <div class="form-group">
+        <label class="col-lg-2">Group:</label>
+        <label class="col-lg-10">@Model.class_name</label>
+    </div>
+
+    <div class="form-group">
+        <label class="col-lg-2">Product Size:</label>
+        <label class="col-lg-10">@Model.product_size_name</label>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-lg-10 col-lg-offset-2">
+            @Html.ActionLink("Edit", "Edit", new { id = Model.product_size_id }, new { @class = "btn btn-primary" })
+            <a href="javascript:void(0)" id="@Model.product_size_id" class="btn btn-primary delete-promp">Delete</a>
+            @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-danger" })
+        </div>
+    </div>
+</div>
+
+<!-- delete modal popup-->
+<div class="modal fade" id="myModal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to delete this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success delete-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+    </div>
+
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            var productSizeId;
+            $('a.delete-promp').on('click', function () {
+                productSizeId = $(this).attr('id');
+                $('#myModal').modal('show');
+            });
+            $('.delete-confirm').click(function () {
+                if (productSizeId != '') {
+                    $.ajax({
+                        url: "/ProductSize/Delete",
+                        data: {
+                            'id': productSizeId,
+                        },
+                        type: 'GET',
+                        success: function (response) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#myModal').modal('hide');
+                            if (response.Message == "Success") {
+                                if ('@TempData["message"]' != null) {
+                                    $.notify('Your data has been deleted!', { className: 'success' });
+                                }
+                                window.location.href = '@Url.Action("Index", "ProductSize")';
+                            }
+                            else if (da.Message == "fail")
+                                $.notify('Your data has been error while deleting!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while deleting!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

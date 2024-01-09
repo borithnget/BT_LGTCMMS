@@ -1,0 +1,323 @@
+﻿@model BT_KimMex.Models.ItemRequestViewModel
+@using BT_KimMex.Class
+@{
+    ViewBag.Title = "Approved";
+    //Layout = "~/Views/Shared/_LayoutBackend.cshtml";
+    //ViewBag.PageTitle = "Material Request Approval";
+    //ViewBag.Controller = "Material Request";
+    //ViewBag.Action = "Approval List";
+    //ViewBag.MRActive = "active";
+    //ViewBag.MRMyApprovalActive = "active";
+    bool isAdmin = false;
+    if (User.IsInRole("Admin") || User.IsInRole("Economic Engineer"))
+    {
+        isAdmin = true;
+    }
+    string date = Convert.ToDateTime(Model.created_date).ToString("dd/MM/yyyy");
+}
+<style type="text/css">
+    table tr td{
+        vertical-align:middle !important;
+        font-size:13px !important;
+        padding:0px !important;
+    }
+</style>
+<h3 class="title">Approval/Feedback Material Request</h3>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.ir_id)
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.Label("PR Date:", new { @class = "col-md-4" })
+                    @Html.Label(date, new { @class="col-md-8"})
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4">PR No.:</label>
+                    @Html.DisplayFor(model => model.ir_no, new { @class = "col-md-8" })
+                </div>
+                <div class="form-group">
+                    @Html.Label("Project Name:", new { @class = "col-md-4" })
+                    @Html.DisplayFor(model => model.project_full_name, new { @class = "col-md-8" })
+                </div>
+                <div class="form-group">
+                    @Html.Label("Purpose of Purchase:", new { @class = "col-md-4" })
+                    @Html.DisplayFor(model => model.purpose_description, new { @class = "col-md-8" })
+                </div>
+            </div>
+            <div class="col-md-6">
+
+            </div>
+        </div>
+        <div class="row" style="margin:0 !important;">
+            <table class="table table-bordered" id="ir_table">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Item Code</th>
+                        <th>Item Name</th>
+                        @*<th>BOQ Unit</th>
+                        <th>BOQ Balance</th>*@
+                        <th>Requested QTY</th>
+                        <th>Requested Unit</th>
+                        <th>Remark</th>
+                        @*<th><input type='checkbox' value='' class='' id="head_approve" />Approve</th>*@
+                        <th><label><input type="radio" class="approval" name="app_header" value="approved"> Approve</label></th>
+                        <th><label><input type="radio" class="approval" name="app_header" value="rejected"> Rejected</label></th>
+                        <th><label><input type="radio" class="approval" name="app_header" value="feedbacked"> Feedback</label></th>
+                        <th>Approved QTY</th>
+                        <th>Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int dCount = 1;
+                        var dIRs = Model.ir1;
+                        foreach (var dIr in dIRs)
+                        {
+                            var roman = (Convert.ToChar(8543 + dCount)).ToString();
+
+                            <tr style="display:none !important;">
+                                <td>@roman</td>
+                                <td colspan="10">@dIr.job_category_description</td>
+                            </tr>
+                            int ddCount = 1;
+                            int itemCount = 1;
+                            foreach (var ddIr in dIr.ir2)
+                            {
+
+                                string requestQty = string.Format("{0:G29}", decimal.Parse(ddIr.ir_qty.ToString()));
+
+                                if (string.Compare(ddIr.item_status, Status.Approved) == 0|| string.Compare(ddIr.item_status, Status.Rejected) == 0)
+                                {
+                                    string approvedQty = string.Empty;
+                                    if (string.Compare(ddIr.item_status, Status.Approved) == 0)
+                                    {
+                                        approvedQty = string.Format("{0:G29}", decimal.Parse(ddIr.approved_qty.ToString()));
+                                    }
+
+                                    <tr>
+                                        <td> @itemCount</td>
+                                        <td style="text-align:center !important;vertical-align:middle !important;">@ddIr.product_code</td>
+                                        <td>@ddIr.product_name</td>
+                                        <td style="text-align:center !important;vertical-align:middle !important;"><label class="">@requestQty</label> </td>
+                                        <td style="text-align:center !important;vertical-align:middle !important;"><label class="request-unit">@ddIr.requested_unit</label></td>
+                                        <td>@ddIr.remark</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td style="text-align:center !important;vertical-align:middle !important;">@approvedQty</td>
+                                        <td>@ddIr.reason</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    string name = "item" + ddCount;
+                                    <tr>
+                                        <td><input type="hidden" class="item_detail_id" value="@ddIr.ir_detail2_id" /> @itemCount</td>
+                                        <td style="text-align:center !important;vertical-align:middle !important;">@ddIr.product_code</td>
+                                        <td><input type="hidden" class="td_prod_desc" value="@string.Format("{0}-{1}",ddIr.product_code,ddIr.product_name)"/> @ddIr.product_name</td>
+                                        @*<td>@ddIr.product_unit</td>
+                                            <td><label class="boq-qty">@ddIr.boq_qty</label></td>*@
+                                        <td style="text-align:center !important;vertical-align:middle !important;"><label class="request-qty">@requestQty</label> </td>
+                                        <td style="text-align:center !important;vertical-align:middle !important;"><label class="request-unit">@ddIr.requested_unit</label></td>
+                                        @*<td><strong style="color:red !important;">@ddIr.remark</strong></td>*@
+                                        <td>@ddIr.remark</td>
+                                        @*<td style="text-align:center !important;vertical-align:middle !important;"><input type='checkbox' value='' class='is_approved' name="is_approved" /></td>*@
+                                        <td><label><input type="radio" class="approval" name="@name" value="approved"> Approve</label></td>
+                                        <td><label><input type="radio" class="approval" name="@name" value="rejected"> Reject</label></td>
+                                        <td><label><input type="radio" class="approval" name="@name" value="feedbacked"> Feedback</label></td>
+                                        <td style="text-align:center !important;vertical-align:middle !important;"><input type='number' class='form-control approved_qty' onchange="checkQty(this)" value="@requestQty" placeholder="Approve QTY" style="width:80px !important; padding-left:0px !important;padding-right:0px !important;" /></td>
+                                        <td><textarea class="form-control reason" placeholder="Reason" style="padding-left:0px !important;padding-right:0px !important;"></textarea></td>
+                                    </tr>
+                                    ddCount++;
+                                }
+                                itemCount++;
+                            }
+                            dCount++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">Attachment Reference:</label>
+            <div class="col-md-10">
+                <a class="title" href="/ItemRequest/Download/?p=@(Model.att_id + Model.ir_attachment_extension)&d=@Model.ir_attachment_name">@Model.ir_attachment_name</a>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <button type="button" class="btn btn-primary" id="btnApprove">Submit</button>
+                <a href="javascript:history.back()" class="btn btn-danger">Back</a>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            
+
+            //$('#head_approve').click(function () {
+            //    if ($(this).prop("checked") == true) {
+            //        //alert("Checkbox is checked.");
+            //        check_uncheck_checkbox(true);
+            //    }
+            //    else if ($(this).prop("checked") == false) {
+            //        //alert("Checkbox is unchecked.");
+            //        check_uncheck_checkbox(false);
+            //    }
+            //});
+
+            $('input:radio[name="app_header"]').change(function () {
+                if ($(this).is(':checked') && $(this).val() == 'approved') {
+                    // append goes here
+                    var countTableRow = $('#ir_table tbody tr').length;
+                    for (var i = 1; i <= countTableRow; i++) {
+                        $("input[name=item" + i + "][value='approved']").prop("checked", true);
+                    }
+                }
+                else if ($(this).is(':checked') && $(this).val() == 'rejected') {
+                    // append goes here
+                    var countTableRow = $('#ir_table tbody tr').length;
+                    for (var i = 1; i <= countTableRow; i++) {
+                        $("input[name=item" + i + "][value='rejected']").prop("checked", true);
+                    }
+                }
+                else {
+                    var countTableRow = $('#ir_table tbody tr').length;
+                    for (var i = 1; i <= countTableRow; i++) {
+                        $("input[name=item" + i + "][value='feedbacked']").prop("checked", true);
+                    }
+                }
+            });
+
+            $('#btnApprove').click(function () {
+                var item_element = {};
+                var itemRequestDetail = [];
+                var irId = $('#ir_id').val();
+                var itemDetailIds = $('.item_detail_id');
+                var isApproveds = $('.is_approved');
+                var requestedQtys = $('.request-qty');
+                var approvedQtys = $('.approved_qty');
+                var reasons = $('.reason');
+                var productDescs = $('.td_prod_desc');
+                var count = 0;
+                for (var i = 0; i < itemDetailIds.length; i++) {
+                    var item_status = $('input[name=item' + Number(i+1) + ']:checked').val();
+                    var requestedQty = requestedQtys[i].innerHTML;
+                    var approvedQty = approvedQtys[i].value;
+                    if (Number(approvedQty) <= 0) {
+                        alert("Item approved Qty must be greater than 0.");
+                        return;
+                    }
+                    if (Number(approvedQty) > Number(requestedQty)) {
+                        alert("Approved Qty must not greater than Requested Qty.");
+                        return;
+                    }
+                    if (item_status == undefined) {
+                        alert("Please select approve status for " + productDescs[i].value);
+                        return;
+                    }
+                    item_element = {};
+                    item_element.ir_detail2_id = itemDetailIds[i].value;
+                    item_element.is_approved = true;
+                    item_element.approved_qty = approvedQty;
+                    item_element.reason = reasons[i].value;
+                    item_element.item_status = item_status;
+                    itemRequestDetail.push(item_element);
+
+                    //if ($(isApproveds[i]).is(':checked')) {
+                    //    var requestedQty = requestedQtys[i].innerHTML;
+                    //    var approvedQty = approvedQtys[i].value;
+                    //    if (Number(approvedQty) <= 0) {
+                    //        alert("Item approved Qty must be greater than 0.");
+                    //        return;
+                    //    }
+                    //    if (Number(approvedQty) > Number(requestedQty)) {
+                    //        alert("Approved Qty must not greater than Requested Qty.");
+                    //        return;
+                    //    }
+                    //    item_element = {};
+                    //    item_element.ir_detail2_id = itemDetailIds[i].value;
+                    //    item_element.is_approved = true;
+                    //    item_element.approved_qty = approvedQty;
+                    //    item_element.reason = reasons[i].value;
+                    //    itemRequestDetail.push(item_element);
+                    //}
+                    //else {
+                    //    item_element = {};
+                    //    item_element.ir_detail2_id = itemDetailIds[i].value;
+                    //    item_element.is_approved = false;
+                    //    item_element.approved_qty = 0;
+                    //    item_element.reason = reasons[i].value;
+                    //    itemRequestDetail.push(item_element);
+                    //    count++;
+                    //}
+                }
+
+                if (count == itemRequestDetail.length) {
+                    alert("Approve Item Request must have at lease one item to approved.");
+                    return;
+                }
+
+                //console.log(itemRequestDetail);
+                //return;
+                $(this).text("Submitting");
+                $(this).attr('disabled', true);
+                $.ajax({
+                    url: "@Url.Action("ApprovedItemRequest", "ItemRequest")",
+                    type: "post",
+                    dataType: "json",
+                    async: false,
+                    data: { id: irId, itemDetails: itemRequestDetail },
+                    success: function (da) {
+                        if (da.result == "success") {
+                            //$.notify('Your data has been saved!', { className: 'success' });
+                            window.location.href = '@Url.Action("Index", "itemRequest")';
+                        } else if (da.result == "fail") {
+                            $.notify(da.message, { className: 'error' });
+                            $('#btnApprove').text("Submit");
+                            $('#btnApprove').attr('disabled', false);
+                        }
+                    },
+                    error: function (err) {
+                        $.notify('Your data is error while saving!', { className: 'error' });
+                        $('#btnApprove').text("Submit");
+                        $('#btnApprove').attr('disabled', false);
+                    }
+                });
+            });
+        });
+        function checkQty(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var requestQty = $('#ir_table tr').eq(ind).find('label.request-qty').text();
+            var approvedQty = $('#ir_table tr').eq(ind).find('input.approved_qty').val();
+            if (Number(approvedQty) > Number(requestQty)) {
+                alert("Approved Qty must not greater than Requested Qty.");
+                return;
+            }
+        }
+        function check_uncheck_checkbox(isChecked) {
+            if (isChecked) {
+                $('input[name="is_approved"]').each(function () {
+                    this.checked = true;
+                });
+            } else {
+                $('input[name="is_approved"]').each(function () {
+                    this.checked = false;
+                });
+            }
+        }
+    </script>
+    }
+

@@ -1,0 +1,73 @@
+﻿@model BT_KimMex.Models.CustomerViewModel
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h3>View Customer Detail</h3>
+
+<div>
+    <dl class="dl-horizontal">
+
+        <dt>
+            @Html.DisplayNameFor(model => model.customer_created_date)
+        </dt>
+
+        <dd>
+            <label id="customer_created_date"></label>
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.customer_name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.customer_name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.customer_phone)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.customer_phone)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.customer_email)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.customer_email)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.customer_address)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.customer_address)
+        </dd>
+        <dt>
+            
+        </dt>
+
+        <dd>
+            @Html.ActionLink("Edit", "Edit", "Customer", new { id = Model.customer_id }, new { @class="btn btn-default"})
+            <input type="button" value="Back" id="btnCancel" class="btn btn-default" />
+        </dd>
+
+    </dl>
+</div>
+
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('#customer_created_date').text(getFormattedDateMMDDYYYY(new Date('@Model.customer_created_date')));
+            $('#btnCancel').click(function () {
+                window.location.href = '@Url.Action("Index","Customer")';
+            });
+        });
+    </script>
+    }

@@ -1,0 +1,585 @@
+﻿@model BT_KimMex.Models.PurchaseRequisitionViewModel
+    @using Microsoft.AspNet.Identity;
+@using BT_KimMex.Class;
+@{
+    ViewBag.Title = "Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string userid = User.Identity.GetUserId().ToString();
+    List<BT_KimMex.Entities.tb_purchase_requisition> prHistories = BT_KimMex.Models.PurchaseRequisitionViewModel.GetPurchaseRequisitionHistorybyMRID(Model.material_request_id, Model.purchase_requisition_id);
+}
+
+<div class="w3-panel w3-card-4">
+    <div class="w3-container w3-display-container">
+        <h3 class="title">View Purchase Requisition Detail</h3>
+        <button class="w3-button w3-tiny w3-display-topright w3-white w3-border w3-border-blue" style="margin-top:20px !important;" id="btn_show_history"><i class="fa fa-history" aria-hidden="true"></i> View History</button>
+    </div>
+    
+
+    <div class="form-horizontal">
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="col-md-4">Request Date:</label>
+                    <label class="col-md-8">@Convert.ToDateTime(Model.created_at).ToString("dd/MM/yyyy")</label>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4">Purchase Requisition Number:</label>
+                    <label class="col-md-8">@Model.purchase_requisition_number</label>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4">Project <span class="text-danger">*</span>:</label>
+                    <label class="col-md-8">@Model.project_fullname</label>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4">Material Request Ref. <span class="text-danger">*</span>:</label>
+                    <label class="col-md-8">@Model.materail_request_number</label>
+                </div>
+            </div>
+            <div class="col-md-2"></div>
+            <div class="col-md-4">
+                @if (prHistories.Count() > 0)
+                {
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="">
+                            <thead>
+                                <tr>
+                                    <th>PR History Date</th>
+                                    <th>PR No.</th>
+                                    <th>Requested By</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    foreach (var his in prHistories)
+                                    {
+                                        <tr>
+                                            <td><a href="@Url.Action("Detail","PurchaseRequisition",new { id = his.purchase_requisition_id })" target="_blank" data-id="@his.purchase_requisition_id" class="btn_show_history_data">@Convert.ToDateTime(his.created_at).ToString("dd/MM/yyyy HH:mm")</a></td>
+                                            <td class="text-center">@his.purchase_requisition_number</td>
+                                            <td>@CommonFunctions.GetUserFullnamebyUserId(his.created_by)</td>
+                                        </tr>
+                                    }
+                                }
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                
+            </div>
+        </div>
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="table">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Item Code</th>
+                            <th>Item Name</th>
+                            <th>Requested Qty</th>
+                            <th>Requested Unit</th>
+                            @*<th>Status</th>*@
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int count = 1;
+                            foreach (var item in Model.purchaseRequisitionDetails)
+                            {
+                                <tr>
+                                    <td>@count</td>
+                                    <td>@item.item_code</td>
+                                    <td>@item.item_name</td>
+                                    <td class="text-center">@item.approved_qty</td>
+                                    <td>@item.item_unit_name</td>
+                                    @*<td>@item.item_status</td>*@
+                                </tr>
+                                count++;
+                            }
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    @if ((User.IsInRole(Role.SystemAdmin) || string.Compare(Model.created_by, userid) == 0 || User.IsInRole(Role.Purchaser)) && (string.Compare(Model.purchase_requisition_status, Status.Pending) == 0 || string.Compare(Model.purchase_requisition_status, Status.Approved) == 0) && Model.is_quote_complete == false)
+                    {
+                        <a href="javascript:void(0)" class="w3-button w3-tiny w3-orange" id="btnCancel">Request Cancel</a>
+                        @*<a href="javascript:void(0)" class="btn btn-danger" id="btnDelete">Delete</a>*@
+                    }
+                    @if ((User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProcurementManager)) && string.Compare(Model.purchase_requisition_status, Status.Pending) == 0)
+                    {
+                        <a href="javascript:void(0)" class="w3-button w3-tiny w3-teal" id="btnApprove">Approve</a>
+                        <a href="javascript:void(0)" class="w3-button w3-tiny w3-deep-orange" id="btnReject">Reject</a>
+                        <a href="javascript:void(0)" class="w3-button w3-tiny w3-orange" id="btnCancelPR">Cancel MR</a>
+                    }
+                    <a href="javascript:history.back();" class="w3-button w3-tiny w3-red">Back</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Approved project modal popup-->
+<div class="modal fade" id="myModal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+
+            <div class="modal-body">
+                <p class="success-message">Are you sure to Approve this request?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default approve-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- cancel project modal popup-->
+<div class="modal fade" id="cancelModal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" id="cancel-type" />
+                <p class="success-message ">Are you sure to <span id="sp-cancel-text">Cancel</span>  this request?</p>
+                <div class="form-group row">
+                    <label class="col-md-2">Reason:</label>
+                    <div class="col-md-10">
+                        <textarea class="form-control" rows="5" id="request-cancel-comment"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default cancel-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Show History modal popup-->
+<div class="modal fade" id="showHistoryModal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-primary">
+                <h4 class="modal-title" id="myModalLabel">View Process History</h4>
+            </div>
+
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>User</th>
+                                <th>Status</th>
+                                <th>Remark</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{ 
+                                foreach(var history in Model.processWorkflow)
+                                {
+                                    <tr>
+                                        <td>@Convert.ToDateTime(history.created_at).ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>@history.crated_by_name</td>
+                                        <td>@Html.Raw(ShowStatus.GetPRShowStatus(history.status))</td>
+                                        <td>@history.remark</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                @*<button class="btn btn-default approve-confirm">Yes</button>*@
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PR History Modal -->
+<div class="modal fade" id="prHistoryModal" tabindex="=-1" role="dialog" aria-labelledby="mrHistoryModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-primary">
+                <h4 class="modal-title" id="myModalLabel">View Purchase Requisition History Detail</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-horizontal">
+                    @*@Html.Partial("_MaterialRequestHistoryPatial")*@
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+
+            $('#btnCancel').click(function () {
+                $('#cancel-type').val('@Status.RequestCancelled');
+                $('#sp-cancel-text').html("Cancel");
+                $('#cancelModal').modal('show');
+            });
+
+            $('#btnReject').click(function () {
+                $('#cancel-type').val('@Status.Rejected');
+                $('#sp-cancel-text').html("Reject");
+                $('#cancelModal').modal('show');
+            });
+
+            $('#btnCancelPR').click(function () {
+                $('#cancel-type').val('@Status.cancelled');
+                $('#sp-cancel-text').html("Cancel MR");
+                $('#cancelModal').modal('show');
+            });
+
+            $('#btn_show_history').click(function (e) {
+                $('#showHistoryModal').modal('show');
+            });
+
+            $('.cancel-confirm').click(function (e) {
+                var canceltype = $('#cancel-type').val();
+                var reason = $("#request-cancel-comment").val();
+
+                if (canceltype == '@Status.RequestCancelled') {
+                    $.ajax({
+                        url: "/PurchaseRequisition/RequestCancel",
+                        data: {
+                            'id': '@Model.purchase_requisition_id',
+                            'remark': reason,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#cancelModal').modal('hide');
+
+                            $.notify('Your data has been cancelled.', { className: 'success' });
+                            window.location.href = '@Url.Action("RequestList", "PurchaseRequisition")';
+
+                            @*if (da.result == "success") {
+                                $.notify('Your data has been cancelled!', { className: 'success' });
+                                window.location.href = '@Url.Action("RequestList", "PurchaseRequisition")';
+                            }*@
+                            //else if (da.result == "fail") {
+                            //    $.notify(da.message, { className: 'error' });
+                            //}
+                            //else {
+                            //    $.notify('Your data has been error while approving!', { className: 'error' });
+                            //}
+
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.approve-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while cancelling!', { className: 'error' });
+                        }
+                    });
+                } else if (canceltype == '@Status.Rejected') {
+                    $.ajax({
+                        url: "/PurchaseRequisition/Approval",
+                            data: {
+                                'id': '@Model.purchase_requisition_id',
+                                'status': '@Status.Rejected',
+                                'comment': reason,
+                            },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#cancelModal').modal('hide');
+
+                            $.notify('Your data has been rejected.', { className: 'success' });
+                            window.location.href = '@Url.Action("ApprovalList", "PurchaseRequisition")';
+
+
+                            },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.approve-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while cancelling!', { className: 'error' });
+                        }
+                    });
+                } else if (canceltype == '@Status.cancelled') {
+                    $.ajax({
+                        url: "/PurchaseRequisition/Approval",
+                            data: {
+                                'id': '@Model.purchase_requisition_id',
+                                'status': '@Status.cancelled',
+                                'comment': reason,
+                            },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#cancelModal').modal('hide');
+
+                            $.notify('Your data has been cancelled.', { className: 'success' });
+                             window.location.href = '@Url.Action("ApprovalList", "PurchaseRequisition")';
+
+
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.approve-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while cancelling!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+            //$('.btn_show_history_data').click(function (e) {
+            //    var pr_history_id = $(this).attr('data-id');
+            //    alert(pr_history_id);
+
+            //});
+
+            @*$("#btnCancel").click(function (e) {
+                e.preventDefault();
+
+                swal.fire({
+                    title: 'Please input your comment:',
+                    input: 'text',
+                    inputAttributes: {
+                        autocapitalize: 'off'
+                    },
+                    showCancelButton: true,
+                    confirmButtonText: 'Submit',
+                    showLoaderOnConfirm: true,
+                    preConfirm: (value) => {
+                        return { comment: value };
+                    },
+                    allowOutsideClick: () => !swal.isLoading()
+                }).then((result) => {
+                    console.log(result.value.comment);
+                    if (result.isConfirmed) {
+                        // A dialog has been submitted
+                        $.ajax({
+                            url: "/PurchaseRequisition/RequestCancel",
+                            data: {
+                                'id': '@Model.purchase_requisition_id',
+                                'remark': result.value.comment,
+                            },
+                            type: 'GET',
+                            success: function (da) {
+                                console.log(da);
+                                swal.fire({ title: 'Sucess' });
+                                window.location.href = '@Url.Action("RequestList", "PurchaseRequisition")';
+                            },
+                            error: function (err) {
+                                Swal.showValidationMessage(`Request failed: ${err}`)
+                            }
+                        });
+
+                    }
+
+                })
+
+            });*@
+
+            $('#btnDelete').click(function (e) {
+                e.preventDefault();
+                swal.fire({
+                    title: "Confirmation",
+                    text: "Do you want to delete this request?",
+                    icon: "warning",
+                    buttons: true,
+                    //dangerMode: true,
+                })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $.ajax({
+                            url: "/PurchaseRequisition/Delete",
+                            data: {
+                                'id': '@Model.purchase_requisition_id',
+                            },
+                            type: 'GET',
+                            success: function (da) {
+                                swal.fire("Request has been deleted successfully.", {
+                                    icon: "success",
+                                });
+                                window.location.href = '@Url.Action("RequestList", "PurchaseRequisition")';
+                            },
+                            error: function (err) {
+                                swal("Poof! " + err, {
+                                    icon: "error",
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+
+            $("#btnApprove").click(function (e) {
+                e.preventDefault();
+
+                Swal.fire({
+                    title: 'Confirmation',
+                    text: 'Do you want to approve this request?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "/PurchaseRequisition/Approval",
+                            data: {
+                                'id': '@Model.purchase_requisition_id',
+                                'status': 'approved',
+                                'comment': '',
+                            },
+                            type: 'GET',
+                            success: function (da) {
+                                swal.fire("Request has been approved successfully.", {
+                                    icon: "success",
+                                });
+                                window.location.href = '@Url.Action("ApprovalList", "PurchaseRequisition")';
+                            },
+                            error: function (err) {
+                                swal.fire("Poof! " + err, {
+                                    icon: "error",
+                                });
+                            }
+                        });
+                    }
+                })
+
+            });
+
+            @*$('#btnReject').click(function (e) {
+                e.preventDefault();
+
+                swal.fire({
+                    title: 'Please input your reject comment:',
+                    input: 'text',
+                    inputAttributes: {
+                        autocapitalize: 'off'
+                    },
+                    showCancelButton: true,
+                    confirmButtonText: 'Submit',
+                    showLoaderOnConfirm: true,
+                    preConfirm: (value) => {
+                        //console.log(value);
+                        return { comment: value };
+                    },
+                    allowOutsideClick: () => !swal.isLoading()
+                }).then((result) => {
+                    console.log(result.value.comment);
+                    if (result.isConfirmed) {
+                        // A dialog has been submitted
+                        $.ajax({
+                            url: "/PurchaseRequisition/Approval",
+                            data: {
+                                'id': '@Model.purchase_requisition_id',
+                                'status': '@Status.Rejected',
+                                'comment': result.value.comment,
+                            },
+                            type: 'GET',
+                            success: function (da) {
+                                console.log(da);
+                                swal.fire({ title: 'Sucess' });
+                                window.location.href = '@Url.Action("ApprovalList", "PurchaseRequisition")';
+                            },
+                            error: function (err) {
+                                Swal.showValidationMessage(`Request failed: ${err}`)
+                            }
+                        });
+
+                    }
+
+                })
+
+            });*@
+
+            @*$('#btnCancelPR').click(function (e) {
+                e.preventDefault();
+
+                swal.fire({
+                    title: 'Please input your cancel comment:',
+                    input: 'text',
+                    inputAttributes: {
+                        autocapitalize: 'off'
+                    },
+                    showCancelButton: true,
+                    confirmButtonText: 'Submit',
+                    showLoaderOnConfirm: true,
+                    preConfirm: (value) => {
+                        //console.log(value);
+                        return { comment: value };
+                    },
+                    allowOutsideClick: () => !Swal.isLoading()
+                }).then((result) => {
+                    console.log(result.value.comment);
+                    if (result.isConfirmed) {
+                        // A dialog has been submitted
+                        $.ajax({
+                            url: "/PurchaseRequisition/Approval",
+                            data: {
+                                'id': '@Model.purchase_requisition_id',
+                                'status': '@Status.cancelled',
+                                'comment': result.value.comment,
+                            },
+                            type: 'GET',
+                            success: function (da) {
+                                console.log(da);
+                                swal.fire({ title: 'Sucess.' });
+                                window.location.href = '@Url.Action("ApprovalList", "PurchaseRequisition")';
+                            },
+                            error: function (err) {
+                                Swal.showValidationMessage(`Request failed: ${err}`)
+                            }
+                        });
+
+                    }
+
+                });
+            });*@
+
+        });
+    </script>
+    }

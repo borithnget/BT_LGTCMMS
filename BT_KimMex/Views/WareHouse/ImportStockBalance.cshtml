@@ -1,0 +1,77 @@
+﻿@model BT_KimMex.Class.StockBalancedImportReturn
+@{
+    ViewBag.Title = "ImportStockBalance";
+}
+
+
+@using (Html.BeginForm("ImportStockBalance", "Warehouse", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <h3 class="title">Import Stock Balance from Excel File</h3>
+
+        @{
+            if (Model != null && Model.Message != "")
+            {
+                @*Alert Message*@
+                <div class="alert alert-info alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  @Model.Message <br />
+                </div>
+            }
+        }
+
+        <div class="row form-group">
+            <label class="col-md-2">Excel file <span style="color:red;">(.xlsx || .xls) *</span> :</label>
+            <div class="col-md-10">
+                <input type="file" class="form-control" id="filename" name="filename"/>
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-md-2"></div>
+            <div class="col-md-10">
+                <input type="submit" value="Import" class="btn btn-default" />
+                <a href="@Url.Action("Index","StockAdjustment")" class="btn btn-default">Cancel</a>
+            </div>
+        </div>
+        <div class="row form-group​​​​​​" style="margin-left: 20px;">
+            @{
+                if (Model != null)
+                {
+            <div>
+                * All Total items: @Model.AllItemCount, Success items: @Model.SuccessItemCount, Error Items: @Model.ErrorItemCount <br />
+
+                * There were an success @Model.SuccessItemCount items in file :
+                <ul>
+                    @{
+                        foreach (var i in Model.successItems)
+                        {
+                            <li>@i.toString()</li>
+                        }
+                    }
+                </ul>
+
+                @if (Model.ErrorItemCount > 0)
+                {
+                <p class="text-danger">*There were an error @Model.ErrorItemCount unexisted items in file:</p>
+                <p class="text-danger">@Model.Message</p>
+                    <ul>
+                        @{
+                        foreach (var i in Model.ErrorItem)
+                            {
+                                <li class="text-danger">@i.toString()</li>
+                            }
+                        }
+                    </ul>
+                }
+
+
+
+            </div>
+                                    }
+            }
+        </div>
+    </div>
+}
+

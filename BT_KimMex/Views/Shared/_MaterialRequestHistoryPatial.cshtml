@@ -1,0 +1,69 @@
+﻿<div class="form-horizontal">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.Label("MR Date:", new { @class = "col-md-4" })
+                <label class="col-md-8" style="font-weight:normal !important" id="md_mrh_date"></label>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4">MR No.:</label>
+                <label class="col-md-8" style="font-weight:normal !important" id="md_mrh_number"></label>
+            </div>
+
+            <div class="form-group">
+                @Html.Label("Project Name:", new { @class = "col-md-4" })
+                <label class="col-md-8" style="font-weight:normal !important" id="md_mrh_project_name"></label>
+            </div>
+            <div class="form-group">
+                @Html.Label("Purpose of Purchase:", new { @class = "col-md-4" })
+                <label class="col-md-8" style="font-weight:normal !important" id="md_mrh_purpose_of_purchase"></label>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4">Expected Delivery Date:</label>
+                <label class="col-md-8" style="font-weight:normal !important" id="md_mrh_expected_delivery_date"></label>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin:0 !important;">
+        <table class="table table-bordered" id="md_mrh_table">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Item Code</th>
+                    <th>Item Name</th>
+                    <th>Requested QTY</th>
+                    <th>Requested Unit</th>
+                    <th>Remark</th>
+                    <th>Approved QTY</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
+        </table>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2">Remark:</label>
+        <div class="col-md-10"><label id="md_mrh_remark"></label></div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2">Attachment Reference:</label>
+        <div class="col-md-10" id="md_mrh_attachment_panel">
+            @*<a class="title" href="/ItemRequest/Download/?p=@(Model.att_id + Model.ir_attachment_extension)&d=@Model.ir_attachment_name">@Model.ir_attachment_name</a>*@
+        </div>
+    </div>
+
+    <div class="form-group" id="md_mrh_reject_panel">
+        <label class="col-md-2">Reject Command:</label>
+        <div class="col-md-10">
+            <ul id="md_mrh_reject">
+                
+            </ul>
+        </div>
+    </div>
+
+
+
+</div>

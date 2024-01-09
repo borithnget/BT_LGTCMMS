@@ -1,0 +1,87 @@
+﻿@model BT_KimMex.Models.StockViewModel
+@using BT_KimMex.Class
+@{
+    ViewBag.Title = "CheckStockBalanceWorkshop";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<form>
+    <div class="form-horizontal">
+        <h3 class="title">Check Stock Balance from Workshop</h3>
+        <div class="form-group">
+            @Html.Label("Date:", new { @class = "control-label col-md-2" })
+            <label class="col-md-10">@CommonClass.ToLocalTime(DateTime.Now).ToString("dd/MM/yyyy")</label>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">Material Request No.:</label>
+            <label class="col-md-10">@Model.mrNumber</label>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">Project :</label>
+            <label id="warehouse">@Model.projectname</label>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">To Warehouse :</label>
+            <label id="warehouse">@Model.warehouse</label>
+        </div>
+        @*<div class="form-group">
+                <label class="control-label col-md-2">From Warehouse :</label>
+                <div class="col-md-10">
+                    @Html.DropDownList("from_warehouse_id",new SelectList(Model.warehouses, "warehouse_id", "warehouse_name"), "All", new { @class="form-control",id="from_warehouse_id"})
+                </div>
+            </div>*@
+
+        <div class="row" style="margin:0 !important;">
+            <table class="table table-bordered" id="st_table">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Description</th>
+                        <th>Stock Balance</th>
+                        <th>Requested QTY</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.stocks.Count() == 0)
+                    {
+                        <tr>
+                            <td colspan="11">No item from warehouse to transfer.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        int count = 1;
+                        foreach (var item in Model.stocks)
+                        {
+                            <tr>
+                                <td>@count</td>
+                                <td>@item.itemCode - @item.itemName</td>
+                                <td>@item.stockBalance @item.itemUnitName</td>
+                                <td>@item.requestQty @item.requestUnitName</td>
+                            </tr>
+
+                            count++;
+                        }
+                    }
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                @if (Model.stocks.Count() > 0)
+                {
+                    <a href="@Url.Action("Create","TransferFromMainStock",new { id = Model.mrId})" class="btn btn-primary">Transfer from Workshop</a>
+                }
+                @if (User.IsInRole(Role.Purchaser) || User.IsInRole(Role.SystemAdmin))
+                {
+                    <a href="@Url.Action("Create","PurchaseRequisition",new { id = Model.mrId })" class="btn btn-primary">Purchase Requisition</a>
+                }
+
+                <a href="javascript:history.back()" class="btn btn-danger">Back</a>
+            </div>
+        </div>
+    </div>
+</form>
+

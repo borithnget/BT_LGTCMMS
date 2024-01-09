@@ -1,0 +1,64 @@
+﻿@model IEnumerable<BT_KimMex.Models.UserRolesViewModel>
+@{
+    ViewBag.Title = "UserList";
+}
+
+<h2 class="text-center">User View Page</h2>
+<p></p>
+<a href="@Url.Action("Register","Account")" class="btn btn-primary">Create User</a>
+<p></p>
+<table class="table table-bordered" id="userTable">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            InitialUserDataTable();
+            function InitialUserDataTable() {
+                $('#userTable').DataTable({
+                    "ajax": {
+                        "url": "@Url.Action("UserDataTable", "Account")",
+                        "type": "GET",
+                        "dataType": "json"
+                    },
+                        "columns": [
+                            { "data": "Username" },
+                            { "data": "Email" },
+                            { "data": "Role" },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    return '<a class="btn btn-info" href="/Unit/Details/' + full.Id + '">Detail</a>';
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    return '<a class="btn btn-primary" href="/Unit/Edit/' + full.Id + '">Edit</a>';
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    return '<a class="btn btn-primary" href="/Unit/Edit/' + full.Id + '">Delete</a>';
+                                }
+                            }
+                        ],
+                    });
+                $('select[name="userTable_length"]').addClass('datatable-control');
+                $('input[aria-controls="userTable"]').addClass('datatable-control');
+            }
+        });
+    </script>
+    }
+
+

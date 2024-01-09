@@ -1,0 +1,549 @@
+﻿@model BT_KimMex.Models.BOQViewModel
+@using BT_KimMex.Class;
+
+@{
+    ViewBag.Title = "Details";
+    bool isAdmin = false;
+    bool isAM = false;
+    bool isPM = false;
+    bool isD = false;
+    if (User.IsInRole("Admin"))
+    {
+        isAdmin = true;
+    }
+    if(User.IsInRole("Economic Engineer"))
+    {
+        isAM = true;
+    }
+    if(User.IsInRole("Project Manager"))
+    {
+        isPM = true;
+    }
+    if (User.IsInRole("Director"))
+    {
+        isD = true;
+    }
+}
+
+<style type="text/css">
+    select.form-control {
+        display: inline !important;
+    }
+
+    thead th,tr {
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+</style>
+
+<div class="form-horizontal">
+    <div class="container">
+        
+        <h3 class="title">View BoQ Detail</h3>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.Label("Date:", new { @class = "col-md-4" })
+                    <label class="col-md-8" id="current_date"></label>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4">BoQ No.:</label>
+                    <label class="col-md-8" id="boq_no"></label>
+                </div>
+                <div class="form-group">
+                    @Html.Label("Project Name:", new { @class = "col-md-4" })
+                    @*<label class="col-md-8" id="project_id"></label>*@
+                    <div class="col-md-8" id="project_id"></div>
+                </div>
+            </div>
+            <div class="col-md-6"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="col-md-4">Customer:</label>
+                    <label class="col-md-8" id="customer_name"></label>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4">Customer Signatory:</label>
+                    <label class="col-md-8" id="customer_signatory"></label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="col-md-5">Customer Project Manager:</label>
+                    <label class="col-md-7" id="customer_project_manager"></label>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-5">Telephone:</label>
+                    <label class="col-md-7" id="customer_telephone"></label>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row" style="margin:0 !important;">
+        <table class="table table-bordered" id="boq_table">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Item Code</th>
+                    <th>Description</th>
+                    <th>Chart Account</th>
+                    <th>Unit</th>
+                    <th>QTY</th>
+                    <th>Unit Price</th>
+                    <th colspan="2">Amount</th>
+                    <th>Dif. Amount</th>
+                    <th>Remark</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <div class="form-group">
+        @Html.Label("Attachments Reference:", new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @{
+                var atts = Model.attachments;
+                for (int i = 0; i < atts.Count(); i++)
+                {
+                    <a class="title" href="/BOQ/Download/?p=@(atts[i].attachment_id + atts[i].attachment_extension)&d=@atts[i].attachment_name">@atts[i].attachment_name</a><br />
+                }
+            }
+        </div>
+    </div>
+    @if (Model.rejects.Count() > 0)
+    {
+        <div class="form-group">
+            <label class="control-label col-md-2">Reject Command:</label>
+            <div class="col-md-10">
+                <ul>
+                    @foreach (var reject in Model.rejects)
+                    {
+                        <li>@reject.comment <b>By @reject.rejected_by</b></li>
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10" id="btnBlock">
+            @if ((isAdmin|| isAM)&&(Model.boq_status == "Rejected" || Model.boq_status == "Draft"|| Model.boq_status == "Imported"))
+            {
+                <a href='javascript:void(0)' class="btn btn-default submit-promp" id='@Model.boq_id'>Submit</a>
+                <a href='@Url.Action("Edit",new { id = Model.boq_id })' class="btn btn-default edit-promp">Edit</a>
+            }
+            @if (((isAdmin || isPM) && Model.boq_status == "Pending") || ((isAdmin || isD) && Model.boq_status == "Approved"))
+            {
+                <a href='javascript:void(0)' class='btn btn-default approve-promp' id=''>Approve</a>
+                <a href='javascript:void(0)' class='btn btn-default reject-promp' id=''>Reject</a>
+            }
+
+            <a href="@Url.Action("Index","BOQ",new { status = "All" })" class="btn btn-default">Cancel</a>
+        </div>
+    </div>
+</div>
+
+<!-- approve project modal popup-->
+<div class="modal fade" id="approveModal" tabindex="=-1" role="dialog" aria-labelledby="approveModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-warning">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to <strong>Approve</strong> this BOQ?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default approve-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- reject project modal popup-->
+<div class="modal fade" id="rejectModal" tabindex="=-1" role="dialog" aria-labelledby="rejectModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to <strong>Reject</strong> this BOQ?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default reject-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- submit project modal popup-->
+<div class="modal fade" id="submitModal" tabindex="=-1" role="dialog" aria-labelledby="submitModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-warning">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to <strong>Submit</strong> this BOQ?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default submit-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            var id = GetURLParameter();
+            if (id != null) {
+                InitialBOQ(id);
+            }
+
+            var isPM = false;
+            var isDir = false;
+            var status = '@Model.boq_status';
+            @if ((User.IsInRole("Admin")||User.IsInRole("Director"))&&string.Compare(Model.boq_status,"Approved")==0)
+            {
+                <text>
+                    isDir = true;
+                </text>
+            }
+            else if ((User.IsInRole("Admin") || User.IsInRole("Project Manager")) && string.Compare(Model.boq_status, "Pending") == 0)
+            {
+                <text>
+                    isPM = true;
+                </text>
+            }
+
+            var boq_id;
+            var role;
+
+            $('.approve-promp').click(function () {
+                boq_id = id;
+                if (isPM)
+                    role = "Project Manager";
+                else if (isDir)
+                    role = "Director";
+                $('#approveModal').modal('show');
+            });
+
+            $('.approve-confirm').click(function () {
+                if (boq_id != '') {
+                    $.ajax({
+                        url: "/BOQ/Approve",
+                        data: { id: boq_id, role: role, },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.approve-confirm').css('display', 'none');
+                            }
+                            $('#approveModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been approved!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "BOQ")';
+                            }
+                            else if (da.result == "fail")
+                                $.notify('Your data has been error while approving!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.approve-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while approving!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+            $('a.reject-promp').click(function () {
+                boq_id = id;
+                if (isPM)
+                    role = "Project Manager";
+                else if (isDir)
+                    role = "Director";
+                $('#rejectModal').modal('show');
+            });
+
+            $('.reject-confirm').click(function () {
+                if (boq_id != '') {
+                    $.ajax({
+                        url: "/BOQ/Reject",
+                        data: { id: boq_id, role: role },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.reject-confirm').css('display', 'none');
+                            }
+                            $('#rejectModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been rejected!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "BOQ")';
+                            }
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.approve-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while rejecting!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+            $('a.submit-promp').click(function () {
+                boq_id = id;
+                $('#submitModal').modal('show');
+            });
+
+            $('.submit-confirm').click(function () {
+                if (boq_id != '') {
+                    $.ajax({
+                        url: "/BOQ/Submit",
+                        data: { id: boq_id },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.submit-confirm').css('display', 'none');
+                            }
+                            $('#submitModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been submitted!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "BOQ")';
+                            }
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.approve-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while submiting!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+        });
+    </script>
+    <script type="text/javascript">
+        Number.prototype.formatMoney = function (c, d, t) {
+            var n = this,
+            c = isNaN(c = Math.abs(c)) ? 2 : c,
+            d = d == undefined ? "." : d,
+            t = t == undefined ? "," : t,
+            s = n < 0 ? "-" : "",
+            i = String(parseInt(n = Math.abs(Number(n) || 0).toFixed(c))),
+            j = (j = i.length) > 3 ? j % 3 : 0;
+            return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+        };
+        function InitialBOQ(boq_id) {
+            $.ajax({
+                url:"@Url.Action("BOQViewDetail", "BOQ")",
+                type: "get",
+                dataType: "json",
+                data: { id :boq_id},
+                success: function (da) {
+                    var boq = da.boq;
+                    var boq_details_1 = da.boq_details_1;
+                    var boq_details_2 = da.boq_details_2;
+                    var boq_details_3 = da.boq_details_3;
+                    var count_detail_3 = 1;
+                    var total_amount = 0;
+                    var total_estimate_amount = 0;
+
+                    if (boq) {
+                        $('#current_date').text(getFormattedDateMMDDYYYY(new Date(parseInt((boq.created_date).replace("/Date(", "").replace(")/", ""), 10))));
+                        $('#boq_no').text(boq.boq_no);
+                        //$('#project_id').text(boq.project_full_name);
+                        $('#project_id').append("<a href='/Project/Details/"+boq.project_id+"'>" + boq.project_full_name + "</a>");
+                        $('#customer_name').text(boq.customer_name);
+                        $('#customer_signatory').text(boq.cutomer_signatory == null ? '' : boq.cutomer_signatory);
+                        $('#customer_project_manager').text(boq.cutomer_project_manager == null ? '' : boq.cutomer_project_manager);
+                        $('#customer_telephone').text(boq.customer_telephone == null ? '' : boq.customer_telephone);
+}
+
+                    $.each(boq_details_1, function (index, item) {
+                        var remark = (item.remark == null) ? " " : item.remark;
+                        var job_id = "job" + Number(index + 1);
+                        var total_job_category = 0;
+
+                        $('#boq_table').append(""+
+                                "<tr id='"+job_id+"'>"+
+                                    //"<td style='vertical-align: middle !important;'>" + String.fromCharCode(8544 + Number(index)) + "</td>" +
+                                    "<td style='vertical-align: middle !important;'>" + convertNumberToRoman(Number(Number(index)+1)) + "</td>" +
+                                    "<td>" + item.job_category_code + "</td>" +
+                                    "<td colspan='5' style='text-align:left !important; vertical-align: middle !important;'>" + item.j_category_name + "</td>" +
+                                    "<td style='vertical-align: middle !important;'>" + Number(item.amount).formatMoney(2) + "</td>" +
+                                    "<td><label class='control-label total_job_amount'></label></td>" +
+                                    "<td><label class='control-label dif_job_amount'></label></td>"+
+                                    "<td>" + remark + "</td>" +
+                                "</tr>"
+                            );
+
+                        $.each(boq_details_2, function (index1, item1) {
+                            var chat_accouunt = (item1.chart_account==null) ? " " : item1.chart_account;
+                            if (item.job_group == item1.job_group) {
+                                total_job_category = total_job_category + Number(item1.amount);
+                                console.log(item1);
+                                $('#boq_table').append("" +
+                                    "<tr>" +
+                                        //"<td style='padding-left:25px !important;'>" + (item1.type_group).replace(new RegExp('[0-9]'), '') + "</td>" +
+                                        "<td style='padding-left:25px !important;'>" + (item1.type_group).replace(/\d+|^\s+|\s+$/g, '') + "</td>" +
+                                        "<td style='vertical-align: middle !important;'>" + item1.p_category_code + "</td>" +
+                                        "<td style='text-align:left !important; vertical-align: middle !important;'>" + item1.p_category_name + "</td>" +
+                                        "<td colspan='4'>" + chat_accouunt + "</td>" +
+                                        "<td></td>"+
+                                        "<td style='vertical-align: middle !important;'>" + Number(item1.amount).formatMoney(2) + "</td>" +
+                                        "<td></td>"+
+                                        "<td>" + item1.remark + "</td>" +
+                                    "</tr>"
+                                );
+                                count_detail_3 = 1;
+                                $.each(boq_details_3, function (index2, item2) {
+                                    if (item1.type_group == item2.type_group) {
+                                        $('#boq_table').append("" +
+                                            "<tr>" +
+                                                "<td style='padding-left:50px !important;'>" + Number(count_detail_3)+ "</td>" +
+                                                "<td style='vertical-align: middle !important;'>" + item2.product_code + "</td>" +
+                                                "<td style='text-align:left !important; vertical-align: middle !important;'>" + item2.product_name + "</td>" +
+                                                "<td></td>"+
+                                                "<td>" + item2.product_unit + "</td>" +
+                                                "<td>" + Number(item2.item_qty).formatMoney(2) + "</td>" +
+                                                "<td>" + Number(item2.item_unit_price).formatMoney(2) + "</td>" +
+                                                "<td></td>"+
+                                                "<td>" + Number(Number(item2.item_qty) * Number(item2.item_unit_price)).formatMoney(2)+ "</td>" +
+                                                "<td></td>" +
+                                                "<td>" + item1.remark + "</td>" +
+                                            "</tr>"
+                                        );
+                                        count_detail_3 ++;
+                                    }
+                                    else
+                                        count_detail_3 = 1;
+                                });
+                            }
+                        });
+                        total_amount = Number(total_amount) + Number(total_job_category);
+                        total_estimate_amount = Number(total_estimate_amount) + Number(item.amount);
+                        $('#boq_table tr#' + job_id).find('label.total_job_amount').text(Number(total_job_category).formatMoney(2));
+                        $('#boq_table tr#' + job_id).find('label.dif_job_amount').text(Number(item.amount- total_job_category).formatMoney(2));
+                     });
+                    //console.log(da.boq_details_3);
+                    $('#boq_table tbody').find('tr:last-child').after(
+                        '<tr>' +
+                            '<td colspan="7" style="text-align:right !important;"><label class="control-label">Grand Total</label></td>' +
+                            '<td><label class="control-label" id="estimate_sub_total">' + Number(total_estimate_amount).formatMoney(2) + '</label></td>' +
+                            '<td><label class="control-label" id="sub_total">' + Number(total_amount).formatMoney(2) + '</label></td>' +
+                            '<td><label class="control-label" id="diff_sub_total">'+Number(total_estimate_amount-total_amount).formatMoney(2)+'</label></td>'+
+                            '<td></td>'+
+                        '</tr>'
+                    );
+                        //initial button block
+                    @*
+                    var isAdmin = false;
+                    var isPM = false;
+                    var isDir = false;
+                    var isAM = false;
+                    @if (GlobalMethod.IsUserInRole(User.Identity.Name, "Director"))
+                    {
+                        <text>
+                            isDir = true;
+                        </text>
+                    }
+                    else if (GlobalMethod.IsUserInRole(User.Identity.Name, "Admin"))
+                    {
+                        <text>
+                            isAdmin=true;
+                        </text>
+                    }
+                    else if (GlobalMethod.IsUserInRole(User.Identity.Name, "Project Manager"))
+                    {
+                        <text>
+                            isPM = true;
+                    </text>
+                    }
+                    else if(GlobalMethod.IsUserInRole(User.Identity.Name, "Economic Engineer"))
+                    {
+                        <text>
+                    isAM = true;
+                    </text>
+                    }
+                    if (!((isPM && boq.boq_status == "Pending") || (isDir && boq.boq_status == "Approved"))) {
+                        $('.approve-promp').hide();
+                        $('.reject-promp').hide();
+                    } 
+                        *@
+                },
+                error: function (err) {
+                    alert("Fail to initial boq:"+err.statusText);
+                }
+            });
+        }
+        function convertNumberToRoman(num) {
+            var lookup = {
+                ↈ: 100000,
+                ↂↈ: 90000,
+                ↇ: 50000,
+                ↂↇ: 40000,
+                ↂ: 10000,
+                Ⅿↂ: 9000,
+                ↁ: 5000,
+                Ⅿↁ: 4000,
+                Ⅿ: 1000,
+                ⅭⅯ: 900,
+                Ⅾ: 500,
+                ⅭⅮ: 400,
+                Ⅽ: 100,
+                ⅩⅭ: 90,
+                Ⅼ: 50,
+                ⅩⅬ: 40,
+                Ⅹ: 10,
+                Ⅸ: 9,
+                Ⅷ: 8,
+                Ⅶ: 7,
+                Ⅵ: 6,
+                Ⅴ: 5,
+                Ⅳ: 4,
+                Ⅲ: 3,
+                Ⅱ: 2,
+                Ⅰ: 1
+            }, roman = '',i;
+            if (num.length > 6) {
+                roman = num.substr(0, 6);
+                return roman;
+            }
+            /*
+            if (num <= 399999) {
+                roman = num;
+            } else {
+                roman = "399999";
+            }
+            */
+            for (i in lookup) {
+                while (num >= lookup[i]) {
+                    roman += i;
+                    num -= lookup[i];
+                }
+            }
+            return roman;
+        }
+    </script>
+    }

@@ -1,0 +1,85 @@
+﻿@model BT_KimMex.Models.BrandViewModel
+@{    ViewBag.Title = "Create";
+    //Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h3 class="title">Create New Brand</h3>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+ 
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="form-group">
+                    <label class="control-label col-md-2">Product Type <strong style="color:red;"></strong> :</label>
+                    <div class="col-md-10">
+                        <select class="form-control" id="product_type_id" name="product_type_id">
+                            <option value="">Select Product Type</option>
+                            @{
+                                BT_KimMex.Entities.kim_mexEntities db = new BT_KimMex.Entities.kim_mexEntities();
+                                //var producttype = db.tb_product_type.OrderBy(o => o.product_type_name).Where(w => w.active == true).ToList();
+                                
+                                foreach (var item in BT_KimMex.Class.CommonFunctions.GetProductTypeListItems())
+                                {
+                                    <option value="@item.product_type_id">@string.Format("{0} - {1}", item.product_type_name,item.product_category_name)</option>
+                                }
+                            }
+                        </select>
+                        @Html.ValidationMessageFor(model => model.product_type_id, "", new { @class = "text-danger", style = "display:block !important;" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="form-group row">
+                    <label class="control-label col-md-2">Brand <strong style="color:red;"></strong> :</label>
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.brand_name, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.brand_name, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Create" class="btn btn-default" />
+                        <a href="@Url.Action("Index", "Brand")" class="btn btn-default">Cancel</a>
+                    </div>
+                </div>
+            </div>
+
+                  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

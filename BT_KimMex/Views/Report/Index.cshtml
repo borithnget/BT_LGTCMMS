@@ -1,0 +1,24 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<style type="text/css">
+    .list-group-item{
+        border:none !important;
+    }
+</style>
+
+<h3 class="title">Report List</h3>
+<div class="list-group">
+    <a href="@Url.Action("ItemRequestbyProject","Report")" class="list-group-item">1. BOQ vs Actual Balance by Project</a>
+    <a href="@Url.Action("PurchaseOrder","Report")" class="list-group-item">2. Purchase Order</a>
+    @*<a href="javascript:" class="list-group-item">3. Purchase Order by supplier</a>*@
+    <a href="@Url.Action("PurchaseOrderBySupplier","Report")" class="list-group-item">3. Purchase Order by supplier with balance</a>
+    <a href="@Url.Action("StockMovement","Report")" class="list-group-item">4. Stock movement</a>
+    <a href="@Url.Action("ReturnItemtoSupplier","Report")" class="list-group-item">5. Return item to supplier</a>
+    <a href="@Url.Action("PurchaseOrderVsItemReceived", "Report")" class="list-group-item">6. Purchase Order vs Item Received</a>
+    <a href="@Url.Action("StockUsageBySiteWithRemainBalance", "Report")" class="list-group-item">7. Stock Usage by Site with remain balance</a>
+    <a href="@Url.Action("StockBalanceBywarehouse","Report")" class="list-group-item">8. Stock Balance by warehouse</a>
+</div>
+

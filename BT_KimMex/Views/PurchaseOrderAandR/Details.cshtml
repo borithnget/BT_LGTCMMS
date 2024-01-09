@@ -1,0 +1,813 @@
+﻿@model BT_KimMex.Models.PurchaseRequestViewModel
+    @using BT_KimMex.Class;
+@using Microsoft.AspNet.Identity;
+@{
+    ViewBag.Title = "Details";
+    var supplier_name = ViewBag.supplier_name;
+    var amount = ViewBag.Amount;
+    string date =Convert.ToDateTime(Model.updated_date).ToString("dd/MM/yyyy");
+    string userid = User.Identity.GetUserId().ToString();
+    BT_KimMex.Entities.kim_mexEntities db = new BT_KimMex.Entities.kim_mexEntities();
+    var remarks = Model.processFlow.Where(s => string.Compare(s.status, Status.RequestCancelled) == 0 || string.Compare(s.status, Status.Rejected) == 0 || string.Compare(s.status, Status.CancelledMR) == 0).ToList();
+    List<BT_KimMex.Entities.tb_purchase_request> poHistories = BT_KimMex.Models.PurchaseRequestViewModel.GetPurchaseOrderHistorybyPOIdAndQuoteId(Model.pruchase_request_id, Model.purchase_order_id);
+}
+<style type="text/css">
+    #purchaseOrderTable tr td:nth-child(5) {
+        text-align: left !important;
+    }
+
+    #purchaseOrderTable thead th {
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+
+    .form-control {
+        padding: 5px 0px !important;
+        height: auto !important;
+    }
+
+      #purchaseOrderTable thead th{
+        text-align:center !important;
+        vertical-align:middle !important;
+    }
+</style>
+@*<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />*@
+
+<div class="w3-panel w3-card-4">
+    <div class="w3-container w3-display-container">
+        <h3 class="title">View Purchase Order Detail</h3>
+        <button class="w3-button w3-tiny w3-display-topright w3-white w3-border w3-border-blue" style="margin-top:20px !important;" id="btn_show_history"><i class="fa fa-history" aria-hidden="true"></i> View History</button>
+    </div>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        <div class="form-horizontal">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <input id="purchase_order_id" class="hidden" type="number" value="@Model.pruchase_request_id" />
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="col-md-2">Date : </label>
+                        <label class="col-md-10">@date</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-2">PO Number :</label>
+                        <label class="col-md-10" id="purchase_number">@Model.purchase_request_number</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-2">PR Ref. Number:</label>
+                        <label class="col-md-10" id="purchase_number">@Model.purchaseRequisition.purchase_oder_number</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    @if (poHistories.Count() > 0)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="">
+                                <thead>
+                                    <tr>
+                                        <th>Requested Date</th>
+                                        <th>PO No.</th>
+                                        <th>Requested By</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{ 
+                                        foreach(var his in poHistories)
+                                        {
+                                            <tr>
+                                                <td><a href="@Url.Action("Details","PurchaseOrderAandR",new { id = his.pruchase_request_id })" target="_blank">@Convert.ToDateTime(his.created_date).ToString("dd/MM/yyyy HH:mm")</a></td>
+                                                <td class="text-center">@his.purchase_request_number</td>
+                                                <td>@CommonFunctions.GetUserFullnamebyUserId(his.created_by)</td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+            
+
+            @*<div class="form-group">
+                    <label class="col-md-2">Num : </label>
+                    <label class="col-md-10">@approveNo</label>
+                </div>*@
+
+
+            <div class="row" style="margin:0 !important;">
+                <table class="table table-bordered" id="purchaseOrderTable">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Supplier Name</th>
+                            <th>T&C</th>
+                            <th>PO Number</th>
+                            <th>Total Amount after VAT ($)</th>
+                            <th>Status</th>
+                    </thead>
+                    <tbody>
+                        @{
+                                        int count = 1;
+                                        foreach (var item in Model.poDetails)
+                                        {
+                                            var prId = db.tb_purchase_order.Where(s => string.Compare(s.purchase_order_id, Model.purchase_order_id) == 0).FirstOrDefault();
+                                            var supplierQuote = db.tb_quote.OrderByDescending(s => s.created_date)
+                                                .Where(s => s.status == true && string.Compare(s.quote_status, Status.cancelled) != 0
+                                                && string.Compare(s.mr_id,prId.item_request_id)== 0 && string.Compare(s.supplier_id,item.supplier_id)==0 ).FirstOrDefault();
+                                            string tnc = "<ul style='margin:0px !important;padding:0px !important;margin-left:7px !important;'​>";
+                                            if (supplierQuote != null)
+                                            {
+                                                if (!string.IsNullOrEmpty(supplierQuote.incoterm))
+                                                {
+                                                    tnc = string.Format("{0}<li>Incoterms: {1}</li>", tnc, supplierQuote.incoterm);
+                                                }
+                                                if (!string.IsNullOrEmpty(item.supplier_quote.payment))
+                                                {
+                                                    tnc = string.Format("{0}<li>Payment: {1}</li>", tnc, supplierQuote.payment);
+                                                }
+                                                if (!string.IsNullOrEmpty(item.supplier_quote.delivery))
+                                                {
+                                                    tnc = string.Format("{0}<li>Delivery: {1}</li>", tnc, supplierQuote.delivery);
+                                                }
+                                                if (!string.IsNullOrEmpty(item.supplier_quote.shipment))
+                                                {
+                                                    tnc = string.Format("{0}<li>Shipment: {1}</li>", tnc, supplierQuote.shipment);
+                                                }
+                                                if (!string.IsNullOrEmpty(item.supplier_quote.warranty))
+                                                {
+                                                    tnc = string.Format("{0}<li>Wanrranty: {1}</li>", tnc, supplierQuote.warranty);
+                                                }
+                                                if (!string.IsNullOrEmpty(item.supplier_quote.vendor_ref))
+                                                {
+                                                    tnc = string.Format("{0}<li>Vendor Ref.: {1}</li>", tnc, supplierQuote.vendor_ref);
+                                                }
+                                                tnc = string.Format("{0}{1}", tnc, "</ul>");
+                                            }
+                                //if (item.supplier_quote != null)
+                                //{
+                                //    if (!string.IsNullOrEmpty(item.supplier_quote.incoterm))
+                                //    {
+                                //        tnc = string.Format("{0}<li>Incoterms: {1}</li>", tnc, item.supplier_quote.incoterm);
+                                //    }
+                                //    if (!string.IsNullOrEmpty(item.supplier_quote.payment))
+                                //    {
+                                //        tnc = string.Format("{0}<li>Payment: {1}</li>", tnc, item.supplier_quote.payment);
+                                //    }
+                                //    if (!string.IsNullOrEmpty(item.supplier_quote.delivery))
+                                //    {
+                                //        tnc = string.Format("{0}<li>Delivery: {1}</li>", tnc, item.supplier_quote.delivery);
+                                //    }
+                                //    if (!string.IsNullOrEmpty(item.supplier_quote.shipment))
+                                //    {
+                                //        tnc = string.Format("{0}<li>Shipment: {1}</li>", tnc, item.supplier_quote.shipment);
+                                //    }
+                                //    if (!string.IsNullOrEmpty(item.supplier_quote.warranty))
+                                //    {
+                                //        tnc = string.Format("{0}<li>Wanrranty: {1}</li>", tnc, item.supplier_quote.warranty);
+                                //    }
+                                //    if (!string.IsNullOrEmpty(item.supplier_quote.vendor_ref))
+                                //    {
+                                //        tnc = string.Format("{0}<li>Vendor Ref.: {1}</li>", tnc, item.supplier_quote.vendor_ref);
+                                //    }
+                                //    tnc = string.Format("{0}{1}", tnc, "</ul>");
+                                //}
+
+                                <tr>
+                                    <td>@count</td>
+                                    <td>@item.supplier_name</td>
+                                    <td style="padding-left:14px !important;">
+                                        @Html.Raw(tnc)
+                                    </td>
+                                    <td><a href="javascript:void(0)" onclick="generateNewReport('@Model.purchase_order_id','@item.supplier_id')">@item.po_report_number</a></td>
+                                    <td class="text-center">@item.amount</td>
+                                    <td>@item.status</td>
+                                </tr>
+                                count++;
+                            }
+                            }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (remarks.Count() > 0)
+            {
+                <div class="form-group">
+                    <label class="col-md-2">Reason:</label>
+                    <div class="col-md-10">
+                        @foreach (var rm in remarks)
+                        {
+                            <p>@rm.remark</p>
+                        }
+                    </div>
+                </div>
+            }
+
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+
+                    @if ((string.Compare(Model.purchase_request_status, Status.Pending) == 0 || string.Compare(Model.purchase_request_status, Status.Approved) == 0 || string.Compare(Model.purchase_request_status, Status.Completed) == 0) && (User.IsInRole(Role.SystemAdmin) || string.Compare(Model.created_by, userid) == 0 || User.IsInRole(Role.Purchaser)))
+                    {
+                        <a id="cancel" class="w3-button w3-tiny w3-deep-orange cancel-promp">Request Cancel</a>
+                    }
+
+                    @if (string.Compare(Model.purchase_request_status, Status.Pending) == 0 && (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.FinanceManager) || User.IsInRole(Role.AccountingManager)))
+                    {
+                        <a href="@Url.Action("Approval","PurchaseOrderAandR",new { id = Model.pruchase_request_id })" class="w3-button w3-tiny w3-teal">Approval</a>
+                        <a href="javascript:void(0)" class="w3-button w3-tiny w3-deep-orange" id="btn-approval-reject">Reject</a>
+                        <a id="btn-cancel-mr" class="w3-button w3-tiny w3-deep-orange">Cancel MR</a>
+                    }
+
+                    @if (string.Compare(Model.purchase_request_status, Status.Approved) == 0 && Model.is_check == true && (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.OperationDirector)))
+                    {
+                        <a href="javascript:void(0)" class="w3-button w3-tiny w3-teal" id="btn-approve">Approve</a>
+                        <a href="javascript:void(0)" class="w3-button w3-tiny w3-deep-orange" id="btn-reject">Reject</a>
+                        <a id="btn-cancel-mr" class="w3-button w3-tiny w3-deep-orange">Cancel MR</a>
+                    }
+
+                    @if (string.Compare(Model.purchase_request_status, Status.Approved) == 0 || string.Compare(Model.purchase_request_status, Status.Completed) == 0 || string.Compare(Model.purchase_request_status, Status.MREditted) == 0)
+                {
+                        <a href="/PurchaseOrder/GenerateReport/@Model.purchase_order_id" class="w3-button w3-tiny w3-orange"><span class="glyphicon glyphicon-th-list"></span> Generate</a>
+                    }
+
+                    <a href="javascript:history.back()" class="w3-button w3-tiny w3-red">Back</a>
+
+                </div>
+            </div>
+
+        </div>
+
+                            }
+
+</div>
+
+
+
+
+<!-- delete project modal popup-->
+<div class="modal fade" id="myModal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+
+            <div class="modal-body">
+                <p class="success-message">Are you sure to Approve this request?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default approve-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- reject project modal popup-->
+@*<div class="modal fade" id="myModal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+
+            <div class="modal-body">
+                <p class="success-message">Are you sure to Reject this item?</p>
+                <div class="form-group row">
+                    <label class="col-md-2">Comment:</label>
+                    <div class="col-md-10">
+                        <textarea class="form-control" rows="5" id="request-cancel-comment"></textarea>
+                    </div>
+                </div> 
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default reject-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+</div>*@
+
+
+<!-- cancel project modal popup-->
+<div class="modal fade" id="cancelModal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" id="cancel-type"/>
+                <p class="success-message ">Are you sure to <span id="sp-cancel-text">Cancel</span>  this request?</p>
+                <div class="form-group row">
+                    <label class="col-md-2">Comment:</label>
+                    <div class="col-md-10">
+                        <textarea class="form-control" rows="5" id="request-cancel-comment"></textarea>
+                    </div>
+                </div>  
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default cancel-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Show History modal popup-->
+<div class="modal fade" id="showHistoryModal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-primary">
+                <h4 class="modal-title" id="myModalLabel">View Process History</h4>
+            </div>
+
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>User</th>
+                                <th>Status</th>
+                                <th>Remark</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                foreach (var history in Model.processWorkFlows)
+                                {
+                                    <tr>
+                                        <td>@Convert.ToDateTime(history.created_at).ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>@history.crated_by_name</td>
+                                        <td>@Html.Raw(ShowStatus.GetPurchaseOrderShowStatus(history.status))</td>
+                                        <td>@history.remark</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                @*<button class="btn btn-default approve-confirm">Yes</button>*@
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js" type="text/javascript"></script>
+    
+    <script type="text/javascript">
+        $(function () {
+            var po_id = GetURLParameter();
+            var role;
+
+            $('#btn_show_history').click(function (e) {
+                $('#showHistoryModal').modal('show');
+            });
+
+            $("#btn-approve").click(function (e) {
+                e.preventDefault();
+                swal({
+                    title: "Confirmation",
+                    text: "Do you want to approve this request?",
+                    icon: "warning",
+                    buttons: true,
+                    //dangerMode: true,
+                })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $.ajax({
+                            url: "/PurchaseOrderAandR/CheckApproval",
+                            data: {
+                                'id': '@Model.pruchase_request_id',
+                                'status': 'approved',
+                                'comment':'',
+                            },
+                            type: 'GET',
+                            success: function (da) {
+                                swal("Request has been approved successfully.", {
+                                    icon: "success",
+                                });
+                                window.location.href = '@Url.Action("MyApproval", "PurchaseOrderAandR")';
+                            },
+                            error: function (err) {
+                                swal("Poof! " + err, {
+                                    icon: "error",
+                                });
+                            }
+                        });
+
+
+
+                    } else {
+                        //swal("Your imaginary file is safe!");
+                    }
+                });
+            });
+
+            @*$('#btn-reject').click(function (e) {
+                e.preventDefault();
+                swal({
+                    title: "Rejection",
+                    text: "Please input your reject comment:",
+                    icon: "warning",
+                    content: "input",
+                })
+                .then((value) => {
+                    $.ajax({
+                        url: "/PurchaseOrderAandR/CheckApproval",
+                        data: {
+                            'id': '@Model.pruchase_request_id',
+                            'status': 'rejected',
+                            'comment': value,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            swal("Request has been rejected successfully.", {
+                                icon: "success",
+                            });
+                            window.location.href = '@Url.Action("Index", "PurchaseOrderAandR")';
+                        },
+                        error: function (err) {
+                            swal("Poof! " + err, {
+                                icon: "error",
+                            });
+                        }
+                    });
+                });
+            });*@
+
+            $('.approve-promp').click(function () {
+                $('#myModal').modal('show');
+            });
+            $('.approve-confirm').click(function () {
+                po_id = $('#purchase_order_id').val();
+                if (po_id != '') {
+                    $.ajax({
+                        url: "/PurchaseOrderAandR/ApproveByCO",
+                        data: {
+                            'id': po_id,
+                        },
+                        type: 'POST',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#myModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been approved!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "PurchaseOrderAandR")';
+                            }
+                            else if (da.result == "fail") {
+                                $.notify(da.message, { className: 'error' });
+                            }
+                            else {
+                                $.notify('Your data has been error while approving!', { className: 'error' });
+                            }
+
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.approve-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while approving!', { className: 'error' });
+                        }
+
+                    });
+                }
+            });
+
+
+            $('#btn-reject').click(function () {
+                $('#cancel-type').val('@Status.CheckRejected');
+                $('#cancelModal').modal('show');
+            });
+
+            $('.reject-confirm').click(function () {
+                po_id = $('#purchase_order_id').val();
+                if (po_id != '') {
+                    $.ajax({
+                        url: "/PurchaseOrderAandR/RejectByCO",
+                        data: {
+                            'id': po_id,
+                        },
+                        type: 'POST',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#myModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been approved!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "PurchaseOrderAandR")';
+                            }
+                            else if (da.result == "fail") {
+                                $.notify(da.message, { className: 'error' });
+                            }
+                            else {
+                                $.notify('Your data has been error while rjecting!', { className: 'error' });
+                            }
+
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.approve-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while rejecting!', { className: 'error' });
+                        }
+
+                    });
+                }
+            });
+
+            //Check reject
+
+            $('#btn-reject').click(function () {
+                $('#cancel-type').val('@Status.CheckRejected');
+                $('#sp-cancel-text').html("Reject");
+                $('#cancelModal').modal('show');
+            });
+
+            $('#btn-approval-reject').click(function () {
+                $('#cancel-type').val('@Status.Rejected');
+                $('#sp-cancel-text').html("Reject");
+                $('#cancelModal').modal('show');
+            });
+
+            // Cancel Purchase Order
+            $('.cancel-promp').click(function () {
+                $('#cancel-type').val('@Status.RequestCancelled');
+                $('#cancelModal').modal('show');
+
+            });
+
+            //cancel mr
+
+            $('#btn-cancel-mr').click(function (e) {
+                e.preventDefault();
+                $('#cancel-type').val('@Status.CancelledMR');
+                $('#cancelModal').modal('show');
+            });
+
+            $('.cancel-confirm').click(function () {
+                po_id = '@Model.pruchase_request_id';
+                var canceltype = $('#cancel-type').val();
+
+                if (po_id != '') {
+                    if (canceltype == '@Status.RequestCancelled') {
+
+                        $.ajax({
+                            url: "/PurchaseOrderAandR/Cancel",
+                            data: {
+                                'id': po_id,
+                                'suppliers': [],
+                                'comment': $("#request-cancel-comment").val(),
+                            },
+                            type: 'POST',
+                            success: function (da) {
+                                if ($('.modal-header').hasClass('alert-danger')) {
+                                    $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                    $('.delete-confirm').css('display', 'none');
+                                }
+                                $('#cancelModal').modal('hide');
+                                if (da.result == "success") {
+                                    $.notify('Your data has been cancelled.', { className: 'success' });
+                                    window.location.href = '@Url.Action("MyRequest", "PurchaseOrderAandR")';
+                                }
+                                else if (da.result == "fail") {
+                                    $.notify(da.message, { className: 'error' });
+                                }
+                                else {
+                                    $.notify('Your data has been error while approving!', { className: 'error' });
+                                }
+                            },
+                            error: function (err) {
+                                if (!$('.modal-header').hasClass('alert-danger')) {
+                                    $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                    $('.approve-confirm').css('display', 'none');
+                                }
+                                $('.success-message').html(err.statusText);
+                                $.notify('Your data has been error while cancelling!', { className: 'error' });
+                            }
+                        });
+
+                    } else if (canceltype == '@Status.CheckRejected') {
+                        $.ajax({
+                            url: "/PurchaseOrderAandR/CheckApproval",
+                            data: {
+                                'id': '@Model.pruchase_request_id',
+                                'status': 'rejected',
+                                'comment': $("#request-cancel-comment").val(),
+                            },
+                            type: 'POST',
+                            success: function (da) {
+                                if ($('.modal-header').hasClass('alert-danger')) {
+                                    $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                    $('.delete-confirm').css('display', 'none');
+                                }
+                                $('#cancelModal').modal('hide');
+                                if (da.result == "success") {
+                                    $.notify('Your data has been rejected.', { className: 'success' });
+                                    window.location.href = '@Url.Action("MyApproval", "PurchaseOrderAandR")';
+                                }
+                                else if (da.result == "fail") {
+                                    $.notify(da.message, { className: 'error' });
+                                }
+                                else {
+                                    $.notify('Your data has been error while approving!', { className: 'error' });
+                                }
+                            },
+                            error: function (err) {
+                                if (!$('.modal-header').hasClass('alert-danger')) {
+                                    $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                    $('.approve-confirm').css('display', 'none');
+                                }
+                                $('.success-message').html(err.statusText);
+                                $.notify('Your data has been error while cancelling!', { className: 'error' });
+                            }
+                        });
+                    } else if (canceltype == '@Status.CancelledMR') {
+                        $.ajax({
+                            url: "/PurchaseOrderAandR/CancelMR",
+                            data: {
+                                'id': '@Model.pruchase_request_id',
+                                'comment': $("#request-cancel-comment").val(),
+                            },
+                            type: 'POST',
+                            success: function (da) {
+                                if ($('.modal-header').hasClass('alert-danger')) {
+                                    $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                    $('.delete-confirm').css('display', 'none');
+                                }
+                                $('#cancelModal').modal('hide');
+                                if (da.result == "success") {
+                                    $.notify('Your data has been rejected.', { className: 'success' });
+                                    window.location.href = '@Url.Action("MyApproval", "PurchaseOrderAandR")';
+                                }
+                                else if (da.result == "error") {
+                                    $.notify(da.message, { className: 'error' });
+                                }
+                                else {
+                                    $.notify('Your data has been error while approving.', { className: 'error' });
+                                }
+                            },
+                            error: function (err) {
+                                if (!$('.modal-header').hasClass('alert-danger')) {
+                                    $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                    $('.approve-confirm').css('display', 'none');
+                                }
+                                $('.success-message').html(err.statusText);
+                                $.notify('Your data has been error while cancelling!', { className: 'error' });
+                            }
+                        });
+                    } else if (canceltype == '@Status.Rejected') {
+                        $.ajax({
+                            url: "/PurchaseOrderAandR/RejectApproval",
+                            data: {
+                                'id': '@Model.pruchase_request_id',
+                                'comment': $("#request-cancel-comment").val(),
+                            },
+                            type: 'POST',
+                            success: function (da) {
+                                if ($('.modal-header').hasClass('alert-danger')) {
+                                    $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                    $('.delete-confirm').css('display', 'none');
+                                }
+                                $('#cancelModal').modal('hide');
+                                if (da.result == "success") {
+                                    $.notify('Your data has been rejected.', { className: 'success' });
+                                    window.location.href = '@Url.Action("MyApproval", "PurchaseOrderAandR")';
+                                }
+                                else if (da.result == "fail") {
+                                    $.notify(da.message, { className: 'error' });
+                                }
+                                else {
+                                    $.notify('Your data has been error while approving!', { className: 'error' });
+                                }
+                            },
+                            error: function (err) {
+                                if (!$('.modal-header').hasClass('alert-danger')) {
+                                    $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                    $('.approve-confirm').css('display', 'none');
+                                }
+                                $('.success-message').html(err.statusText);
+                                $.notify('Your data has been error while cancelling!', { className: 'error' });
+                            }
+                        });
+                    }
+
+
+
+                }
+            });
+
+
+            function InitPOSupplierDataTabl() {
+                var po_id = $('#purchase_order_id').val();
+                var t = $('#purchase_table').DataTable({
+                    "ajax": {
+                        "url": "@Url.Action("GetPurchaseOrderApprovalDataTable", "PurchaseOrderAandR")",
+                    "type": "GET",
+                    "dataType": "json"
+                },
+                    "columns": [
+            { "data": "Purchase_order_id" },
+            {
+                "data": "checked_date", render: function (data, type, full, meta) {
+                    return new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)).toISOString().slice(0, 10);
+                }
+            },
+            { "data": "Purchar_Number" },
+            { "data": "purchase_oder_number" },
+            { "data": "status" },
+
+            //{ "data": "Action" },
+            //{ " data": "purchase_oder_number" },
+            {
+                "render": function (data, type, full, meta) {
+                    return '<a href="/PurchaseOrderAandR/details/' + full.Purchase_order_id + '">view detail</a>';
+                }
+            },
+            //{
+            //    "render": function (data, type, full, meta) {
+            //        return '<a href="/PurchaseOrderAandR/cancel/' + full.Purchase_order_id + '">cancel</a>';
+            //    }
+            //},
+            //{
+            //    "render": function (data, type, full, meta) {
+            //        return '<a href="javascript:void(0)" id="' + full.Purchase_order_id + '" class="delete-promp">Delete</a>';
+            //    }
+            //}
+        ],
+        "order": [[1, "desc"]],
+        });
+
+
+        t.on('order.dt search.dt', function () {
+            t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                cell.innerHTML = i + 1;
+            });
+        }).draw();
+        $('select[name="purchase_table_length"]').addClass('datatable-control');
+        $('input[aria-controls="purchase_table"]').addClass('datatable-control');
+        $('#purchase_table_filter').append('<a href="@Url.Action("Create", "PurchaseOrderAandR")" class="btn btn-default pull-left" style="margin-right:10px !important;">Add New</a>');
+        }
+
+
+        });
+
+        //added on dec 12 2018
+        function generateNewReport(poId, supplierId) {
+            $.ajax({
+                url: '/PurchaseOrder/GenerateReport',
+                type: "post",
+                dataType: "json",
+                data: { id: poId, supplierID: supplierId },
+                success: function (da) {
+                    if (da.result == "success") {
+                        //window.location.href = "/PurchaseOrder/Report?id=" + da.poId + "&supplierId=" + supplierId;
+                        if (da.isHasVAT) {
+                            var show1 = window.open("/PurchaseOrder/Report?id=" + da.poId + "&supplierId=" + supplierId, "_blank");
+                            show1.focus();
+                        }
+                        if (da.isHasNotVAT) {
+                            var show = window.open("/PurchaseOrder/ReportNotVAT?id=" + da.poId + "&supplierId=" + supplierId, "_blank");
+                            show.focus();
+                        }
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(textStatus);
+                }
+            });
+        }
+
+    </script>
+}
+

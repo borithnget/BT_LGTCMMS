@@ -1,0 +1,94 @@
+﻿
+@{
+    ViewBag.Title = "ItemMaster";
+}
+
+<style type="text/css">
+    #itemPriceTable tr td{
+        vertical-align:middle !important;
+    }
+</style>
+
+<h3 class="title">Item Price by Supplier List</h3>
+<table class="table table-bordered" id="itemPriceTable">
+
+</table>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function(){
+            initialTableHeader();
+        });
+        function initialTableHeader() {
+
+            $('#itemPriceTable').append('<thead></thead>');
+            var strHeader = "<tr>" +
+                "<th>Item Code</th><th>Item Name</th><th>Unit</th>";
+            var maxSupplier = getMaxSupplier();
+            for (var i = 1; i <= maxSupplier; i++) {
+                strHeader = strHeader + "<th>Supplier " + i+"</th><th>Price</th>";
+            }
+            strHeader = strHeader + "<th></th></tr>";
+            $('#itemPriceTable thead').append(strHeader);
+            $('#itemPriceTable').append("<tbody></tbody>");
+            $.ajax({
+                url: '@Url.Action("GetItemsPriceList", "Quote")',
+                type: "get",
+                dataType: "json",
+                async: false,
+                contentType: "application/json; charset=utf-8",
+                success: function (da) {
+                    $.each(da.data, function (index, item) {
+                        //console.log(item);
+                        var strBody = "<tr>";
+                        strBody = strBody + "<td>" + item.product_code + "</td>" +
+                            "<td>" + item.product_name + "</td>" +
+                            "<td>" + item.product_unit + "</td>";
+                        if (item.quoteSuppliers.length > 0) {
+                            $.each(item.quoteSuppliers, function (index1, item1) {
+                                strBody = strBody + "<td>" + item1.supplier_name + "</td>" +
+                                    "<td>"+parseFloat(item1.price).toFixed(4)+"</td>";
+                            });
+                        }
+                        for (var i = 1; i <= Number(maxSupplier - item.quoteSuppliers.length); i++)
+                            strBody = strBody + "<td></td><td></td>";
+                        strBody = strBody + "<td><a href='/Quote/ItemPirceDetail/"+item.product_id+"'>Edit</a></td></tr>";
+                        $('#itemPriceTable tbody').append(strBody);
+                    });
+                    $('#itemPriceTable').DataTable({
+                        dom: 'Bfrtip',
+                        buttons: [
+                          //'copyHtml5',
+                          'excelHtml5',
+                          //'pdfHtml5', 'csvHtml5'
+                        ],
+                    });
+                    $('input[aria-controls="itemPriceTable"]').addClass('datatable-control');
+                    $('button[aria-controls="itemPriceTable"]').removeClass('dt-button');
+                    $('button[aria-controls="itemPriceTable"]').addClass('btn btn-default');
+                    $('button[aria-controls="itemPriceTable"]').html('Export to Excel');
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(textStatus);
+                }
+            });
+        }
+        function getMaxSupplier(){
+            var max = 0;
+            $.ajax({
+                url: '@Url.Action("GetItemsPriceList", "Quote")',
+                type: "get",
+                dataType: "json",
+                async: false,
+                contentType: "application/json; charset=utf-8",
+                success: function (da) {
+                    max = da.maxSupplier;
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(XMLHttpRequest);
+                }
+            });
+            return max;
+        }
+    </script>
+    }

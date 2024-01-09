@@ -1,0 +1,291 @@
+﻿@model BT_KimMex.Models.PurchaseOrderViewModel
+
+@{
+    Layout = null;
+    decimal totalAmount = 0;
+    int maxSupplier = 0;
+    foreach (var item in Model.poDetails)
+    {
+        if (item.poSuppliers.Count() > maxSupplier)
+        {
+            maxSupplier = item.poSuppliers.Count();
+        }
+    }
+    string createdDate = Convert.ToDateTime(Model.created_date).ToString("dd/MM/yyyy");
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Print</title>
+    <link rel="stylesheet" href="~/Content/bootstrap.min.css" />
+    <link id="favicon" rel="shortcut icon" type="image/jpg" href="~/icon_km.png" />
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
+
+    @*<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/responsive/2.2.1/css/responsive.bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.min.css" rel="stylesheet" />
+    <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />*@
+    <link href="~/Assets/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/Assets/plugins/datatables/datatables.min.css" rel="stylesheet" />
+    <link href="~/Assets/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css" rel="stylesheet" />
+    <link href="~/Assets/plugins/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet" />
+    <link href="~/Assets/plugins/jquery-ui/jquery-ui.min.css" rel="stylesheet" />
+    <style type="text/css">
+        body {
+            font-family: 'Khmer OS Content', sans-serif !important;
+        }
+        #po_table thead th,tr td{
+            text-align:center !important;
+            vertical-align:middle !important;
+            font-size:10px !important;
+        }
+        #po_table td:nth-child(3){
+            text-align:left !important;
+        }
+    </style>
+</head>
+<body id="element-body">
+    <div class="container-fluid body-content" style="margin-top:0 !important;"> 
+        <h3 class="title">Quote Detail Report</h3>
+        <div class="form-horizontal">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        @Html.Label("Date:", new { @class = "control-label col-md-4",style="width:10% !important;" })
+                        <label class="col-md-8" id="date" style="width:85% !important;">@createdDate</label>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-4" style="width:10% !important;" >PO List No.:</label>
+                        @Html.DisplayFor(model => model.purchase_oder_number, new { @class = "col-md-8", style = "width:10% !important;" })
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-4" style="width:10% !important;">PR Ref.:</label>
+                        @Html.DisplayFor(model => model.ir_no, new { @class = "col-md-8",style="width:85% !important;" })
+                    </div>
+                    <div class="form-group row">
+                        @Html.Label("Project Name:", new { @class = "control-label col-md-4", style = "width:10% !important;" })
+                        @Html.DisplayFor(model => model.project_full_name, new { @class = "col-md-8",style = "width:85% !important;" })
+                    </div>
+                </div>
+                <div class="col-md-6">
+
+                </div>
+            </div>
+            <div class="row" style="margin:0 !important;">
+                <table class="table table-responsive table-bordered" id="po_table">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">No.</th>
+                            <th rowspan="2">Item Code</th>
+                            <th rowspan="2">Item Name</th>
+                            <th rowspan="2">Req. QTY</th>
+                            <th rowspan="2">Req. Unit</th>
+                            @for (int i = 1; i <= maxSupplier; i++)
+                            {
+                                <th colspan="4">Supplier @i</th>
+                            }
+                            <th colspan="5">Selected Supplier</th>
+                            <th rowspan="2">Total</th>
+                            <th rowspan="2">Remark</th>
+                            <th rowspan="2">Status</th>
+                        </tr>
+                        <tr>
+                            @for (int i = 1; i <= maxSupplier; i++)
+                            {
+                                <th>VAT</th>
+                                <th></th>
+                                <th>Name</th>
+                                <th>Unit Price</th>
+                            }
+                            <th>VAT</th>
+                            <th>Name</th>
+                            <th>Unit Price</th>
+                            <th>PO QTY</th>
+                            <th>PO Unit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int count = 1;
+                            foreach (var item in Model.poDetails)
+                            {
+                                string requestQty = string.Format("{0:G29}", decimal.Parse(item.quantity.ToString()));
+                                <tr>
+                                    <td>@count</td>
+                                    <td>@item.product_code</td>
+                                    <td>@item.product_name</td>
+                                    <td>@requestQty</td>
+                                    <td>@item.item_unit</td>
+                                    @{
+                                        var sups = item.poSuppliers;
+                                        for (int i = 0; i < sups.Count(); i++)
+                                        {
+                                            <td>
+                                                @if (Convert.ToBoolean(sups[i].vat))
+                                                {
+                                                    <input type="checkbox" checked disabled />
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" disabled />
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (Convert.ToBoolean(sups[i].is_check))
+                                                {
+                                                    <input type="checkbox" checked disabled />
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" disabled />
+                                                }
+                                            </td>
+                                            <td>@sups[i].supplier_name</td>
+                                            <td>@sups[i].unit_price</td>
+                                        }
+
+                                        for (var i = 1; i <= (maxSupplier - sups.Count()); i++)
+                                        {
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        }
+
+                                        for (int i = 0; i < sups.Count(); i++)
+                                        {
+                                            if (sups[i].is_selected == true)
+                                            {
+                                                string poQty = string.Format("{0:G29}", decimal.Parse(item.po_quantity.ToString()));
+                                                <td style="background-color:yellow !important;">
+                                                    @if (Convert.ToBoolean(sups[i].vat))
+                                                    {
+                                                        <input type="checkbox" checked disabled />
+                                                    }
+                                                    else
+                                                    {
+                                                        <input type="checkbox" disabled />
+                                                    }
+                                                </td>
+                                                    <td style="background-color:yellow !important;">@sups[i].supplier_name</td>
+                                                    <td style="background-color:yellow !important;">@sups[i].unit_price</td>
+                                                    <td style="background-color:yellow !important;">@poQty</td>
+                                                    <td style="background-color:yellow !important;">@item.product_unit_name</td>
+                                                    <td>
+                                                        @{
+                                                            decimal total = Convert.ToDecimal(sups[i].unit_price * item.po_quantity);
+                                                            <b>@total.ToString("C")</b>
+                                                        }
+                                                    </td>
+                                                    <td>@sups[i].Reason</td>
+                                                                    totalAmount = totalAmount + Convert.ToDecimal(sups[i].unit_price * item.po_quantity);
+                                                                }
+
+                                                            }
+                                    }
+
+                                    <td>
+                                        @{ if (string.Compare(item.item_status, "Pending") == 0)
+                                            {
+                                                <label style="color:green !important">@item.item_status</label>
+                                            }
+                                            else if (string.Compare(item.item_status, "approved") == 0)
+                                            {
+                                                <label style="color:blue !important">@item.item_status</label>
+                                            }
+                                            else if (string.Compare(item.item_status, "rejected") == 0)
+                                            {
+                                                <label style="color:gray !important">@item.item_status</label>
+                                            }
+                                            else if (string.Compare(item.item_status, "cancelled") == 0)
+                                            {
+                                                <label style="color:gray !important">@item.item_status</label>
+                                            }
+                                        }
+                                    </td>
+                                </tr>
+                                                count++;
+                                            }
+                        }
+                    </tbody>
+                    @{
+                        int cspan = 10 + (maxSupplier * 4);
+                        <tfoot>
+                            <tr>
+                                <td colspan="@cspan" style="text-align:right !important;"><label style="font-weight:bold !important;">Total Amount</label></td>
+                                <td style="text-align:center !important;"><label style="font-weight:bold !important;"><b>@totalAmount.ToString("C")</b></label></td>
+                                <td colspan="2"></td>
+                            </tr>
+                        </tfoot>
+                    }
+                </table>
+            </div>
+            <div class="form-group">
+                @Html.Label("Attachments Reference:", new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @{
+                        var atts = Model.poAttachments;
+                        for (int i = 0; i < atts.Count(); i++)
+                        {
+                            <a class="title" href="/PurchaseOrder/Download/?p=@(atts[i].po_attachment_id + atts[i].po_attachment_extension)&d=@atts[i].po_attachment_name">@atts[i].po_attachment_name</a><br />
+                        }
+                    }
+                </div>
+            </div>
+            @if (Model.rejects.Count() > 0)
+            {
+                <div class="form-group">
+                    <label class="control-label col-md-2">Reject Command:</label>
+                    <div class="col-md-10">
+                        <ul>
+                            @foreach (var reject in Model.rejects)
+                            {
+                                <li>@reject.comment <b>By @reject.rejected_by</b></li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <script type="text/javascript" src="~/Scripts/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/bootstrap.min.js"></script>
+    @*<script type="text/javascript" src="~/Scripts/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/respond.min.js"></script>*@
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js" type="text/javascript"></script>*@
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="~/Assets/plugins/jquery-ui/jquery-ui.min.js"></script>
+    @*<script src="~/Scripts/notify.min.js" type="text/javascript"></script>*@
+    <script src="~/Scripts/jQuery.print.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('#element-body').print();
+            @*$("#element-body").print({
+                //Use Global styles
+                //globalStyles: false,
+                //Add link with attrbute media=print
+                //mediaPrint: false,
+                //Custom stylesheet
+                stylesheet: "https://fonts.googleapis.com/css?family=Inconsolata",
+                //Print in a hidden iframe
+                //iframe: false,
+                //Don't print this
+                //noPrintSelector: ".avoid-this",
+                //Add this at top
+                //prepend: "Hello World!!!<br/>",
+                //Add this on bottom
+                //append: "<span><br/>Buh Bye!</span>",
+                //Log to console when printing is done via a deffereDed callback
+
+                deferred: $.Deferred().done(function () {
+                    //console.log('Printing done', arguments);
+                    window.location.href = "@Url.Action("Detail","PurchaseOrder",new { id = Model.purchase_order_id })";
+                })
+            });*@
+        });
+    </script>
+</body>
+</html>

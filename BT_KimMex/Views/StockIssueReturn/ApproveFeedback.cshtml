@@ -1,0 +1,164 @@
+﻿@model BT_KimMex.Models.StockIssueReturnViewModel
+
+@{
+    ViewBag.Title = "ApproveFeedback";
+}
+<style type="text/css">
+    #issueReturnTable tr td{
+        vertical-align:middle !important;
+    }
+    #issueReturnTable tr td:nth-child(5),#issueReturnTable tr td:nth-child(6){
+        text-align:center !important;
+    }
+</style>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        @Html.HiddenFor(model=>model.stock_issue_return_id)
+        <h3 class="title">Approve/ Feedback Stock Return Request</h3>
+        <div class="form-group">
+            @Html.LabelFor(model => model.created_date, htmlAttributes: new { @class = "col-md-2" })
+            @Html.Label(BT_KimMex.Class.CommonClass.ToLocalTime(Convert.ToDateTime(Model.created_date)).ToString("dd/MM/yyyy"), new { @class = "col-md-10" })
+        </div>
+        <div class="form-group">
+            <label class="col-md-2">Stock Return No.:</label>
+            @Html.Label(Model.issue_return_number, new { @class = "col-md-10" })
+        </div>
+        <div class="form-group">
+            <label class="col-md-2">Stock Transfer Ref.:</label>
+            @Html.Label(Model.stock_issue_number, new { @class = "col-md-10" })
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered table-responsive" id="issueReturnTable">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Item Code</th>
+                        <th>Item Name</th>
+                        <th>Warehouse</th>
+                        <th>Transfer Qty</th>
+                        <th>Return Qty</th>
+                        <th>Unit</th>
+                        <th>Invoice No.</th>
+                        <th>Invoice Date</th>
+                        <th>Approve</th>
+                        <th>Feedback</th>
+                        <th>Remark</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int count = 1;
+                        int countPending = 1;
+                        foreach (var item in Model.inventoryDetails)
+                        {
+                            if (string.Compare(item.item_status, "Completed") == 0)
+                            {
+                                <tr>
+                                    <td>@count</td>
+                                    <td>@item.itemCode</td>
+                                    <td>@item.itemName</td>
+                                    <td>@item.warehouseName</td>
+                                    <td>@string.Format("{0:G29}", decimal.Parse(item.stock_balance.ToString())) @item.itemunitname</td>
+                                    <td>@string.Format("{0:G29}", decimal.Parse(item.quantity.ToString()))</td>
+                                    <td>@item.itemunitname</td>
+                                    <td>@item.invoice_number</td>
+                                    <td>@Convert.ToDateTime(item.invoice_date).ToString("dd/MM/yyyy")</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>@item.remark</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                string name = "item" + countPending;
+                                <tr>
+                                    <td>@count</td>
+                                    <td><input type="hidden" class="inventory_detail" value="@item.inventory_detail_id" /> @item.itemCode</td>
+                                    <td>@item.itemName</td>
+                                    <td>@item.warehouseName</td>
+                                    <td>@string.Format("{0:G29}", decimal.Parse(item.stock_balance.ToString())) @item.itemunitname</td>
+                                    <td>@string.Format("{0:G29}", decimal.Parse(item.quantity.ToString()))</td>
+                                    <td>@item.itemunitname</td>
+                                    <td>@item.invoice_number</td>
+                                    <td>@Convert.ToDateTime(item.invoice_date).ToString("dd/MM/yyyy")</td>
+                                    <td><label><input type="radio" class="approval" name="@name" value="approved"> Approve</label></td>
+                                    <td><label><input type="radio" class="approval" name="@name" value="feedbacked"> Feedback</label></td>
+
+                                    @*@if (item.item_status == "firstapproved" )
+                                    {
+                                        <td><label><input type="radio" class="approval" name="@name" value="approved"> Approve</label></td>
+                                        <td><label></label></td>
+                                    }
+                                    else if (item.item_status == "pending" || item.item_status == "feedbacked")
+                                    {
+                                        <td><label><input type="radio" class="approval" name="@name" value="firstapproved"> Approve</label></td>
+                                        <td><label><input type="radio" class="approval" name="@name" value="feedbacked"> Feedback</label></td>
+                                    }*@
+
+                                    <td><textarea class="form-control feedback_comment">@item.remark</textarea></td>
+                                </tr>                                
+                                countPending++;
+                            }
+
+                            count++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="button" value="Submit" class="btn btn-success" onclick="approveFeedbackStockIssueReturn()" />
+                <a href="javascript:history.back()" class="btn btn-danger">Back</a>
+            </div>
+        </div>
+    </div>
+}
+@section Scripts{
+    <script type="text/javascript">
+        function approveFeedbackStockIssueReturn() {
+            var models = [];
+            var item_element = {};
+            var countInvalidStatus=0;
+            var issueReturnId = $('#stock_issue_return_id').val();
+            var issueReturnDetails = $('.inventory_detail');
+            var feedbackComments = $('.feedback_comment');
+            for (var i = 1; i <= issueReturnDetails.length; i++) {
+                var item_status = $('input[name=item' + i + ']:checked').val();
+                if (!item_status) countInvalidStatus++;
+                var idx = Number(i - 1);
+                item_element = {};
+                item_element.inventory_detail_id = issueReturnDetails[idx].value;
+                item_element.item_status = item_status;
+                item_element.remark = feedbackComments[idx].value;
+                models.push(item_element);
+            }
+            if (countInvalidStatus > 0) {
+                alert("Please select Approve or Feedback option for each item.");
+                return;
+            }
+            $.ajax({
+                url: "@Url.Action("ApproveFeedback", "StockIssueReturn")",
+                type: "post",
+                dataType: "json",
+                async: false,
+                data: { id: issueReturnId, models: models },
+                success: function (da) {
+                    if (da.result == "success") {
+                        alert('Your data has been sumitted successfully.');
+                        window.location.href = '@Url.Action("Index")';
+                    } else {
+                        alert('Your data is error while sumiting.');
+                    }
+                },
+                error: function (err) {
+                    alert('Your data is error while sumiting.');
+                }
+            });
+        }
+    </script>
+    }
+

@@ -1,0 +1,165 @@
+﻿@model BT_KimMex.Views.PurchaseOrderAandR
+@{
+    ViewBag.Title = "Cancel";
+    string date =Convert.ToDateTime(DateTime.Now).ToString("dd/MM/yyyy");
+    var POD_Number = ViewBag.PONumberID;
+    var approveNo = ViewBag.ApprovealNumber;
+}
+
+<style type="text/css">
+    #itemReceiveTable tr td:nth-child(5) {
+        text-align: left !important;
+    }
+
+    #itemReceivedTable thead th, #po_table tr td {
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+
+    .form-control {
+        padding: 5px 0px !important;
+        height: auto !important;
+        font-size: 13px !important;
+    }
+</style>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+
+<h2>Cancel</h2>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <h3 class="title">Cancel by Purchase OrderAandR</h3>
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+       
+        <div class="form-group">
+    <label class="col-md-2">Date : </label>
+    <label class="col-md-10">@date</label>
+</div>
+
+<div class="form-group">
+    <label class="col-md-2">Num : </label>
+    <label class="col-md-10" id="purchase_number">@approveNo</label>
+</div>
+
+<div class="form-group">
+    <label class="col-md-2"> Ref.Num :</label>
+    <label class="col-md-10" id="purchase_order_number">@approveNo</label>
+</div>
+
+        <!--End Rathana Add-->
+        <div class="row" style="margin:0 !important;">
+            <table class="table table-responsive table-bordered" id="po_table">
+                <thead>
+                    <tr>
+                        <th rowspan="2">No.</th>
+                        <th rowspan="2">Supplier Name</th>
+                        <th rowspan="2">Po Number</th>
+                        <th rowspan="2">Total Amount($)</th>
+                        <th colspan="2">Action</th>
+                        <th style="text-align:center;vertical-align:middle;">Cancel</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int rCount = 1;
+                        int count = 1;
+                        int sCount = 1;
+                        foreach (var supplier in Model.poSuppliers)
+                        {
+                            var roman = (Convert.ToChar(8543 + rCount)).ToString();
+                            count = 1;
+                            sCount = 1;
+                            foreach (var item in Model.poDetails)
+                            {
+                                var sup = item.poSuppliers;
+
+                                foreach (var ssup in sup)
+                                {
+                                    if (ssup.supplier_id == supplier.supplier_id)
+                                    {
+                                        sCount++;
+                                    }
+                                }
+
+                            }
+                            <tr>
+                                <td>@roman</td>
+                                <td colspan="4"><input type="hidden" class="supplier_id" value="@supplier.supplier_id" />@supplier.supplier_name</td>
+                                <td rowspan="@sCount" style="text-align:center;vertical-align:middle;"><input type='checkbox' class='selected_supplier' value='@supplier.supplier_id' /> Cancel</td>
+                            </tr>
+
+                            foreach (var item in Model.poDetails)
+                            {
+                                var sup = item.poSuppliers;
+
+                                foreach (var ssup in sup)
+                                {
+                                    if (ssup.supplier_id == supplier.supplier_id)
+                                    {
+                                        <tr>
+                                            <td>@count</td>
+                                            <td>@item.product_code</td>
+                                            <td>@item.product_name</td>
+                                            <td style="text-align:center;vertical-align:middle;">@item.product_unit</td>
+                                            <td style="text-align:center;vertical-align:middle;">@item.po_quantity</td>
+                                        </tr>
+                                        count++;
+                                    }
+                                }
+
+                            }
+                            rCount++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="button" id="btnSubmit" value="Submit" class="btn btn-default" />
+                <a href="@Url.Action("Index")" class="btn btn-default">Back</a>
+            </div>
+        </div>
+    </div>
+                        }
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('#btnSubmit').click(function () {
+                var po_id = $('#purchase_order_number').val();
+                $('#purchaseOrderTable tbody').empty();
+                var arrSup = [];
+                $('.selected_supplier:checkbox:checked').each(function () {
+                    var supplierId = $(this).val();
+                    arrSup.push(supplierId);
+                });               
+                $.ajax({
+                    url: "@Url.Action("Cancel", "PurchaseOrderAandR")",
+                    type: "post",
+                    dataType: "json",
+                    async: false,
+                    data: { id:po_id,suppliers:arrSup },
+                    success: function (da) {
+                        if (da.result == "success") {
+                            $.notify('Your data has been submitted!', { className: 'success' });
+                            window.location.href = '@Url.Action("Index", "PurchaseOrderAandR")';
+                        }
+                        else if (da.result == "error") {
+                            alert(da.message);
+                        }
+                        else {
+                            console.log(da.message);
+                            $.notify('Your data is error while submitting!', { className: 'error' });
+                        }
+                    },
+                    error: function (err) {
+                        $.notify('Your data is error while submitting!', { className: 'error' });
+                    }
+                });
+
+            });
+        });
+    </script>
+}

@@ -1,0 +1,243 @@
+﻿@model BT_KimMex.Models.ItemBlockingViewModel
+    @using BT_KimMex.Class;
+@{
+    ViewBag.Title = "Create Item Blocking";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style type="text/css">
+    #table tr td{
+        vertical-align:middle !important;
+    }
+</style>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <h3 class="title">Create New Item Blocking Request</h3>
+        <div class="form-group">
+            <label class="control-label col-md-2">Date:</label>
+            <label class="col-md-10">@CommonClass.ToLocalTime(Convert.ToDateTime(DateTime.Now)).ToString("dd/MM/yyyy")</label>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">Item Blocking Number:</label>
+            <label class="col-md-10">@CommonClass.GenerateProcessNumber("IBQ")</label>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">Warehouse <strong class="text-danger">*</strong>:</label>
+            <div class="col-md-10">
+                @Html.DropDownList("warehouse_id",new SelectList(ViewBag.Warehouses, "warehouse_id", "warehouse_name"),"Select Warehouse",new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">Project:</label>
+            <label class="col-md-10" id="project_full_name"></label>
+        </div>
+        <div class="row">
+            <table class="table table-bordered" id="table">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Item Code</th>
+                        <th>Item Name</th>
+                        <th>Item Unit</th>
+                        <th>Stock Balance</th>
+                        <th><input type='checkbox' value='' class='' id="head_block" /> Block</th>
+                        <th>Block QTY</th>
+                        <th>Reason</th>
+                        <th style="width:50px !important;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="9">No Item Data</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="button" value="Submit" class="btn btn-success" onclick="submitItemBlocking()" />
+                <a href="javascript:history.back();" class="btn btn-danger">Back</a>
+            </div>
+        </div>
+    </div>
+}
+
+@section scripts{
+    <script type="text/javascript">
+
+        $(function () {
+            $('#warehouse_id').change(function (e) {
+                e.preventDefault();
+                var warehouse_id = $(this).val();
+                $('#table tbody').empty();
+                $('#project_full_name').text('');
+                if (warehouse_id == "" || warehouse_id == null) {
+                    $('#table tbody').append("" +
+                        "<tr>" +
+                            "<td colspan='9'>No Item Data</td>" +
+                        "</tr>"
+                        );
+                } else {
+                    $.ajax({
+                        url: '@Url.Action("GetAllItemsbyWarehouseJson", "Stock")',
+                        type: "get",
+                        dataType: "json",
+                        data: { id: warehouse_id },
+                        success: function (da) {
+                            $('#project_full_name').text(da.project.project_full_name);
+                            if (da.data.length == 0) {
+                                $('#table tbody').append("" +
+                                    "<tr>" +
+                                        "<td colspan='8'>No Item Data</td>" +
+                                    "</tr>"
+                                );
+                            } else {
+                                $.each(da.data, function (index, item) {
+                                    console.log(item);
+                                    var btnAdd = "";
+                                    if (index == da.data.length - 1)
+                                        btnAdd = "<a href='javascript:void(0)' class='btn-default btn-sm' onclick='appendItemRow(this)'><span class='glyphicon glyphicon-plus'></span></a>";
+                                    $('#table tbody').append("" +
+                                        "<tr id='i" + Number(index + 1) + "'>" +
+                                            "<td>" + Number(index + 1) + "</td>" +
+                                            "<td><input type='hidden' value='" + item.product_id + "' class='item_id'/><label class='item_code'>" + item.itemCode + "</label></td>" +
+                                            "<td><label class='item_name'>" + item.itemName + "</label></td>" +
+                                            "<td><label class='item_unit'>" + item.itemUnitName + "</label></td>" +
+                                            "<td class='text-center'><label class='stock_balance'>" + item.total_quantity + "</label></td>" +
+                                            '<td style="text-align:center !important;vertical-align:middle !important;"><input type="checkbox" value="" class="is_blocked" name="is_blocked" /></td>' +
+                                            "<td><input type='number' class='form-control block_qty' value='" + item.total_quantity + "' /></td>" +
+                                            "<td><textarea class='form-control reason'></textarea></td>" +
+                                            "<td style='width:50px !important;'><a href='javascript:void(0)' class='btn-default btn-sm' onclick='removeItemRow(this)'><span class='glyphicon glyphicon-trash'></span></a></td>" +
+                                            //"<td>" + btnAdd + "</td>" +
+                                        "</tr>"
+                                    );
+                                });
+                            }
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            console.log("Stock Adjustment:: " + textStatus);
+                        }
+                    });
+                }
+            });
+
+            $('#head_block').click(function () {
+                if ($(this).prop("checked") == true) {
+                    //alert("Checkbox is checked.");
+                    check_uncheck_checkbox(true);
+                }
+                else if ($(this).prop("checked") == false) {
+                    //alert("Checkbox is unchecked.");
+                    check_uncheck_checkbox(false);
+                }
+            });
+
+        });
+        function check_uncheck_checkbox(isChecked) {
+            if (isChecked) {
+                $('input[name="is_blocked"]').each(function () {
+                    this.checked = true;
+                });
+            } else {
+                $('input[name="is_blocked"]').each(function () {
+                    this.checked = false;
+                });
+            }
+        }
+        function submitItemBlocking() {
+            var inventories = [];
+            var item_element = {};
+            var warehouse = $('#warehouse_id').val();
+            var items = $('.item_id');
+            var stock_balances = $('.stock_balance');
+            var block_qtys = $('.block_qty');
+            var reasons = $('.reason');
+            var isBlockeds = $('.is_blocked');
+            var countInvalid = 0;
+            var countZeroQty = 0;
+            if (!warehouse || warehouse == "" || warehouse == null) {
+                alert("Warehouse is required.");
+                return;
+            }
+            for (var i = 0; i < isBlockeds.length; i++) {
+                if ($(isBlockeds[i]).is(':checked')) {
+                    var item_id = items[i].value;
+                    var stock_balance = stock_balances[i].innerHTML;
+                    var block_qty = block_qtys[i].value;
+                    if (Number(block_qty) <= 0) {
+                        countInvalid++;
+                    }
+                    if (Number(block_qty) > Number(stock_balance)) {
+                        countInvalid++;
+                    }
+                    item_element = {};
+                    item_element.item_id = items[i].value;
+                    item_element.warehouse_id = warehouse;
+                    item_element.is_block = true;
+                    item_element.block_qty = block_qty;
+                    item_element.remark = reasons[i].value;
+                    inventories.push(item_element);
+                }
+            }
+
+            if (countInvalid > 0) {
+                alert("Please fill all items information.");
+                return;
+            }
+
+            if (inventories.length == 0) {
+                alert("No item to block.");
+                return;
+            }
+            
+            var model = {
+                warehouse_id: warehouse,
+                itemBlockingDetails: inventories
+            };
+            console.log(model);
+            $.ajax({
+                url: "@Url.Action("CreateItemBlocking", "Stock")",
+                type: "post",
+                dataType: "json",
+                async: false,
+                data: { model: model },
+                success: function (da) {
+                    if (da.result == "success") {
+                        alert('Your data has been saved successfully.');
+                        window.location.href = '@Url.Action("ItemBlocking")';
+                    } else if (da.result == "error") {
+                        alert(da.message);
+                    }
+                },
+                error: function (err) {
+                    alert('Your data is error while saving.');
+                }
+            });
+        }
+
+        function removeItemRow(row) {
+            var arrItemId = [];
+            var ind = row.parentNode.parentNode.rowIndex;
+            var isLastChild = $('#table tr').eq(ind).find('td:nth-child(9) a').length == 0 ? false : true;
+            var itemId = $('#table tr').eq(ind).attr('id');
+            var countTableRow = $('#table tr').length;
+            for (var i = 1; i < countTableRow; i++) {
+                var id = $('#table tr').eq(i).attr('id');
+                if (id != undefined)
+                    arrItemId.push(id);
+            }
+            if (arrItemId.length == 1)
+                return;
+            document.getElementById('table').deleteRow(ind);
+            var deleted_index = arrItemId.indexOf(itemId);
+                arrItemId.splice(deleted_index, 1);
+                for (var i = 0; i < arrItemId.length; i++) {
+                    $('tr#' + arrItemId[i] + ' td:nth-child(1)').html(Number(i) + 1);
+                }
+        }
+
+    </script>
+    }

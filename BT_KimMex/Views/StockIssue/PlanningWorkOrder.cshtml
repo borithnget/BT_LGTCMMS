@@ -1,0 +1,883 @@
+﻿
+@using Microsoft.AspNet.Identity;
+@{
+    ViewBag.Title = "Planning WorkOrder";
+    DateTime baseDate = DateTime.Today;
+    var today = baseDate;
+    var yesterday = baseDate.AddDays(-1);
+    var thisWeekStart = baseDate.AddDays(-(int)baseDate.DayOfWeek);
+    var thisWeekEnd = thisWeekStart.AddDays(7).AddSeconds(-1);
+    string startDate = DateTime.Now.AddDays(-30).ToString("MM/dd/yyyy");
+}
+
+<div class="w3-panel w3-card-4">
+    <div class="w3-container w3-display-container">
+        <h3 class="title">@ViewBag.Title</h3>
+    </div>
+    <div class="w3-container w3-display-container">
+        <form>
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="col-md-4 control-label">Project <strong class="text-danger">*</strong>:</label>
+                            <div class="col-md-8">
+                                <select class="form-control" id="project_id" name="project_id">
+                                    <option selected disabled>Select Project</option>
+                                    @foreach (var project in BT_KimMex.Models.ProjectViewModel.GetProjectListItemsBySiteSupervisor(User.IsInRole(BT_KimMex.Class.Role.SystemAdmin), User.Identity.GetUserId()))
+                                    {
+                                        <option value="@project.project_id">@project.project_full_name</option>
+                                    }
+                                </select>
+
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-4">Date From <strong class="text-danger">*</strong></label>
+                            <div class="col-md-8">
+                                <div class="input-group date" data-provide="datepicker" style="width:280px !important;">
+
+                                    <input type="text" class="form-control" id="date_from" name="date_from" placeholder="MM/DD/YYYY" />
+                                    <div class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-md-4">Date To <strong class="text-danger">*</strong></label>
+                            <div class="col-md-8">
+                                <div class="input-group date" data-provide="datepicker" style="width:280px !important;">
+
+                                    <input type="text" class="form-control" id="date_to" name="date_to" placeholder="MM/DD/YYYY" />
+                                    <div class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        
+                    </div>
+                </div>  
+                <div class="row">
+                    <div class="w3-panel w3-card-4" style="padding: 5px !important; padding-left: 30px !important;">
+                        @*<h5>Filter product information</h5>*@
+                        <div class="form-group row" style="margin-bottom:0px !important;">
+                            <div class="col-md-1">
+                                <select class="form-control" id="product_group" name="product_group" style="padding-left:0px !important;padding-right:0px !important; font-size:11px !important;">
+                                    <option selected disabled>Select Group</option>
+                                </select>
+                            </div>
+                            <div class="col-1 col-xl-1 col-lg-1 col-sm-1 col-md-1" style="">
+                                <div class="form-group row">
+                                    <select class="form-control" name="product_sub_group" id="product_sub_group" onchange="" style="padding-left:0px !important;padding-right:0px !important; font-size:11px !important;">
+                                        <option selected disabled>Select Category</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-1 col-xl-1 col-lg-1 col-sm-1 col-md-1" style="padding-right:0px !important;">
+                                <select class="form-control" name="product_category" id="product_category" style="padding-left: 0px !important; padding-right: 0px !important; font-size: 11px !important;">
+                                    <option selected disabled>Select Sub Category</option>
+                                </select>
+                            </div>
+                            <div class="col-1 col-xl-1 col-lg-1 col-sm-1 col-md-1" style="padding-right:0px !important;">
+                                <select class="form-control" name="product_type" id="product_type" style="padding-left:0px !important;padding-right:0px !important; font-size:11px !important;">
+                                    <option selected disabled>Select Type</option>
+                                </select>
+                            </div>
+                            <div class="col-1 col-xl-1 col-lg-1 col-md-1 col-sm-1" style="padding-right:0px !important;">
+                                <select class="form-control" name="brand" id="brand" style="padding-left:0px !important;padding-right:0px !important; font-size:11px !important;">
+                                    <option selected disabled>Select Brand</option>
+                                </select>
+                            </div>
+                            <div class="col-1 col-xl-1 col-lg-1 col-md-1 col-sm-1" style="padding-right:0px !important;" >
+                                <select class="form-control" name="product_size" id="product_size" style="padding-left: 0px !important; padding-right: 0px !important; font-size: 11px !important;">
+                                    <option selected disabled>Select Size</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <input class="form-control" id="product_description" onfocus="initialProductSuggestionControl()" placeholder="Enter product here" />
+                                <input type="hidden" id="product_sugguestion_id" />
+                            </div>
+                            <div class="col-md-1">
+                                <a class="btn btn-xs btn-primary btn-flat" id="btnadd">Add</a>
+                                <a class="btn btn-xs btn-danger btn-flat" id="btnclear">Clear</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="table_product">
+                        <thead>
+                            <tr>
+                                <th>N0.</th>
+                                <th>Description</th>
+                                <th>Unit</th>
+                                <th>Planning QTY</th>
+                                <th>Labour Hour</th>
+                                <th>Total Labour Hour</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-10">
+                        <button type="button" class="btn btn-success" onclick="" id="btn_submit">Submit</button>
+                        @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-danger" })
+                    </div>
+                </div>
+
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="filter_result_modal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel" style="width:100% !important;">
+    <div class="modal-dialog " role="document" style="width:100% !important;">
+        <div class="modal-content ">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Filter results for '<b id="filter_keyword"></b>'</h4>
+            </div>
+            <div class="modal-body col-sm-12" style="width:100% !important">
+                <div class="row">
+                    <div class="form-group row">
+                        <div class="col-lg-10 col-md-10"></div>
+                        <div class="col-lg-1 col-md-1" style="padding-right:15px !important;">
+                            <input type="button" value="Add to List" class="btn btn-primary float-right" id="btn_add_to_list" />
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="filter_resultTable">
+                        <thead>
+                            <tr>
+                                <th class="text-center"><input type="checkbox" id="head_selected" /></th>
+                                <th>Group</th>
+                                <th>Category</th>
+                                <th>Type</th>
+                                <th>Class</th>
+                                <th>Size</th>
+                                <th>Color</th>
+                                <th>Brand</th>
+                                <th>Factory Code</th>
+                                <th>Unit</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('#date_from').val('@thisWeekStart.ToString("MM/dd/yyyy")');
+            $('#date_to').val('@thisWeekEnd.ToString("MM/dd/yyyy")');
+            $('div.date').on('changeDate', function () {
+                $(this).datepicker('hide');
+            });
+            $('#project_id').select2();
+
+            $('#btnadd').click(function (e) {
+                e.preventDefault();
+                var rowId = 0, rowNumber = 0;
+                var itemId = $('#product_sugguestion_id').val();
+                var countrow = $('#table_product tbody tr').length;
+
+                if (itemId == null || itemId == undefined || itemId == "")
+                    return;
+                if (countrow > 0) {
+                    rowId = $('#table_product tbody tr:last-child').attr('id').replace(/[^\d]/g, '');
+                    rowNumber = $('#table_product tbody tr:last-child').find('td:first-child').text();
+                }
+
+                $('#table_product tbody').append("" +
+                    "<tr id='i" + Number(Number(rowId) + 1) + "'>" +
+                    //"<td>" + Number(Number(rowNumber) + 1) + "</td>" +
+                    "<td><label class='ordering_number'>" + Number(Number(rowNumber) + 1) + "</label></td>" +
+                    "<td><input type='hidden' class='item_id' id='1'/><label class='item_name'></label></td>" +
+                    "<td><select class='form-control item_unit' style='padding:0px !important;'></select></td>" +
+                    "<td><input type='number' class='form-control planning_qty' value='" + Number(0) + "' placeholder='Planning Quantity'/></td>" +
+                    "<td class='text-center'><label class='labour_hour'></label></td>"+
+                    "<td class='text-center'><label class='total_labour_hour'>0</label></td>"+
+                    '<td class="text-center"><a href="javascript:void(0)" class="btn btn-sm btn-danger btn-flat" onclick=" remove_ir_item_row(this)"><i class="fa fa-trash-o"></i></a></td>' +
+                    '</tr>'
+                );
+
+
+                var ind = $('#table_product tr').length - 1;
+                $('#product_description').val('');
+                $('#product_sugguestion_id').val('');
+                if (itemId != "") {
+                    $.ajax({
+                        url: '/Product/GetProductDataByCode',
+                        type: "get",
+                        dataType: "json",
+                        async: false,
+                        data: { id: itemId },
+                        success: function (da) {
+                            $('#table_product tr').eq(ind).find('select.item_unit').empty();
+                            if (da.data) {
+                                var item = da.data;
+                                console.log(item);
+                                var labour_hour = item.labour_hour == null ? 0 : item.labour_hour;
+                                $('#table_product tr').eq(ind).find('input.item_id').val(itemId);
+                                $('#table_product tr').eq(ind).find('label.item_name').text(item.product_code + " - " + item.product_name);
+                                $('#table_product tr').eq(ind).find('input.planning_qty').val(Number(0));
+                                $('#table_product tr').eq(ind).find('label.labour_hour').text(labour_hour);
+
+                                $('#table_product tr').eq(ind).find('select.item_unit').append("<option value='" + item.product_unit + "'>" + item.unit_name + "</option>");
+
+                                if (item.uom1_id && item.uom1_qty) {
+                                    $('#table_product tr').eq(ind).find('select.item_unit').append("<option value='" + item.uom1_id + "'>" + item.uom1_id + "</option>");
+                                }
+                                if (item.uom2_id && item.uom2_qty) {
+                                    $('#table_product tr').eq(ind).find('select.item_unit').append("<option value='" + item.uom2_id + "'>" + item.uom2_id + "</option>");
+                                }
+                                if (item.uom3_id && item.uom3_qty) {
+                                    $('#table_product tr').eq(ind).find('select.item_unit').append("<option value='" + item.uom3_id + "'>" + item.uom3_id + "</option>");
+                                }
+                                if (item.uom4_id && item.uom4_qty) {
+                                    $('#table_product tr').eq(ind).find('select.item_unit').append("<option value='" + item.uom4_id + "'>" + item.uom4_id + "</option>");
+                                }
+                                if (item.uom5_id && item.uom5_qty) {
+                                    $('#table_product tr').eq(ind).find('select.item_unit').append("<option value='" + item.uom5_id + "'>" + item.uom5_id + "</option>");
+                                }
+
+                            } else {
+                                $('#table_product tr').eq(ind).find('input.item_id').val(' ');
+                                $('#table_product tr').eq(ind).find('label.item_name').text(' ');
+                                $('#table_product tr').eq(ind).find('input.planning_qty').val(parseFloat(0).toFixed(2));
+                            }
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            $('#table_product tr').eq(ind).find('select.item-_unit').empty().append("<option disabled selected>Unit</option>");
+                            $('#table_product tr').eq(ind).find('input.item_id').val(' ');
+                            $('#table_product tr').eq(ind).find('label.item_name').text(' ');
+                            $('#table_product tr').eq(ind).find('input.planning_qty').val(parseFloat(0).toFixed(2));
+                            alert(textStatus);
+                        }
+                    });
+                }
+
+            })
+
+            $('#btn_submit').click(function (e) {
+                e.preventDefault();
+                $(this).attr('disabled', true);
+                $(this).text("Submitting");
+                var project_id = $('#project_id').val();
+                var date_from = $('#date_from').val();
+                var date_to = $('#date_to').val();
+
+                var item_ids = $('.item_id');
+                var item_unit_ids = $('.item_unit');
+                var planning_qtys = $('.planning_qty');
+                var labour_hours = $('.labour_hour');
+                var item_descriptions = $('.item_name');
+                var items = [];
+
+                for (var i = 0; i < item_ids.length; i++) {
+                    var element = {
+                        item_id: $(item_ids[i]).val(),
+                        item_unit_id: $(item_unit_ids[i]).val(),
+                        planning_qty: parseFloat($(planning_qtys[i]).val()),
+                        labour_hour: parseFloat($(labour_hours[i]).text()),
+                        item_description: $(item_descriptions[i]).text(),
+                    };
+                    items.push(element);
+                }
+                var model = {
+                    project_id: project_id,
+                    date_from: date_from,
+                    date_to: date_to,
+                    planningItems: items,
+                };
+
+                console.log(items);
+                $.ajax({
+                    url: '@Url.Action("SubmitPlanningWorkorderAJAX", "StockIssue")',
+                    type: "post",
+                    dataType: "json",
+                    data: { model: model },
+                    async: false,
+                    success: function (da) {
+                        console.log(da);
+                        var result = da.result;
+                        if (result.isSuccess == true) {
+                            alert("Your data has been saved successfully.");
+                            window.location.reload();
+                        } else {
+                            alert(result.message);
+                            $('#btn_submit').attr('disabled', false);
+                            $('#btn_submit').text("Submit");
+                        }
+
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+
+                    }
+                });
+
+            });
+
+            $("#product_group").click(function () {
+                var val = $(this).val();
+                if (val == null)
+                    initialGroupControl();
+            });
+
+            $('#product_sub_group').click(function () {
+                var val = $(this).val();
+                if (val == null)
+                    initialSubGroupControl();
+            });
+
+            $('#product_category').click(function () {
+                var val = $(this).val();
+                if (val == null) {
+                    initialProductSubCategoryControl();
+                }
+            });
+
+            $('#product_type').click(function () {
+                var val = $(this).val();
+                if (val == null) {
+                    initialProductTypeControl();
+                }
+            });
+            $('#product_type').change(function () {
+                $('#brand').empty().append("<option selected disabled>Select Brand</option>");
+                //$('#product_size').empty().append("<option selected disabled>Select Size</option>");
+            });
+            $('#brand').click(function () {
+                var val = $(this).val();
+                if (val == null)
+                    initialBrandControl();
+            });
+            //$('#brand').change(function () {
+            //    $('#product_size').empty().append("<option selected disabled>Select Size</option>");
+            //});
+
+            $('#product_size').click(function () {
+                var val = $(this).val();
+                if (val == null)
+                    initialProductSizeControl();
+            });
+
+            $('#product_description').keyup(function (e) {
+                if (e.keyCode == 13) {
+                    var filter_keyword = $(this).val();
+                    if (filter_keyword) {
+                        $('#filter_keyword').html(filter_keyword);
+                        $('#filter_result_modal').modal('show');
+
+                        $('#filter_resultTable tbody').empty();
+                        var classId = $('#product_group').val();
+                        var categoryId = $('#product_category').val();
+                        var productTypeId = $('#product_type').val();
+                        var brands = $('#brand').val();
+                        var productSizeId = $('#product_size').val();
+
+                        $.ajax({
+                            url: "/Product/GetProductFilterResult/",
+                            dataType: "json",
+                            data: { term: filter_keyword, classId: classId, subGroupId: $('#product_sub_group').val(), categoryId: categoryId, productTypeId: productTypeId, brandId: brands, productSizeId: productSizeId },
+                            success: function (data) {
+                                //console.log(data);
+                                if (data.results.length == 0)
+                                    $('#filter_resultTable tbody').append("" +
+                                        "<tr>" +
+                                        "<td colspan='11'>No Result</td>" +
+                                        "</tr>"
+                                    );
+                                else {
+                                    $.each(data.results, function (index, item) {
+                                        $('#filter_resultTable tbody').append("" +
+                                            "<tr>" +
+                                            "<td class='text-center'><input type='checkbox' value='' class='is_selected' name='is_selected' /> <input type='hidden' class='filter_item_id' value='" + item.product_id + "' /> </td>" +
+                                            "<td>" + checkIsNullorEmpty(item.class_name) + "</td>" +
+                                            "<td>" + checkIsNullorEmpty(item.p_category_name) + "</td>" +
+                                            "<td>" + checkIsNullorEmpty(item.product_type_name) + "</td>" +
+                                            "<td>" + checkIsNullorEmpty(item.product_class_name) + "</td>" +
+                                            "<td>" + checkIsNullorEmpty(item.product_size_name) + "</td>" +
+                                            "<td>" + checkIsNullorEmpty(item.color_name) + "</td>" +
+                                            "<td>" + checkIsNullorEmpty(item.brand_name) + "</td>" +
+                                            "<td>" + checkIsNullorEmpty(item.model_factory_code) + "</td>" +
+                                            "<td>" + item.product_unit + "</td>" +
+                                            "<td>" + item.product_name + "</td>" +
+                                            "</tr>"
+                                        );
+                                    });
+                                }
+
+                            }
+                        });
+
+
+                    }
+
+                }
+            });
+
+            $('#btn_add_to_list').click(function (e) {
+                e.preventDefault();
+                var is_selecteds = $('.is_selected');
+                var item_ids = $('.filter_item_id');
+
+                var countSelectedItem = 0;
+
+                for (var i = 0; i < is_selecteds.length; i++) {
+                    if ($(is_selecteds[i]).is(':checked')) {
+                        var itemId = item_ids[i].value;
+
+                        var rowId = 0, rowNumber = 0;
+                        var countrow = $('#table_product tbody tr').length;
+
+                        if (itemId == null || itemId == undefined || itemId == "")
+                            return;
+                        if (countrow > 0) {
+                            rowId = $('#table_product tbody tr:last-child').attr('id').replace(/[^\d]/g, '');
+                            rowNumber = $('#table_product tbody tr:last-child').find('td:first-child').text();
+                        }
+
+                        $('#table_product tbody').append("" +
+                            "<tr id='i" + Number(Number(rowId) + 1) + "'>" +
+                            "<td><label class='ordering_number'>" + Number(Number(rowNumber) + 1) + "</label></td>" +
+                            "<td><input type='hidden' class='item_id' id='1'/><label class='item_name'></label></td>" +
+                            "<td><input type='number' class='form-control ir_qty' value='" + Number(0) + "' placeholder='Request Quantity'/></td>" +
+                            "<td><select class='form-control item-unit'></select></td>" +
+                            "<td><textarea class='form-control item_remark' placeholder='Remark'></textarea></td>" +
+                            '<td><a href="javascript:void(0)" class="btn btn-sm btn-danger btn-flat" onclick=" remove_ir_item_row(this)"><i class="fa fa-trash-o"></i></a></td></td>' +
+                            '</tr>'
+                        );
+
+
+                        var ind = $('#table_product tr').length - 1;
+                        $('#product_description').val('');
+                        $('#product_sugguestion_id').val('');
+
+                        if (itemId != "") {
+                            $.ajax({
+                                url: '/Product/GetProductDataByCode',
+                                type: "get",
+                                dataType: "json",
+                                async: false,
+                                data: { id: itemId },
+                                success: function (da) {
+                                    $('#table_product tr').eq(ind).find('select.item-unit').empty();
+                                    if (da.data) {
+                                        var item = da.data;
+                                        console.log(item);
+                                        $('#table_product tr').eq(ind).find('input.item_id').val(itemId);
+                                        $('#table_product tr').eq(ind).find('label.item_name').text(item.product_code + " - " + item.product_name);
+                                        $('#table_product tr').eq(ind).find('input.ir_qty').val(Number(0));
+
+                                        $('#table_product tr').eq(ind).find('select.item-unit').append("<option value='" + item.product_unit + "'>" + item.unit_name + "</option>");
+
+                                        if (item.uom1_id && item.uom1_qty) {
+                                            $('#table_product tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom1_id + "'>" + item.uom1_id + "</option>");
+                                        }
+                                        if (item.uom2_id && item.uom2_qty) {
+                                            $('#table_product tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom2_id + "'>" + item.uom2_id + "</option>");
+                                        }
+                                        if (item.uom3_id && item.uom3_qty) {
+                                            $('#table_product tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom3_id + "'>" + item.uom3_id + "</option>");
+                                        }
+                                        if (item.uom4_id && item.uom4_qty) {
+                                            $('#table_product tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom4_id + "'>" + item.uom4_id + "</option>");
+                                        }
+                                        if (item.uom5_id && item.uom5_qty) {
+                                            $('#table_product tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom5_id + "'>" + item.uom5_id + "</option>");
+                                        }
+
+                                    } else {
+                                        $('#table_product tr').eq(ind).find('input.item_id').val(' ');
+                                        $('#table_product tr').eq(ind).find('label.item_name').text(' ');
+                                        $('#table_product tr').eq(ind).find('input.ir_qty').val(parseFloat(0).toFixed(2));
+                                    }
+                                },
+                                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                    $('#ir_table tr').eq(ind).find('select.item-unit').empty().append("<option disabled selected>Select Unit</option>");
+                                    $('#ir_table tr').eq(ind).find('input.item_id').val(' ');
+                                    $('#ir_table tr').eq(ind).find('label.item_name').text(' ');
+                                    $('#ir_table tr').eq(ind).find('input.ir_qty').val(parseFloat(0).toFixed(2));
+                                    alert(textStatus);
+                                }
+                            });
+                        }
+                        countSelectedItem++;
+                    }
+                }
+
+                if (countSelectedItem == 0) {
+                    alert("No item for add to list.");
+                    return;
+                }
+
+            });
+
+            $('#btnclear').click(function (e) {
+                
+                initialGroupControl();
+                //initialCategoryProductSizeControl();
+
+                $('#product_sugguestion_id').val('');
+                $('#product_description').val('');
+            });
+
+            
+
+            $('#head_selected').click(function () {
+                if ($(this).prop("checked") == true) {
+                    //alert("Checkbox is checked.");
+                    check_uncheck_checkbox(true);
+                }
+                else if ($(this).prop("checked") == false) {
+                    //alert("Checkbox is unchecked.");
+                    check_uncheck_checkbox(false);
+                }
+            });
+
+        });
+
+        function checkIsNullorEmpty(value) {
+            if (value)
+                return value;
+            return "";
+        }
+        function check_uncheck_checkbox(isChecked) {
+            if (isChecked) {
+                $('input[name="is_selected"]').each(function () {
+                    this.checked = true;
+                });
+            } else {
+                $('input[name="is_selected"]').each(function () {
+                    this.checked = false;
+                });
+            }
+        }
+
+        function initialProductSuggestionControl() {
+            var classId = $('#product_group').val();
+            var categoryId = $('#product_category').val();
+            var productTypeId = $('#product_type').val();
+            var brands = $('#brand').val();
+            var productSizeId = $('#product_size').val();
+            $('#product_description').autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: "/Product/GetProductAutoSuggestName/",
+                        dataType: "json",
+                        data: { term: request.term, classId: classId, subGroupId: $('#product_sub_group').val() , categoryId: categoryId, productTypeId: productTypeId, brandId: brands, productSizeId: productSizeId },
+                        success: function (data) {
+                            response(data);
+                        }
+                    });
+                },
+                select: function (event, ui) {
+                    console.log(ui);
+                    $('#product_sugguestion_id').val('');
+                    var selectedObj = ui.item;
+                    var item = (selectedObj.value).split(' ');
+                    $('#product_sugguestion_id').val(selectedObj.id);
+                }
+            })
+        }
+
+        function remove_ir_item_row(row) {
+            var arrItemId = [];
+            var ind = row.parentNode.parentNode.rowIndex;
+            //var isLastChild = $('#quoteTable tr').eq(ind).find("td:nth-child(8) a").length == 0 ? false : true;
+            var isLastChild = $('#table_product tbody tr').length == 1 ? true : false;
+            var itemId = $('#table_product tr').eq(ind).attr('id');
+            var count_table_row = $('#table_product tr').length;
+            for (var i = 1; i <= count_table_row; i++) {
+                var id = $('#table_product tr').eq(i).attr('id');
+                if (id != undefined)
+                    arrItemId.push(id);
+            }
+            if (arrItemId.length == 1) {
+                return;
+            }
+            document.getElementById('table_product').deleteRow(ind);
+            if (isLastChild) {
+                //$('#quoteTable tr#' + arrItemId[arrItemId.length - 2]).find('td:nth-child(8)').html("<a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='appendItemRow(this)'><span class='glyphicon glyphicon-plus'></span></a>");
+            }
+            else {
+                var deleted_index = arrItemId.indexOf(itemId);
+                arrItemId.splice(deleted_index, 1);
+                for (var i = 0; i < arrItemId.length; i++) {
+                    //$('tr#' + arrItemId[i] + ' td:nth-child(1)').html(Number(i) + 1);
+                    $('tr#' + arrItemId[i] + ' td:nth-child(1)').html('<label class="ordering_number">' + Number(Number(i) + 1) + '</label>');
+                }
+            }
+        }
+
+        function initialGroupControl() {
+            $('#product_group').empty().append("<option selected disabled>Select Group</option>");
+            $('#product_sub_group').append("<option selected disabled>Select Category</option>");
+            $('#product_category').empty().append("<option selected disabled>Select Sub Category</option>");
+            $('#product_type').empty().append("<option selected disabled>Select Type</option>");
+            $('#brand').empty().append("<option selected disabled>Select Brand</option>");
+            $('#product_size').empty().append("<option selected disabled>Select Size</option>");
+            $('#product_sub_group').empty().append("<option selected disabled>Select Category</option>");
+            $.ajax({
+                url: '/Class/GetClassDataDropdownlist',
+                type: "get",
+                dataType: "json",
+                async: false,
+                success: function (da) {
+                    if (da.result == "success") {
+                        //console.log(da);
+                        $.each(da.data, function (ind, item) {
+                            $('#product_group').append("" +
+                                "<option value='" + item.class_id + "'>" + item.class_name + "</option>"
+                            );
+                        });
+                    } else {
+                        alert('Error: ' + da.message);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log('Initial Group :' + textStatus);
+                }
+            });
+        }
+        function initialSubGroupControl() {
+            $('#product_sub_group').empty().append("<option selected disabled>Select Category</option>");
+            $('#product_category').empty().append("<option selected disabled>Select Sub Category</option>");
+
+            var groupId = $('#product_group').val();
+
+            $.ajax({
+                url: '/SubGroup/GetSubGroupDataTable',
+                type: "get",
+                data: {
+                    group_id: groupId,
+                },
+                dataType: "json",
+                async: false,
+                success: function (da) {
+                    //console.log(da);
+                    $.each(da.data, function (index, item) {
+                        $('#product_sub_group').append("" +
+                            "<option value='" + item.sub_group_id + "'>" + item.sub_group_name + "</option>"
+                        );
+                    });
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log('Initial Group :' + textStatus);
+                }
+            });
+
+        }
+        function initialCategoryProductSizeControl() {
+            var groupId = $('#product_group').val();
+            $('#product_category').empty().append("<option selected disabled>Select Sub Category</option>");
+            $('#product_type').empty().append("<option selected disabled>Select Type</option>");
+            $('#brand').empty().append("<option selected disabled>Select Brand</option>");
+            $('#product_size').empty().append("<option selected disabled>Select Size</option>");
+            $('#product_sub_group').empty().append("<option selected disabled>Select Category</option>");
+
+            //Sub Group
+            initialSubGroupControl();
+
+            $.ajax({
+                url: '/ProductCategory/GetCategoryDataDropdownlistbyClassId',
+                type: "get",
+                dataType: "json",
+                async: false,
+                data: { id: groupId },
+                success: function (da) {
+                    if (da.result == "success") {
+                        //console.log(da);
+                        $.each(da.data, function (ind, item) {
+                            $('#product_category').append("" +
+                                "<option value='" + item.p_category_id + "'>" + item.p_category_name + "</option>"
+                            );
+                        });
+                    } else {
+                        alert('Error:' + da.message);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log('Initial Product Category:' + textStatus);
+                }
+            });
+
+            //product size
+            $.ajax({
+                url: '/ProductSize/GetProductDataDropdownlistbyClassId',
+                type: "get",
+                dataType: "json",
+                async: false,
+                data: { id: groupId },
+                success: function (da) {
+                    if (da.result == "success") {
+                        //console.log(da);
+                        $.each(da.data, function (ind, item) {
+                            $('#product_size').append("" +
+                                "<option value='" + item.product_size_id + "'>" + item.product_size_name + "</option>"
+                            );
+                        });
+                    } else {
+                        alert('Initial BOQ Item Type:' + da.message);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log('Initial Product Size:' + textStatus);
+                }
+            });
+
+            //product type
+            $.ajax({
+                url: '/ProductType/GetProductTypeListItemsbyCategoryId',
+                type: "get",
+                dataType: "json",
+                async: false,
+                data: { id: groupId },
+                success: function (da) {
+                    //console.log(da.data);
+                    $.each(da.data, function (ind, item) {
+                        $('#product_type').append("" +
+                            "<option value='" + item.product_type_id + "'>" + item.product_type_name + "</option>"
+                        );
+                    });
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log('Initial Product Type:' + textStatus);
+                }
+            });
+            //brand
+            initialBrandControl();
+
+
+        }
+
+        function initialProductSubCategoryControl() {
+            var groupId = $('#product_group').val();
+            var categoryId = $('#product_sub_group').val();
+            $('#product_category').empty().append("<option selected disabled>Select Sub Category</option>");
+
+            $.ajax({
+                url: '/ProductCategory/GetCategoryDataDropdownlistbyClassId',
+                type: "get",
+                dataType: "json",
+                async: false,
+                data: {
+                    id: groupId,
+                    categoryId: categoryId,
+                },
+                success: function (da) {
+                    if (da.result == "success") {
+                        //console.log(da);
+                        $.each(da.data, function (ind, item) {
+                            $('#product_category').append("" +
+                                "<option value='" + item.p_category_id + "'>" + item.p_category_name + "</option>"
+                            );
+                        });
+                    } else {
+                        alert('Error:' + da.message);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log('Initial Product Category:' + textStatus);
+                }
+            });
+
+        }
+
+        function initialProductTypeControl() {
+            var categoryId = $('#product_category').val();
+            var groupId = $('#product_group').val();
+
+            $('#product_type').empty().append("<option selected disabled>Select Product Type</option>");
+            $('#brand').empty().append("<option selected disabled>Select Brand</option>");
+            $.ajax({
+                url: '/ProductType/GetProductTypeListItemsbyCategoryId',
+                type: "get",
+                dataType: "json",
+                async: false,
+                data: { id: groupId },
+                success: function (da) {
+                    //console.log(da.data);
+                    $.each(da.data, function (ind, item) {
+                        $('#product_type').append("" +
+                            "<option value='" + item.product_type_id + "'>" + item.product_type_name + "</option>"
+                        );
+                    });
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Initial Product Type:' + textStatus);
+                }
+            });
+        }
+        function initialBrandControl() {
+            var productTypeId = $('#product_type').val();
+            var groupId = $('#product_group').val();
+            $('#brand').empty().append("<option selected disabled>Select Brand</option>");
+            $.ajax({
+                url: '/Brand/GetBrandListItemsbyCategoryId',
+                type: "get",
+                dataType: "json",
+                async: false,
+                data: { id: productTypeId, group_id: groupId },
+                success: function (da) {
+                    //console.log(da.data);
+                    $.each(da.data, function (ind, item) {
+                        $('#brand').append("" +
+                            "<option value='" + item.brand_id + "'>" + item.brand_name + " - " + item.product_type_name + "</option>"
+                        );
+                    });
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Initial Brand:' + textStatus);
+                }
+            });
+        }
+        function initialProductSizeControl() {
+            var brandId = $('#brand').val();
+            //var groupId=$('#')
+            $('#product_size').empty().append("<option selected disabled>Select Size</option>");
+            $.ajax({
+                url: '/ProductSize/GetProductDataDropdownlistbyClassId',
+                type: "get",
+                dataType: "json",
+                async: false,
+                data: { id: '' },
+                success: function (da) {
+                    if (da.result == "success") {
+                        //console.log(da);
+                        $.each(da.data, function (ind, item) {
+                            $('#product_size').append("" +
+                                "<option value='" + item.product_size_id + "'>" + item.product_size_name + "</option>"
+                            );
+                        });
+                    } else {
+                        alert('Initial BOQ Item Type:' + da.message);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Initial BOQ Item Type:' + textStatus);
+                }
+            });
+        }
+
+    </script>
+    }

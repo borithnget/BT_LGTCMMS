@@ -1,0 +1,172 @@
+﻿@model BT_KimMex.Models.Home
+@{
+    ViewBag.Title = "Home Page";
+}
+@*<link href="~/Assets/style.min.css"  type="text/css" rel="stylesheet"/>*@
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<style>
+
+</style>
+
+<div class="w3-container w3-padding-16">
+    <div class="w3-row-padding w3-margin-bottom">
+        <div class="w3-col m2 l2">
+            <div class="w3-container w3-red w3-padding-16">
+                <div class="w3-left"><i class="fa fa-comment w3-xxxlarge"></i></div>
+                <div class="w3-right">
+                    <h3>@Model.pendingIR</h3>
+                </div>
+                <div class="w3-clear"></div>
+                <h4>Material Request</h4>
+            </div>
+        </div>
+        <div class="w3-col m2 l2">
+            <div class="w3-container w3-blue w3-padding-16">
+                <div class="w3-left"><i class="fa fa-eye w3-xxxlarge"></i></div>
+                <div class="w3-right">
+                    <h3>@Model.countPR</h3>
+                </div>
+                <div class="w3-clear"></div>
+                <h4>Purchase Requisition</h4>
+            </div>
+        </div>
+        <div class="w3-col m2 l2">
+            <div class="w3-container w3-teal w3-padding-16">
+                <div class="w3-left"><i class="fa fa-share-alt w3-xxxlarge"></i></div>
+                <div class="w3-right">
+                    <h3>@Model.countQuote</h3>
+                </div>
+                <div class="w3-clear"></div>
+                <h4>Quote</h4>
+            </div>
+        </div>
+        <div class="w3-col m2 l2">
+            <div class="w3-container w3-orange w3-text-white w3-padding-16">
+                <div class="w3-left"><i class="fa fa-users w3-xxxlarge"></i></div>
+                <div class="w3-right">
+                    <h3>@Model.countPO</h3>
+                </div>
+                <div class="w3-clear"></div>
+                <h4>Purchase Order</h4>
+            </div>
+        </div>
+        <div class="w3-col m2 l2">
+            <div class="w3-container w3-pink w3-text-white w3-padding-16">
+                <div class="w3-left"><i class="fa fa-users w3-xxxlarge"></i></div>
+                <div class="w3-right">
+                    <h3>@Model.PendingIRec</h3>
+                </div>
+                <div class="w3-clear"></div>
+                <h4>Good Receive Note</h4>
+            </div>
+        </div>
+        <div class="w3-col m2 l2">
+            <div class="w3-container w3-purple w3-text-white w3-padding-16">
+                <div class="w3-left"><i class="fa fa-users w3-xxxlarge"></i></div>
+                <div class="w3-right">
+                    <h3>@Model.PendingIRet</h3>
+                </div>
+                <div class="w3-clear"></div>
+                <h4>Stock Return to Supplier</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="w3-row-padding w3-margin-bottom">
+        <div class="w3-col m2 l2">
+            <div class="w3-container w3-brown w3-padding-16">
+                <div class="w3-left"><i class="fa fa-comment w3-xxxlarge"></i></div>
+                <div class="w3-right">
+                    <h3>@Model.PendingST</h3>
+                </div>
+                <div class="w3-clear"></div>
+                <h4>Stock Transfer</h4>
+            </div>
+        </div>
+        <div class="w3-col m2 l2">
+            <div class="w3-container w3-amber w3-padding-16">
+                <div class="w3-left"><i class="fa fa-eye w3-xxxlarge"></i></div>
+                <div class="w3-right">
+                    <h3>@Model.countSR</h3>
+                </div>
+                <div class="w3-clear"></div>
+                <h4>Stock Return</h4>
+            </div>
+        </div>
+        <div class="w3-col m2 l2">
+            <div class="w3-container w3-lime w3-padding-16">
+                <div class="w3-left"><i class="fa fa-share-alt w3-xxxlarge"></i></div>
+                <div class="w3-right">
+                    <h3>@Model.PendingSIss</h3>
+                </div>
+                <div class="w3-clear"></div>
+                <h4>Work Order Issued</h4>
+            </div>
+        </div>
+        <div class="w3-col m2 l2">
+            <div class="w3-container w3-cyan w3-text-white w3-padding-16">
+                <div class="w3-left"><i class="fa fa-users w3-xxxlarge"></i></div>
+                <div class="w3-right">
+                    <h3>@Model.PendingIssRe</h3>
+                </div>
+                <div class="w3-clear"></div>
+                <h4>Work Order Returned</h4>
+            </div>
+        </div>
+        <div class="w3-col m2 l2">
+            <div class="w3-container w3-deep-orange w3-text-white w3-padding-16">
+                <div class="w3-left"><i class="fa fa-users w3-xxxlarge"></i></div>
+                <div class="w3-right">
+                    <h3>@Model.countSA</h3>
+                </div>
+                <div class="w3-clear"></div>
+                <h4>Stock Adjustment</h4>
+            </div>
+        </div>
+        <div class="w3-col m2 l2">
+            <div class="w3-container w3-orange w3-text-white w3-padding-16">
+                <div class="w3-left"><i class="fa fa-users w3-xxxlarge"></i></div>
+                <div class="w3-right">
+                    <h3>@Model.countTW</h3>
+                </div>
+                <div class="w3-clear"></div>
+                <h4>Transfer from Workshop</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="w3-row-padding w3-margin-bottom">
+        <div class="w3-col m2 l2">
+            <div class="w3-container w3-red w3-padding-16">
+                <div class="w3-left"><i class="fa fa-comment w3-xxxlarge"></i></div>
+                <div class="w3-right">
+                    <h3>@Model.countRW</h3>
+                </div>
+                <div class="w3-clear"></div>
+                <h4>Return to Workshop</h4>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        var myIndex = 0;
+        $(function () {
+            carousel();
+        });
+
+        function carousel() {
+            var i;
+            var x = document.getElementsByClassName("mySlides");
+            for (i = 0; i < x.length; i++) {
+                x[i].style.display = "none";
+            }
+            myIndex++;
+            if (myIndex > x.length) { myIndex = 1 }
+            x[myIndex - 1].style.display = "block";
+            setTimeout(carousel, 5000); // Change image every 2 seconds
+        }
+    </script>
+    }

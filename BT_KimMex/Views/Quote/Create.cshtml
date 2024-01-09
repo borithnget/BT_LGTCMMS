@@ -1,0 +1,1883 @@
+﻿@model BT_KimMex.Models.QuoteViewModel
+
+@{
+    ViewBag.Title = "Create New Supplier Quote";
+    string date = Convert.ToDateTime(DateTime.Now).ToString("dd/MM/yyyy");
+    string quoteNo = ViewBag.QuoteNumber;
+}
+<style type="text/css">
+    #quoteTable tr td {
+        vertical-align: middle !important;
+    }
+
+        #quoteTable tr td:nth-child(7), #quoteTable tr td:last-child {
+            text-align: center !important;
+            vertical-align: middle !important;
+        }
+
+    .form-control {
+        padding: 5px 0px !important;
+        height: auto !important;
+        font-size: 13px !important;
+    }
+</style>
+
+@*<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />*@
+
+<div class="w3-panel w3-card-4">
+
+    <div class="w3-container w3-display-container">
+        <h3 class="title">@ViewBag.Title</h3>  
+        <button class="w3-button w3-tiny w3-display-topright w3-green w3-border w3-border-green" style="margin-top:20px !important;" id="supplier_promp">Create New Supplier</button>
+    </div>
+
+    <div class="w3-container w3-display-container">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal">
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.created_date, htmlAttributes: new { @class = "col-md-2" })
+                    @Html.Label(date, new { @class = "col-md-10" })
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.quote_no, htmlAttributes: new { @class = "col-md-2" })
+                    @Html.Label(quoteNo, new { @class = "col-md-10", id = "quote_no" })
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2">Project:</label>
+                    <div class="col-md-10">
+                        @Html.DropDownList("ir_project_id", new SelectList(BT_KimMex.Class.CommonClass.GetAllProject(), "project_id", "project_full_name"), "Select Project", new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2">Purchase Requisition Ref. <strong class="text-danger">*</strong>:</label>
+                    <div class="col-md-8">
+                        <select class="form-control" id="item_request_id" name="item_request_id">
+                            <option>Select Purchase Requsition Reference</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-2">Supplier Name <strong style="color:red">*</strong>:</label>
+                    <div class="col-md-3">
+                        @Html.DropDownList("supplier_id", ViewBag.SupplierID as SelectList, "Select Supplier",
+                            new { @class = "form-control", id = "supplier_id", @onchange = "getSupplier();" }) @*onchange = "initialQuoteItem()"*@
+                            @Html.ValidationMessageFor(model => model.item_id, "", new { @class = "text-danger" })
+                        </div>
+
+
+                        <div class="col-md-6" style="margin-top:-190px; float:right; margin-right:-1px;">
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    <h4>TERMS & CONDITIONS</h4>
+                                    <div class="form-group">
+                                        <label class="col-md-4">Incoterms:</label>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" name="incoterm" id="incoterm" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4">Payment:</label>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" name="payment" id="payment" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4">Delivery:</label>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" name="delivery" id="delivery" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4">Shipment:</label>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" name="shipment" id="shipment" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4">Warranty:</label>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" name="warranty" id="warranty" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4">Vendor Ref:</label>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" name="vendor_ref" id="vendor_ref" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!--<div class="col-md-2"></div>
+                    <div class="col-md-5" style="float:right;margin-right:-1px; margin-top:-2px; margin-bottom : 20px ">
+                        <button type="button" class="btn btn-default pull-right" id="supplier_promp">New Supplier</button>-->
+                        @*<button type="button" class="btn btn-default pull-right" id="btn_link_to_item">Add New Item</button>*@
+                    <!--</div>-->
+
+                    <div class="row" style="margin:0 !important;">
+                        <table class="table table-bordered" id="quoteTable">
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Code</th>
+                                    <th>Description</th>
+                                    <th>Unit</th>
+                                    <th>QTY</th>
+                                    <th>Unit Price($)</th>
+                                    <th class="text-center">Dis. (%) <input type='number' step='any' class='form-control' value='0' onchange='changeDiscount(this)' style="width:80px !important;margin:0 auto!important;" id="thead_discount" /></th>
+                                    <th class="text-center">Dis. ($) </th>
+                                    <th>Total ($)</th>
+                                    @*<th></th>*@
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-right" colspan="8">Grand Total Amount ($):</th>
+                                    <th class="text-center"><label id="grand_total_amount">0.0000</label></th>
+                                </tr>
+                                <tr>
+                                    <th class="text-right" colspan="8">Discount ($):</th>
+                                    <th class="text-center">
+                                        <input type="number" id="lump_discount_amount" class="form-control" name="lump_discount_amount" value="0" min="0" style="display:inline-block;" />
+                                        @*<button type="button" class="btn btn-sm btn-default" style="display:inline-block;" id="btn-revert"><i class="fa fa-reply"></i> Revert</button>*@
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th class="text-right" colspan="8">Grand Total Amount after Discount($):</th>
+                                    <th class="text-center"><label id="grand_total_after_amount">0.0000</label></th>
+                                </tr>
+                                @*<tr>
+                                    <th class="text-right" colspan="8">Grand Total Amount ($):</th>
+                                    <th class="text-center"><label id="final_grand_total_amount">0.0000</label></th>
+                                </tr>*@
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">Supporting Document <strong style="color:red;">*</strong>:</label>
+                        <div class="col-md-10">
+                            <input type="file" class="form-control" name="attachment_reference" id="attachment_reference" multiple />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="button" value="Submit" onclick="saveQuote()" class="btn btn-success" />
+                            @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-danger" })
+                        </div>
+                    </div>
+                </div>
+
+            }
+    </div>
+</div>
+
+
+<!-- New Supplier Modal -->
+<div class="modal fade" id="supplier_modal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document" style="width:100%;">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2>Create New Supplier</h2>
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-horizontal">
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        <div class="row col-lg-12">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label col-md-4">Date:</label>
+                                    <label class="col-md-8" id="supplier_date">@BT_KimMex.Class.CommonClass.ToLocalTime(DateTime.Now).ToString("dd/MM/yyyy")</label>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-md-4">Supplier Name <span style="color:red;">*</span>:</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="supplier_name" name="supplier_name" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">VAT (%):</label>
+                                    <div class="col-md-8">
+                                        <input type="number" class="form-control" id="discount" name="discount" value="0" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Telephone:</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="supplier_phone" name="supplier_phone" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Email:</label>
+                                    <div class="col-md-8">
+                                        <input type="email" class="form-control" id="supplier_email" name="supplier_email" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Address:</label>
+                                    <div class="col-md-8">
+                                        <textarea class="form-control" id="supplier_address" rows="4"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-md-4">Supplier Type:</label>
+                                    <div class="col-md-8">
+                                        <select class="form-control" id="supplier_type" name="supplier_type">
+                                            <option value="local">Local</option>
+                                            <option value="oversea">Oversea </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-offset-4 col-md-8">
+                                        <input type="button" value="Create" class="btn btn-default" id="supplier_submit" />
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+                                        <h4>TERMS & CONDITIONS</h4>
+                                        <div class="form-group">
+                                            <label class="col-md-4">Incoterms:</label>
+                                            <div class="col-md-8">
+                                                <input type="text" class="form-control" name="incoterm" id="supplier_incoterm" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-4">Payment:</label>
+                                            <div class="col-md-8">
+                                                <input type="text" class="form-control" name="payment" id="supplier_payment" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-4">Delivery:</label>
+                                            <div class="col-md-8">
+                                                <input type="text" class="form-control" name="delivery" id="supplier_delivery" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-4">Shipment:</label>
+                                            <div class="col-md-8">
+                                                <input type="text" class="form-control" name="shipment" id="supplier_shipment" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-4">Warranty:</label>
+                                            <div class="col-md-8">
+                                                <input type="text" class="form-control" name="warranty" id="supplier_warranty" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-4">Vendor Ref:</label>
+                                            <div class="col-md-8">
+                                                <input type="text" class="form-control" name="vendor_ref" id="supplier_vendor_ref" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>            
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- add link item popup -->
+<div class="modal fade" id="item_modal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content ">
+            <div class="modal-body col-sm-12" style="width:100% !important">
+                <h2 style="margin-top:-5px">Create new Item</h2>
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-horizontal">
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        <div class="form-group">
+                            <label class="control-label col-md-4">Date:</label>
+                            <label class="col-md-8" id="customer_current_date"></label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">Type Name <span style="color:red;">*</span>:</label>
+                            <div class="col-md-8">
+                                @*@Html.DropDownList("p_category_id", ViewBag.Categories as SelectList,"Select Item Type",new { @class = "form-control", id = "p_category_id" })*@
+
+                                <select class="form-control type_name" id="type_name" name="type_name">
+                                    <option selected disabled>select Type Name</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-4">Item Code <span style="color:red;">*</span>:</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" id="item_code" onchange="itemCheckDuplicate()" />
+                                <p id="Status"></p>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-4">Item Name <span style="color:red;">*</span>:</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" id="item_name" />
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">Unit <span style="color:red;">*</span>:</label>
+                            <div class="col-md-8">
+                                <select class="form-control product_unit" id="product_unit" name="product_unit" onchange="initialUOM1()">
+                                    <option selected disabled>select unit</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-4">Unit Price :</label>
+                            <div class="col-md-8">
+                                <input type="number" class="form-control" id="unit_price" placeholder="0.00" min="0" step="0.01" pattern="^\d+(?:\.\d{1,2})?$" onchange="validateFloatKeyPress(this);" onKeyPress="if(this.value.length==9) return false;" />
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="control-label col-md-4">Remark:</label>
+                            <div class="col-md-8">
+                                <textarea class="form-control" id="Remark" rows="5"></textarea>
+                            </div>
+                        </div>
+
+                        <h2>Unit of Measurement</h2>
+                        <div class="row" style="margin-bottom:20px !important;">
+                            <table style="margin-right:20px">
+                                <tr>
+                                    <td width="50px"><label>1</label></td>
+                                    <td width="50px"><label id="uom1">Unit</label></td>
+                                    <td width="50px">=></td>
+                                    <td><input type="number" id="uom1_qty" class="form-control" value="0" /></td>
+                                    <td width="150px">
+                                        <select class="form-control uom1_id" id="uom1_id" onchange="initialUOM2()">
+                                            <option selected disabled>select unit</option>
+                                        </select>
+                                    </td>
+                                    <td><input type="number" id="price_umo1" class="form-control" placeholder="Uom Price" onchange="validateFloatKeyPress(this);" onKeyPress="if(this.value.length==8) return false;" /></td>
+                                </tr>
+                                <tr>
+                                    <td width="50px"><label>1</label></td>
+                                    <td width="50px"><label id="uom2">Unit</label></td>
+                                    <td width="50px">=></td>
+                                    <td><input type="number" id="uom2_qty" class="form-control" value="0" /></td>
+                                    <td width="150px">
+                                        <select class="form-control uom2_id" id="uom2_id" onchange="initialUOM3()">
+                                            <option selected disabled>select unit</option>
+                                        </select>
+                                    </td>
+                                    <td><input type="number" id="price_umo2" class="form-control" placeholder="Uom Price" onchange="validateFloatKeyPress(this);" onKeyPress="if(this.value.length==8) return false;" /></td>
+
+
+                                </tr>
+                                <tr>
+                                    <td width="50px"><label>1</label></td>
+                                    <td width="50px"><label id="uom3">Unit</label></td>
+                                    <td width="50px">=></td>
+                                    <td><input type="number" id="uom3_qty" class="form-control" value="0" /></td>
+                                    <td width="150px">
+                                        <select class="form-control uom3_id" id="uom3_id" onchange="initialUOM4()">
+                                            <option selected disabled>select unit</option>
+                                        </select>
+                                    </td>
+                                    <td><input type="number" id="price_umo3" class="form-control" placeholder="Uom Price" onchange="validateFloatKeyPress(this);" onKeyPress="if(this.value.length==8) return false;" /></td>
+
+
+                                </tr>
+                                <tr>
+                                    <td width="50px"><label>1</label></td>
+                                    <td width="50px"><label id="uom4">Unit</label></td>
+                                    <td width="50px">=></td>
+                                    <td><input type="number" id="uom4_qty" class="form-control" value="0" /></td>
+                                    <td width="150px">
+                                        <select class="form-control uom3_id" id="uom4_id" onchange="initialUOM5()">
+                                            <option selected disabled>select unit</option>
+                                        </select>
+                                    </td>
+                                    <td><input type="number" id="price_umo4" class="form-control" placeholder="Uom Price" onchange="validateFloatKeyPress(this);" onKeyPress="if(this.value.length==8) return false;" /></td>
+
+
+                                </tr>
+                                <tr>
+                                    <td width="50px"><label>1</label></td>
+                                    <td width="50px"><label id="uom5">Unit</label></td>
+                                    <td width="50px">=></td>
+                                    <td><input type="number" id="uom5_qty" class="form-control" value="0" /></td>
+                                    <td width="150px">
+                                        <select class="form-control uom3_id" id="uom5_id">
+                                            <option selected disabled class="uom3_id">select unit</option>
+                                        </select>
+                                    </td>
+                                    <td><input type="number" id="price_umo5" class="form-control" placeholder="Uom Price" onchange="validateFloatKeyPress(this);" onKeyPress="if(this.value.length==8) return false;" /></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-6 ">
+                                <button class="btn btn-default btnSubmit_item">Save</button>
+                                <button type="button" class="btn btn-default" onclick="ClearFields();">Clear</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- End add link item popup -->
+@section Scripts{
+
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>*@
+
+    <script type="text/javascript">
+        var quote_items = [];
+        var discount_lumpsum = 0;
+        $(function () {
+
+            $('#ir_project_id').on('change', function (e) {
+                e.preventDefault();
+                var projectId = $(this).val();
+                $('#item_request_id').empty().append("<option>Select Material Request Reference</option>");;
+                $('#po_table tbody').empty();
+                $('#thead_discount').val(0);
+                quote_items = [];
+                discount_lumpsum = 0;
+
+                //console.log(projectId);
+                if (projectId) {
+                    $.ajax({
+                        url: '@Url.Action("GetPurchaseRequisitionByProjectJson", "PurchaseRequisition")',
+                        type: "get",
+                        dataType: "json",
+                        data: { id: projectId },
+                        success: function (da) {
+                            //console.log(da);
+                            $.each(da, function (index, item) {
+                                $('#item_request_id').append("<option value='" + item.purchase_requisition_id + "'>" + item.purchase_requisition_number + "</option>");
+                            });
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            console.log(XMLHttpRequest);
+                        }
+                    });
+                }
+
+            });
+
+            $('#item_request_id').change(function () {
+                var irID = $(this).val();
+                $('#quoteTable tbody').empty();
+                $('#thead_discount').val(0);
+                $('#grand_total_amount').text(parseFloat(0).toFixed(4));
+                $('#lump_discount_amount').val(0);
+                quote_items = [];
+                discount_lumpsum = 0;
+                if (irID) {
+                    $.ajax({
+                        url: '@Url.Action("GetPurchaseRequisitionItemListbyJson", "PurchaseRequisition")',
+                        type: "get",
+                        dataType: "json",
+                        data: { id: irID },
+                        success: function (da) {
+                            
+
+                            $.each(da.data, function (index, item) {
+                                console.log(item);
+
+                                var rowNumber = index;
+
+                                $('#quoteTable tbody').append("" +
+                                    "<tr id='i" + Number(Number(rowNumber) + 1) + "'>" +
+                                    "<td>" + Number(Number(rowNumber) + 1) + "</td>" +
+                                    "<td><input type='hidden' class='item-id' value='" + item.ir_item_id + "'/><label class='item-code' id='item" + Number(Number(rowNumber) + 1) + "'>" + item.product_code + "</label></td>" +
+                                    "<td><label class='item-name'>" + item.product_name + "</label></td>" +
+                                    "<td><label class='item-unit'>" + item.ir_item_unit + "</label></td>" +
+                                    "<td class='text-center'><label class='item-qty'>" + item.remain_qty + "</label></td>" +
+                                    "<td><input type='number' class='form-control unit-price' value='0' onchange='validateFloatKeyPress(this);' onKeyPress='if(this.value.length==8) return false;'/>" +
+                                    "<input type='hidden' class='unit-price-full' value='0'/>" +
+                                    "</td>" +
+                                    "<td><input type='number' class='form-control discount' onchange='onchangeDiscount(this)' value='0'/></td>" +
+                                    "<td><input type='number' class='form-control discount_amount' onchange='onchangeDiscountAmount(this)' value='0'/>" +
+                                    "<input type='hidden' class='discount_amount_full' value='0'/>" +
+                                    "</td>" +
+                                    "<td class='text-center'><label class='item_total_amount'>" + parseFloat(0).toFixed(4) + "</label></td>" +
+                                    "</tr>"
+                                );
+
+                            });
+
+                            /*
+                            if (da.data.purchaseRequisitionDetails.length > 0) {
+                                $.each(da.data.purchaseRequisitionDetails, function (index, item) {
+                                    var rowNumber = index;
+                                    console.log(item);
+
+                                    $('#quoteTable tbody').append("" +
+                                        "<tr id='i" + Number(Number(rowNumber) + 1) + "'>" +
+                                            "<td>" + Number(Number(rowNumber) + 1) + "</td>" +
+                                            "<td><input type='hidden' class='item-id' value='" + item.item_id + "'/><label class='item-code' id='item" + Number(Number(rowNumber) + 1) + "'>" + item.item_code + "</label></td>" +
+                                            "<td><label class='item-name'>" + item.item_name + "</label></td>" +
+                                            "<td><label class='item-unit'>" + item.item_unit_name + "</label></td>" +
+                                            "<td class='text-center'><label class='item-qty'>" + item.remain_qty + "</label></td>" +
+                                            "<td><input type='number' class='form-control unit-price' value='0' onchange='validateFloatKeyPress(this);' onKeyPress='if(this.value.length==8) return false;'/>" +
+                                            "<input type='hidden' class='unit-price-full' value='0'/>"+
+                                            "</td>" +
+                                            "<td><input type='number' class='form-control discount' onchange='onchangeDiscount(this)' value='0'/></td>" +
+                                            "<td><input type='number' class='form-control discount_amount' onchange='onchangeDiscountAmount(this)' value='0'/>" +
+                                            "<input type='hidden' class='discount_amount_full' value='0'/>" +
+                                            "</td>" +
+                                            "<td class='text-center'><label class='item_total_amount'>" + parseFloat(0).toFixed(2)+ "</label></td>" +
+                                        "</tr>"
+                                        );
+                                });
+                            }
+                            */
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            $('#quoteTable tbody ').empty();
+                        }
+                    });
+                }
+
+            });
+
+            //initialItemRow(1, 1, 0);
+            //initialUnit();
+            //initialTypeName();
+
+            //initialGroupControl();
+            //initialCategoryProductSizeControl();
+            //initialProductTypeControl();
+            //initialBrandControl();
+            //initialProductSizeControl();
+
+            $('#type_name').select2({ width: '80%' });
+            $('#supplier_id').select2();
+            $('#item_request_id').select2();
+            $('#ir_project_id').select2();
+
+            $('#product_group').change(function (e) {
+                e.preventDefault();
+                initialCategoryProductSizeControl();
+                initialProductTypeControl();
+                initialBrandControl();
+                initialProductSizeControl();
+            });
+
+            $('#product_category').change(function (e) {
+                e.preventDefault();
+                initialProductTypeControl();
+                initialBrandControl();
+                initialProductSizeControl();
+            });
+            $('#product_type').change(function (e) {
+                e.preventDefault();
+                initialBrandControl();
+                initialProductSizeControl();
+            });
+
+            $('#brand').change(function (e) {
+                e.preventDefault();
+                initialProductSizeControl();
+            });
+
+            $('#btnadd').click(function (e) {
+                e.preventDefault();
+                var rowId = 0, rowNumber = 0;
+                var itemId = $('#product_sugguestion_id').val();
+                var countrow = $('#quoteTable tbody tr').length;
+
+                if (itemId == null || itemId == undefined || itemId == "")
+                    return;
+                if (countrow > 0) {
+                    rowId = $('#quoteTable tbody tr:last-child').attr('id').replace(/[^\d]/g, '');
+                    rowNumber = $('#quoteTable tbody tr:last-child').find('td:first-child').text();
+                }
+
+
+                $('#quoteTable tbody').append("" +
+                        "<tr id='i" + Number(Number(rowId) + 1) + "'>" +
+                            "<td>" + Number(Number(rowNumber) + 1) + "</td>" +
+                            "<td><input type='hidden' class='item-id'/><label class='item-code' id='item" + Number(Number(rowNumber) + 1) + "'></label></td>" +
+                            "<td><label class='item-name'></label></td>" +
+                            "<td><label class='item-unit'></label></td>" +
+                            "<td><input type='number' class='form-control unit-price' value='0' onchange='validateFloatKeyPress(this);' onKeyPress='if(this.value.length==8) return false;'/></td>" +
+                            "<td><input type='number' class='form-control discount' value='0'/></td>" +
+                            "<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='removeItemRow(this)'><span class='glyphicon glyphicon-trash'></span></a></td>" +
+                        "</tr>"
+                        );
+
+                var ind = $('#quoteTable tr').length - 1;
+                $('#product_description').val('');
+                $('#product_sugguestion_id').val('');
+                if (itemId != "") {
+                    $.ajax({
+                        url: '/Product/GetProductDataByCode',
+                        type: "get",
+                        dataType: "json",
+                        async: false,
+                        data: { id: itemId },
+                        success: function (da) {
+                            $('#quoteTable tr').eq(ind).find('select.item-unit').empty();
+                            if (da.data) {
+                                var item = da.data;
+                                console.log(item);
+                                $('#quoteTable tr').eq(ind).find('input.item-id').val(itemId);
+                                $('#quoteTable tr').eq(ind).find('label.item-code').text(item.product_code);
+                                $('#quoteTable tr').eq(ind).find('label.item-name').text(item.product_name);
+                                $('#quoteTable tr').eq(ind).find('label.item-unit').text(item.unit_name);
+                            } else {
+                                $('#quoteTable tr').eq(ind).find('input.item-id').val('');
+                                $('#quoteTable tr').eq(ind).find('label.item-name').text('');
+                                $('#quoteTable tr').eq(ind).find('label.item-unit').text('');
+                                $('#quoteTable tr').eq(ind).find('label.item-code').text('');
+                            }
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            $('#quoteTable tr').eq(ind).find('input.item-id').val('');
+                            $('#quoteTable tr').eq(ind).find('label.item-name').text('');
+                            $('#quoteTable tr').eq(ind).find('label.item-unit').text('');
+                            $('#quoteTable tr').eq(ind).find('label.item-code').text('');
+                            alert(textStatus);
+                        }
+                    });
+                }
+
+            })
+
+            $('#btnclear').click(function (e) {
+                //initialJobCategoryControl();
+                initialGroupControl();
+                initialCategoryProductSizeControl();
+                initialProductTypeControl();
+                initialBrandControl();
+                $('#product_sugguestion_id').val('');
+                $('#product_description').val('');
+            });
+
+            $('#btn_link_to_item').click(function () {
+                $('#customer_current_date').text(getFormattedDateMMDDYYYY(new Date()));
+                $('#item_modal').modal('show');
+                $("#item_code").val("");
+                $("#item_name").val("");
+                $("#product_unit").val("--- Select Product Unit ---");
+                $("#unit_price").val("");
+                $("#type_name").val("--- Select Type Name ---");
+                $("#Remark").val("");
+
+                $("#uom1_qty").val("");
+                $("#uom2_qty").val("");
+                $("#uom3_qty").val("");
+                $("#uom4_qty").val("");
+                $("#uom5_qty").val("");
+
+                $("#price_umo1").val("");
+                $("#price_umo2").val("");
+                $("#price_umo3").val("");
+                $("#price_umo4").val("");
+                $("#price_umo5").val("");
+
+                $("#uom1_id").val("select unit");
+                $("#uom2_id").val("select unit");
+                $("#uom3_id").val("select unit");
+                $("#uom4_id").val("select unit");
+                $("#uom5_id").val("select unit");
+
+                $("#uom1").text("Unit");
+                $("#uom2").text("Unit");
+                $("#uom3").text("Unit");
+                $("#uom4").text("Unit");
+                $("#uom5").text("Unit");
+
+                $("#valumo1").val("0");
+                $("#valumo2").val("0");
+                $("#valumo3").val("0");
+                $("#valumo4").val("0");
+                $("#valumo5").val("0");
+            });
+
+            $('.btnSubmit_item').on("click", function (e) {
+                e.preventDefault();
+                var product_code = $('#item_code').val();
+                var product_name = $('#item_name').val();
+                var product_unit = $('#product_unit').val();
+                var unit_price = $('#unit_price').val();
+                var p_category_id = $('#type_name').val();
+                var Remark = $('#Remark').val();
+                var uom1_id = $('#uom1_id').val();
+                var uom2_id = $('#uom2_id').val();
+                var uom3_id = $('#uom3_id').val();
+                var uom4_id = $('#uom4_id').val();
+                var uom5_id = $('#uom5_id').val();
+                var uom1_qty = $('#uom1_qty').val();
+                var uom2_qty = $('#uom2_qty').val();
+                var uom3_qty = $('#uom3_qty').val();
+                var uom4_qty = $('#uom4_qty').val();
+                var uom5_qty = $('#uom5_qty').val();
+                var uom1_price = $('#price_umo1').val();
+                var uom2_price = $('#price_umo2').val();
+                var uom3_price = $('#price_umo3').val();
+                var uom4_price = $('#price_umo4').val();
+                var uom5_price = $('#price_umo5').val();
+
+                if (product_code == "" || product_code == null) {
+                    alert("Item Code is required")
+                }
+
+                else if (product_name == "" || product_name == null) {
+                    alert("Item Name is required")
+                }
+                else if (product_unit == "" || product_unit == null) {
+                    alert("Unit is required")
+                }
+                else if (p_category_id == "" || p_category_id == null) {
+                    alert("Type Name is required")
+                }
+                else {
+                    $.ajax({
+                        url: "/Product/CreateJson",
+                        data: {
+                            product_code: product_code,
+                            product_name: product_name,
+                            product_unit: product_unit,
+                            unit_price: unit_price,
+                            p_category_id: p_category_id,
+                            Remark: Remark,
+                            uom1_id: uom1_id,
+                            uom2_id: uom2_id,
+                            uom3_id: uom3_id,
+                            uom4_id: uom4_id,
+                            uom5_id: uom5_id,
+
+                            uom1_qty: uom1_qty,
+                            uom2_qty: uom2_qty,
+                            uom3_qty: uom3_qty,
+                            uom4_qty: uom4_qty,
+                            uom5_qty: uom5_qty,
+
+                            uom1_price: uom1_price,
+                            uom2_price: uom2_price,
+                            uom3_price: uom3_price,
+                            uom4_price: uom4_price,
+                            uom5_price: uom5_price,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#item_modal').modal('hide');
+                            if (da.Message == "Success") {
+                                initialUnit();
+                                initialTypeName();
+                            }
+                            else if (da.Message == "Fail") {
+                                if (!$('.modal-header').hasClass('alert-danger')) {
+                                    $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                    $('.delete-confirm').css('display', 'none');
+                                }
+                                $('.success-message').html('Your data is error while saving!');
+                            }
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html('Your data is error while saving!');
+                        }
+                    });
+                }
+
+            });
+
+            //Supplier
+
+            $('#supplier_promp').click(function () {
+                $('#supplier_date').text(getFormattedDateMMDDYYYY(new Date()));
+                $('#supplier_modal').modal('show');
+            });
+
+            $('#lump_discount_amount').change(function (e) {
+                var lump_discount_amount = parseFloat($(this).val());
+                var grand_total_amount =RemoveCommaFromNumber($('#grand_total_amount').text());
+                if (lump_discount_amount < 0 || lump_discount_amount > grand_total_amount) {
+                        alert("Invalid Number.");
+                        $(this).val(0);
+                        lump_discount_amount = 0;
+                        return;
+                }
+                calculationGrandTotalAmount();
+
+            })
+
+            //$('#lump_discount_amount').change(function (e) {
+            //    var lump_discount_amount = parseFloat($(this).val());
+            //    if (lump_discount_amount <= 0) {
+            //        alert("Invalid Number.");
+            //        $(this).val(0);
+            //        lump_discount_amount = 0;
+            //        return;
+            //    }
+            //    var grand_total = parseFloat(RemoveCommaFromNumber($('#grand_total_amount').text()));
+            //    if (grand_total < lump_discount_amount) {
+            //        alert("Invalid Number.");
+            //        $(this).val(0);
+            //        return;
+            //    }
+            //    var item_qtys = $('.item-qty');
+            //    var item_discount_amounts = $('.discount_amount');
+            //    var item_discount_percentages = $('.discount');
+            //    var item_unit_prices = $('.unit-price');
+            //    var item_total_amounts = $('.item_total_amount');
+            //    var item_unit_price_fulls = $('.unit-price-full');
+            //    var item_discount_amount_fulls = $('.discount_amount_full');
+            //    //quote_items = [];
+            //    if (quote_items.length == 0) {
+            //        $.each(item_unit_prices, function (index, item) {
+            //            var element = {
+            //                unit_price: parseFloat($(item).val()),
+            //                discount_percentage: parseFloat($(item_discount_percentages[index]).val()),
+            //                discount_amount: parseFloat($(item_discount_amounts[index]).val()),
+            //                unit_price_full: parseFloat($(item_unit_price_fulls[index]).val()),
+            //                discount_amount_full: parseFloat($(item_discount_amount_fulls[index]).val()),
+            //            };
+            //            quote_items.push(element);
+            //        });
+            //    }
+            //    discount_lumpsum = $(this).val();
+            //    var total_item_qty = 0
+            //    $.each(item_qtys, function (index, item) {
+            //        total_item_qty = total_item_qty + parseFloat($(item).text());
+            //    });
+            //    var discount_addon_per_item = parseFloat(lump_discount_amount / total_item_qty).toFixed(4);
+            //    var discount_addon_per_item_full = parseFloat(lump_discount_amount / total_item_qty);
+            //    var grand_total_amount = 0;
+            //    $.each(item_discount_amounts, function (index, item) {
+            //        var total_discount = parseFloat($(item).val()) + parseFloat(discount_addon_per_item_full);
+            //        var total_discount = parseFloat($(item).val()) + parseFloat(discount_addon_per_item);
+            //        //var total_discount_full = parseFloat($(item).val()) + discount_addon_per_item_full;
+            //        $(item).val(parseFloat(total_discount).toFixed(4));
+            //        //$(item).val(parseFloat(total_discount));
+            //        $(item_discount_amount_fulls[index]).val(parseFloat(total_discount_full));
+            //        var total_amount = parseFloat($(item_qtys[index]).text()) * (parseFloat($(item_unit_prices[index]).val()) - total_discount);
+            //        var total_amount_full = parseFloat($(item_qtys[index]).text()) * (parseFloat($(item_unit_prices[index]).val()) - total_discount_full);
+            //        $(item_total_amounts[index]).text(ReplaceNumberWithCommas(parseFloat(total_amount).toFixed(4)));
+            //        //$(item_total_amounts[index]).html(ReplaceNumberWithCommas(parseFloat(total_amount).toFixed(4)) + "<br/>" + ReplaceNumberWithCommas(total_amount_full));
+            //        grand_total_amount = grand_total_amount + total_amount_full;
+            //    });
+            //    //alert(discount_addon_per_item);               
+            //    //calculationGrandTotalAmount();
+            //    $('#grand_total_amount').text(ReplaceNumberWithCommas(parseFloat(grand_total_amount).toFixed(4)));
+            //    //$('#grand_total_amount').html(ReplaceNumberWithCommas(parseFloat(grand_total_amount).toFixed(4)) + "<br/>" + ReplaceNumberWithCommas(parseFloat(grand_total_amount)));
+            //});
+
+            $('#btn-revert').click(function (e) {
+
+                //console.log(quote_items);
+                //console.log(discount_lumpsum);
+
+                var item_qtys = $('.item-qty');
+                var item_discount_amounts = $('.discount_amount');
+                var item_discount_percentages = $('.discount');
+                var item_unit_prices = $('.unit-price');
+                var item_total_amounts = $('.item_total_amount');
+                var item_unit_price_fulls = $('.unit-price-full');
+                var item_discount_amount_fulls = $('.discount_amount_full');
+
+                $("#lump_discount_amount").val(0);
+                $('#thead_discount').val(0);
+                for (var i = 0; i < quote_items.length; i++) {
+
+                    var qty = parseFloat($(item_qtys[i]).text());
+                    
+                    $(item_unit_prices[i]).val(ReplaceNumberWithCommas(parseFloat(quote_items[i].unit_price).toFixed(4)));
+                    $(item_discount_percentages[i]).val(parseFloat(quote_items[i].discount_percentage).toFixed(2));
+                    $(item_discount_amounts[i]).val(ReplaceNumberWithCommas(parseFloat(quote_items[i].discount_amount).toFixed(4)));
+                    var total_amount = qty * (parseFloat(quote_items[i].unit_price) - parseFloat(quote_items[i].discount_amount));
+                    $(item_total_amounts[i]).text(ReplaceNumberWithCommas(parseFloat(total_amount).toFixed(4)));
+                    $(item_unit_price_fulls[i]).text(parseFloat(quote_items[i].unit_price_full));
+                    $(item_discount_amount_fulls[i]).val(parseFloat(quote_items[i].discount_amount_full));
+                }
+
+                calculationGrandTotalAmount();
+
+            });
+         
+            $('#supplier_submit').click(function (e) {
+                e.preventDefault();
+                var supplier_name = $('#supplier_name').val();
+                var supplier_vat = $('#discount').val();
+                var supplier_phone = $('#supplier_phone').val();
+                var supplier_email = $('#supplier_email').val();
+                var supplier_address = $('#supplier_address').val();
+                var supplier_type = $('#supplier_type').val();
+                var model = {
+                    supplier_name: supplier_name,
+                    supplier_email: supplier_email,
+                    supplier_address: supplier_address,
+                    supplier_phone: supplier_phone,
+                    discount: supplier_vat,
+                    supplier_type: supplier_type,
+                    incoterm: $('#supplier_incoterm').val(),
+                    payment: $('#supplier_payment').val(),
+                    delivery: $('#supplier_delivery').val(),
+                    shipment: $('#supplier_shipment').val(),
+                    warranty: $('#supplier_warranty').val(),
+                    vendor_ref: $('#supplier_vendor_ref').val(),
+                }
+              
+                $.ajax({
+                    url: "@Url.Action("CreateJson","Supplier")",
+                    data: { model: model },
+                    type: 'POST',
+                    success: function (da) {
+                        if ($('.modal-header').hasClass('alert-danger')) {
+                            $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                            $('.supplier_submit').css('display', 'none');
+                        }
+                        $('#supplier_modal').modal('hide');
+                        if (da.result == "success") {
+                            InitialSupplierDropdownList(da.supplier_id);
+                        }
+                        else if (da.result == "error") {
+                            alert(da.message);
+                        }
+                    },
+                    error: function (err) {
+                        if (!$('.modal-header').hasClass('alert-danger')) {
+                            $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                            $('.supplier_submit').css('display', 'none');
+                        }
+                        $('.success-message').html('Your data is error while saving!');
+                    }
+                });
+            });
+
+
+            //Term & Condition
+
+            @*$('#terms_promp').click(function () {
+                $('#terms_modal').modal('show');
+            });
+
+            $('#terms_submit').click(function (d) {
+                d.preventDefault();
+                var incoterm = $('#incoterm').val();
+                var supplier_vat = $('#discount').val();
+                var supplier_phone = $('#supplier_phone').val();
+                var supplier_email = $('#supplier_email').val();
+                var supplier_address = $('#supplier_address').val();
+                var model = {
+                    supplier_name: supplier_name,
+                    supplier_email: supplier_email,
+                    supplier_address: supplier_address,
+                    supplier_phone: supplier_phone,
+                    discount: supplier_vat,
+                }
+              
+                $.ajax({
+                    url: "@Url.Action("CreateJson","Supplier")",
+                    data: { model: model },
+                type: 'POST',
+                success: function (da) {
+                    if ($('.modal-header').hasClass('alert-danger')) {
+                        $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                        $('.supplier_submit').css('display', 'none');
+                    }
+                    $('#supplier_modal').modal('hide');
+                    if (da.result == "success") {
+                        InitialSupplierDropdownList(da.supplier_id);
+                    }
+                    else if (da.result == "error") {
+                        alert(da.message);
+                    }
+                },
+                error: function (err) {
+                    if (!$('.modal-header').hasClass('alert-danger')) {
+                        $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                        $('.supplier_submit').css('display', 'none');
+                    }
+                    $('.success-message').html('Your data is error while saving!');
+                }
+            });
+        });*@
+
+            $('#type_name').on('change', function (e) {
+                e.preventDefault();
+                var itemTypeId = $(this).val();
+                $('#product_code').val('');
+                if (itemTypeId) {
+                    $.ajax({
+                        url: "@Url.Action("GenerateItemCodebyItemType", "Product")",
+                        type: "get",
+                        dataType: "json",
+                        data: { id: itemTypeId },
+                        success: function (data) {
+                            $('#item_code').val(data.code);
+                        }
+                    });
+                }
+            });
+        });
+        function initialGroupControl() {
+            $('#product_group').empty().append("<option selected disabled>Select Group</option>");
+            $.ajax({
+                url: '/Class/GetClassDataDropdownlist',
+                type: "get",
+                dataType: "json",
+                async: false,
+                success: function (da) {
+                    if (da.result == "success") {
+                        //console.log(da);
+                        $.each(da.data, function (ind, item) {
+                            $('#product_group').append("" +
+                                "<option value='" + item.class_id + "'>" + item.class_name + "</option>"
+                            );
+                        });
+                    } else {
+                        alert('Error: ' + da.message);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Initial BOQ Item Type:' + textStatus);
+                }
+            });
+        }
+
+        function initialCategoryProductSizeControl() {
+            var groupId = $('#product_groupr').val();
+            $('#product_category').empty().append("<option selected disabled>Select Category</option>");
+            $('#product_type').empty().append("<option selected disabled>Select Product Type</option>");
+            $('#brand').empty().append("<option selected disabled>Select Brand</option>");
+            $('#product_size').empty().append("<option selected disabled>Select Product Size</option>");
+            $.ajax({
+                url: '/ProductCategory/GetCategoryDataDropdownlistbyClassId',
+                type: "get",
+                dataType: "json",
+                async: false,
+                data: { id: groupId },
+                success: function (da) {
+                    if (da.result == "success") {
+                        //console.log(da);
+                        $.each(da.data, function (ind, item) {
+                            $('#product_category').append("" +
+                                "<option value='" + item.p_category_id + "'>" + item.p_category_name + "</option>"
+                            );
+                        });
+                    } else {
+                        alert('Error:' + da.message);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Initial BOQ Item Type:' + textStatus);
+                }
+            });
+
+        }
+        function initialProductTypeControl() {
+            var categoryId = $('#product_category').val();
+            $('#product_type').empty().append("<option selected disabled>Select Type</option>");
+            $('#brand').empty().append("<option selected disabled>Select Brand</option>");
+            $.ajax({
+                url: '/ProductType/GetProductTypeListItemsbyCategoryId',
+                type: "get",
+                dataType: "json",
+                async: false,
+                data: { id: categoryId },
+                success: function (da) {
+                    //console.log(da.data);
+                    $.each(da.data, function (ind, item) {
+                        $('#product_type').append("" +
+                            "<option value='" + item.product_type_id + "'>" + item.product_type_name + "</option>"
+                        );
+                    });
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Initial Product Type:' + textStatus);
+                }
+            });
+        }
+        function initialBrandControl() {
+            var productTypeId = $('#product_type').val();
+            $('#brand').empty().append("<option selected disabled>Select Brand</option>");
+            $.ajax({
+                url: '/Brand/GetBrandListItemsbyCategoryId',
+                type: "get",
+                dataType: "json",
+                async: false,
+                data: { id: productTypeId },
+                success: function (da) {
+                    //console.log(da.data);
+                    $.each(da.data, function (ind, item) {
+                        $('#brand').append("" +
+                            "<option value='" + item.brand_id + "'>" + item.brand_name + "</option>"
+                        );
+                    });
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Initial Brand:' + textStatus);
+                }
+            });
+        }
+        function initialProductSizeControl() {
+            var brandId = $('#brand').val();
+            $('#product_size').empty().append("<option selected disabled>Select Product Size</option>");
+            $.ajax({
+                url: '/ProductSize/GetProductDataDropdownlistbyClassId',
+                type: "get",
+                dataType: "json",
+                async: false,
+                data: { id: brandId },
+                success: function (da) {
+                    if (da.result == "success") {
+                        //console.log(da);
+                        $.each(da.data, function (ind, item) {
+                            $('#product_size').append("" +
+                                "<option value='" + item.product_size_id + "'>" + item.product_size_name + "</option>"
+                            );
+                        });
+                    } else {
+                        alert('Initial BOQ Item Type:' + da.message);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Initial BOQ Item Type:' + textStatus);
+                }
+            });
+        }
+        function initialProductSuggestionControl() {
+            var classId = $('#product_group').val();
+            var categoryId = $('#product_category').val();
+            var productTypeId = $('#product_type').val();
+            var brands = $('#brand').val();
+            var productSizeId = $('#product_size').val();
+            $('#product_description').autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: "/Product/GetProductAutoSuggestName/",
+                        dataType: "json",
+                        data: { term: request.term, classId: classId, categoryId: categoryId, productTypeId: productTypeId, brandId: brands, productSizeId: productSizeId },
+                        success: function (data) {
+                            response(data);
+                        }
+                    });
+                },
+                select: function (event, ui) {
+                    console.log(ui);
+                    $('#product_sugguestion_id').val('');
+                    var selectedObj = ui.item;
+                    var item = (selectedObj.value).split(' ');
+                    $('#product_sugguestion_id').val(selectedObj.id);
+                }
+            })
+        }
+    </script>
+    <script type="text/javascript">
+
+        function changeDiscount(row) {
+
+            quote_items = [];
+            discount_lumpsum = 0;
+
+            var ind = row.parentNode.parentNode.rowIndex;
+            var cost = $(row).val();
+            //var clss = $(row).attr('class').split(' ');
+            var categories_class = $('.discount');
+            var qtys = $('.item-qty');
+            var unitPrices = $('.unit-price');
+            var discountAmounts = $('.discount_amount');
+            var discountAmountFulls = $('.discount_amount_full');
+            var totals = $('.item_total_amount');
+
+            for (var i = 0; i < categories_class.length; i++) {
+                $(categories_class[i]).val(cost);
+
+                var qty = Number($(qtys[i]).text());
+                var unitPrice = parseFloat($(unitPrices[i]).val());
+                var discountAmount =parseFloat(unitPrice * (cost / 100)).toFixed(4);
+                $(discountAmounts[i]).val(parseFloat(discountAmount).toFixed(4));
+                $(discountAmountFulls[i]).val(discountAmount);
+                var total = (unitPrice - discountAmount) * qty;
+                
+                $(totals[i]).text(ReplaceNumberWithCommas(parseFloat(total).toFixed(4)));
+                //$(totals[i]).html(ReplaceNumberWithCommas(parseFloat(total).toFixed(4)) + "<br/>" + ReplaceNumberWithCommas(parseFloat(total)));
+
+            }
+
+            calculationGrandTotalAmount();
+
+        }
+
+        function calculationGrandTotalAmount() {
+            var totals = $('.item_total_amount');
+
+            var item_qtys = $('.item-qty');
+            var item_discount_amounts = $('.discount_amount');
+            var item_discount_percentages = $('.discount');
+            var item_unit_prices = $('.unit-price');
+            var item_total_amounts = $('.item_total_amount');
+            var item_unit_price_fulls = $('.unit-price-full');
+            var item_discount_amount_fulls = $('.discount_amount_full');
+
+            var grand_total_amount = 0;
+
+            $.each(item_discount_amounts, function (index, item) {
+
+                var total_discount_full = $(item_discount_amount_fulls[index]).val();
+                var total_amount_full = parseFloat($(item_qtys[index]).text()) * (parseFloat($(item_unit_prices[index]).val()) - total_discount_full);
+                grand_total_amount = grand_total_amount + total_amount_full;
+
+            });
+
+
+            //var grand_total_amount = 0;
+            //for (var i = 0; i < totals.length; i++) {
+            //    grand_total_amount = grand_total_amount + Number(RemoveCommaFromNumber(totals[i].innerHTML));
+            //}
+            //console.log(grand_total_amount);
+
+            $('#grand_total_amount').text(ReplaceNumberWithCommas(parseFloat(grand_total_amount).toFixed(4)));
+            //$('#grand_total_amount').html(ReplaceNumberWithCommas(parseFloat(grand_total_amount)) + "<br/>" + ReplaceNumberWithCommas(parseFloat(grand_total_amount)));
+        }
+
+        function initialUnit() {
+            $.ajax({
+                url: "@Url.Action("UnitDropDown", "Product")",
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    $('#product_unit').empty();
+                    $('#product_unit').append("" +
+                        "<option selected disabled>--- Select Product Unit ---</option>"
+                    );
+                    $.each(data, function (index, item) {
+                        $.each(item, function (index1, item1) {
+                            $('#product_unit').append("" +
+                                    "<option value='" + item1.Name + "'>" + item1.Name + "</option>"
+                                );
+                            $('#uom1_id').append("" +
+                                  "<option value='" + item1.Name + "'>" + item1.Name + "</option>"
+                              );
+                            $('#uom2_id').append("" +
+                                  "<option value='" + item1.Name + "'>" + item1.Name + "</option>"
+                              );
+                            $('#uom3_id').append("" +
+                                  "<option value='" + item1.Name + "'>" + item1.Name + "</option>"
+                              );
+                            $('#uom4_id').append("" +
+                                  "<option value='" + item1.Name + "'>" + item1.Name + "</option>"
+                              );
+                            $('#uom5_id').append("" +
+                                   "<option value='" + item1.Name + "'>" + item1.Name + "</option>"
+                               );
+                        });
+                    });
+                },
+                error: function (data) {
+                    //alert('fail');
+                }
+            });
+        }
+        function initialTypeName() {
+            $.ajax({
+                url: "@Url.Action("TypeNameDropdownList", "Product")",
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    $('#type_name').empty();
+                    $('#type_name').append("" +
+                        "<option selected disabled>--- Select Type Name ---</option>"
+                    );
+                    $.each(data, function (index, item) {
+                        $.each(item, function (index1, item1) {
+                            //var full_name = item1.user_first_name + " " + item1.user_last_name;
+                            $('#type_name').append("" +
+                                    "<option value='" + item1.p_category_id + "'>" + item1.p_category_name + "</option>"
+                                );
+                        });
+                    });
+                },
+                error: function (data) {
+                    alert('fail');
+                }
+            });
+        }
+        function initialUOM1() {
+            var unit = $('#product_unit').val();
+            if (unit != null || unit != "")
+                $('#uom1').text(unit);
+        }
+        function initialUOM2() {
+            var unit = $('#uom1_id').val();
+            if (unit != null || unit != "")
+                $('#uom2').text(unit);
+        }
+        function initialUOM3() {
+            var unit = $('#uom2_id').val();
+            if (unit != null || unit != "")
+                $('#uom3').text(unit);
+        }
+        function initialUOM4() {
+            var unit = $('#uom3_id').val();
+            if (unit != null || unit != "")
+                $('#uom4').text(unit);
+        }
+        function initialUOM5() {
+            var unit = $('#uom4_id').val();
+            if (unit != null || unit != "")
+                $('#uom5').text(unit);
+        }
+        function initialItemRow(rowNumber, rowIdNumber, rowIndex) {
+            if (rowIndex == 0) {
+                $('#quoteTable tbody').append("" +
+                    "<tr id='i" + rowIdNumber + "'>" +
+                        "<td>" + rowNumber + "</td>" +
+                        "<td><input type='hidden' class='item-id'/><input type='text' class='form-control item-code' placeholder='Item Code' onfocus='getItemDataRow(this)' id='item" + rowIdNumber + "'/></td>" +
+                        "<td><label class='item-name'></label></td>" +
+                        "<td><label class='item-unit'></label></td>" +
+                        "<td><input type='number' class='form-control unit-price' value='0' onchange='validateFloatKeyPress(this);' onKeyPress='if(this.value.length==8) return false;'/></td>" +
+                        "<td><input type='number' class='form-control discount' value='0'/></td>" +
+                        "<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='removeItemRow(this)'><span class='glyphicon glyphicon-trash'></span></a></td>" +
+                        "<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='appendItemRow(this)'><span class='glyphicon glyphicon-plus'></span></a></td>" +
+                    "</tr>"
+                );
+            } else {
+                $('#quoteTable tr').eq(rowIndex).after("" +
+                    "<tr id='i" + rowIdNumber + "'>" +
+                        "<td>" + rowNumber + "</td>" +
+                        "<td><input type='hidden' class='item-id'/><input type='text' class='form-control item-code' placeholder='Item Code' onfocus='getItemDataRow(this)' id='item" + rowIdNumber + "'/></td>" +
+                        "<td><label class='item-name'></label></td>" +
+                        "<td><label class='item-unit'></label></td>" +
+                        "<td><input type='number' class='form-control unit-price' value='0' onchange='validateFloatKeyPress(this);' onKeyPress='if(this.value.length==8) return false;'/></td>" +
+                        "<td><input type='number' class='form-control discount' value='0'/></td>" +
+                        "<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='removeItemRow(this)'><span class='glyphicon glyphicon-trash'></span></a></td>" +
+                        "<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='appendItemRow(this)'><span class='glyphicon glyphicon-plus'></span></a></td>" +
+                    "</tr>"
+                );
+            }
+
+        }
+        function appendItemRow(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            console.log(ind);
+            var rowId = $('#quoteTable tr').eq(ind).attr('id').replace(/[^\d]/g, '');
+            var rowNumber = $('#quoteTable tr').eq(ind).find('td:first-child').text();
+            var itemId = $('#quoteTable tr').eq(ind).find('input.item-id').val();
+            var price = $('#quoteTable tr').eq(ind).find('input.unit-price').val();
+            if (!itemId || Number(price) <= 0) {
+                return;
+            }
+            initialItemRow(Number(rowNumber) + 1, Number(rowId) + 1, ind);
+            $('#quoteTable tr').eq(ind).find('td:nth-child(8)').html('');
+        }
+        function removeItemRow(row) {
+            var arrItemId = [];
+            var ind = row.parentNode.parentNode.rowIndex;
+            //var isLastChild = $('#quoteTable tr').eq(ind).find("td:nth-child(8) a").length == 0 ? false : true;
+            var isLastChild = $('#quoteTable tbody tr').length == 1 ? true : false;
+            var itemId = $('#quoteTable tr').eq(ind).attr('id');
+            var count_table_row = $('#quoteTable tr').length;
+            for (var i = 1; i <= count_table_row; i++) {
+                var id = $('#quoteTable tr').eq(i).attr('id');
+                if (id != undefined)
+                    arrItemId.push(id);
+            }
+            if (arrItemId.length == 1) {
+                return;
+            }
+            document.getElementById('quoteTable').deleteRow(ind);
+            if (isLastChild) {
+                //$('#quoteTable tr#' + arrItemId[arrItemId.length - 2]).find('td:nth-child(8)').html("<a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='appendItemRow(this)'><span class='glyphicon glyphicon-plus'></span></a>");
+            }
+            else {
+                var deleted_index = arrItemId.indexOf(itemId);
+                arrItemId.splice(deleted_index, 1);
+                for (var i = 0; i < arrItemId.length; i++) {
+                    $('tr#' + arrItemId[i] + ' td:nth-child(1)').html(Number(i) + 1);
+                }
+            }
+        }
+
+        function getItemDataRow(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var rowId = $('#quoteTable tr').eq(ind).find('input.item-code').attr('id');
+            var itemClass = $('#quoteTable tr').eq(ind).attr('id');
+            //var itemTypeId = $('#stockIssueTable tr#type' + itemClass).find('input.type-id').val();
+            //var itemId;
+            autocompleted(rowId);
+
+            function autocompleted(rowId) {
+                $("#" + rowId).autocomplete({
+                    source: '@Url.Action("GetProductAutoSuggestName", "Product")',
+                    select: function (event, ui) {
+                        AutoCompleteSelectHandler(event, ui, ind);
+                        $(this).val('');
+                    }
+                });
+            }
+
+            function AutoCompleteSelectHandler(event, ui, ind) {
+                var selectedObj = ui.item;
+                var item = (selectedObj.value).split(' ');
+                itemId = selectedObj.id;
+                GetItemDataRow(ind, itemId);
+                //$('#stockIssueTable tr').eq(ind).find('input.item-code').val(item[0]);
+            }
+
+            function GetItemDataRow(ind, itemId) {
+                if (itemId != "") {
+                    $.ajax({
+                        url: '@Url.Action("GetProductDataByCode", "Product")',
+                        type: "get",
+                        dataType: "json",
+                        async: false,
+                        data: { id: itemId },
+                        success: function (da) {
+                            $('#quoteTable tr').eq(ind).find('input.unit-price').val(0);
+                            $('#quoteTable tr').eq(ind).find('input.discount').val(0);
+                            if (da.data) {
+                                var item = da.data;
+                                console.log(item);
+                                $('#quoteTable tr').eq(ind).find('input[type="hidden"].item-id').val(item.product_id);
+                                $('#quoteTable tr').eq(ind).find('input[type="text"].item-code').val(item.product_code);
+                                $('#quoteTable tr').eq(ind).find('label.item-name').text(item.product_name);
+                                $('#quoteTable tr').eq(ind).find('label.item-unit').text(item.unit_name);
+
+                            } else {
+                                $('#quoteTable tr').eq(ind).find('input[type="hidden"].item-id').val('');
+                                $('#quoteTable tr').eq(ind).find('label.item-name').text(' ');
+                                $('#quoteTable tr').eq(ind).find('label.item-unit').text(' ');
+                            }
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            $('#quoteTable tr').eq(ind).find('input.unit-price').text(0);
+                            $('#quoteTable tr').eq(ind).find('input.discount').text(0);
+                            $('#quoteTable tr').eq(ind).find('input[type="hidden"].item-id').val('');
+                            $('#quoteTable tr').eq(ind).find('label.item-name').text(' ');
+                            $('#quoteTable tr').eq(ind).find('label.item-unit').text(' ');
+                            alert(textStatus);
+                        }
+                    });
+                }
+            }
+        }
+
+        function InitialSupplierDropdownList(supplier) {
+            $.ajax({
+                url: "@Url.Action("SupplierDropdownList", "Supplier")",
+                type: "get",
+                dataType: "json",
+                success: function (da) {
+                    if (da.result == "sucess") {
+                        var selectedsup = {};
+                        $('#supplier_id').empty();
+                        $('#supplier_id').append("<option disabled>Select Supplier</option>");
+                        $.each(da.data, function (index, item) {
+                            $('#supplier_id').append("<option value='" + item.supplier_id + "'>" + item.supplier_name + "</option>");
+                            if (item.supplier_id == supplier)
+                                selectedsup = item;
+                        });
+                        $('#supplier_id').val(supplier);
+
+                        if (selectedsup != null) {
+                            $('#incoterm').val(selectedsup.incoterm);
+                            $('#payment').val(selectedsup.payment);
+                            $('#delivery').val(selectedsup.delivery);
+                            $('#shipment').val(selectedsup.shipment);
+                            $('#warranty').val(selectedsup.warranty);
+                            $('#vendor_ref').val(selectedsup.vendor_ref);
+                        }
+                    }
+                },
+                error: function (data) {
+                    //alert('fail');
+                }
+            });
+        }
+
+        function ClearFields() {
+            $("#item_code").val("");
+            $("#item_name").val("");
+            $("#product_unit").val("--- Select Product Unit ---");
+            $("#unit_price").val("");
+            $("#type_name").val("--- Select Type Name ---");
+            $("#Remark").val("");
+
+            $("#uom1_qty").val("");
+            $("#uom2_qty").val("");
+            $("#uom3_qty").val("");
+            $("#uom4_qty").val("");
+            $("#uom5_qty").val("");
+
+            $("#price_umo1").val("");
+            $("#price_umo2").val("");
+            $("#price_umo3").val("");
+            $("#price_umo4").val("");
+            $("#price_umo5").val("");
+
+            $("#uom1_id").val("select unit");
+            $("#uom2_id").val("select unit");
+            $("#uom3_id").val("select unit");
+            $("#uom4_id").val("select unit");
+            $("#uom5_id").val("select unit");
+
+            $("#uom1").text("Unit");
+            $("#uom2").text("Unit");
+            $("#uom3").text("Unit");
+            $("#uom4").text("Unit");
+            $("#uom5").text("Unit");
+
+            $("#valumo1").val("0");
+            $("#valumo2").val("0");
+            $("#valumo3").val("0");
+            $("#valumo4").val("0");
+            $("#valumo5").val("0");
+
+        }
+        function itemCheckDuplicate() {
+            $("#Status").html("Checking ...");
+            $.post("@Url.Action("CheckItemCodeAvailable", "Product")",
+            {
+                itemdata: $("#item_code").val()
+            },
+            function (data) {
+                if (data == 0) {
+                    $("#Status").html('<font color="Blue">Item Code Available.</font>');
+                    $("#item_code").css("border-color", "Blue");
+                    $("#item_name").removeAttr("disabled");
+                    $(".product_unit").removeAttr("disabled");
+                    $(".type_name").removeAttr("disabled");
+                    $("#Remark").removeAttr("disabled");
+                    $(".btnSubmit_item").removeAttr("disabled");
+                }
+
+                else {
+                    $("#Status").html('<font color="Red">Items Code already exists . Try more ...</font>');
+                    $("#item_code").css("border-color", "Red");
+                    $("#item_name").attr("disabled", "disabled");
+                    $(".product_unit").attr("disabled", "disabled");
+                    $(".type_name").attr("disabled", "disabled");
+                    $("#Remark").attr("disabled", "disabled");
+                    $(".btnSubmit_item").attr("disabled", "disabled");
+                }
+            })
+        }
+
+        function saveQuote() {
+            var quoteItems = [];
+            var itemElement = {};
+            var quoteNo = $('#quote_no').text();
+            var supplierId = $('#supplier_id').val();
+            var mrId = $('#item_request_id').val();
+            var items = $('.item-id');
+            var unitPrices = $('.unit-price');
+            var discounts = $('.discount');
+            var qtys = $('.item-qty');
+            var unitPriceFulls = $('.unit-price-full');
+            var DiscountAmountFulls = $('.discount_amount_full');
+            //var DiscountAmountFulls = $('.discount_amount');
+            //var unitPrices = $('.unit-price');
+            var countInvalid = 0;
+            var arrAttachment = [];
+            if (!mrId) {
+                alert("Marterial Request is required.");
+                return;
+            }
+            if (!supplierId) {
+                alert("Supplier is required.");
+                return;
+            }
+            if (items.length == 0) {
+                alert("Items are required.");
+                return;
+            }
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].value && unitPrices[i].value && Number(unitPrices[i].value) > 0) {
+                    itemElement = {};
+                    itemElement.item_id = items[i].value;
+                    //itemElement.price = unitPrices[i].value;
+                    itemElement.price = unitPriceFulls[i].value;
+                    itemElement.discount = discounts[i].value;
+                    itemElement.qty = Number(qtys[i].innerHTML);
+                    itemElement.discount_amount =parseFloat(DiscountAmountFulls[i].value).toFixed(8);
+                    quoteItems.push(itemElement);
+                }
+            }
+            if (quoteItems.length == 0) {
+                alert("Please fill in all items unit price.");
+                return;
+            }
+
+            var form_data = new FormData();
+            var file_input = document.getElementById('attachment_reference');
+            if (file_input.files.length > 0) {
+                for (var i = 0; i < file_input.files.length; i++) {
+                    form_data = new FormData();
+                    form_data.append(file_input.files[i].name, file_input.files[i]);
+                    $.ajax({
+                        url: '@Url.Action("UploadAttachment", "Quote")',
+                        type: "POST",
+                        data: form_data,
+                        async: false,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (da) {
+                            if (da.result == "success")
+                                arrAttachment.push(da.attachment_id);
+                        },
+                        error: function (xhr, error, status) {
+                            console.log(error, status);
+                        }
+                    });
+                }
+            } else {
+                $.notify('Supporting Document is required.', { className: 'error' });
+                return;
+            }
+
+            var incoterm = $('#incoterm').val();
+            var payment = $('#payment').val();
+            var delivery = $('#delivery').val();
+            var shipment = $('#shipment').val();
+            var warranty = $('#warranty').val();
+            var vendor_ref = $('#vendor_ref').val();
+
+            $.ajax({
+                url: "/Quote/Create",
+                type: "post",
+                dataType: "json",
+                async: false,
+                data: {
+                    quoteNo: quoteNo,
+                    supplierId: supplierId,
+                    mrId: mrId,
+                    items: quoteItems,
+                    Attachment: arrAttachment,
+                    incoterm: incoterm,
+                    payment: payment,
+                    delivery: delivery,
+                    shipment: shipment,
+                    warranty: warranty,
+                    vendor_ref: vendor_ref,
+                    //grand_total_amount: RemoveCommaFromNumber($('#grand_total_amount').text()),
+                    grand_total_amount: RemoveCommaFromNumber($('#grand_total_after_amount').text()),
+                    lump_sum_discount_amount: parseFloat($('#lump_discount_amount').val())
+                },
+                success: function (da) {
+                    console.log(da);
+                    if (da.result == "success") {
+                        alert('Your data has been saved successfully.');
+                        window.location.href = '@Url.Action("Index")';
+                    } else if (da.result == "fail") {
+                        alert(da.message);
+                    }
+                },
+                error: function (err) {
+                    console.log(err);
+                    $.notify('Your data is error while saving!', { className: 'error' });
+                }
+            });
+        }
+        function validateFloatKeyPress(el) {
+            var v = parseFloat(el.value);
+            el.value = (isNaN(v)) ? '' : v.toFixed(4);
+
+            var ind = el.parentNode.parentNode.rowIndex;
+
+            //discount
+            var discountPercent = Number($('#quoteTable tr').eq(ind).find('input.discount').val())/100;
+            //alert(discountPercent);
+            $('#quoteTable tr').eq(ind).find('input.discount_amount').val(ReplaceNumberWithCommas(parseFloat(v * discountPercent).toFixed(4)));
+
+            $('#quoteTable tr').eq(ind).find('input.discount_amount_full').val(ReplaceNumberWithCommas(parseFloat(v * discountPercent)));
+            $('#quoteTable tr').eq(ind).find('input.unit-price-full').val(v);
+            
+            //calculate total
+            
+            var qty = Number($('#quoteTable tr').eq(ind).find('label.item-qty').text());
+            var discountAmount = $('#quoteTable tr').eq(ind).find('input.discount_amount').val();
+            var total = (v - discountAmount) * qty;
+            $('#quoteTable tr').eq(ind).find('label.item_total_amount').text(ReplaceNumberWithCommas(parseFloat(total).toFixed(4)));
+            calculationGrandTotalAmount();
+        }
+
+        function calculationGrandTotalAmount() {
+            var totals = $('.item_total_amount');
+
+            var item_qtys = $('.item-qty');
+            var item_discount_amounts = $('.discount_amount');
+            var item_discount_percentages = $('.discount');
+            var item_unit_prices = $('.unit-price');
+            var item_total_amounts = $('.item_total_amount');
+            var item_unit_price_fulls = $('.unit-price-full');
+            var item_discount_amount_fulls = $('.discount_amount_full');
+
+            var grand_total_amount = 0;
+
+            $.each(item_discount_amounts, function (index, item) {
+
+                //var total_discount_full = $(item_discount_amount_fulls[index]).val();
+                //var total_amount_full = parseFloat($(item_qtys[index]).text()) * (parseFloat($(item_unit_prices[index]).val()) - total_discount_full);
+                var total_discount_full = $(item_discount_amounts[index]).val();
+                var total_amount_full = parseFloat($(item_qtys[index]).text()) * (parseFloat($(item_unit_prices[index]).val()) - total_discount_full);
+                grand_total_amount = grand_total_amount + total_amount_full;
+            });
+
+            
+            //var grand_total_amount = 0;
+            //for (var i = 0; i < totals.length; i++) {
+            //    grand_total_amount = grand_total_amount + Number(RemoveCommaFromNumber(totals[i].innerHTML));
+            //}
+
+            //console.log(grand_total_amount);
+            $('#grand_total_amount').text(ReplaceNumberWithCommas(parseFloat(grand_total_amount).toFixed(4)));
+            //$('#grand_total_amount').text(ReplaceNumberWithCommas(parseFloat(grand_total_amount)));
+            var lump_sum_discount_amount = parseFloat($('#lump_discount_amount').val()).toFixed(4);
+            var grand_total_after_discount = parseFloat(grand_total_amount).toFixed(4) - lump_sum_discount_amount;
+            $('#grand_total_after_amount').text(ReplaceNumberWithCommas(parseFloat(grand_total_after_discount).toFixed(4)));
+        }
+
+        function onchangeDiscount(el) {
+            var v = parseFloat(el.value)/100;
+            var ind = el.parentNode.parentNode.rowIndex;
+            //var unitPrice = parseFloat($('#quoteTable tr').eq(ind).find('input.unit-price').val());
+            var unitPrice = parseFloat($('#quoteTable tr').eq(ind).find('input.unit-price-full').val());
+            $('#quoteTable tr').eq(ind).find('input.discount_amount').val(ReplaceNumberWithCommas(parseFloat(v * unitPrice).toFixed(4)));
+            $('#quoteTable tr').eq(ind).find('input.discount_amount_full').val(ReplaceNumberWithCommas(parseFloat(v * unitPrice)));
+
+            var qty = Number($('#quoteTable tr').eq(ind).find('label.item-qty').text());
+            var discountAmount = $('#quoteTable tr').eq(ind).find('input.discount_amount').val();
+
+            calculateTotal(ind, unitPrice, discountAmount, qty);
+
+        }
+
+        function onchangeDiscountAmount(el) {
+            var v = parseFloat(el.value);
+            var ind = el.parentNode.parentNode.rowIndex;
+            //var unitPrice = parseFloat($('#quoteTable tr').eq(ind).find('input.unit-price').val());
+            var unitPrice = parseFloat($('#quoteTable tr').eq(ind).find('input.unit-price-full').val());
+            var qty = Number($('#quoteTable tr').eq(ind).find('label.item-qty').text());
+            $('#quoteTable tr').eq(ind).find('input.discount_amount_full').val(v);
+            if (v > unitPrice) {
+                alert("Discount Amount cannot greater than Unit Price.");
+                el.value = 0;
+                $('#quoteTable tr').eq(ind).find('input.discount').val(0);
+                calculateTotal(ind, unitPrice, el.value, qty);
+                return;
+            }
+            var discountPercent = (v * 100) / unitPrice;
+            $('#quoteTable tr').eq(ind).find('input.discount').val(parseFloat(discountPercent).toFixed(4));
+            calculateTotal(ind, unitPrice, v, qty);
+        }
+
+        function calculateTotal(ind, unitPrice, discountAmount, qty) {
+            var total = (unitPrice - discountAmount) * qty;
+            $('#quoteTable tr').eq(ind).find('label.item_total_amount').text(ReplaceNumberWithCommas(parseFloat(total).toFixed(4)));
+            calculationGrandTotalAmount();
+        }
+
+        function initialQuoteItem() {
+            var id = $('#supplier_id').val();
+            $.ajax({
+                url: "@Url.Action("GetAllQuoteItem", "Quote")",
+                type: "get",
+                dataType: "json",
+                data: { id: id },
+                success: function (da) {
+                    $('#quoteTable tbody').empty();
+                    if (da.result == "success") {
+                        if (da.data.length == 0) {
+                            //initialItemRow(1, 1, 0);
+                        } else if (da.data.length > 0) {
+                            $.each(da.data, function (index, item) {
+                                var btnAdd = "";
+                                if (index == da.data.length - 1)
+                                    btnAdd = "<a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='appendItemRow(this)'><span class='glyphicon glyphicon-plus'></span></a>";
+                                $('#quoteTable tbody').append("" +
+                                    "<tr id='i" + Number(index + 1) + "'>" +
+                                        "<td>" + Number(index + 1) + "</td>" +
+                                        "<td><input type='hidden' class='item-id' value='" + item.item_id + "'/><label class='item-code' id='item" + Number(index + 1) + "'>" + item.product_code + "</label></td>" +
+                                        "<td><label class='item-name'>" + item.product_name + "</label></td>" +
+                                        "<td><label class='item-unit'>" + item.unit_name + "</label></td>" +
+                                        "<td><input type='number' class='form-control unit-price' value='" + item.price + "' onchange='validateFloatKeyPress(this);' onKeyPress='if(this.value.length==8) return false;'/></td>" +
+                                        "<td><input type='number' class='form-control discount' value='" + item.discount + "'/></td>" +
+                                        //"<td></td>"+
+                                        "<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='removeItemRow(this)'><span class='glyphicon glyphicon-trash'></span></a></td>" +
+                                        //"<td>"+btnAdd+"</td>" +
+                                    "</tr>"
+                                    );
+                            });
+                        }
+                    } else if (da.result == "error") {
+                        console.log("Quote :: " + da.message);
+                    }
+                },
+                error: function (data) {
+                    //alert('fail');
+                }
+            });
+        }
+
+
+        function getSupplier() {
+            var supplierId = $('#supplier_id').val();
+
+            $.ajax({
+                url: '@Url.Action("FindSupplierItem", "Supplier")',
+                type: "get",
+                dataType: "json",
+                data: { id: supplierId },
+                success: function (da) {
+                    if (da.result == "success") {
+                        $('#incoterm').val(da.data.incoterm);
+                        $('#payment').val(da.data.payment);
+                        $('#delivery').val(da.data.delivery);
+                        $('#shipment').val(da.data.shipment);
+                        $('#warranty').val(da.data.warranty);                      
+                        $('#vendor_ref').val(da.data.vendor_ref);
+
+                    } else if (da.result == "error") {
+                        console.log("Supplier :: " + da.message);
+                    }
+            },
+            error: function (data) {
+                //alert('fail');
+            }
+        });
+        }
+    </script>
+}

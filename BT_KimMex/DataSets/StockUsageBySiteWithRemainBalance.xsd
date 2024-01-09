@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="StockUsageBySiteWithRemainBalance" targetNamespace="http://tempuri.org/StockUsageBySiteWithRemainBalance.xsd" xmlns:mstns="http://tempuri.org/StockUsageBySiteWithRemainBalance.xsd" xmlns="http://tempuri.org/StockUsageBySiteWithRemainBalance.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="StockUsageBySiteWithRemainBalance" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="StockUsageBySiteWithRemainBalance" msprop:Generator_UserDSName="StockUsageBySiteWithRemainBalance">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="StockUsageBySiteWithRemainBalance" msprop:Generator_TableClassName="StockUsageBySiteWithRemainBalanceDataTable" msprop:Generator_TableVarName="tableStockUsageBySiteWithRemainBalance" msprop:Generator_RowChangedName="StockUsageBySiteWithRemainBalanceRowChanged" msprop:Generator_TablePropName="_StockUsageBySiteWithRemainBalance" msprop:Generator_RowDeletingName="StockUsageBySiteWithRemainBalanceRowDeleting" msprop:Generator_RowChangingName="StockUsageBySiteWithRemainBalanceRowChanging" msprop:Generator_RowEvHandlerName="StockUsageBySiteWithRemainBalanceRowChangeEventHandler" msprop:Generator_RowDeletedName="StockUsageBySiteWithRemainBalanceRowDeleted" msprop:Generator_RowClassName="StockUsageBySiteWithRemainBalanceRow" msprop:Generator_UserTableName="StockUsageBySiteWithRemainBalance" msprop:Generator_RowEvArgName="StockUsageBySiteWithRemainBalanceRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Site_id" msprop:Generator_ColumnVarNameInTable="columnSite_id" msprop:Generator_ColumnPropNameInRow="Site_id" msprop:Generator_ColumnPropNameInTable="Site_idColumn" msprop:Generator_UserColumnName="Site_id" type="xs:string" minOccurs="0" />
+              <xs:element name="Site_name" msprop:Generator_ColumnVarNameInTable="columnSite_name" msprop:Generator_ColumnPropNameInRow="Site_name" msprop:Generator_ColumnPropNameInTable="Site_nameColumn" msprop:Generator_UserColumnName="Site_name" type="xs:string" minOccurs="0" />
+              <xs:element name="Create_Date" msprop:Generator_ColumnVarNameInTable="columnCreate_Date" msprop:Generator_ColumnPropNameInRow="Create_Date" msprop:Generator_ColumnPropNameInTable="Create_DateColumn" msprop:Generator_UserColumnName="Create_Date" type="xs:string" minOccurs="0" />
+              <xs:element name="Status" msprop:Generator_ColumnVarNameInTable="columnStatus" msprop:Generator_ColumnPropNameInRow="Status" msprop:Generator_ColumnPropNameInTable="StatusColumn" msprop:Generator_UserColumnName="Status" type="xs:string" minOccurs="0" />
+              <xs:element name="Project_id" msprop:Generator_ColumnVarNameInTable="columnProject_id" msprop:Generator_ColumnPropNameInRow="Project_id" msprop:Generator_ColumnPropNameInTable="Project_idColumn" msprop:Generator_UserColumnName="Project_id" type="xs:string" minOccurs="0" />
+              <xs:element name="Project_name" msprop:Generator_ColumnVarNameInTable="columnProject_name" msprop:Generator_ColumnPropNameInRow="Project_name" msprop:Generator_ColumnPropNameInTable="Project_nameColumn" msprop:Generator_UserColumnName="Project_name" type="xs:string" minOccurs="0" />
+              <xs:element name="Site_manager_proect_id" msprop:Generator_ColumnVarNameInTable="columnSite_manager_proect_id" msprop:Generator_ColumnPropNameInRow="Site_manager_proect_id" msprop:Generator_ColumnPropNameInTable="Site_manager_proect_idColumn" msprop:Generator_UserColumnName="Site_manager_proect_id" type="xs:string" minOccurs="0" />
+              <xs:element name="inventory_id" msprop:Generator_ColumnVarNameInTable="columninventory_id" msprop:Generator_ColumnPropNameInRow="inventory_id" msprop:Generator_ColumnPropNameInTable="inventory_idColumn" msprop:Generator_UserColumnName="inventory_id" type="xs:string" minOccurs="0" />
+              <xs:element name="Quatity" msprop:Generator_ColumnVarNameInTable="columnQuatity" msprop:Generator_ColumnPropNameInRow="Quatity" msprop:Generator_ColumnPropNameInTable="QuatityColumn" msprop:Generator_UserColumnName="Quatity" type="xs:string" minOccurs="0" />
+              <xs:element name="Product_id" msprop:Generator_ColumnVarNameInTable="columnProduct_id" msprop:Generator_ColumnPropNameInRow="Product_id" msprop:Generator_ColumnPropNameInTable="Product_idColumn" msprop:Generator_UserColumnName="Product_id" type="xs:string" minOccurs="0" />
+              <xs:element name="Product_name" msprop:Generator_ColumnVarNameInTable="columnProduct_name" msprop:Generator_ColumnPropNameInRow="Product_name" msprop:Generator_ColumnPropNameInTable="Product_nameColumn" msprop:Generator_UserColumnName="Product_name" type="xs:string" minOccurs="0" />
+              <xs:element name="Product_unit" msprop:Generator_ColumnVarNameInTable="columnProduct_unit" msprop:Generator_ColumnPropNameInRow="Product_unit" msprop:Generator_ColumnPropNameInTable="Product_unitColumn" msprop:Generator_UserColumnName="Product_unit" type="xs:string" minOccurs="0" />
+              <xs:element name="Stock_adjustment_id" msprop:Generator_ColumnVarNameInTable="columnStock_adjustment_id" msprop:Generator_ColumnPropNameInRow="Stock_adjustment_id" msprop:Generator_ColumnPropNameInTable="Stock_adjustment_idColumn" msprop:Generator_UserColumnName="Stock_adjustment_id" type="xs:string" minOccurs="0" />
+              <xs:element name="dateFrom" msprop:Generator_ColumnVarNameInTable="columndateFrom" msprop:Generator_ColumnPropNameInRow="dateFrom" msprop:Generator_ColumnPropNameInTable="dateFromColumn" msprop:Generator_UserColumnName="dateFrom" type="xs:string" minOccurs="0" />
+              <xs:element name="dateTo" msprop:Generator_ColumnVarNameInTable="columndateTo" msprop:Generator_ColumnPropNameInRow="dateTo" msprop:Generator_ColumnPropNameInTable="dateToColumn" msprop:Generator_UserColumnName="dateTo" type="xs:string" minOccurs="0" />
+              <xs:element name="stock_issue_id" msprop:Generator_ColumnVarNameInTable="columnstock_issue_id" msprop:Generator_ColumnPropNameInRow="stock_issue_id" msprop:Generator_ColumnPropNameInTable="stock_issue_idColumn" msprop:Generator_UserColumnName="stock_issue_id" type="xs:string" minOccurs="0" />
+              <xs:element name="stock_issue_number" msprop:Generator_ColumnVarNameInTable="columnstock_issue_number" msprop:Generator_ColumnPropNameInRow="stock_issue_number" msprop:Generator_ColumnPropNameInTable="stock_issue_numberColumn" msprop:Generator_UserColumnName="stock_issue_number" type="xs:string" minOccurs="0" />
+              <xs:element name="inventory_ref_id" msprop:Generator_ColumnVarNameInTable="columninventory_ref_id" msprop:Generator_ColumnPropNameInRow="inventory_ref_id" msprop:Generator_ColumnPropNameInTable="inventory_ref_idColumn" msprop:Generator_UserColumnName="inventory_ref_id" type="xs:string" minOccurs="0" />
+              <xs:element name="product_code" msprop:Generator_ColumnVarNameInTable="columnproduct_code" msprop:Generator_ColumnPropNameInRow="product_code" msprop:Generator_ColumnPropNameInTable="product_codeColumn" msprop:Generator_UserColumnName="product_code" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

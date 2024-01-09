@@ -1,0 +1,160 @@
+﻿@using BT_KimMex.Models;
+@using BT_KimMex.Class;
+@using Microsoft.AspNet.Identity;
+@{
+    ViewBag.Title = "Planning WorkOrder List";
+}
+
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+<div class="w3-panel w3-card-4">
+    <div class="w3-container w3-display-container">
+        <h3 class="title">@ViewBag.Title</h3>
+        @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.SiteSupervisor))
+        {
+            <a href="@Url.Action("PlanningWorkOrder","StockIssue")" class="w3-button w3-tiny w3-display-topright w3-green w3-border w3-border-green" style="margin-top:20px !important;">Planning Work Order</a>
+        }
+    </div>
+    <div class="w3-container w3-display-container">
+        <div class="well" style="padding:8px !important; padding-bottom:30px !important;">
+            <div class="form-group">
+                <label class="control-label col-md-2">Date:</label>
+                <div class="col-md-3">
+                    <div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
+                        <i class="fa fa-calendar"></i>&nbsp;
+                        <span></span> <i class="fa fa-caret-down"></i>
+                    </div>
+                </div>
+                <label class="control-label col-md-2">Project:</label>
+                <div class="col-md-3">
+                    <select class="form-control" id="project_id" name="project_id">
+                        <option selected disabled>Select Project</option>
+                        @foreach (var project in BT_KimMex.Models.ProjectViewModel.GetProjectListItemsBySiteSupervisor(User.IsInRole(BT_KimMex.Class.Role.SystemAdmin), User.Identity.GetUserId()))
+                        {
+                            <option value="@project.project_id">@project.project_full_name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="w3-button w3-tiny w3-blue" onclick="inititalDataTable()">Filter</button>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered" id="table1">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        @*<th>Project</th>*@
+                        <th>Item Description</th>
+                        <th>Planning QTY</th>
+                        <th>Labour Hour</th>
+                        <th>Total Labour</th>
+                        @*<th></th>*@
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.3/moment.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('#project_id').select2();
+            var start = moment();
+            var end = moment();
+
+            function cb(start, end) {
+                $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            }
+
+            $('#reportrange').daterangepicker({
+                startDate: start,
+                endDate: end,
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                }
+            }, cb);
+
+            cb(start, end);
+            inititalDataTable();
+
+        });
+
+        function inititalDataTable() {
+
+            var t = $('#table1').DataTable({
+                destroy: true,
+                //"responsive": true,
+                //"autoWidth": false,
+                //"scrollX": true,
+                "ajax": {
+                    "url": "/StockIssue/PlanningWorkOrderListAJAX",
+                    "type": "GET",
+                    "datatype": "json",
+                    "data": {
+                        dateRange: $('#reportrange span').html(),
+                        projectId: $('#project_id').val(),
+                    }
+                },
+                "columns": [
+                    { "data": "planning_date_str" },
+                    //{ "data": "project_fullname" },
+                    { "data": "item_description" },
+                    { "data": "planning_qty" },
+                    { "data": "labour_hour" },
+                    {
+                        "render": function (data, type, full, meta) {
+                            return full.planning_qty * full.labour_hour;
+                        }
+                    },
+                    //{
+                    //    "render": function (data, type, full, meta) {
+                    //        //var btn = '<a href="javascript:void(0)" id="' + full.Id + '" class="btn btn-xs default btn-edit"><i class="fa fa-edit"></i> Edit</a> ';
+                    //        console.log(full);
+                    //        //var btn = '<a href="javascript:void(0)" class="w3-button w3-tiny w3-blue-gray btn_delete" id="' + full.po_report_id + '"><i class="fa fa-trash"></i></a>';
+                    //        return '';
+                    //    }
+                    //},
+
+                ],
+                'columnDefs': [
+                    {
+                        "targets": 0,
+                        "className": "text-center",
+                    },
+                    {
+                        "targets": 2,
+                        "className": "text-center",
+                    },
+                    {
+                        "targets": 3,
+                        "className": "text-center",
+                    },
+                    {
+                        "targets": 4,
+                        "className": "text-center",
+                    },
+
+                ],
+                "order": [[1, "desc"]],
+            });
+            //t.on('order.dt search.dt', function () {
+            //    t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+            //        cell.innerHTML = i + 1;
+            //    });
+            //}).draw();
+
+        }
+
+    </script>
+}

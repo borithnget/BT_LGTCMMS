@@ -1,0 +1,83 @@
+﻿@model BT_KimMex.Models.PurchaseOrderReportViewModel
+@{
+    ViewBag.Title = "ViewPOReportDetail";
+    decimal totalRemainQTY = Convert.ToDecimal(Model.items.Sum(s=>s.purd.remain_quantity));
+
+}
+
+<div class="row" style="padding:10px !important;">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            View Purchase Order Report Detail
+        </div>
+        <div class="panel-body">
+            <input type="hidden" value="@Model.po_report_id" id="po_report_id"/>
+            <div class="table-responsive">
+                <table class="table table-bordered" id="table_1">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Item Description</th>
+                            <th>PO QTY</th>
+                            <th>Remain QTY</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{ 
+                            int count = 1;
+                            foreach(var item in Model.items)
+                            {
+                                <tr>
+                                    <td class="text-center">@count</td>
+                                    <td>@string.Format("{0} - {1}",item.prod.product_code,item.prod.product_name)</td>
+                                    <td class="text-center">@string.Format("{0} {1}",item.purd.po_quantity,item.unit.Name)</td>
+                                    <td class="text-center">@item.purd.remain_quantity</td>
+                                </tr>
+                                count++;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row form-group">
+                @if (totalRemainQTY > 0 && Model.is_completed==true)
+                {
+                    <button class="btn btn-default" id="btn_activate_grn">Activate GRN</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+    <script type="text/javascript">
+        $(function(){
+            $('#btn_activate_grn').click(function(e){
+                var po_report_id = $('#po_report_id').val();
+                //alert(po_report_id);
+                $.ajax({
+                        url: "@Url.Action("UpdatePOReportStatusForGRN", "PurchaseOrderAandR")",
+                        type: "post",
+                        dataType: "json",
+                        async: false,
+                    data: { po_report_number: po_report_id },
+                        success: function (da) {
+                            if (da.isSuccess) {
+                                //alert('Your data has been saved successfully.');
+                                window.location.reload();
+                            } else  {
+                                //alert(da.message);
+                                alert(da.message);
+                            }
+                        },
+                        error: function (err) {
+                            alert('Your data is error while saving!');
+                        }
+                    });
+            });
+        });
+    </script>
+    }

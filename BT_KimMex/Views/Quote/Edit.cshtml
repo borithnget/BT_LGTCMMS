@@ -1,0 +1,973 @@
+﻿
+@model BT_KimMex.Models.QuoteViewModel
+        @*@model IEnumerable<BT_KimMex.Models.QuoteViewModel>*@
+
+        @{
+            ViewBag.Title = "Edit";
+            int num = Convert.ToInt32(Model.quoteItems.Count()) + 1;
+            decimal amount = 0, grandTotalAfterDiscount = 0 ;
+        }
+        @*<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />*@
+       @*<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />*@
+        <h3 class="title">Edit Supplier Quote</h3>
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal">
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.HiddenFor(model => model.quote_id)
+
+                <div class="row">
+                    <div class="col-md-6 col-lg-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.created_date, htmlAttributes: new { @class = "col-md-4" })
+                            @Html.Label(Convert.ToDateTime(DateTime.Now).ToString("dd/MMM/yyyy"), new { @class = "col-md-8" })
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.quote_no, htmlAttributes: new { @class = "col-md-4" })
+                            @Html.Label(Model.quote_no, new { @class = "col-md-8" })
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-4">Project:</label>
+                            <label class="col-md-8">@Model.project_fullname</label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4">Purchase Requisition Ref.:</label>
+                            <label class="col-md-8">@Model.mr_number</label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-4">Supplier Name:</label>
+                            <label class="col-md-8">@Model.supplier_name</label>
+                            @*<div class="col-md-5">
+                @Html.DropDownList("supplier_id", new SelectList(ViewBag.SupplierID, "supplier_id", "supplier_name", Model.supplier_id), new { @class = "form-control", id = "supplier_id" })
+                @Html.ValidationMessageFor(model => model.item_id, "", new { @class = "text-danger" })
+            </div>*@
+                            @*<div class="col-md-4 col-md-offset-1">
+
+                    <input type="text" class="form-control pull-left" style="width: 60%" id="Search" placeholder="Search ..." />
+                    <button type="button" class="btn btn-default" id="btn_link_to_item" style="float:right">Add New Item</button>
+
+            </div>*@
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-6">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <h4>TERMS & CONDITIONS</h4>
+                                <div class="form-group">
+                                    <label class="col-md-4">Incoterms:</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" name="incoterm" id="incoterm" value="@Model.incoterm" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4">Payment:</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" name="payment" id="payment" value="@Model.payment" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4">Delivery:</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" name="delivery" id="delivery" value="@Model.delivery" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4">Shipment:</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" name="shipment" id="shipment" value="@Model.shipment" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4">Warranty:</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" name="warranty" id="warranty" value="@Model.warranty" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4">Vendor Ref:</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" name="vendor_ref" id="vendor_ref" value="@Model.vendor_ref"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" style="margin:0 !important;">
+                    <table class="table table-bordered" id="quoteTable">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Code</th>
+                                <th>Description</th>
+                                <th>Unit</th>
+                                <th>QTY</th>
+                                <th>Unit Price ($)</th>
+                                <th class="text-center">Discount (%) <input type='number' step='any' class='form-control' value='0' onchange='changeDiscount(this)' style="width:80px !important;margin:0 auto!important;" id="thead_discount" /></th>
+                                <th class="text-center">Dis. ($) </th>
+                                <th>Total ($)</th>
+                                @*<th></th>
+                                <th></th>
+                                <th hidden></th>*@
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @*<tr id='typeA' class='A'>
+                                    <td>A</td>
+                                    <td><input type='hidden' class='type-id' />@*<input type='text' class='form-control type-code' id='A' onfocus='getItemDateRow(this)' placeholder='Item Type Code' value="" /></td>
+                                    <td colspan='4'><label class='type-description'>Quote Item</label></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td rowspan="@num"><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='removeTypeRow(this)'><span class='glyphicon glyphicon-trash'></span></a></td>
+                                    <td rowspan="@num" ><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='appendTypeRow(this)'><span class='glyphicon glyphicon-plus'></span></a></td>
+                                </tr>*@
+                            @{
+                                int count = 1;
+                                foreach (var item in Model.quoteItems)
+                                {
+                                    decimal totalAmount = 0;
+                                    string rowId = "i" + count.ToString();
+                                    string controlId = "item" + count;
+                                    //string price = string.Format("{0:G29}", decimal.Parse(item.price.ToString()));
+                                    string price = string.Format("{0:N4}", decimal.Parse(item.price.ToString()));
+                                    string discount = string.Format("{0:G29}", decimal.Parse(item.discount.HasValue?item.discount.ToString():string.Format("0")));
+                                    //var discountAmount = item.price * (item.discount / 100);
+                                    var discountAmount = item.discount_amount;
+
+                                    if (item.qty.HasValue)
+                                    {
+                                        totalAmount = (decimal)(item.price - discountAmount) * Convert.ToDecimal(item.qty);
+
+                                    }
+                                    else
+                                    {
+                                        var rs = BT_KimMex.Models.PurchaseRequisitionViewModel.GetPurchaseRequisitionItem(Model.mr_id).purchaseRequisitionDetails.Where(s => string.Compare(s.item_id, item.item_id) == 0).FirstOrDefault();
+                                        if (rs != null)
+                                        {
+                                            item.qty = rs.approved_qty;
+                                            totalAmount = (decimal)(item.price - discountAmount) * Convert.ToDecimal(item.qty);
+                                        }
+                                    }
+
+                                    <tr id='@rowId' class="hoverSelectEdit">
+                                        <td>@count</td>
+                                        @*hidden*@
+                                        <td>
+                                            @item.product_code
+                                        <input type='hidden' class='item-id' value="@item.item_id" />
+                                            <input type="hidden" class="quote_detail_id" name="quote_detail_id[]" value="@item.quote_detail_id"/>
+                                        @*<input type='text' class='form-control item-code' placeholder='Item Code' onfocus='getItemDataRow(this)' id='@controlId' value="@item.product_code" />*@
+                                        </td>
+                                        <td><label class='item-name'>@item.product_name</label></td>
+                                        <td><label class='item-unit'>@item.unit_name</label></td>
+                                        <td class="text-center"><label class='item-qty'>@item.qty</label></td>
+                                        <td><input type='number' class='form-control unit-price' value='@price' onchange='validateFloatKeyPress(this);' onKeyPress='if(this.value.length==8) return false;' /></td>
+                                        <td><input type='number' class='form-control discount' value='@discount' onchange='onchangeDiscount(this)' /></td>
+                                        <td><input type='number' class='form-control discount_amount' onchange='onchangeDiscountAmount(this)' value='@string.Format("{0:N4}", decimal.Parse(discountAmount.ToString()))' /></td>
+                                        <td class="text-center"><label class='item_total_amount'>@string.Format("{0:N4}", decimal.Parse(totalAmount.ToString()))</label></td>
+                                        @*<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='removeItemRow(this)'><span class='glyphicon glyphicon-trash'></span></a></td>
+                                        <td>
+                                            @if (count == Model.quoteItems.Count())
+                                            {
+                                                <a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='appendItemRow(this)'><span class='glyphicon glyphicon-plus'></span></a>
+                                            }
+
+                                        </td>*@
+
+                                        @*<td hidden>
+                                            <a href='javascript:void(0)' id="@item.item_id" class="editItemFromQuots select-link edit-promp">Edit Item</a>
+                                        </td>*@
+
+                                        @*<td><a href="javascript:void(0)" id="@item.item_id" class="getbyID">Edit</a> </td>'*@
+
+                                    </tr>
+                                    count++;
+                                    amount = amount + Convert.ToDecimal(totalAmount);
+                                }
+                                grandTotalAfterDiscount = amount -Convert.ToDecimal(Model.lump_sum_discount_amount);
+                            }
+
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th class="text-right" colspan="8">Grand Total Amount ($):</th>
+                                <th class="text-center"><label id="grand_total_amount">@string.Format("{0:N4}", decimal.Parse(amount.ToString()))</label></th>
+                            </tr>
+                            <tr>
+                                <th class="text-right" colspan="8">Discount ($):</th>
+                                <th class="text-center">
+                                    <input type="number" id="lump_discount_amount" class="form-control" name="lump_discount_amount" value="@string.Format("{0:N4}",Model.lump_sum_discount_amount)" min="0" style="display:inline-block;" />
+                                    @*<button type="button" class="btn btn-sm btn-default" style="display:inline-block;" id="btn-revert"><i class="fa fa-reply"></i> Revert</button>*@
+                                </th>
+                            </tr>
+                            <tr>
+                                <th class="text-right" colspan="8">Grand Total Amount after Discount($):</th>
+                                <th class="text-center"><label id="grand_total_after_amount">@string.Format("{0:N4}",grandTotalAfterDiscount)</label></th>
+                            </tr>
+
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-2">Suppoting Document <strong style="color:red;">*</strong>:</label>
+                    <div class="col-md-10" id="attachment_block">
+                        @{
+                            var atts = Model.attachments;
+                            if (atts.Count() == 0)
+                            {
+                                <input type="file" class="form-control" name="attachment_reference" id="attachment_reference" multiple />
+                            }
+                            else
+                            {
+                                <table id="tableAttachment">
+                                    @for (int i = 0; i < atts.Count(); i++)
+                                    {
+                                        <tr>
+                                            <td><a class="title @i" href="/Quote/Download/?p=@(atts[i].attachment_id + atts[i].attachment_extension)&d=@atts[i].attachment_name">@atts[i].attachment_name</a></td>
+                                            <td><a href="javascript:void(0);" class="btn btn-default delete-att title @i" data-id="@atts[i].attachment_id">x</a></td>
+                                            @{ if (i == atts.Count() - 1)
+                                                {
+                                                    <td><a href="javascript:void(0);" class="btn btn-default add-row " data-id="@atts[i].attachment_id">+</a></td>
+                                                }
+                                            }
+                                        </tr>
+                                                }
+                                </table>
+                                                }
+                        }
+
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="button" value="Save" class="btn btn-default" id="btnSubmit" />
+                        @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-default" })
+                    </div>
+                </div>
+            </div>
+                                                }
+        <!-- add link item popup -->
+        <div class="modal fade" id="item_modal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog " role="document">
+                <div class="modal-content ">
+                    <div class="modal-body col-sm-12" style="width:100% !important">
+                        <h2 style="margin-top:-5px">Create new Item</h2>
+                        @using (Html.BeginForm())
+                        {
+                            @Html.AntiForgeryToken()
+                        <div class="form-horizontal">
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
+                            <div class="form-group">
+                                <label class="control-label col-md-4">Date:</label>
+                                <label class="col-md-8" id="customer_current_date"></label>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Type Name <span style="color:red;">*</span>:</label>
+                                <div class="col-md-8">
+                                    @*@Html.DropDownList("p_category_id", ViewBag.Categories as SelectList,"Select Item Type",new { @class = "form-control", id = "p_category_id" })*@
+
+                                    <select class="form-control type_name" id="type_name" name="type_name">
+                                        <option selected disabled>select Type Name</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4">Item Code <span style="color:red;">*</span>:</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" id="item_code" onchange="itemCheckDuplicate()" />
+                                    <p id="Status"></p>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-md-4">Item Name <span style="color:red;">*</span>:</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" id="item_name" />
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Unit <span style="color:red;">*</span>:</label>
+                                <div class="col-md-8">
+                                    <select class="form-control product_unit" id="product_unit" name="product_unit" onchange="initialUOM1()">
+                                        <option selected disabled>select unit</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4">Unit Price :</label>
+                                <div class="col-md-8">
+                                    <input type="number" class="form-control" id="unit_price" placeholder="0.00" onchange='validateFloatKeyPress(this);' onKeyPress='if(this.value.length==8) return false;' />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4">Remark:</label>
+                                <div class="col-md-8">
+                                    <textarea class="form-control" id="Remark" rows="5"></textarea>
+                                </div>
+                            </div>
+
+                            <h2>Unit of Measurement</h2>
+                            <div class="row" style="margin-bottom:20px !important;">
+                                <table style="margin-right:20px">
+                                    <tr>
+                                        <td width="50px"><label>1</label></td>
+                                        <td width="50px"><label id="uom1">Unit</label></td>
+                                        <td width="50px">=></td>
+                                        <td><input type="number" id="uom1_qty" class="form-control" value="0" /></td>
+                                        <td width="150px">
+                                            <select class="form-control uom1_id" id="uom1_id" onchange="initialUOM2()">
+                                                <option selected disabled>select unit</option>
+                                            </select>
+                                        </td>
+                                        <td><input type="number" id="price_umo1" class="form-control" placeholder="Uom Price" onchange='validateFloatKeyPress(this);' onKeyPress='if(this.value.length==8) return false;' /></td>
+
+
+                                    </tr>
+                                    <tr>
+                                        <td width="50px"><label>1</label></td>
+                                        <td width="50px"><label id="uom2">Unit</label></td>
+                                        <td width="50px">=></td>
+                                        <td><input type="number" id="uom2_qty" class="form-control" value="0" /></td>
+                                        <td width="150px">
+                                            <select class="form-control uom2_id" id="uom2_id" onchange="initialUOM3()">
+                                                <option selected disabled>select unit</option>
+                                            </select>
+                                        </td>
+                                        <td><input type="number" id="price_umo2" class="form-control" placeholder="Uom Price" onchange='validateFloatKeyPress(this);' onKeyPress='if(this.value.length==8) return false;' /></td>
+
+                                    </tr>
+                                    <tr>
+                                        <td width="50px"><label>1</label></td>
+                                        <td width="50px"><label id="uom3">Unit</label></td>
+                                        <td width="50px">=></td>
+                                        <td><input type="number" id="uom3_qty" class="form-control" value="0" /></td>
+                                        <td width="150px">
+                                            <select class="form-control uom3_id" id="uom3_id" onchange="initialUOM4()">
+                                                <option selected disabled>select unit</option>
+                                            </select>
+                                        </td>
+                                        <td><input type="number" id="price_umo3" class="form-control" placeholder="Uom Price" onchange='validateFloatKeyPress(this);' onKeyPress='if(this.value.length==8) return false;' /></td>
+
+
+                                    </tr>
+                                    <tr>
+                                        <td width="50px"><label>1</label></td>
+                                        <td width="50px"><label id="uom4">Unit</label></td>
+                                        <td width="50px">=></td>
+                                        <td><input type="number" id="uom4_qty" class="form-control" value="0" /></td>
+                                        <td width="150px">
+                                            <select class="form-control uom3_id" id="uom4_id" onchange="initialUOM5()">
+                                                <option selected disabled>select unit</option>
+                                            </select>
+                                        </td>
+                                        <td><input type="number" id="price_umo4" class="form-control" placeholder="Uom Price" onchange='validateFloatKeyPress(this);' onKeyPress='if(this.value.length==8) return false;' /></td>
+                                    </tr>
+                                    <tr>
+                                        <td width="50px"><label>1</label></td>
+                                        <td width="50px"><label id="uom5">Unit</label></td>
+                                        <td width="50px">=></td>
+                                        <td><input type="number" id="uom5_qty" class="form-control" value="0" /></td>
+                                        <td width="150px">
+                                            <select class="form-control uom3_id" id="uom5_id">
+                                                <option selected disabled class="uom3_id">select unit</option>
+                                            </select>
+                                        </td>
+                                        <td><input type="number" id="price_umo5" class="form-control" placeholder="Uom Price" onchange='validateFloatKeyPress(this);' onKeyPress='if(this.value.length==8) return false;' /></td>
+
+
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-6"></div>
+                                <div class="col-md-6 ">
+                                    <button class="btn btn-default btnSubmit_item">Save</button>
+                                    <button type="button" class="btn btn-default" onclick="ClearFields();">Clear</button>
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End add link item popup -->
+        <!--Add New Edit item-->
+
+        <div class="modal fade" id="item_modalforedit" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog " role="document">
+                <div class="modal-content ">
+                    <div class="modal-body col-sm-12" style="width:100% !important">
+                        <h2 style="margin-top:-5px">Update Item</h2>
+                        @using (Html.BeginForm())
+                        {
+
+                            @Html.AntiForgeryToken()
+                            <div class="form-horizontal">
+                                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                                <div class="form-group">
+                                    <label class="control-label col-md-4">Item Id </label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="item_idforedit" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-md-4">Date:</label>
+                                    <label class="col-md-8" id="customer_current_dateforedit"></label>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-md-4">Item Code <span style="color:red;">*</span>:</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="item_codeforedit" onchange="itemCheckDuplicateforedit()" />
+                                        <p id="Statusforedit"></p>
+                                    </div>
+                                </div>
+                                @*@{
+
+                                        int count = 1;
+                                        foreach (var item in Model.quoteItems)
+                                        {
+                                            <div class="form-group">
+                                                <label class="control-label col-md-4">Item Code <span style="color:red;">*</span>:</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control" id="item_codeforedit" onchange="itemCheckDuplicateforedit()" value="@item.product_name" />
+                                                    <p id="Statusforedit"></p>
+                                                </div>
+                                            </div>
+                                        }
+                                    }*@
+
+
+
+                                @*@{
+                                        for (int i = 0; i < Model.quoteItems.Count; i++)
+                                        {
+                                            var number = Model.quoteItems[i];
+                                            <div class="form-group">
+                                                <label class="control-label col-md-4">Item Code <span style="color:red;">*</span>:</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control" id="item_codeforedit" onchange="itemCheckDuplicateforedit()" value="@number.product_name" />
+                                                    <p id="Statusforedit"></p>
+                                                </div>
+                                            </div>
+                                        }
+                                    }*@
+
+
+                                @*@{
+
+                                        for (int i = 0; i < Model.quoteItems.Count; i++)
+                                        {
+                                            var items = Model.quoteItems[i];
+                                            <div class="form-group">
+                                                <label class="control-label col-md-4">Item Code <span style="color:red;">*</span>:</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control" id="item_codeforedit" onchange="itemCheckDuplicateforedit()" value="@Model.ProductforQuote" />
+                                                    <p id="Statusforedit"></p>
+                                                </div>
+                                            </div>
+
+                                        }
+
+                                    }*@
+
+
+
+
+                                @*@foreach ((var items in Model.quoteItems)
+                                        as List<BT_KimMex.Models.ProductViewModel>)
+                                    {
+
+                                        <label class="control-label col-md-4">Item Code <span style="color:red;">*</span>:</label>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" id="item_codeforedit" onchange="itemCheckDuplicateforedit()" value="@items.p_category_id" />
+                                            <p id="Statusforedit"></p>
+                                        </div>
+                                    }*@
+                                @*@{
+                                    var test = new List<BT_KimMex.Models.ProductViewModel>();
+
+                                    foreach (var item in test)
+                                    {
+                                        <div class="form-group">
+                                            <label class="control-label col-md-4">Item Code <span style="color:red;">*</span>:</label>
+                                            <div class="col-md-8">
+
+                                                <input type="text" class="form-control" id="item_codeforedit" onchange="itemCheckDuplicateforedit()" value="@item.product_id" />
+
+                                            </div>
+                                        </div>
+                                    }
+                                }*@
+
+                                <div class="form-group">
+                                    <label class="control-label col-md-4">Item Name <span style="color:red;">*</span>:</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="item_nameforedit" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Unit <span style="color:red;">*</span>:</label>
+                                    <div class="col-md-8">
+                                        <select class="form-control product_unitforedit" id="product_unitforedit" name="product_unitforedit" onchange="initialUOM1foredit()">
+                                            <option selected disabled>select unit</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-md-4">Unit Price :</label>
+                                    <div class="col-md-8">
+                                        <input type="number" class="form-control" id="unit_price" placeholder="0.00" onchange='validateFloatKeyPress(this);' onKeyPress='if(this.value.length==8) return false;'/>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Type Name <span style="color:red;">*</span>:</label>
+                                    <div class="col-md-8">
+
+                                        <select class="form-control type_nameforedit" id="type_nameforedit" name="type_nameforedit">
+                                            <option selected disabled>select Type Name</option>
+                                        </select>
+
+                                        @* @Html.DropDownList("item_id", (IEnumerable<SelectListItem>)ViewData["Category"], new { id = "type_nameforedit", @class = "form-control" })*@
+                                        @*@Html.ValidationMessageFor(model => model.item_id, "", new { @class = "text-danger" })*@
+
+
+
+
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-4">Remark:</label>
+                                    <div class="col-md-8">
+                                        <textarea class="form-control" id="Remarkforedit" rows="5"></textarea>
+                                    </div>
+                                </div>
+
+                                <h2>Unit of Measurement</h2>
+                                <div class="row" style="margin-bottom:20px !important;">
+                                    <table style="margin-right:20px">
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px"><label id="uom1foredit">Unit</label></td>
+                                            <td width="50px">=></td>
+                                            <td><input type="number" id="valumo1foredit" class="form-control" value="0" /></td>
+                                            <td width="150px">
+                                                <select class="form-control uom1_idforedit" id="uom1_idforedit" onchange="initialUOM2foredit()">
+                                                    <option selected disabled>select unit</option>
+                                                </select>
+                                            </td>
+                                            <td><input type="number" id="priceforedit_umo1" class="form-control" placeholder="Uom Price" onchange='validateFloatKeyPress(this);' onKeyPress='if(this.value.length==8) return false;' /></td>
+
+
+
+                                        </tr>
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px"><label id="uom2foredit">Unit</label></td>
+                                            <td width="50px">=></td>
+                                            <td><input type="number" id="valumo2foredit" class="form-control" value="0" /></td>
+                                            <td width="150px">
+                                                <select class="form-control uom2_idforedit" id="uom2_idforedit" onchange="initialUOM3foredit()">
+                                                    <option selected disabled>select unit</option>
+                                                </select>
+                                            </td>
+                                            <td><input type="number" id="priceforedit_umo2" class="form-control" placeholder="Uom Price" onchange='validateFloatKeyPress(this);' onKeyPress='if(this.value.length==8) return false;'/></td>
+
+
+                                        </tr>
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px"><label id="uom3foredit">Unit</label></td>
+                                            <td width="50px">=></td>
+                                            <td><input type="number" id="valumo3foredit" class="form-control" value="0" /></td>
+                                            <td width="150px">
+                                                <select class="form-control uom3_idforedit" id="uom3_idforedit" onchange="initialUOM4foredit()">
+                                                    <option selected disabled>select unit</option>
+                                                </select>
+                                            </td>
+                                            <td><input type="number" id="priceforedit_umo3" class="form-control" placeholder="Uom Price" onchange='validateFloatKeyPress(this);' onKeyPress='if(this.value.length==8) return false;'/></td>
+
+
+                                        </tr>
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px"><label id="uom4foredit">Unit</label></td>
+                                            <td width="50px">=></td>
+                                            <td><input type="number" id="valumo4foredit" class="form-control" value="0" /></td>
+                                            <td width="150px">
+                                                <select class="form-control uom3_idforedit" id="uom4_idforedit" onchange="initialUOM5foredit()">
+                                                    <option selected disabled>select unit</option>
+                                                </select>
+                                            </td>
+                                            <td><input type="number" id="priceforedit_umo4" class="form-control" placeholder="Uom Price" onchange='validateFloatKeyPress(this);' onKeyPress='if(this.value.length==8) return false;' /></td>
+
+
+                                        </tr>
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px"><label id="uom5foredit">Unit</label></td>
+                                            <td width="50px">=></td>
+                                            <td><input type="number" id="valumo5foredit" class="form-control" value="0" /></td>
+                                            <td width="150px">
+                                                <select class="form-control uom3_idforedit" id="uom5_idforedit">
+                                                    <option selected disabled class="uom3_idforedit">select unit</option>
+                                                </select>
+                                            </td>
+                                            <td><input type="number" id="priceforedit_umo5" class="form-control" placeholder="Uom Price" onchange='validateFloatKeyPress(this);' onKeyPress='if(this.value.length==8) return false;'/></td>
+
+
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-6"></div>
+                                    <div class="col-md-6 ">
+                                        <button class="btn btn-default btnSubmit_itemforedit">Save</button>
+                                        <button type="button" class="btn btn-default" onclick="ClearFieldsforedit();">Clear</button>
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                                    }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--End Add New Edit item-->
+
+        @section Scripts{
+            @*<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js"></script>*@
+            @*<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>*@
+            @*<script>
+                $('#type_name').select2({ width: '80%' });
+                $('#supplier_id').select2();
+            </script>*@
+
+
+            <script type="text/javascript">
+
+                $('#lump_discount_amount').change(function (e) {
+                    var lump_discount_amount = parseFloat($(this).val());
+                    var grand_total_amount = RemoveCommaFromNumber($('#grand_total_amount').text());
+                    if (lump_discount_amount < 0 || lump_discount_amount > grand_total_amount) {
+                        alert("Invalid Number.");
+                        $(this).val(0);
+                        lump_discount_amount = 0;
+                        return;
+                    }
+                    calculationGrandTotalAmount();
+
+                })
+
+                function changeDiscount(row) {
+                    var ind = row.parentNode.parentNode.rowIndex;
+                    var cost = $(row).val();
+                    //var clss = $(row).attr('class').split(' ');
+                    var categories_class = $('.discount');
+                    var qtys = $('.item-qty');
+                    var unitPrices = $('.unit-price');
+                    var discountAmounts = $('.discount_amount');
+                    var totals = $('.item_total_amount');
+                    for (var i = 0; i < categories_class.length; i++) {
+                        $(categories_class[i]).val(cost);
+                        var qty = Number($(qtys[i]).text());
+                        var unitPrice = parseFloat($(unitPrices[i]).val());
+                        var discountAmount =parseFloat(unitPrice * (cost / 100)).toFixed(4);
+                        $(discountAmounts[i]).val(parseFloat(discountAmount).toFixed(4));
+                        var total = (unitPrice - discountAmount) * qty;
+                        $(totals[i]).text(ReplaceNumberWithCommas(parseFloat(total).toFixed(4)));
+
+                        calculationGrandTotalAmount();
+                    }
+
+                }
+
+                    var arrDeletedAttachment = [];
+                    @*inititalTypeRow(@Model.quoteItems.Count(), 'A');*@
+                    $('.delete-att').click(function (e) {
+                        e.preventDefault();
+                        var att_id = $(this).data('id');
+                        arrDeletedAttachment.push(att_id);
+                        var index = $(this)[0].parentNode.parentNode.rowIndex;
+                        document.getElementById('tableAttachment').deleteRow(index);
+                        var rowCount = $('#tableAttachment tr').length;
+                        if (rowCount == 0) {
+                            $("#attachment_block").empty();
+                            $("#attachment_block").append("" +
+                                '<input type="file" class="form-control" name="attachment_reference" id="attachment_reference" multiple />'
+                                );
+                        }
+                    });
+
+                    $('.add-row').click(function (e) {
+                        e.preventDefault();
+                        $('#tableAttachment').append("" +
+                           "<tr>" +
+                                '<td><input type="file" class="form-control" name="attachment_reference" id="attachment_reference" multiple /></td>' +
+                                '<td><a href="javascript:void(0);" class="btn btn-default delete-att" onclick="removeAttachmentRow(this)">x</a></td>' +
+
+                           "</tr>"
+                         );
+                        $(this).remove();
+                    });
+
+                    $('#btnSubmit').click(function (e) {
+                        var quoteItems = [];
+                        var itemElement = {};
+                        var quoteId = $('#quote_id').val();
+                        var quoteNo = $('#quote_no').text();
+                        var supplierId = $('#supplier_id').val();
+                        var items = $('.item-id');
+                        var unitPrices = $('.unit-price');
+                        var discounts = $('.discount');
+                        var quoteDetailIds = $('.quote_detail_id');
+                        var qtys = $('.item-qty');
+                        var DiscountAmountFulls = $('.discount_amount');
+                        var countInvalid = 0;
+                        var arrAttachment = [];
+                        //if (!supplierId) {
+                        //    alert("Supplier is required.");
+                        //    return;
+                        //}
+                        if (items.length == 0) {
+                            alert("Items are required.");
+                            return;
+                        }
+                        for (var i = 0; i < items.length; i++) {
+                            if (items[i].value && unitPrices[i].value && Number(unitPrices[i].value) > 0) {
+                                itemElement = {};
+                                itemElement.quote_detail_id = quoteDetailIds[i].value;
+                                itemElement.item_id = items[i].value;
+                                itemElement.price = unitPrices[i].value;
+                                itemElement.discount = discounts[i].value;
+                                itemElement.qty = Number(qtys[i].innerHTML);
+                                itemElement.discount_amount = parseFloat(DiscountAmountFulls[i].value).toFixed(8);
+                                quoteItems.push(itemElement);
+                            }
+                        }
+                        if (quoteItems.length == 0) {
+                            alert("Please fill in all items unit price.");
+                            return;
+                        }
+
+                        if (arrDeletedAttachment.length > 0) {
+                            for (var i = 0; i < arrDeletedAttachment.length; i++) {
+                                var attID = arrDeletedAttachment[i];
+                                $.ajax({
+                                    url: '@Url.Action("DeleteAttachment", "Quote")',
+                                    type: 'POST',
+                                    data: { id: attID }
+                                }).done(function (data) {
+                                    //if (data.Result == "ok") {
+                                    //}
+                                    //else if (data.Result.Message) {
+                                    //    alert(data.Result.Message);
+                                    //}
+                                }).fail(function () {
+                                    alert("There is something wrong. Please try again.");
+                                })
+                            }
+                        }
+                        var form_data = new FormData();
+                        var file_input = document.getElementById('attachment_reference');
+                        if (file_input != undefined && file_input.files.length > 0) {
+                            for (var i = 0; i < file_input.files.length; i++) {
+                                form_data = new FormData();
+                                form_data.append(file_input.files[i].name, file_input.files[i]);
+                                $.ajax({
+                                    url: '@Url.Action("UploadAttachment", "Quote")',
+                                    type: "POST",
+                                    data: form_data,
+                                    async: false,
+                                    cache: false,
+                                    contentType: false,
+                                    processData: false,
+                                    success: function (da) {
+                                        if (da.result == "success")
+                                            arrAttachment.push(da.attachment_id);
+                                    },
+                                    error: function (xhr, error, status) {
+                                        console.log(error, status);
+                                    }
+                                });
+                            }
+                        }
+                        //else {
+                        //    $.notify('Supporting Document is required.', { className: 'error' });
+                        //    return;
+                        //}
+
+                        $.ajax({
+                            url: "/Quote/Edit",
+                            type: "post",
+                            dataType: "json",
+                            async: false,
+                            data: {
+                                quoteId: quoteId, supplierId: supplierId, items: quoteItems, Attachment: arrAttachment,
+                                incoterm: $('#incoterm').val(),
+                                payment: $('#payment').val(),
+                                delivery: $('#delivery').val(),
+                                shipment: $('#shipment').val(),
+                                warranty: $('#warranty').val(),
+                                vendor_ref: $('#vendor_ref').val(),
+                                //grand_total_amount: parseFloat($('#grand_total_amount').text()),
+                                grand_total_amount: RemoveCommaFromNumber($('#grand_total_after_amount').text()),
+                                lump_sum_discount_amount: parseFloat($('#lump_discount_amount').val())
+                            },
+                            success: function (da) {
+                                if (da.result == "success") {
+                                    alert('Your data has been updated.');
+                                    window.location.href = '@Url.Action("Index")';
+                                } else if (da.result == "fail") {
+                                    alert(da.message);
+                                }
+                            },
+                            error: function (err) {
+                                $.notify('Your data is error while saving!', { className: 'error' });
+                            }
+                        });
+                    });
+
+                //});
+            </script>
+            <script type="text/javascript">
+    
+
+                function removeAttachmentRow(row) {
+                    var index = row.parentNode.parentNode.rowIndex;
+                    document.getElementById('tableAttachment').deleteRow(index);
+                    var rowCount = $('#tableAttachment tr').length;
+                    if (rowCount == 0) {
+                        $("#attachment_block").empty();
+                        $("#attachment_block").append("" +
+                            '<input type="file" class="form-control" name="attachment_reference" id="attachment_reference" multiple />'
+                            );
+                    }
+                }
+                function validateFloatKeyPress(el) {
+                    var v = parseFloat(el.value);
+                    el.value = (isNaN(v)) ? '' : v.toFixed(4);
+
+                    var ind = el.parentNode.parentNode.rowIndex;
+
+                    //discount
+                    var discountPercent = Number($('#quoteTable tr').eq(ind).find('input.discount').val()) / 100;
+                    //alert(discountPercent);
+                    $('#quoteTable tr').eq(ind).find('input.discount_amount').val(ReplaceNumberWithCommas(parseFloat(v * discountPercent).toFixed(4)));
+
+                    //calculate total
+
+                    var qty = Number($('#quoteTable tr').eq(ind).find('label.item-qty').text());
+                    var discountAmount = $('#quoteTable tr').eq(ind).find('input.discount_amount').val();
+                    var total = (v - discountAmount) * qty;
+                    $('#quoteTable tr').eq(ind).find('label.item_total_amount').text(ReplaceNumberWithCommas(parseFloat(total).toFixed(4)));
+                    calculationGrandTotalAmount();
+                }
+
+                //function calculationGrandTotalAmount() {
+                //    var totals = $('.item_total_amount');
+                //    var grand_total_amount = 0;
+                //    for (var i = 0; i < totals.length; i++) {
+                //        grand_total_amount = grand_total_amount + Number(RemoveCommaFromNumber(totals[i].innerHTML));
+                //    }
+                //    $('#grand_total_amount').text(ReplaceNumberWithCommas(parseFloat(grand_total_amount).toFixed(4)));
+                //}
+
+                function calculationGrandTotalAmount() {
+                    var totals = $('.item_total_amount');
+
+                    var item_qtys = $('.item-qty');
+                    var item_discount_amounts = $('.discount_amount');
+                    var item_discount_percentages = $('.discount');
+                    var item_unit_prices = $('.unit-price');
+                    var item_total_amounts = $('.item_total_amount');
+                    //var item_unit_price_fulls = $('.unit-price-full');
+                    //var item_discount_amount_fulls = $('.discount_amount_full');
+
+                    var grand_total_amount = 0;
+
+                    //$.each(item_discount_amounts, function (index, item) {
+
+                    //    //var total_discount_full = $(item_discount_amount_fulls[index]).val();
+                    //    //var total_amount_full = parseFloat($(item_qtys[index]).text()) * (parseFloat($(item_unit_prices[index]).val()) - total_discount_full);
+                    //    var total_discount_full = $(item_discount_amounts[index]).val();
+                    //    var total_amount_full = parseFloat($(item_qtys[index]).text()) * (parseFloat($(item_unit_prices[index]).val()) - total_discount_full);
+                    //    grand_total_amount = grand_total_amount + total_amount_full;
+                    //});
+
+
+                    var grand_total_amount = 0;
+                    for (var i = 0; i < totals.length; i++) {
+                        grand_total_amount = grand_total_amount + Number(RemoveCommaFromNumber(totals[i].innerHTML));
+                    }
+
+                    //console.log(grand_total_amount);
+                    $('#grand_total_amount').text(ReplaceNumberWithCommas(parseFloat(grand_total_amount).toFixed(4)));
+                    //$('#grand_total_amount').text(ReplaceNumberWithCommas(parseFloat(grand_total_amount)));
+                    var lump_sum_discount_amount = parseFloat($('#lump_discount_amount').val()).toFixed(4);
+                    var grand_total_after_discount = parseFloat(grand_total_amount).toFixed(4) - lump_sum_discount_amount;
+                    $('#grand_total_after_amount').text(ReplaceNumberWithCommas(parseFloat(grand_total_after_discount).toFixed(4)));
+                }
+
+                function onchangeDiscount(el) {
+                    var v = parseFloat(el.value) / 100;
+                    var ind = el.parentNode.parentNode.rowIndex;
+                    var unitPrice = parseFloat($('#quoteTable tr').eq(ind).find('input.unit-price').val());
+                    $('#quoteTable tr').eq(ind).find('input.discount_amount').val(ReplaceNumberWithCommas(parseFloat(v * unitPrice).toFixed(4)));
+
+                    var qty = Number($('#quoteTable tr').eq(ind).find('label.item-qty').text());
+                    var discountAmount = $('#quoteTable tr').eq(ind).find('input.discount_amount').val();
+
+                    calculateTotal(ind, unitPrice, discountAmount, qty);
+
+                }
+
+                function onchangeDiscountAmount(el) {
+                    var v = parseFloat(el.value);
+                    var ind = el.parentNode.parentNode.rowIndex;
+                    var unitPrice = parseFloat($('#quoteTable tr').eq(ind).find('input.unit-price').val());
+                    var qty = Number($('#quoteTable tr').eq(ind).find('label.item-qty').text());
+
+                    if (v > unitPrice) {
+                        alert("Discount Amount cannot greater than Unit Price.");
+                        el.value = 0;
+                        $('#quoteTable tr').eq(ind).find('input.discount').val(0);
+                        calculateTotal(ind, unitPrice, el.value, qty);
+                        return;
+                    }
+                    var discountPercent = (v * 100) / unitPrice;
+                    $('#quoteTable tr').eq(ind).find('input.discount').val(parseFloat(discountPercent).toFixed(4));
+                    calculateTotal(ind, unitPrice, v, qty);
+                }
+
+                function calculateTotal(ind, unitPrice, discountAmount, qty) {
+                    var total = (unitPrice - discountAmount) * qty;
+                    $('#quoteTable tr').eq(ind).find('label.item_total_amount').text(ReplaceNumberWithCommas(parseFloat(total).toFixed(4)));
+                    calculationGrandTotalAmount();
+                }
+
+            </script>
+
+        }
+

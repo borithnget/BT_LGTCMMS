@@ -1,0 +1,263 @@
+﻿@model BT_KimMex.Views.PurchaseOrderAandR
+@using BT_KimMex.Class;
+@{
+
+    ViewBag.title="Create";
+    string date = Convert.ToDateTime(DateTime.Now).ToString("dd/MM/yyyy");
+    var POD_Number = ViewBag.PONumberID;
+    var approveNo = ViewBag.ApprovealNumber;
+
+}
+<style type="text/css">
+    #itemReceiveTable tr td:nth-child(5) {
+        text-align: left !important;
+        color : blue;
+    }
+
+    #itemReceivedTable thead th, #po_table tr td {
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+    .form-control{
+        padding:5px 0px !important;
+        height:auto !important;
+        font-size:13px !important;
+        
+    }
+    
+</style>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+
+<div class="row" style="padding:10px !important;">
+    <div class="panel panel-default">
+        <div class="panel-heading">Create New Purchase Order Request</div>
+        <div class="panel-body">
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-horizontal">
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    <div class="form-group">
+                        <label class="col-md-2">Date : </label>
+                        <label class="col-md-10">@date</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-2">Request Number : </label>
+                        <label class="col-md-10" id="purchase_number">@approveNo</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-2">Quote Ref. Number<strong style="color:red">*</strong>:</label>
+                        <div class="col-md-3">
+                            @Html.DropDownList("po_number", POD_Number as SelectList, "Select Quote Number",new { @class = "form-control", id = "purchase_order_number", onchange = "InitPOSupplierDataTable()" })
+                            @* @Html.ValidationMessageFor(model => model.purchase_order_id, "", new { @class = "text-danger" })*@
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-2">Project : </label>
+                        <label class="col-md-10" id="project_name"></label>
+                    </div>
+
+                    <!--End Rathana Add-->
+                    <div class="row" style="margin:0 !important;">
+                        <table class="table table-responsive table-bordered" id="purchaseOrderTable">
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>PO Number</th>
+                                    <th>PO Type</th>
+                                    <th>Supplier Name</th>
+                                    <th>Description</th>
+                                    <th>Amount ($)</th>
+                                    <th>VAT Amount ($)</th>
+                                    <th>Amount After VAT($)</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Submit" class="btn btn-success" />
+                            <a href="javascript:history.back()" class="btn btn-danger">Back</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+    <script type="text/javascript">
+
+        $(function () {
+            $('#purchase_order_number').select2();
+        });
+
+        function InitPOSupplierDataTable() {
+            var po_id = $('#purchase_order_number').val();
+            $('#purchaseOrderTable tbody').empty();
+            $('#project_name').text('');
+
+            $.ajax({
+                url: '/PurchaseOrderAandR/GetPOSupplierDataTabel',
+                data: { id: po_id },
+                type: "get",
+                dataType: "json",
+                async: false,
+                success: function (da) {
+                    if (da.result == "success") {
+                        
+                        $('#project_name').html(da.data.project_full_name);
+                        var count=1;
+                        $.each(da.data.poReports, function (index, item) {
+                            console.log(item);
+                            var vatstatus = "";
+                            var vat_number = 0;
+                            if (item.vat_status == true){
+                                
+                                vat_number = item.supplier.discount;
+                                vat_number = vat_number > 0 ? vat_number / 100 : vat_number;
+                                vatstatus = "VAT " + item.supplier.discount+" %";
+                            }                                
+                            else {
+                                vatstatus = "NON-VAT"
+                            }
+                                
+                            var amount = 0, vat_amount = 0,grand_total;
+                            $.each(item.purchaseOrderDetails, function (index1, item1) {
+                                amount = amount + Number(item1.po_quantity * item1.unit_price);
+                            });
+                            amount = amount - item.lump_sum_discount_amount;
+                            vat_amount = amount * vat_number;
+                            grand_total = amount + vat_amount;
+
+                                    var str = "<tr>" +
+                                       "<td style='text-align:center'>" + count + "<input type='hidden' class='detail_id' name='detail_id' value='" + item.po_report_id + "'/></td>" +
+                                       "<td>" + item.po_report_number + "</td>" +
+                                       "<td>"+vatstatus+"</td>" +
+                                       "<td>" + item.supplier.supplier_name + "</td>" +
+                                       "<td></td>" +
+                                       //"<td><input type='hidden' name='amount' value='" + amount + "'/>" + parseFloat(amount).toFixed(4)+ "</td>" +
+                                       "<td class='text-center'><input type='hidden' name='amount_before_vat' value='" + amount + "'/>" + ReplaceNumberWithCommas(parseFloat(amount).toFixed(4)) + "</td>" +
+                                       "<td class='text-center'><input type='hidden' name='vat_amount' value='" + vat_amount + "'/>" + ReplaceNumberWithCommas(parseFloat(vat_amount).toFixed(4)) + "</td>" +
+                                       "<td class='text-center'><input type='hidden' name='amount' value='" + grand_total + "'/>" + ReplaceNumberWithCommas(parseFloat(grand_total).toFixed(4)) + "</td>" +
+                                    "</tr>";
+                                    $('#purchaseOrderTable tbody').append(str);
+                                    count++;
+
+                        });
+
+                        //var count = 1;
+                        //$.each(da.data.poSuppliers, function (ind, item) {
+                        //    var amount = 0;
+                        //    console.log(item);
+
+                        //    $.each(da.data.poDetails, function (index1, item1) {
+                                
+                        //        if (item.supplier_id == item1.supplier_id) {
+                        //            amount = amount + Number(item1.po_quantity * item1.unit_price);
+                        //            //console.log(amount);
+                        //        }
+                                
+                        //    });
+
+
+                        //    $.each(item.reports, function (ind1, item1) {
+                        //        var str = "<tr>" +
+                        //           "<td style='text-align:center'>" + count + "<input type='hidden' class='detail_id' name='detail_id' value='" + item1.po_report_id + "'/></td>" +
+                        //           "<td>" + item1.po_report_number + "</td>" +
+                        //           "<td></td>" +
+                        //           "<td>" + item.supplier_name + "</td>" +
+                                   
+                        //           "<td><input type='hidden' name='amount' value='"+amount+"'/>"+ parseFloat(amount).toFixed(2)+"</td>" +
+                        //           "<td></td>" +
+                                   
+                        //        "</tr>";
+                        //        $('#purchaseOrderTable tbody').append(str);
+                        //    });
+                        //    count++;
+                        //});
+                    } else {
+                        alert('Error: ' + da.message);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Initial BOQ Item Type:' + textStatus);
+                }
+
+            });
+
+            @*$('#btnCreate').click(function (sel, name) {
+                var purchaseOrderNumber = $('#purchase_order_number').val();
+                var purcahseNumber = $('#purchase_number').text();
+                var approves = [];
+                var rejects = [];
+                var po_id = $('#purchase_order_id').val();
+                var arrSup = [];
+                var rows = $('tbody tr');
+                $.each(rows, function (ind, row) {
+                    var radio = document.getElementById("approve_" + ind);
+                    if (radio.checked) {
+                        approves.push(radio.getAttribute("data-id"));
+                    }
+
+                    var rej = document.getElementById("reject_" + ind);
+                    if (rej.checked) {
+                        rejects.push(rej.getAttribute("data-id"));
+                    }
+
+                    $('.selected_supplier:checkbox:checked').each(function () {
+                        var supplierId = $(this).val();
+                        arrSup.push(supplierId);
+                    });
+                });
+
+                $.ajax({
+                    url: '/PurchaseOrderAandR/CreateNew',
+                    data: {
+                        purchase_order_number: purchaseOrderNumber,
+                        purchase_number: purcahseNumber,
+                        approves: approves,
+                        rejects: rejects
+                    },
+                    type: "post",
+                    dataType: "json",
+                    async: false,
+                    success: function (da) {
+                        if (da.result == "success") {
+                            alert('Your data has been saved!');
+                            window.location.href = '@Url.Action("Index", "PurchaseOrderAandR")';
+                        } else {
+                            alert('Error: ' + da.message);
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert('Your data is error while saving!');
+                    }
+                });
+            });*@
+        };
+
+        function approve_check(ind) {
+            if (document.getElementById("approve_" + ind).checked == true) {
+                document.getElementById("reject_" + ind).checked = false;
+            }
+        }
+
+        function reject_check(ind) {
+            if (document.getElementById("reject_" + ind).checked == true) {
+                document.getElementById("approve_" + ind).checked = false;
+            }
+        }
+
+
+    </script>
+}
+

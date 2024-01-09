@@ -1,0 +1,385 @@
+﻿@model BT_KimMex.Models.StockIssueViewModel
+    @using Microsoft.AspNet.Identity;
+@using BT_KimMex.Class
+@{
+    ViewBag.Title = "View Work Order Detail";
+    string userid = User.Identity.GetUserId().ToString();
+    //string date =Convert.ToDateTime(Model.created_date).ToString("dd/MM/yyyy HH:mm");
+    string date =Convert.ToString(Model.created_date);
+    bool isSK = false;
+    bool isMSC = false;
+    bool isAdmin = false;
+    if (User.IsInRole("Admin"))
+    {
+        isAdmin = true;
+    }
+    if (User.IsInRole("Stock Keeper"))
+    {
+        isSK = true;
+    }
+    if (User.IsInRole("Main Stock Controller") || User.IsInRole("Purchaser"))
+    {
+        isMSC = true;
+    }
+    BT_KimMex.Entities.kim_mexEntities db = new BT_KimMex.Entities.kim_mexEntities();
+    var wh = db.tb_warehouse.Where(s => string.Compare(s.warehouse_project_id, Model.project_id) == 0).FirstOrDefault();
+    string whname = string.Empty;
+    if (wh != null)
+    {
+        whname = wh.warehouse_name;
+    }
+
+}
+<style type="text/css">
+    #stockIssueTable tr td {
+        vertical-align: middle !important;
+        text-align: center !important;
+    }
+
+        #stockIssueTable tr td:nth-child(3) {
+            text-align: left !important;
+        }
+</style>
+
+<div class="w3-panel w3-card-4">
+    <div class="w3-container w3-display-container">
+        <h3 class="title">@ViewBag.Title</h3>        
+    </div>
+    <div class="w3-container w3-display-container">
+        <div class="form-horizontal">
+            <div class="form-group">
+                
+                <label class="col-md-2">Transaction Date:</label>
+                @Html.Label(date, new { @class = "col-md-10" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.stock_issue_number, new { @class = "col-md-2" })
+                <label class="col-md-10">@Model.stock_issue_number</label>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2">Project:</label>
+                <label class="col-md-10">@db.tb_project.Find(Model.project_id).project_full_name</label>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2">Warehouse:</label>
+                <label class="col-md-10">@whname</label>
+            </div>
+            <div class="row" style="margin:0 !important;">
+                <table class="table table-bordered table-responsive" id="stockIssueTable">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">No.</th>
+                            <th rowspan="2">Item Code</th>
+                            <th rowspan="2">Item Name</th>
+                            <th rowspan="2">Labour Hour</th>
+                            @*<th>Warehouse</th>*@
+                            @*<th>Stock Balance</th>*@
+                            <th rowspan="2">Issue Qty</th>
+                            @if (Model.inventorieshistoryqty.Count() > 0)
+                            {
+                                int i = @Model.inventorieshistoryqty.Count();
+                                <th colspan="@i">Issue Qty History</th>
+
+                            }
+                            <th rowspan="2">Unit</th>
+                            <th rowspan="2">Inovice No.</th>
+                            <th rowspan="2">Inovice Date</th>
+                            <th rowspan="2">Reason</th>
+                            <th rowspan="2">Status</th>
+                        </tr>
+                        @if ((Model.inventorieshistoryqty.Count()) > 0)
+                        {
+                            int js = @Model.inventorieshistoryqty.Count();
+
+                            <tr>
+
+                                @for (int i = 1; i <= js; i++)
+                                {
+                                    <th>@i</th>
+                                }
+                            </tr>
+                        }
+                    </thead>
+                    <tbody>
+                        @{
+                            int count = 1;
+                            foreach (var item in Model.inventoryDetails)
+                            {
+                                <tr>
+                                    <td>@count</td>
+                                    <td>@item.itemCode</td>
+                                    <td>@item.itemName</td>
+                                    <td>@Convert.ToDecimal(item.item_labour_hour).ToString("N")</td>
+                                    @*<td>@item.warehouseName</td>*@
+                                    @*<td>@item.stock_balance @item.itemUnit</td>*@
+                                    @*<td>@string.Format("{0:G29}", decimal.Parse(item.total_quantity.ToString()))</td>*@
+                                    <td>@item.total_quantity</td>
+                                    @foreach (var obj in db.tb_history_issue_qty.Where(s => string.Compare(s.inventory_detail_id, @item.inventory_detail_id) == 0).OrderBy(s => s.create_at).ToList())
+                                    {
+                                        <td class="text-center his_qty" id="his_qty">@obj.issue_qty</td>
+                                    }
+                                    <td>@item.unitName</td>
+                                    <td>@item.invoice_number</td>
+                                    <td>@Convert.ToDateTime(item.invoice_date).ToString("dd/MM/yyyy")</td>
+                                    <td>@item.remark</td>
+                                    <td>
+                                        @{
+                                            if (string.Compare(item.item_status, "pending") == 0)
+                                            {
+                                                <label style="color:orange">@item.item_status</label>
+                                            }
+                                            else if (string.Compare(item.item_status, "approved") == 0)
+                                            {
+                                                <label style="color:blue">@item.item_status</label>
+                                            }
+                                            else if (string.Compare(item.item_status, "feedbacked") == 0)
+                                            {
+                                                <label style="color:grey !important;">@item.item_status</label>
+                                            }
+                                        }
+                                    </td>
+                                </tr>
+                                count++;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="row" style="margin:0 !important;">
+                <div class="form-group">
+                    @Html.Label("Supporting Document:", new { @class = "col-md-2" })
+                    <div class="col-md-10">
+                        @{
+                            var attachments = Model.attachments;
+                            foreach (var att in attachments)
+                            {
+                                <a class="title" href="/StockIssue/Download/?p=@(att.attachment_id+att.attachment_extension)&d=@att.attachment_name">@att.attachment_name</a><br />
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+            @if (Model.rejects.Count() > 0)
+            {
+                <div class="form-group">
+                    <label class="control-label col-md-2">Reject Command:</label>
+                    <div class="col-md-10">
+                        <ul>
+                            @foreach (var reject in Model.rejects)
+                            {
+                                <li>@reject.comment <b>By @reject.rejected_by</b></li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            }
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    @{
+                        if ((User.IsInRole(Role.SystemAdmin) || string.Compare(Model.created_by, userid) == 0))
+                        {
+                            if (string.Compare(Model.stock_issue_status, Status.Pending) == 0)
+                            {
+                                @*@Html.ActionLink("Edit", "Edit", new { id = Model.stock_issue_id }, new { @class = "btn btn-success" })
+                                <a href="javascript:void(0)" class="btn btn-danger" id="btn-delete">Delete</a>*@
+                                <button class="w3-button w3-tiny w3-deep-orange" id="btn-cancel">Request Cancel</button>
+                            }
+                            else if (string.Compare(Model.stock_issue_status, Status.PendingFeedback) == 0)
+                            {
+                                @Html.ActionLink("Prepare Feedback", "PrepareFeedback", new { id = Model.stock_issue_id }, new { @class = "w3-button w3-tiny w3-green" })
+                            }
+                        }
+                        if ((User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.SiteStockKeeper)) && (string.Compare(Model.stock_issue_status, Status.Pending) == 0 || string.Compare(Model.stock_issue_status, Status.Feedbacked) == 0))
+                        {
+                            @Html.ActionLink("Approve/ Feedback", "ApproveFeedback", new { id = Model.stock_issue_id }, new { @class = "w3-button w3-tiny w3-teal" })
+                        }
+                        if ((User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.SiteManager)) && string.Compare(Model.stock_issue_status, Status.Approved) == 0)
+                        {
+                            <a href="javascript:void(0)" id="@Model.stock_issue_id" class="w3-button w3-tiny w3-teal approve-promp">Approve</a>
+                            <a href="javascript:void(0)" id="@Model.stock_issue_id" class="w3-button w3-tiny w3-deep-orange reject-promp">Reject</a>
+                        }
+                        if (string.Compare(Model.stock_issue_status, Status.Completed) == 0)
+                        {
+                            @Html.ActionLink("Edit", "EditNew", new { id = Model.stock_issue_id }, new { @class = "w3-button w3-tiny w3-green" })
+                        }
+                    }
+
+                    <a href="javascript:history.back()" class="w3-button w3-tiny w3-red">Back</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- approve project modal popup-->
+<div class="modal fade" id="approveModal" tabindex="=-1" role="dialog" aria-labelledby="approveModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-warning">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to <strong>Approve</strong> this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default approve-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- reject project modal popup-->
+<div class="modal fade" id="rejectModal" tabindex="=-1" role="dialog" aria-labelledby="rejectModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <p class="success-message col-md-12">Are you sure to <strong>Reject</strong> this item?</p>
+                    <label class="col-md-2">Comment:</label>
+                    <div class="col-md-10">
+                        <textarea class="form-control" rows="5" id="reject-comment"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default reject-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function () {
+            var stockIssueId = '@Model.stock_issue_id';
+
+            $('#btn-cancel').click(function (e) {
+                e.preventDefault();
+                swal({
+                    title: "Cancellation",
+                    text: "Please input your cancel comment:",
+                    icon: "warning",
+                    content: "input",
+                })
+                .then((value) => {
+                    $.ajax({
+                        url: "/StockIssue/CancelRequest",
+                        data: {
+                            'id': '@Model.stock_issue_id',
+                            'comment': value,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            swal("Request has been cancelled successfully.", {
+                                icon: "success",
+                            });
+                            window.location.href = '@Url.Action("Index", "StockIssue")';
+                        },
+                        error: function (err) {
+                            swal("Poof! " + err, {
+                                icon: "error",
+                            });
+                        }
+                    });
+                });
+            });
+
+            $('.approve-promp').click(function () {
+                $('#approveModal').modal('show');
+            });
+
+            $('.approve-confirm').click(function () {
+
+               // var list = $("#his_qty").find(':last-child').text();
+               // var list = $('.his_qty :last-child').text();
+                //var list = $('.his_qty').closest('table tr:last-child td #his_qty:last-child').text();
+
+                //return false;
+
+                if (stockIssueId != '') {
+                    $.ajax({
+                        url: "/StockIssue/Approve",
+                        data: {
+                            'id': stockIssueId,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#approveModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been approved!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "StockIssue")';
+                            }
+                            else if (da.result == "fail")
+                                $.notify('Your data has been error while approving!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while approving!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+            $('.reject-promp').click(function () {
+                $('#rejectModal').modal('show');
+            });
+
+            $('.reject-confirm').click(function () {
+                if (stockIssueId != '') {
+                    var comment = $('#reject-comment').val();
+                    $.ajax({
+                        url: "/StockIssue/Reject",
+                        data: {
+                            'id': stockIssueId,
+                            'comment': comment,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.reject-confirm').css('display', 'none');
+                            }
+                            $('#rejectModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been rejected!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "StockIssue")';
+                            }
+                            else if (da.result == "fail")
+                                $.notify('Your data has been error while rejecting!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while rejecting!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}
+

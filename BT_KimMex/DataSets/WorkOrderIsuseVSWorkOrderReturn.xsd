@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="WorkOrderIsuseVSWorkOrderReturn" targetNamespace="http://tempuri.org/WorkOrderIsuseVSWorkOrderReturn.xsd" xmlns:mstns="http://tempuri.org/WorkOrderIsuseVSWorkOrderReturn.xsd" xmlns="http://tempuri.org/WorkOrderIsuseVSWorkOrderReturn.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="WorkOrderIsuseVSWorkOrderReturn" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="WorkOrderIsuseVSWorkOrderReturn" msprop:Generator_UserDSName="WorkOrderIsuseVSWorkOrderReturn">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="WorkOrderIsuseVSWorkOrderReturn" msprop:Generator_TableClassName="WorkOrderIsuseVSWorkOrderReturnDataTable" msprop:Generator_TableVarName="tableWorkOrderIsuseVSWorkOrderReturn" msprop:Generator_TablePropName="_WorkOrderIsuseVSWorkOrderReturn" msprop:Generator_RowDeletingName="WorkOrderIsuseVSWorkOrderReturnRowDeleting" msprop:Generator_RowChangingName="WorkOrderIsuseVSWorkOrderReturnRowChanging" msprop:Generator_RowEvHandlerName="WorkOrderIsuseVSWorkOrderReturnRowChangeEventHandler" msprop:Generator_RowDeletedName="WorkOrderIsuseVSWorkOrderReturnRowDeleted" msprop:Generator_UserTableName="WorkOrderIsuseVSWorkOrderReturn" msprop:Generator_RowChangedName="WorkOrderIsuseVSWorkOrderReturnRowChanged" msprop:Generator_RowEvArgName="WorkOrderIsuseVSWorkOrderReturnRowChangeEvent" msprop:Generator_RowClassName="WorkOrderIsuseVSWorkOrderReturnRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="item_id" msprop:Generator_ColumnVarNameInTable="columnitem_id" msprop:Generator_ColumnPropNameInRow="item_id" msprop:Generator_ColumnPropNameInTable="item_idColumn" msprop:Generator_UserColumnName="item_id" type="xs:string" minOccurs="0" />
+              <xs:element name="datefrom" msprop:Generator_ColumnVarNameInTable="columndatefrom" msprop:Generator_ColumnPropNameInRow="datefrom" msprop:Generator_ColumnPropNameInTable="datefromColumn" msprop:Generator_UserColumnName="datefrom" type="xs:string" minOccurs="0" />
+              <xs:element name="todate" msprop:Generator_ColumnVarNameInTable="columntodate" msprop:Generator_ColumnPropNameInRow="todate" msprop:Generator_ColumnPropNameInTable="todateColumn" msprop:Generator_UserColumnName="todate" type="xs:string" minOccurs="0" />
+              <xs:element name="project_name" msprop:Generator_ColumnVarNameInTable="columnproject_name" msprop:Generator_ColumnPropNameInRow="project_name" msprop:Generator_ColumnPropNameInTable="project_nameColumn" msprop:Generator_UserColumnName="project_name" type="xs:string" minOccurs="0" />
+              <xs:element name="issue_no" msprop:Generator_ColumnVarNameInTable="columnissue_no" msprop:Generator_ColumnPropNameInRow="issue_no" msprop:Generator_ColumnPropNameInTable="issue_noColumn" msprop:Generator_UserColumnName="issue_no" type="xs:string" minOccurs="0" />
+              <xs:element name="issue_item_code" msprop:Generator_ColumnVarNameInTable="columnissue_item_code" msprop:Generator_ColumnPropNameInRow="issue_item_code" msprop:Generator_ColumnPropNameInTable="issue_item_codeColumn" msprop:Generator_UserColumnName="issue_item_code" type="xs:string" minOccurs="0" />
+              <xs:element name="issue_description" msprop:Generator_ColumnVarNameInTable="columnissue_description" msprop:Generator_ColumnPropNameInRow="issue_description" msprop:Generator_ColumnPropNameInTable="issue_descriptionColumn" msprop:Generator_UserColumnName="issue_description" type="xs:string" minOccurs="0" />
+              <xs:element name="issue_unit" msprop:Generator_ColumnVarNameInTable="columnissue_unit" msprop:Generator_ColumnPropNameInRow="issue_unit" msprop:Generator_ColumnPropNameInTable="issue_unitColumn" msprop:Generator_UserColumnName="issue_unit" type="xs:string" minOccurs="0" />
+              <xs:element name="issue_qty" msprop:Generator_ColumnVarNameInTable="columnissue_qty" msprop:Generator_ColumnPropNameInRow="issue_qty" msprop:Generator_ColumnPropNameInTable="issue_qtyColumn" msprop:Generator_UserColumnName="issue_qty" type="xs:string" minOccurs="0" />
+              <xs:element name="return_no" msprop:Generator_ColumnVarNameInTable="columnreturn_no" msprop:Generator_ColumnPropNameInRow="return_no" msprop:Generator_ColumnPropNameInTable="return_noColumn" msprop:Generator_UserColumnName="return_no" type="xs:string" minOccurs="0" />
+              <xs:element name="return_item_code" msprop:Generator_ColumnVarNameInTable="columnreturn_item_code" msprop:Generator_ColumnPropNameInRow="return_item_code" msprop:Generator_ColumnPropNameInTable="return_item_codeColumn" msprop:Generator_UserColumnName="return_item_code" type="xs:string" minOccurs="0" />
+              <xs:element name="return_description" msprop:Generator_ColumnVarNameInTable="columnreturn_description" msprop:Generator_ColumnPropNameInRow="return_description" msprop:Generator_ColumnPropNameInTable="return_descriptionColumn" msprop:Generator_UserColumnName="return_description" type="xs:string" minOccurs="0" />
+              <xs:element name="return_unit" msprop:Generator_ColumnVarNameInTable="columnreturn_unit" msprop:Generator_ColumnPropNameInRow="return_unit" msprop:Generator_ColumnPropNameInTable="return_unitColumn" msprop:Generator_UserColumnName="return_unit" type="xs:string" minOccurs="0" />
+              <xs:element name="return_qty" msprop:Generator_ColumnVarNameInTable="columnreturn_qty" msprop:Generator_ColumnPropNameInRow="return_qty" msprop:Generator_ColumnPropNameInTable="return_qtyColumn" msprop:Generator_UserColumnName="return_qty" type="xs:string" minOccurs="0" />
+              <xs:element name="inventory_type" msprop:Generator_ColumnVarNameInTable="columninventory_type" msprop:Generator_ColumnPropNameInRow="inventory_type" msprop:Generator_ColumnPropNameInTable="inventory_typeColumn" msprop:Generator_UserColumnName="inventory_type" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

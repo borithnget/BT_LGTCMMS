@@ -1,0 +1,550 @@
+﻿@model BT_KimMex.Models.TransferFromMainStockViewModel  
+
+@{
+    ViewBag.Title = "Create";  
+    string STID = ViewBag.STID;
+    string STDate = ViewBag.STDate;
+}
+<style type="text/css">
+    table tr th, tr td {
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+
+    table tr td:nth-child(2), table tr td:nth-child(3), table tr td:nth-child(6) {
+        text-align: left !important;
+    }
+
+    .form-control {
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+        margin-top: 0px !important;
+        margin-bottom: 0px !important;
+    }
+
+    table tr td {
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
+    }
+</style>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h3 class="title">Create New Transfer From WorkShop Request</h3>
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.Label("Date:", new { @class = "control-label col-md-2" })
+            <label class="col-md-10">@BT_KimMex.Class.CommonClass.ToLocalTime(Convert.ToDateTime(DateTime.Now)).ToString("dd/MM/yyyy")</label>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Transfer Number:</label>
+            <label class="col-md-10">@STID</label>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">Project <strong style="color:red;">*</strong>:</label>
+            <div class="col-md-10">
+                @Html.DropDownList("project_id",new SelectList(BT_KimMex.Class.CommonClass.GetAllProject(), "project_id", "project_full_name"),"Select Project",new { @class = "form-control",id="project_id" })
+                @Html.ValidationMessageFor(model => model.item_request_id, "", new { @class = "text-danger" })
+            </div>
+        </div>
+             
+        <div class="form-group">
+            <label class="control-label col-md-2">Purchase Requisition Ref. <strong style="color:red;">*</strong>:</label>
+            <div class="col-md-10">
+                <select class="form-control" name="mr_id" id="mr_id">
+                    <option>Select Material Request Reference</option>
+                </select>
+
+                @Html.ValidationMessageFor(model => model.item_request_id, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Warehouse:</label>
+            <label class="col-md-10" id="warehouse_name"></label>
+            <input type="text" value="0" id="warehouse_id" class="hidden" />
+        </div>
+        <div class="row" style="margin:0 !important;">
+            <table class="table table-bordered" id="st_table">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Item Code</th>
+                        <th>Item Name</th>
+                        <th>Stock Balance</th>
+                        <th>Requested QTY</th>
+                        <th>Transfer</th>
+                        @*<th>Return</th>*@
+                        <th>Transfer QTY</th>
+                        <th>Unit</th>
+                        <th>Invoice No.</th>
+                        <th>Invoice Date</th>
+                      
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="10">No item from workshop to transfer.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="button" value="Submit" id="btnCreate" class="btn btn-success" />
+                <a href="javascript:history.back()" class="btn btn-danger">Back</a>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            var url_id = GetURLParameter();
+
+            $('#project_id').change(function (e) {
+                e.preventDefault();
+                var id = $(this).val();
+                $('#st_table tbody').empty().append("<tr><td colspan='10' class='text-center'>No Item Data</td></tr>");
+                $('#mr_id').empty().append("<option>Select Material Request Reference</option>");
+                $('#warehouse_name').text('');
+                $('#warehouse_id').val('');
+                if (id) {
+                    $.ajax({
+                        url: '@Url.Action("GetItemRequestsbyProject", "PurchaseOrder")',
+                        type: "get",
+                        dataType: "json",
+                        data: { id: id },
+                        success: function (da) {
+                            //console.log(da);
+                            $.each(da, function (index, item) {
+                                $('#mr_id').append("<option value='" + item.ir_id + "'>" + item.ir_no + "</option>");
+                            });
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            console.log(XMLHttpRequest);
+                        }
+                    });
+                }
+            });
+
+            $('#mr_id').change(function (e) {
+                e.preventDefault();
+                var id = $(this).val();
+                $('#st_table tbody').empty();
+                if (id) {
+
+                    $.ajax({
+                        url: '@Url.Action("GetWarehousFromPR", "TransferFromMainStock")',
+                        type: "GET",
+                        data: { id: id },
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.result == "success") {
+                                if (data.data != null) {
+                                    $("#warehouse_name").html(data.data.warehouse_name);
+                                    $('#warehouse_id').val(data.data.warehouse_id);
+                                }
+                                else {
+                                    $("#warehouse_id").html("");
+                                }
+                            }
+                            else if (data.result == "error") {
+                                //alert(data.message);
+                                return;
+                            }
+
+                        }
+                    });
+
+                    $.ajax({
+                        url: '@Url.Action("GetTransferListItemsJson", "TransferFromMainStock")',
+                        type: "GET",
+                        data: { materialRequestId: id },
+                        success: function (data) {
+                            var count=1;
+                            $.each(data.data, function (index, item) {
+                                var mou = "<option value='" + item.itemUnit.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "'>" + item.itemUnitName.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                                $('#st_table').append("" +
+                                                    "<tr>" +
+                                                        "<td>" + count + "</td>" +
+                                                        "<td><input type='hidden' class='item_id' value='" + item.itemID + "'/>" + item.itemCode + "</td>" +
+                                                        "<td><label>" + item.itemName + "</label></td>" +
+                                                        "<td><label class='stock_balance'>" + item.stockBalance + "</label> <input type='hidden' class='stock_balance_unit' value='" + item.itemUnit + "'/> <label class=''>" + item.itemUnitName + "</label></td>" +
+                                                        "<td><label class='request_qty'>" + item.requestQty + "</label> <input type='hidden' class='request_unit' value='" + item.requestUnit + "'/> <label class=''>" + item.requestUnitName + "</label></td>" +
+                                                        "<td><input type='checkbox' value='' class='transfer'/></td>" +
+                                                        "<td style='display:none !important'><input type='checkbox' value='' class='return'/></td>" +
+                                                        "<td hidden><input type='text' id='hidcheck1' class='hidcheck'></td>" +
+                                                        "<td><input type='number' class='form-control transfer_qty' value='0' onchange='checkQty(this)'/></td>" +
+                                                         "<td><select class='form-control transfer-unit' onchange='checkQty(this)'>" + mou + "</select></td>" +
+                                                        "<td><input type='text' class='form-control invoice_no'/></td>" +
+                                                        "<td>" +
+                                                            '<div style="display:inline-block !important;margin-right:5px !important;">' +
+                                                                '<div class="input-group date" data-provide="datepicker" data-autoclose="true" style="width:150px !important;">' +
+                                                                    '<input type="text" class="form-control invoice_date" style="width:130px !important;"/>' +
+                                                                    '<div class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></div>' +
+                                                                '</div>' +
+                                                            '</div>' +
+                                                        "</td>" +
+                                                    "</tr>"
+                                                );
+                                count++;
+                                $(".date").datepicker({ format: 'dd/mm/yyyy' });
+                            });
+
+                        }
+                    });
+                }
+            });
+
+
+            if (url_id == null || url_id == "Create") { }
+            else {
+                var id = url_id;
+                if (id) {
+                    //$('#item_request_id').val(itemRequest);
+                    $('#st_table tbody').empty();
+                    $('#mr_id').empty().append("<option>Select Material Request Reference</option>");
+
+                    $.ajax({
+                        url: '@Url.Action("GetTransferFromWorkshopDatabyMR", "TransferFromMainStock")',
+                        type: "GET",
+                        data: { materialRequestId: id },
+                        success: function (data) {
+                            var count = 1;
+
+                            $('#project_id').val(data.materialRequest.ir_project_id);
+                            $("#warehouse_name").html(data.materialRequest.warehouse_name);
+                            $('#warehouse_id').val(data.materialRequest.warehouse_id);
+
+                            $.each(data.itemRequests, function (index, item) {
+                                $('#mr_id').append("<option value='" + item.ir_id + "'>" + item.ir_no + "</option>");
+                            });
+                            $('#mr_id').val(data.materialRequest.ir_id);
+                            $.each(data.data, function (index, item) {
+                                var mou = "<option value='" + item.itemUnit.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "'>" + item.itemUnitName.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                                $('#st_table').append("" +
+                                                    "<tr>" +
+                                                        "<td>" + count + "</td>" +
+                                                        "<td><input type='hidden' class='item_id' value='" + item.itemID + "'/>" + item.itemCode + "</td>" +
+                                                        "<td><label>" + item.itemName + "</label></td>" +
+                                                        "<td><label class='stock_balance'>" + item.stockBalance + "</label> <input type='hidden' class='stock_balance_unit' value='" + item.itemUnit + "'/> <label class=''>" + item.itemUnitName + "</label></td>" +
+                                                        "<td><label class='request_qty'>" + item.requestQty + "</label> <input type='hidden' class='request_unit' value='" + item.requestUnit + "'/> <label class=''>" + item.requestUnitName + "</label></td>" +
+                                                        "<td><input type='checkbox' value='' class='transfer'/></td>" +
+                                                        "<td style='display:none !important'><input type='checkbox' value='' class='return'/></td>" +
+                                                        "<td hidden><input type='text' id='hidcheck1' class='hidcheck'></td>" +
+                                                        "<td><input type='number' class='form-control transfer_qty' value='0' onchange='checkQty(this)'/></td>" +
+                                                         "<td><select class='form-control transfer-unit' onchange='checkQty(this)'>" + mou + "</select></td>" +
+                                                        "<td><input type='text' class='form-control invoice_no'/></td>" +
+                                                        "<td>" +
+                                                            '<div style="display:inline-block !important;margin-right:5px !important;">' +
+                                                                '<div class="input-group date" data-provide="datepicker" data-autoclose="true" style="width:150px !important;">' +
+                                                                    '<input type="text" class="form-control invoice_date" style="width:130px !important;"/>' +
+                                                                    '<div class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></div>' +
+                                                                '</div>' +
+                                                            '</div>' +
+                                                        "</td>" +
+                                                    "</tr>"
+                                                );
+                                count++;
+                                $(".date").datepicker({ format: 'dd/mm/yyyy' });
+                            });
+
+                        }
+                    });
+                }
+            }
+
+            $('#item_request_id').change(function () {
+                var itemRequest = $(this).val();
+                if (itemRequest) {
+
+                    $.ajax({
+                        url: '@Url.Action("GetWarehousFromPR", "TransferFromMainStock")',
+                        type: "GET",
+                        data: { id: itemRequest },
+                        dataType:"json",
+                        success: function (data) {
+                            if (data.result == "success") {
+                                if (data.data != null) {
+                                    $("#warehouse").html(data.data.warehouse_name);
+                                    $('#warehouseid').val(data.data.warehouse_id);
+                                }
+                                else {
+                                    $("#warehouse").html("");
+                                }
+                            }
+                            else if(data.result=="error") {
+                                alert(data.message);
+                                return;
+                            }
+
+                        }
+                    });
+
+                    $.ajax({
+                        url: '@Url.Action("GetItemByIRID", "TransferFromMainStock")',
+                        type: "get",
+                        dataType: "json",
+                        data: { id: itemRequest },
+                        success: function (da) {
+                            console.log(da);
+                            if (da.result == "success") {
+                                $('#st_table tbody').empty();
+                                var count = 1;
+                                if (da.data.length == 0) {
+                                    $('#st_table tbody').append("" +
+                                        "<tr><td colspan='11'>No item from warehouse to transfer.</td></tr>"
+                                        );
+                                } else {
+                                    $.each(da.data, function (index, item) {
+                                        if (item) {
+                                            console.log(item);
+                                            var mou = "<option value='" + item.itemUnit.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "'>" + item.itemUnitName.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                                            if (item.uom1_id && item.uom1_qty) {
+                                                mou = mou + "<option value='" + item.uom1_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom1_qty + "'>" + item.uom1_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                                            }
+                                            if (item.uom2_id && item.uom2_qty) {
+                                                mou = mou + "<option value='" + item.uom2_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom2_qty + "'>" + item.uom2_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                                            }
+                                            if (item.uom3_id && item.uom3_qty) {
+                                                mou = mou + "<option value='" + item.uom3_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom3_qty + "'>" + item.uom3_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                                            }
+                                            if (item.uom4_id && item.uom4_qty) {
+                                                mou = mou + "<option value='" + item.uom4_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom4_qty + "'>" + item.uom4_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                                            }
+                                            if (item.uom5_id && item.uom5_qty) {
+                                                mou = mou + "<option value='" + item.uom5_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom5_qty + "'>" + item.uom5_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                                            }
+
+                                            var warehouseId = $('#warehouseid').val();
+                                            var warehouseName = $('#warehouse').text();
+
+                                            $('#st_table').append("" +
+                                                "<tr>" +
+                                                    "<td>" + count + "</td>" +
+                                                    "<td><input type='hidden' class='item_id' value='" + item.itemID + "'/>" + item.itemCode + "</td>" +
+                                                    "<td><label>" + item.itemName + "</label></td>" +
+                                                    "<td><label class='stock_balance'>" + item.stockBalance + "</label> <input type='hidden' class='stock_balance_unit' value='" + item.itemUnit + "'/> <label class=''>" + item.itemUnitName + "</label></td>" +
+                                                    "<td><label class='request_qty'>" + item.requestQty + "</label> <input type='hidden' class='request_unit' value='" + item.requestUnit + "'/> <label class=''>" + item.requestUnitName + "</label></td>" +
+                                                    "<td><input type='hidden' class='warehouse_id' value='" + warehouseId + "' />" + warehouseName + "</td>" +
+                                                    "<td><input type='checkbox' value='' class='transfer'/></td>" +
+                                                    "<td><input type='number' class='form-control transfer_qty' value='0' onchange='checkQty(this)'/></td>" +
+                                                    "<td><select class='form-control transfer-unit' onchange='checkQty(this)'>" + mou + "</select></td>" +
+                                                    "<td><input type='text' class='form-control invoice_no'/></td>" +
+                                                    "<td>" +
+                                                        '<div style="display:inline-block !important;margin-right:5px !important;">' +
+                                                            '<div class="input-group date" data-provide="datepicker" data-autoclose="true" style="width:150px !important;">' +
+                                                                '<input type="text" class="form-control invoice_date" style="width:130px !important;"/>' +
+                                                                '<div class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></div>' +
+                                                            '</div>' +
+                                                        '</div>' +
+                                                    "</td>" +
+                                                "</tr>"
+                                                );
+                                            count++;
+                                            $(".date").datepicker({ format: 'dd/mm/yyyy' });
+                                        }
+                                    });
+                                }
+                            }
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            console.log(textStatus);
+                        }
+                    });
+                } else {
+                    $('#st_table tbody').empty().append("" +
+                                        "<tr><td colspan='11'>No item from warehouse to transfer.</td></tr>"
+                                        );;
+                }
+            });
+            $('#st_table tbody').on('changeDate', 'td div.date', function () {
+                $(this).datepicker('hide');
+            });
+
+            $('#btnCreate').click(function () {
+                var arrIndex = [];
+                var isReturn;
+                $('.transfer:checkbox:checked').each(function () {
+                    var index = $(this)[0].parentNode.parentNode.rowIndex;
+                    arrIndex.push(index);
+                });
+                var warehouse = $('#warehouse_id').val();
+                if (warehouse == null || warehouse == '' || warehouse == undefined || warehouse=="0") {
+                    alert("Please create warehouse for project.");
+                    return;
+                }
+                //return;
+                if (arrIndex.length <= 0) {
+                    alert('Please choose at lease one item for transfer.');
+                    return;
+                } else {
+                    var element_item = {};
+                    var items = [];
+                    for (var i = 0; i < arrIndex.length; i++) {
+                        var itemId = $('#st_table tr').eq(arrIndex[i]).find('input.item_id').val();
+                        var stockBalance = $('#st_table tr').eq(arrIndex[i]).find('label.stock_balance').text();
+                        var requestQty = $('#st_table tr').eq(arrIndex[i]).find('label.request_qty').text();
+                        //var warehouse = $('#st_table tr').eq(arrIndex[i]).find('input.warehouse_id').val();
+                        
+                        var transferQty = $('#st_table tr').eq(arrIndex[i]).find('input.transfer_qty').val();
+                        var transferUnit = $('#st_table tr').eq(arrIndex[i]).find('select.transfer-unit').val();
+                        var splitUnit = transferUnit.split(',');
+                        var invoiceNumber = $('#st_table tr').eq(arrIndex[i]).find('input.invoice_no').val();
+                        var invoiceDate = $('#st_table tr').eq(arrIndex[i]).find('input.invoice_date').val();
+
+                        $('#st_table tr').eq(arrIndex[i]).find('.return').each(function () {
+                            if ($(this).prop("checked") == true) {
+                                isReturn = true;
+                            }
+                            else if ($(this).prop("checked") == false) {
+                                isReturn = false;
+                            }
+                        });
+
+                        if (Number(transferQty) <= 0 || Number(transferQty) == '') {
+                            alert('Please fill transfer quantity.');
+                            return;
+                        }
+
+                        //if (Number(transferQty) > Number(requestQty)) {
+                        //    alert('Transfer quantity must be smaller than Approved quantity.');
+                        //    return;
+                        //}
+                        /*
+                        if (Number(transferQty) > Number(stockBalance)) {
+                            $.notify('Transfer quantity must be smaller than Stock Balance.', { className: 'error' });
+                            return;
+                        }
+                        */
+                        element_item = {};
+                        element_item.status = isReturn;
+                        element_item.product_id = itemId;
+                        element_item.warehouse_id = warehouse;
+                        element_item.out_quantity = transferQty;
+                        element_item.total_quantity = requestQty;
+                        element_item.unit = splitUnit[0].trim();
+                        element_item.invoice_number = invoiceNumber;
+                        element_item.invoice_date =convertDDMMYYYtoMMDDYYYY(invoiceDate);
+                        items.push(element_item);
+                    }
+
+                    var model = {
+                        stock_transfer_no: $('#stock_transfer_no').text(),
+                        item_request_id: $('#mr_id').val(),
+                    }
+
+                    $.ajax({
+                        url: "@Url.Action("CreateTransferFromMainStock", "TransferFromMainStock")",
+                        type: "post",
+                        dataType: "json",
+                        async: false,
+                        data: { model: model, inventories: items },
+                        success: function (da) {
+                            if (da.result == "success") {
+                                alert('Your data has been saved successfully.');
+                                window.location.href = '@Url.Action("Index", "TransferFromMainStock")';
+                            } else if (da.result == "fail") {
+                                //alert(da.message);
+                                alert(da.message);
+                            }
+                        },
+                        error: function (err) {
+                            alert('Your data is error while saving!');
+                        }
+                    });
+
+                }
+            });
+        });
+    </script>
+    <script type="text/javascript">
+        function checkQty(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var transferQty = $('#st_table tr').eq(ind).find('input.transfer_qty').val();
+            var transferUnit = $('#st_table tr').eq(ind).find('select.transfer-unit').val();
+            var approvedQty = $('#st_table tr').eq(ind).find('label.request_qty').text();
+            var approvedUnit = $('#st_table tr').eq(ind).find('input.request_unit').val();
+            var stockBalance = $('#st_table tr').eq(ind).find('label.stock_balance').text();
+            var stockBalanceUnit = $('#st_table tr').eq(ind).find('input.stock_balance_unit').val();
+
+            //console.log(transferQty + " " + approvedQty + " " + stockBalance);
+            //console.log(transferUnit + " " + approvedUnit + " " + stockBalanceUnit);
+
+            //if (!transferUnit)
+            //    return;
+            if (!transferQty && !transferUnit)
+                return;
+            var splitTransferUnit = transferUnit.split(',');
+            if (stockBalanceUnit == splitTransferUnit[0]) {
+                if (transferQty && Number(transferQty) > Number(approvedQty)) {
+                    alert("Transter quantity must be samller or equal to Requested quantity.");
+                    $('#st_table tr').eq(ind).find('input.transfer_qty').focus();
+                    $('#st_table tr').eq(ind).find('input.transfer_qty').val(0);
+                    return;
+                }
+                if (transferQty && Number(transferQty) > Number(stockBalance)) {
+                    alert("Not enough stock balance to transfer.");
+                    $('#st_table tr').eq(ind).find('input.transfer_qty').focus();
+                    $('#st_table tr').eq(ind).find('input.transfer_qty').val(0);
+                    return;
+                }
+            }
+            else {
+                var quantity = 0;
+                var selectedIndex = $('#st_table tr').eq(ind).find('select.transfer-unit').prop('selectedIndex');
+                if (transferQty) {
+                    if (selectedIndex == 1) {
+                        var splitElement = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(selectedIndex).val().split(',');
+                        quantity = transferQty / splitElement[1];
+                    }
+                    else if (selectedIndex == 2) {
+                        var splitElement = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(2).val().split(',');
+                        quantity = (transferQty / splitElement[1]) / splitElement2[1];
+                    }
+                    else if (selectedIndex == 3) {
+                        var splitElement = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(2).val().split(',');
+                        var splitElement3 = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(3).val().split(',');
+                        quantity = ((transferQty / splitElement[1]) / splitElement3[1]) / splitElement2[1];
+                    }
+                    else if (selectedIndex == 4) {
+                        var splitElement = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(2).val().split(',');
+                        var splitElement3 = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(3).val().split(',');
+                        var splitElement4 = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(4).val().split(',');
+                        quantity = ((((transferQty / splitElement[1]) / splitElement4[1]) / splitElement3[1]) / splitElement2[1]);
+                    } else if (selectedIndex == 5) {
+                        var splitElement = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(2).val().split(',');
+                        var splitElement3 = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(3).val().split(',');
+                        var splitElement4 = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(4).val().split(',');
+                        var splitElement5 = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(5).val().split(',');
+                        quantity = ((((transferQty / splitElement[1]) / splitElement5[1]) / splitElement4[1]) / splitElement3[1]) / splitElement2;
+                    }
+                    if (Number(quantity) > Number(approvedQty)) {
+                        alert("Transter quantity must be samller or equal to Requested quantity.");
+                        $('#st_table tr').eq(ind).find('input.transfer_qty').focus();
+                        $('#st_table tr').eq(ind).find('input.transfer_qty').val(0);
+                        return;
+                    }
+                    if (Number(quantity) > Number(stockBalance)) {
+                        alert("Not enough stock balance to transfer.");
+                        $('#st_table tr').eq(ind).find('input.transfer_qty').focus();
+                        $('#st_table tr').eq(ind).find('input.transfer_qty').val(0);
+                        return;
+                    }
+                }
+            }
+        }
+    </script>
+}
+

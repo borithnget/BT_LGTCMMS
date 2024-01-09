@@ -1,0 +1,131 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Warehouse Krang Thnong:MR-21-08-018</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>
+                    <tbody>
+                        <tr>
+                            <td colspan="4"><img src="https://lgtss.com/Assets/images/lotusgreeenteam.png" style="height:110px; width:400px; margin-top:10px; "></td>
+                            <td colspan="4"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="8" style=""><h3></h3></td>
+                        </tr>
+                        <tr>
+                            <td colspan="8" style=""><h3></h3></td>
+                        </tr>
+                        <tr>
+                            <td colspan="8" style="font-size:12px;color:red;font-family:Century Gothic;">Note that material sourcing time is at least 7 days.</td>
+                        </tr>
+                        <tr>
+                            <td colspan="8" style="font-size:12px;text-align:center;font-size:1.5em;font-weight:bold;font-family:Century Gothic;">MATERIAL REQUEST (MR)</td>
+                        </tr>
+                        <tr>
+                            <td colspan="8" style=""><h3></h3></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td style="font-weight:bold;font-family:Century Gothic;text-align:left;">Requested By:</td>
+                            <td colspan="2" style="font-family:Century Gothic;text-align:left;">Kimsairng Chea</td>
+                            <td style="font-weight:bold;font-family:Century Gothic;text-align:right;">Project Name:</td>
+                            <td colspan="3" style="font-family:Century Gothic;text-align:left;">Warehouse Krang Thnong</td>
+                        </tr>
+                        <tr>
+                            <td colspan="8"></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td style="font-weight:bold;font-family:Century Gothic;text-align:left;">Request Date:</td>
+                            <td colspan="2" style="font-family:Century Gothic;text-align:left;">13-Aug-21</td>
+                            <td style="font-weight:bold;font-family:Century Gothic;text-align:right;">SO No:</td>
+                            <td colspan="3" style="font-family:Century Gothic;text-align:left;">sairng SO</td>
+                        </tr>
+                        <tr>
+                            <td colspan="8"></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td><label style="font-weight:bold;"></label></td>
+                            <td colspan="2"><label></label></td>
+                            <td style="font-weight:bold;font-family:Century Gothic;text-align:right;">MR No: </td>
+                            <td colspan="3" style="font-family:Century Gothic;text-align:left;">MR-21-08-018 </td>
+                        </tr>
+
+
+                        <tr>
+                            <td colspan="8" style="padding:20px;"><h2></h2></td>
+                        </tr>
+                        <tr>
+                            <th style="border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;width:50px;">No.</th>
+                            <th style="border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;">Item Code</th>
+                            <th colspan="2" style="border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;">Item Name</th>
+                            <th style="border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;">QTY</th>
+                            <th style="border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;">Unit</th>
+                            <th style="border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;">Remark</th>
+                            <th style="border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;">Approved QTY</th>
+                            <th style="border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;">Reason</th>
+                        </tr>
+                                <tr>
+                                    <td style="width:30px;border: 1px solid black;border-collapse: collapse;vertical-align:middle !important; font-family:Century Gothic;text-align:center !important;font-size:12px;">1</td>
+                                    <td style="text-align:center !important;vertical-align:middle !important;border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;font-size:12px;">543</td>
+                                    <td colspan="2" style="vertical-align:middle;border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;font-size:12px;"><p>Diamond Core Drill BIT 1 1/4"–7UNC DN180mmx400mm No Brand</p></td>
+                                    <td style="text-align:center !important;vertical-align:middle !important; border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;font-size:12px;">10</td>
+                                    <td style="text-align:center !important;vertical-align:middle !important; border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;font-size:12px;">pcs</td>
+                                    <td style="vertical-align:middle !important;border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;font-size:12px;"></td>
+                                    <td style="text-align:center !important;vertical-align:middle !important; border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;font-size:12px;">10</td>
+                                    <td style="border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;font-size:12px;"></td>
+                                </tr>
+                                <tr>
+                                    <td style="width:30px;border: 1px solid black;border-collapse: collapse;vertical-align:middle !important; font-family:Century Gothic;text-align:center !important;font-size:12px;">2</td>
+                                    <td style="text-align:center !important;vertical-align:middle !important;border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;font-size:12px;">152</td>
+                                    <td colspan="2" style="vertical-align:middle;border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;font-size:12px;"><p>PVC End Cap 13.5 DN65 (1 1/2") Blue Elephant</p></td>
+                                    <td style="text-align:center !important;vertical-align:middle !important; border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;font-size:12px;">10</td>
+                                    <td style="text-align:center !important;vertical-align:middle !important; border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;font-size:12px;">pcs</td>
+                                    <td style="vertical-align:middle !important;border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;font-size:12px;"></td>
+                                    <td style="text-align:center !important;vertical-align:middle !important; border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;font-size:12px;">10</td>
+                                    <td style="border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;font-size:12px;"></td>
+                                </tr>
+
+                        <tr>
+                            <td colspan="9" style="padding:20px;"><h2></h2></td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="2" style="font-family:Century Gothic;">Prepared By:</td>
+                            <td></td>
+                            <td colspan="2" style="font-family:Century Gothic;">Approved By:</td>
+                            <td></td>
+                            <td colspan="2" style="font-family:Century Gothic;">Approved By:</td>
+                        </tr>
+                        <tr>
+                            <td colspan="8"><h1></h1></td>
+                        </tr>
+                        <tr>
+                            <td colspan="8"><h1></h1></td>
+                        </tr>
+                        <tr>
+                            <td colspan="8"><h1></h1></td>
+                        </tr>
+                        <tr>
+                        
+                        </tr><tr>                           
+                            <td colspan="2" style="font-family:Century Gothic;">Tech Designer</td>
+                            <td></td>
+                            <td colspan="2" style="font-family:Century Gothic;">Technical director</td>
+                            <td></td>
+                            <td colspan="2" style="font-family:Century Gothic;">Project manager </td>
+                            
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="font-family:Century Gothic;">Name: Kimsairng Chea</td>
+                            <td></td>
+                            <td colspan="2" style="font-family:Century Gothic;">Name:</td>
+                            <td></td>
+                            <td colspan="2" style="font-family:Century Gothic;">Name:</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="font-family:Century Gothic;">Date: 13-Aug-21</td>
+                            <td></td>
+                            <td colspan="2" style="font-family:Century Gothic;">Date: </td>
+                            <td></td>
+                            <td colspan="2" style="font-family:Century Gothic;">Date: </td>
+                        </tr>
+
+                    </tbody>
+                </table></body></html>

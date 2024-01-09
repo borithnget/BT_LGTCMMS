@@ -1,0 +1,80 @@
+﻿@model BT_KimMex.Models.POInvoiceModel
+@{
+    ViewBag.Title = "View Invoice Detail";
+}
+<div class="w3-panel w3-card-4">
+    <div class="w3-container w3-display-container">
+        <h3 class="title">@ViewBag.Title</h3>
+
+    </div>
+    <div class="w3-container w3-display-container">
+        <div class="form-horizontal">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="control-label col-md-4">PO Number <strong class="text-danger">*</strong> :</label>
+                    <label class="col-md-8">@Model.po_Report.po_report_number</label>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-4">Invoice Date <strong class="text-danger">*</strong> :</label>
+                    <label class="col-md-8">@Model.invoice_date_text</label>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-4">Inv Number (Shipper):</label>
+                    <label class="col-md-8">@Model.invoice_number_shipper</label>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-4">Inv Amount:</label>
+                    <label class="col-md-8">@Model.invoice_amount</label>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-4">VAT Amount:</label>
+                    <label class="col-md-8">@Model.invoice_vat_amount</label>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-4">Inv Number (Forwarder):</label>
+                    <label class="col-md-8">@Model.invoice_number_forwarder</label>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-4">Transportation Fee:</label>
+                    <label class="col-md-8">@Model.transporation_fee</label>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-4">Import Duty:</label>
+                    <label class="col-md-8">@Model.import_duty</label>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-4 col-md-8">
+                        
+                        @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-danger" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="w3-card-4 w3-panel" style="margin-top:0px !important;">
+                    <div class="form-group row">
+                        <label class="control-label col-md-4">Project:</label>
+                        <label class="col-md-8" id="lbl_project_name">@Model.poReportTransaction.project</label>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-4">MR No.:</label>
+                        <label class="col-md-8" id="lbl_mr_number">@Model.poReportTransaction.mr</label>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-4">PR No.:</label>
+                        <label class="col-md-8" id="lbl_pr_number">@Model.poReportTransaction.pr</label>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-4">Quote No.:</label>
+                        <label class="col-md-8" id="lbl_quote_number">@Model.poReportTransaction.quote</label>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-4">PON No.:</label>
+                        <label class="col-md-8" id="lbl_pon_number">@Model.poReportTransaction.po</label>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

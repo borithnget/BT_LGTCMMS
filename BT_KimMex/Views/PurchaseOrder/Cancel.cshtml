@@ -1,0 +1,158 @@
+﻿@model BT_KimMex.Models.PurchaseOrderViewModel
+@{
+    ViewBag.Title = "Cancel";
+    BT_KimMex.Entities.kim_mexEntities db = new BT_KimMex.Entities.kim_mexEntities();
+}
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <h3 class="title">Cancel Quote by Supplier</h3>
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.purchase_order_id)
+        <div class="form-group">
+            @Html.Label("PO Date :", htmlAttributes: new { @class = "col-md-2" })
+            @Html.Label(Convert.ToDateTime(Model.created_date).ToString("dd-MMM-yyyy"), new { @class = "col-md-10", id = "current_date" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.purchase_oder_number, htmlAttributes: new { @class = "col-md-2" })
+            @Html.Label(Model.purchase_oder_number, new { @class = "col-md-10", id = "purchase_oder_number" })
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-2">PR Ref. :</label>
+            @Html.Label(Model.ir_no, new { @class = "col-md-10" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ir_project_id, htmlAttributes: new { @class = "col-md-2" })
+            @Html.Label(Model.project_full_name, new { @class = "col-md-10", id = "ir_project_id" })
+        </div>
+        <!--Rathana Add 10.04.2019-->
+        <div class="form-group">
+            @Html.LabelFor(m => m.POLNumber, new { @class = "col-md-2" })
+            <label class="col-md-10">@Model.POLNumber</label>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.ShippingTo, new { @class = "col-md-2" })
+            <label class="col-md-10">@BT_KimMex.Class.CommonClass.ConvertUserDetailIDToName(Model.ShippingTo)</label>
+        </div>
+        <!--End Rathana Add-->
+        <div class="row" style="margin:0 !important;">
+            <table class="table table-responsive table-bordered" id="po_table">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Item Code</th>
+                        <th>Item Name</th>
+                        <th>PO Unit</th>
+                        <th>PO Quantity</th>
+                        <th style="text-align:center;vertical-align:middle;">Cancel</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ 
+                        int rCount = 1;
+                        int count = 1;
+                        int sCount = 1;
+                        foreach(var supplier in Model.poSuppliers)
+                        {
+                            var roman = (Convert.ToChar(8543 + rCount)).ToString();
+                            count = 1;
+                            sCount = 1;
+                            foreach (var item in Model.poDetails)
+                            {
+                                var sup = item.poSuppliers;
+
+                                foreach (var ssup in sup)
+                                {
+                                    if (ssup.supplier_id == supplier.supplier_id)
+                                    {
+                                        sCount++;
+                                    }
+                                }
+
+                            }
+                            <tr>
+                                <td>@roman</td>
+                                <td colspan="4"><input type="hidden" class="supplier_id" value="@supplier.supplier_id" />@supplier.supplier_name</td>
+                                <td rowspan="@sCount" style="text-align:center;vertical-align:middle;"><input type='checkbox' class='selected_supplier' value='@supplier.supplier_id' /> Cancel</td>
+                            </tr>
+
+                            foreach (var item in Model.poDetails)
+                            {
+                                var sup = item.poSuppliers;
+
+                                foreach (var ssup in sup)
+                                {
+                                    if (ssup.supplier_id == supplier.supplier_id)
+                                    {
+                                        <tr>
+                                            <td>@count</td>
+                                            <td>@item.product_code</td>
+                                            <td>@item.product_name</td>
+                                            <td style="text-align:center;vertical-align:middle;">@db.tb_unit.Find(item.product_unit).Name</td>
+                                            <td style="text-align:center;vertical-align:middle;">@item.po_quantity</td>
+                                        </tr>
+                                        count++;
+                                    }
+                                }
+
+                            }
+                            rCount++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="button" id="btnSubmit" value="Submit" class="btn btn-default" />
+                <a href="javascript:history.back()" class="btn btn-default">Back</a>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('#btnSubmit').click(function () {
+                var po_id = $('#purchase_order_id').val();
+                var arrSup = [];
+                $('.selected_supplier:checkbox:checked').each(function () {
+                    var supplierId = $(this).val();
+                    arrSup.push(supplierId);
+                });
+
+                $.ajax({
+                    url: "@Url.Action("Cancel", "PurchaseOrder")",
+                    type: "post",
+                    dataType: "json",
+                    async: false,
+                    data: { id:po_id,suppliers:arrSup },
+                    success: function (da) {
+                        if (da.result == "success") {
+                            $.notify('Your data has been submitted!', { className: 'success' });
+                            window.location.href = '@Url.Action("Index","PurchaseOrder")';
+                        }
+                        else if (da.result == "error") {
+                            alert(da.message);
+                        }
+                        else {
+                            console.log(da.message);
+                            $.notify('Your data is error while submitting!', { className: 'error' });
+                        }
+                    },
+                    error: function (err) {
+                        $.notify('Your data is error while submitting!', { className: 'error' });
+                    }
+                });
+
+            });
+        });
+    </script>
+    }
+

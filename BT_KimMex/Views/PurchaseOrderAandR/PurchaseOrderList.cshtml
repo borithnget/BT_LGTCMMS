@@ -1,0 +1,183 @@
+﻿
+@{
+    ViewBag.Title = "PurchaseOrderList";
+}
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+<div class="well" style="padding:8px !important; padding-bottom:30px !important;">
+    <div class="form-group">
+        <label class="control-label col-md-2">Created Date:</label>
+        <div class="col-md-3">
+            <div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
+                <i class="fa fa-calendar"></i>&nbsp;
+                <span></span> <i class="fa fa-caret-down"></i>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="w3-button w3-tiny w3-blue" onclick="inititalDataTable()">Filter</button>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered" id="table_1">
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Date</th>
+                <th>Report Number</th>
+                <th>Quote Ref. No.</th>
+                <th>Supplier</th>
+                <th>Receive Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+</div>
+
+@section scripts{
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.3/moment.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+
+        $(function () {
+            var start = moment().subtract(29, 'days');
+            var end = moment();
+
+            function cb(start, end) {
+                $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            }
+
+            $('#reportrange').daterangepicker({
+                startDate: start,
+                endDate: end,
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                }
+            }, cb);
+
+            cb(start, end);
+            //$('#ddr_status').select2();
+            inititalDataTable();
+
+            $('#table_1 tbody').on('click', 'td a.btn_delete', function () {
+                var po_report_id = $(this).attr('id');
+                swal({
+                    title: "Confirmation",
+                    text: "Do you want to delete this request?",
+                    icon: "warning",
+                    buttons: true,
+                    //dangerMode: true,
+                })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $.ajax({
+                            url: "/PurchaseOrderAandR/DeletePurchaseOrderReportbyId",
+                            data: {
+                                'id': po_report_id,
+                                
+                            },
+                            type: 'GET',
+                            success: function (da) {
+                                swal("Request has been removed successfully.", {
+                                    icon: "success",
+                                });
+                                window.location.href = '@Url.Action("PurchaseOrderList", "PurchaseOrderAandR")';
+                            },
+                            error: function (err) {
+                                swal("Poof! " + err, {
+                                    icon: "error",
+                                });
+                            }
+                        });
+
+
+
+                    } else {
+                        //swal("Your imaginary file is safe!");
+                    }
+                });
+            });
+        });
+
+        function inititalDataTable() {
+
+            var t = $('#table_1').DataTable({
+                destroy: true,
+                //"responsive": true,
+                //"autoWidth": false,
+                //"scrollX": true,
+                "ajax": {
+                    "url": "/PurchaseOrderAandR/GetPurchaseOrderReportbyDaterange",
+                    "type": "GET",
+                    "datatype": "json",
+                    "data": {
+                        dateRange: $('#reportrange span').html(),
+                    }
+                },
+                "columns": [
+                    { "data": "po_report_id" },
+                    { "data": "created_at_text" },
+                    {
+                        "render": function (data, type, full, meta) {
+                            var btn = '<a href="/PurchaseOrderAandR/ViewPOReportDetail/' + full.po_report_id + '">' + full.po_report_number + '</a>';
+                            return btn;
+                        }
+                    },
+                    {
+                        "render": function (data, type, full, meta) {
+                            return '<a href="/PurchaseOrder/Detail/' + full.quote_entity.purchase_order_id + '">' + full.quote_entity.purchase_oder_number + '</a>';;
+                        }
+                    },
+                    {
+                        "render": function (data, type, full, meta) {
+                            return full.supplier_entity.supplier_name;
+                        }
+                    },
+                    {
+                        "render": function (data, type, full, meta) {
+                            if (full.is_completed==true) {
+                                return '<span class="label label-primary">Completed</span>';
+                            } else {
+                                return '<span class="label label-default">GRN Pending</span>';
+                            }
+                        }
+                    },
+                    {
+                        "render": function (data, type, full, meta) {
+                            //var btn = '<a href="javascript:void(0)" id="' + full.Id + '" class="btn btn-xs default btn-edit"><i class="fa fa-edit"></i> Edit</a> ';
+                            console.log(full);
+                            var btn = '<a href="javascript:void(0)" class="w3-button w3-tiny w3-blue-gray btn_delete" id="'+full.po_report_id+'"><i class="fa fa-trash"></i></a>';
+                            return btn;
+                        }
+                    },
+
+                ],
+                'columnDefs': [
+                    {
+                        "targets": 0,
+                        "className": "text-center",
+                    },
+
+
+                ],
+                "order": [[1, "desc"]],
+            });
+            t.on('order.dt search.dt', function () {
+                t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+
+        }
+
+    </script>
+    }

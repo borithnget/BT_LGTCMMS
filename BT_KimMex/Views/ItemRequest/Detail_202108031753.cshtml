@@ -1,0 +1,412 @@
+﻿@model  BT_KimMex.Models.ItemRequestViewModel
+    @using BT_KimMex.Class
+@using Microsoft.AspNet.Identity;
+@{
+    ViewBag.Title = "Detail";
+    //Layout = "~/Views/Shared/_LayoutBackend.cshtml";
+    //ViewBag.PageTitle = "View Material Request Detail";
+    //ViewBag.Controller = "Material Request";
+    //ViewBag.Action = "View Detail";
+    //ViewBag.MRActive = "active";
+    bool isSM = false;
+    bool isEE = false;
+    bool isMSC = false;
+    bool isAdmin = false;
+    bool isSMs = false;
+    if (User.IsInRole("Admin"))
+    {
+        isAdmin = true;
+    }
+    if (User.IsInRole("Site Admin")||User.IsInRole("Site Supervisor"))
+    {
+        isSM = true;
+    }
+    if (User.IsInRole("Technical Department") || User.IsInRole("Project Manager"))
+    {
+        isEE = true;
+    }
+    if (User.IsInRole("Main Stock Controller") || User.IsInRole("Site Supervisor"))
+    {
+        isMSC = true;
+    }
+
+    if (User.IsInRole("Site Manager"))
+    {
+        isSMs = true;
+    }
+    string userid = User.Identity.GetUserId();
+}
+<h3 class="title">View Material Request Detail</h3>
+
+<div class="form-horizontal">
+    <div class="row">
+        @Html.HiddenFor(model => model.ir_id)
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.Label("MR Date:", new { @class = "col-md-4" })
+                <label class="col-md-8" id="date">@Convert.ToDateTime(Model.created_date).ToString("dd/MM/yyyy")</label>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4">MR No.:</label>
+                @Html.DisplayFor(model => model.ir_no, new { @class = "col-md-8" })
+            </div>
+            <div class="form-group">
+                @Html.Label("Project Name:", new { @class = "col-md-4" })
+                @Html.DisplayFor(model => model.project_full_name, new { @class = "col-md-8" })
+            </div>
+            <div class="form-group">
+                @Html.Label("Purpose of Purchase:", new { @class = "col-md-4" })
+                @Html.DisplayFor(model => model.purpose_description, new { @class = "col-md-8" })
+            </div>
+        </div>
+        <div class="col-md-6">
+
+        </div>
+    </div>
+    <div class="row" style="margin:0 !important;">
+        <table class="table table-bordered" id="ir_table">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Item Code</th>
+                    <th>Item Name</th>
+                    
+                    @*<th>Item Unit</th>
+                    <th>BOQ Balance</th>*@
+                    <th>Requested QTY</th>
+                    <th>Requested Unit</th>
+                    <th>Remark</th>
+                    @*<th>Remark</th>*@
+                    <th>Approved QTY</th>
+                    <th>Reason</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int ddCount = 1;
+                    foreach (var ddIr in Model.ir1[0].ir2)
+                    {
+                        string requestQty = string.Format("{0:G29}", decimal.Parse(ddIr.ir_qty.ToString()));
+                        <tr>
+                            <td>@ddCount</td>
+                            <td style="text-align:center !important;vertical-align:middle !important;">@ddIr.product_code</td>
+                            <td>@ddIr.product_name</td>
+                                @*<td>@ddIr.product_unit</td>
+                                <td>@ddIr.boq_qty</td>*@
+                            <td style="text-align:center !important;vertical-align:middle !important;">@requestQty</td>
+                            <td style="text-align:center !important;vertical-align:middle !important;">@ddIr.requested_unit</td>
+                            <td>@ddIr.remark</td>
+                            @*<td><strong style="color:red !important;">@ddIr.remark</strong></td>*@
+                            <td style="text-align:center !important;vertical-align:middle !important;"><strong style="color:green !important;">@ddIr.approved_qty</strong></td>
+                            <td>@ddIr.reason</td>
+                        </tr>
+                        ddCount++;
+                    }
+                    @*int dCount = 1;
+                    var dIRs = Model.ir1;
+                    foreach (var dIr in dIRs)
+                    {
+                        var roman = (Convert.ToChar(8543 + dCount)).ToString();
+                        <tr>
+                            <td>@roman</td>
+                            <td colspan="9">@dIr.job_category_description</td>
+                        </tr>
+                        int ddCount = 1;
+                        foreach(var ddIr in dIr.ir2)
+                        {
+                            string requestQty = string.Format("{0:G29}", decimal.Parse(ddIr.ir_qty.ToString()));
+                            <tr>
+                                <td>@ddCount</td>
+                                <td style="text-align:center !important;vertical-align:middle !important;">@ddIr.product_code</td>
+                                <td>@ddIr.product_name</td>
+                                @*<td>@ddIr.product_unit</td>
+                                <td>@ddIr.boq_qty</td>
+                                <td style="text-align:center !important;vertical-align:middle !important;">@requestQty</td>
+                                <td style="text-align:center !important;vertical-align:middle !important;">@ddIr.requested_unit</td>
+                                <td>@ddIr.remark</td>
+                                @*<td><strong style="color:red !important;">@ddIr.remark</strong></td>
+                                <td style="text-align:center !important;vertical-align:middle !important;"><strong style="color:green !important;">@ddIr.approved_qty</strong></td>
+                                <td>@ddIr.reason</td>
+                            </tr>
+                            ddCount++;
+                        }
+                        dCount++;
+                    }*@
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="form-group">
+        @{
+            string remark = "Requested by " + Model.created_by;
+            if (!string.IsNullOrEmpty(Model.approved_by))
+            {
+                remark = remark + " and Approved by " +Model.approved_by;
+            }
+            <label class="col-md-2">Remark:</label>
+            <div class="col-md-10"><label>@remark</label></div>
+        }
+        
+    </div>
+    <div class="form-group">
+        <label class="col-md-2">Attachment Reference:</label>
+        <div class="col-md-10">
+            <a class="title" href="/ItemRequest/Download/?p=@(Model.att_id + Model.ir_attachment_extension)&d=@Model.ir_attachment_name">@Model.ir_attachment_name</a>
+        </div>
+    </div>
+    @if (Model.rejects.Count() > 0)
+    {
+        <div class="form-group">
+            <label class="control-label col-md-2">Reject Command:</label>
+            <div class="col-md-10">
+                <ul>
+                    @foreach(var reject in Model.rejects)
+                    {
+                        <li>@reject.comment <b>By @reject.rejected_by</b></li>
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            @{
+                if ((isAdmin || isSM) && (Model.ir_status == "Rejected" || Model.ir_status == "Pending"))
+                {
+                    @*<a href="@Url.Action("Edit","ItemRequest",new { id = Model.ir_id })" class="btn btn-default">Edit</a>*@
+                    <a href="javascript:void(0)" class="w3-button w3-tiny w3-deep-orange" id="btn-cancel-request">Request Cancel</a>
+                }
+                if ((isAdmin) && (Model.ir_status == "Pending"))
+                {
+                    <a href="@Url.Action("Approved","ItemRequest",new { id = Model.ir_id })" class="w3-button w3-tiny w3-teal">Approve</a>
+                    <a href='javascript:void(0)' class='w3-button w3-tiny w3-red reject-promp' id=''>Reject</a>
+                }
+
+                if ((isSMs) && (Model.ir_status == "Pending"))
+                {
+                    <span id="showbysitemanager">
+                        <a href="@Url.Action("Approved","ItemRequest",new { id = Model.ir_id })" class="btn btn-default">Approve</a>
+                        @*<a href='javascript:void(0)' class='btn btn-default approve-promp' id=''>Approve</a>*@
+                        <a href='javascript:void(0)' class='btn btn-default reject-promp' id=''>Reject</a>
+                    </span>
+                }
+
+                @*if ((isSMs) && (Model.ir_status == "Pending"))
+            {
+                <span id="showbysitemanager">
+                    <a  href="@Url.Action("Approved","ItemRequest",new { id = Model.ir_id })" class="btn btn-default">Approve</a>
+                    <a  href='javascript:void(0)' class='btn btn-default reject-promp' id=''>Reject</a>
+                </span>
+            }*@
+
+                if ((User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser)) && (Model.ir_status == "Approved") && !Model.isCompleted && Model.is_mr == false)
+                {
+                    <a href="@Url.Action("CheckStockBalance", "Stock",new { id = Model.ir_id })" class="w3-button w3-tiny w3-teal">Check Stock Balance from Site Stock</a>
+                    <a href="@Url.Action("CheckStockBalanceWorkshop", "Stock",new { id = Model.ir_id })" class="w3-button w3-tiny w3-green">Check Stock Balance from Workshop</a>
+                }
+            }
+            <a href="javascript:history.back()" class="w3-button w3-tiny w3-red">Back</a>
+            <input type="button" value="Print" class="w3-button w3-tiny w3-teal" id="btnPrint" />
+
+        </div>
+    </div>
+</div>
+
+<!-- approve project modal popup-->
+<div class="modal fade" id="approveModal" tabindex="=-1" role="dialog" aria-labelledby="approveModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-warning">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to <strong>Approve</strong> this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default approve-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- reject project modal popup-->
+<div class="modal fade" id="rejectModal" tabindex="=-1" role="dialog" aria-labelledby="rejectModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-warning">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <p class="success-message col-md-12">Are you sure to <strong>Reject</strong> this item?</p>
+                    <label class="col-md-2">Comment:</label>
+                    <div class="col-md-10">
+                        <textarea class="form-control" rows="5" id="reject-comment"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default reject-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- cancel request modal popup-->
+<div class="modal fade" id="cancelRequestModal" tabindex="=-1" role="dialog" aria-labelledby="approveModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-warning">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to cancel this request?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" id="btn-cancel-yes">Yes</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        
+        $(function () {
+            var ir_id = '@Model.ir_id';
+            //$('#date').text(getFormattedDateMMDDYYYY(new Date('@Model.created_date')));
+
+            $('.approve-promp').click(function () {
+                $('#approveModal').modal('show');
+            });
+            $('.approve-confirm').click(function () {
+                if (ir_id != '') {
+                    $.ajax({
+                        url: "/ItemRequest/Approve",
+                        data: {
+                            'id': ir_id,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#approveModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been approved!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index","ItemRequest")';
+                            }
+                            else
+                                $.notify('Your data has been error while approving!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.approve-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while approving!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+            $('.reject-promp').click(function () {
+                $('#rejectModal').modal('show');
+            });
+            $('.reject-confirm').click(function () {
+                if (ir_id != '') {
+                    var rejectComment = $('#reject-comment').val();
+                    $.ajax({
+                        url: "/ItemRequest/Reject",
+                        data: {
+                            'id': ir_id,
+                            'comment': rejectComment,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#rejectModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been rejected!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index","ItemRequest")';
+                            }
+                            else
+                                $.notify('Your data has been error while rejecting!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.reject-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while rejecting!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+            $('#btn-cancel-request').click(function () {
+                $('#cancelRequestModal').modal('show');
+            });
+            $('#btn-cancel-yes').click(function () {
+                if (ir_id != '') {
+                    $.ajax({
+                        url: "/ItemRequest/RequestCancel",
+                        data: {
+                            'id': ir_id,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#approveModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been approved!', { className: 'success' });
+                                window.location.href = '@Url.Action("MyRequest", "ItemRequest")';
+                            }
+                            else
+                                $.notify('Your data has been error while approving!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.approve-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while approving!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+             $('#btnPrint').click(function () {
+                var id = $('#ir_id').val();
+                $.ajax({
+                    url: "@Url.Action("Print","ItemRequest")",
+                    type: "post",
+                    dataType: "json",
+                    async: false,
+                    data: { id:id },
+                    success: function (da) {
+                        if (da.result == "success") {
+                            window.location.href = "/ItemRequest/MRReport?id="+da.id;
+                        }
+                    },
+                    error: function (err) {
+                        $.notify('Your data is error while saving!', { className: 'error' });
+                    }
+                });
+            });
+        });
+    </script>
+    }

@@ -1,0 +1,158 @@
+﻿@model IEnumerable<BT_KimMex.Models.SupplierViewModel>
+@using BT_KimMex.Class
+@{
+    ViewBag.Title = "Index";
+}
+<div class="w3-container">
+    <h3>Supplier List</h3>
+</div>
+<div class="w3-container">
+    <table class="table table-bordered" id="SupplierTable">
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>
+                    @Html.DisplayName("Supplier Name")
+                </th>
+                <th>
+                    @Html.DisplayName("Telephone")
+                </th>
+                <th>
+                    @Html.DisplayName("Email")
+                </th>
+                <th>VAT (%)</th>
+                <th>Supplier Type</th>
+                <th>View</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+
+
+<!-- delete modal popup-->
+<div class="modal fade" id="myModal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to delete this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success delete-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            var supplier_id;
+            InitialDataTable();
+
+            if ('@TempData["message"]' != null) {
+                $.notify('@TempData["message"]', { className: 'success' });
+            }
+
+            $('#SupplierTable tbody').on('click', 'td a.delete-promp', function () {
+                supplier_id = $(this).attr('id');
+                $('#myModal').modal('show');
+            });
+
+            $('.delete-confirm').click(function () {
+                if (supplier_id != '') {
+                    $.ajax({
+                        url: "/Supplier/Delete",
+                        data: {
+                            'id': supplier_id,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#myModal').modal('hide');
+                            if (da.Message == "Success")
+                            {
+                                if ('@TempData["message"]' != null) {
+                                    $.notify('Your data has been deleted!', { className: 'success' });
+                                }
+                                window.location.href = '@Url.Action("Index", "Supplier")';
+                            }
+                            else if (da.Message == "fail")
+                                $.notify('Your data has been error while deleting!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while deleting!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+        });
+
+        function InitialDataTable() {
+            var t=$('#SupplierTable').DataTable({
+                "ajax": {
+                    "url": "@Url.Action("SupplierDataTable", "Supplier")",
+                    "type": "GET",
+                    "dataType": "json"
+                },
+                "columns": [
+                    {"data":"supplier_id"},
+                    { "data": "supplier_name" },
+                    { "data": "supplier_phone" },
+                    { "data": "supplier_email" },
+                    { "data": "discount" },
+                    //{
+                    //    "data": "created_date", render: function (data, type, full, meta) {
+                    //        if (data)
+                    //            return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                    //        else return '';
+                    //    }
+                    //},
+                    { "data": "supplier_type" },
+                    {
+                        "render": function (data, type, full, meta) {
+                            return '<a href="/Supplier/Details/' + full.supplier_id + '" class="w3-button w3-tiny w3-green">View Detail</a>';
+                        }
+                    },
+                    {
+                        "render": function (data, type, full, meta) {
+                            return '<a href="/Supplier/Edit/' + full.supplier_id + '" class="w3-button w3-tiny w3-orange">Edit</a>';
+                        }
+                    },
+                    {
+                        "render": function (data, type, full, meta) {
+                            return '<a href="javascript:void(0)" id="' + full.supplier_id + '" class="delete-promp w3-button w3-tiny w3-red">Delete</a>';
+                        }
+                    },
+                ],
+                "order": [[1, "asc"]],
+            });
+            t.on('order.dt search.dt', function () {
+                t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+            $('select[name="SupplierTable_length"]').addClass('datatable-control');
+            $('input[aria-controls="SupplierTable"]').addClass('datatable-control');
+            $('#SupplierTable_filter').append('<a href="@Url.Action("Create", "Supplier")" class="w3-button w3-tiny w3-teal pull-left" style="margin-right:10px !important;">Add New</a>');
+        }
+    </script>
+}

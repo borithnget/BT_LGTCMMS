@@ -1,0 +1,135 @@
+﻿@model BT_KimMex.Models.ItemBlockingViewModel
+@using BT_KimMex.Class;
+@{
+    ViewBag.Title = "Item Blocking Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3 class="title">View Item Blocking Detail</h3>
+
+<div class="form-horizontal">
+    <div class="form-group">
+        <label class="control-label col-md-2">Date:</label>
+        <label class="col-md-10">@CommonClass.ToLocalTime(Convert.ToDateTime(Model.created_at)).ToString("dd/MM/yyyy")</label>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2">Created By:</label>
+        <label class="col-md-10">@CommonFunctions.GetUserFullnamebyUserId(Model.created_by)</label>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2">Item Blocking Number:</label>
+        <label class="col-md-10">@Model.item_blocking_number</label>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2">Warehouse <strong class="text-danger">*</strong>:</label>
+        <label class="col-md-10">@Model.warehouse_name</label>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2">Project:</label>
+        <label class="col-md-10" id="project_full_name">@Model.project_name</label>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-bordered" id="table">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Item Code</th>
+                    <th>Item Name</th>
+                    <th>Item Unit</th>
+                    @*<th>Stock Balance</th>*@
+                    @*<th><input type='checkbox' value='' class='' id="head_block" /> Block</th>*@
+                    <th>Block QTY</th>
+                    <th>Reason</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int count = 1;
+                    foreach (var item in Model.itemBlockingDetails)
+                    {
+                        <tr>
+                            <td>@count</td>
+                            <td class="text-center">@item.item_code</td>
+                            <td>@item.item_name</td>
+                            <td>@item.item_unit</td>
+                            <td class="text-center">@item.block_qty</td>
+                            <td>@item.remark</td>
+                        </tr>
+                        count++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            @if (string.Compare(Model.item_blocking_status, Status.Active) == 0)
+            {
+                <a href="javascript:void(0)" class="w3-button w3-tiny w3-deep-orange" id="btn-deactive-request">De-active</a>
+            }
+            <a href="javascript:history.back()" class="w3-button w3-tiny w3-red">Back</a>
+        </div>
+    </div>
+</div>
+
+<!-- cancel request modal popup-->
+<div class="modal fade" id="cancelRequestModal" tabindex="=-1" role="dialog" aria-labelledby="approveModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-warning">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to de-active this request?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" id="btn-cancel-yes">Yes</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            var item_blocking_id = '@Model.item_blocking_id';
+            $('#btn-deactive-request').click(function () {
+                $('#cancelRequestModal').modal('show');
+            });
+            $('#btn-cancel-yes').click(function () {
+                if (item_blocking_id != '') {
+                    $.ajax({
+                        url: "/Stock/ItemBlockingDeactive",
+                        data: {
+                            'id': item_blocking_id,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#cancelRequestModal').modal('hide');
+                            if (da.result == "success") {
+                                alert('Your request has been de-actived successfully.');
+                                window.location.href = '@Url.Action("ItemBlocking", "Stock")';
+                            }
+                            else
+                                alert('Your data has been error while submitting.');
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.approve-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while approving!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

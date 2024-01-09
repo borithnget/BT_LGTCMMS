@@ -1,0 +1,189 @@
+﻿@model BT_KimMex.Models.StockAdjustmentViewModel
+
+@{
+    ViewBag.Title = "Approve/ Feedback";
+}
+<style type="text/css">
+    #stockAdjustmenttable tr td {
+        vertical-align: middle !important;
+    }
+
+        #stockAdjustmenttable tr td:nth-child(5), #stockAdjustmenttable tr td:nth-child(7), #stockAdjustmenttable tr td:nth-child(6) {
+            text-align: center !important;
+        }
+
+    #stockAdjustmenttable .form-control {
+        width: auto !important;
+        padding: 0px !important;
+        font-size: 10px !important;
+    }
+</style>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        @Html.HiddenFor(model => model.stock_adjustment_id)
+        <h3 class="title">Approve/Feedback Stock Adjustment</h3>
+        @Html.HiddenFor(model => model.stock_adjustment_id)
+        <div class="form-group">
+            @Html.Label("Date :", htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.Label(BT_KimMex.Class.CommonClass.ToLocalTime(Convert.ToDateTime(Model.created_date)).ToString("dd/MM/yyyy"), new { @class = "col-md-10", id = "current_date" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.stock_adjuctment_code, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.Label(Model.stock_adjuctment_code as string, new { @class = "col-md-10", id = "stockAdjuestmentNo" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.warehouse_id, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.Label(Model.warehouse_name as string, new { @class = "col-md-10", id = "warehouse_name" })
+        </div>
+        <div class="row" style="margin:0 !important;">
+            <table class="table table-bordered" id="stockAdjustmenttable" style="margin-top:0px !important;">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Item Code</th>
+                        <th>Item Name</th>
+                        <th>Item Unit</th>
+                        <th>Stock Balance</th>
+                        <th>Count QTY</th>
+                        <th>Variance QTY</th>
+                        @*<th>Approve</th>
+                        <th>Feedback</th>*@
+                        <th>Reason</th>
+                        <th><label><input type="radio" class="approval" name="app_header" value="approved"> Approve</label></th>
+                        <th><label><input type="radio" class="approval" name="app_header" value="feedbacked"> Feedback</label></th>
+                        <th>Comment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int count = 1;
+                        foreach (BT_KimMex.Models.InventoryViewModel item in Model.items)
+                        {
+                            double variance = Convert.ToDouble(item.total_quantity - item.out_quantity);
+                            var rowId = "i" + count;
+                            var name = "item" + count;
+                            if (string.Compare(item.item_status, "approved") == 0)
+                            {
+                                <tr id='@rowId'>
+                                    <td>@count</td>
+                                    <td>
+                                        <input type='hidden' value='@item.inventory_id' class='' />
+                                        <label class='item_code'>@item.itemCode</label>
+                                    </td>
+                                    <td><label class='item_name'>@item.itemName</label></td>
+                                    <td><label class='item_unit'>@item.unitName</label></td>
+                                    <td><label class='stock_balance'>@string.Format("{0:G29}", decimal.Parse(item.total_quantity.ToString()))</label></td>
+                                    <td><label>@string.Format("{0:G29}", decimal.Parse(item.out_quantity.ToString()))</label></td>
+                                    <td><label class='variance_qty'>@variance</label></td>
+                                    <td>@item.reason</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>@item.remark</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr id='@rowId'>
+                                    <td>@count</td>
+                                    <td>
+                                        <input type='hidden' value='@item.inventory_id' class='adjustment_detail_id' />
+                                        <label class='item_code'>@item.itemCode</label>
+                                    </td>
+                                    <td><label class='item_name'>@item.itemName</label></td>
+                                    <td><label class='item_unit'>@item.unitName</label></td>
+                                    <td><label class='stock_balance'>@string.Format("{0:G29}", decimal.Parse(item.total_quantity.ToString()))</label></td>
+                                    <td><label>@string.Format("{0:G29}", decimal.Parse(item.out_quantity.ToString()))</label></td>
+                                    <td><label class='variance_qty'>@variance</label></td>
+                                    <td>@item.reason</td>
+                                    <td><label><input type="radio" class="approval" name="@name" value="approved"> Approve</label></td>
+                                    <td><label><input type="radio" class="approval" name="@name" value="feedbacked"> Feedback</label></td>
+                                    <td>
+                                        <textarea class="form-control feedback_comment">@item.remark</textarea>
+                                    </td>
+                                </tr>
+                            }
+
+                            count++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="button" value="Submit" class="btn btn-default" onclick="approveFeedbackStockAdjustment()" />
+                @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-default" })
+            </div>
+        </div>
+    </div>
+                        }
+@section Scripts{
+    <script type="text/javascript">
+
+        $(function () {
+
+            $('input:radio[name="app_header"]').change(function () {
+                if ($(this).is(':checked') && $(this).val() == 'approved') {
+                    // append goes here
+                    var inventoryDetailsId = $('.adjustment_detail_id');
+                    var countTableRow = $('#stockAdjustmenttable tbody tr').length;
+                    for (var i = 1; i <= countTableRow; i++) {
+                        $("input[name=item" + i + "][value='approved']").prop("checked", true);
+                    }
+                } else {
+                    var inventoryDetailsId = $('.adjustment_detail_id');
+                    var countTableRow = $('#stockAdjustmenttable tbody tr').length;
+                    for (var i = 1; i <= countTableRow; i++) {
+                        $("input[name=item" + i + "][value='feedbacked']").prop("checked", true);
+                    }
+                }
+            });
+
+        });
+
+        function approveFeedbackStockAdjustment() {
+            var models = [];
+            var item_element = {};
+            var countInvalidStatus = 0;
+            var stockAdjustmentId = $('#stock_adjustment_id').val();
+            var inventoryDetailsId = $('.adjustment_detail_id');
+            var feedbackComments = $('.feedback_comment');
+            var countTableRow = $('#stockAdjustmenttable tbody tr').length;
+            for (var i = 1; i <= inventoryDetailsId.length; i++) {
+                var item_status = $('input[name=item' + i + ']:checked').val();
+                //if (!item_status) countInvalidStatus++;
+                var idx = Number(i - 1);
+                item_element = {};
+                item_element.inventory_id = inventoryDetailsId[idx].value;
+                item_element.item_status = item_status;
+                item_element.remark = feedbackComments[idx].value;
+                models.push(item_element);
+            }
+            if (countInvalidStatus > 0) {
+                alert("Please select Approve or Feedback option for each item.");
+                return;
+            }
+            $.ajax({
+                url: "@Url.Action("ApproveFeedback", "StockAdjustment")",
+                type: "post",
+                dataType: "json",
+                async: false,
+                data: { id: stockAdjustmentId, models: models },
+                success: function (da) {
+                    if (da.result == "success") {
+                        alert('Your data has been sumitted successfully.');
+                        window.location.href = '@Url.Action("Index")';
+                    } else {
+                        alert('Your data is error while sumiting.');
+                    }
+                },
+                error: function (err) {
+                    alert('Your data is error while sumiting.');
+                }
+            });
+        }
+    </script>
+}
+

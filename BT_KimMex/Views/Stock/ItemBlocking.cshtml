@@ -1,0 +1,129 @@
+﻿@model IEnumerable<BT_KimMex.Models.ItemBlockingViewModel>
+@using BT_KimMex.Class;
+@{
+    ViewBag.Title = "ItemBlocking";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3 class="title">Item Blocking List</h3>
+<div class="table-responsive">
+    <table class="table table-bordered" id="table">
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Date</th>
+                <th>Item Blocking No.</th>
+                <th>Warehouse</th>
+                <th>Project</th>
+                <th>Created By</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int count = 1;
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@count</td>
+                        <td>@CommonClass.ToLocalTime(Convert.ToDateTime(item.created_at)).ToString("dd/MM/yyyy")</td>
+                        <td>@item.item_blocking_number</td>
+                        <td>@item.warehouse_name</td>
+                        <td>@item.project_name</td>
+                        <td>@BT_KimMex.Class.CommonFunctions.GetUserFullnamebyUserId(item.created_by)</td>
+                        <td class="text-center">
+                            @if (string.Compare(item.item_blocking_status, Status.Active) == 0)
+                            {
+                                <label class="label w3-green">@ShowStatus.Active</label>
+                            }
+                            else
+                            {
+                                <label class="label w3-red">@ShowStatus.DeActive</label>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <div class="w3-bar">
+                                <a href="@Url.Action("ItemBlockingDetails","Stock",new { id = item.item_blocking_id })" class="w3-button w3-tiny w3-green"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                                @if (string.Compare(item.item_blocking_status, Status.Active) == 0)
+                                {
+                                    <a href="javascript:void(0)" class="w3-button w3-tiny w3-red cancel-promp" id="@item.item_blocking_id"><i class="fa fa-ban" aria-hidden="true"></i></a>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                    count++;
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- cancel request modal popup-->
+<div class="modal fade" id="cancelRequestModal" tabindex="=-1" role="dialog" aria-labelledby="approveModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-warning">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to de-active this request?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" id="btn-cancel-yes">Yes</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            var item_blocking_id = '';
+
+            $('#table').DataTable({});
+            $('#table_filter').append('<a href="@Url.Action("CreateItemBlocking", "Stock")" class="w3-button w3-tiny w3-teal pull-left" style="margin-right:10px !important;">Create New</a>');
+
+            $('#table tbody').on('click', 'td a.cancel-promp', function () {
+                item_blocking_id = $(this).attr('id');
+                //console.log(mr_cut_id);
+                $('#cancelRequestModal').modal('show');
+            });
+
+            $('#btn-cancel-yes').click(function () {
+                if (item_blocking_id != '') {
+                    $.ajax({
+                        url: "/Stock/ItemBlockingDeactive",
+                        data: {
+                            'id': item_blocking_id,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#cancelRequestModal').modal('hide');
+                            if (da.result == "success") {
+                                alert('Your request has been de-actived successfully.');
+                                window.location.href = '@Url.Action("ItemBlocking", "Stock")';
+                            }
+                            else
+                                alert('Your data has been error while submitting.');
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.approve-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while approving!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

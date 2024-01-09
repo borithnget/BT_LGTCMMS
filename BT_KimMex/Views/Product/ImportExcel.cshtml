@@ -1,0 +1,128 @@
+﻿@*@model IEnumerable<BT_KimMex.Class.ExcelProductViewModel>*@
+@model BT_KimMex.Class.ImportProductExcelReasponse
+@{
+    //ViewBag.Title = "ImportExcel";
+    ViewBag.Title = "Import Product from Excel";
+}
+
+<div class="panel panel-default">
+    <div class="panel-heading">@ViewBag.Title</div>
+    <div class="panel-body">
+        @using (Html.BeginForm("ImportExcel", "Product", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            <div class="row form-group">
+                <label class="control-label col-md-3 ">Excel File (.xlsx || .xls) <strong class="text-danger">*</strong> : </label>
+                <div class="col-md-8">
+                    <input type="file" name="fileName" id="fileName" class="form-control m0" />
+                </div>
+            </div>
+            <div class="form-group row">
+
+                <div class="col-lg-offset-3 col-md-9 ml-auto">
+                    <button type="submit" class="btn btn-primary" id="">Submit</button>
+                    <a href="javascript:history.back()" class="btn btn-danger btn-site">Back</a>
+                </div>
+            </div>
+        }
+        @if (Model != null)
+        {
+            <h3>@Model.message</h3>
+            <div class="row col-12 col-md-12 col-xl-12">
+                <h3>Total Imported Product : @Model.successProducts.Count()</h3>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Group</th>
+                                <th>Sub Group</th>
+                                <th>Category</th>
+                                <th>Type</th>
+                                <th>Class</th>
+                                <th>Size</th>
+                                <th>Color</th>
+                                <th>Brand</th>
+                                <th>Facetory Code</th>
+                                <th>Product Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int count = 1;
+                                foreach (var item in Model.successProducts)
+                                {
+                                    BT_KimMex.Models.ProductViewModel product = BT_KimMex.Models.ProductViewModel.GetProductItem(item.product_id);
+                                    <tr>
+                                        <td>@product.product_code</td>
+                                        <td>@product.class_name</td>
+                                        <td>@product.sub_group_name</td>
+                                        <td>@product.p_category_name</td>
+                                        <td>@product.product_type_name</td>
+                                        <td>@product.product_class_name</td>
+                                        <td>@product.product_size_name</td>
+                                        <td>@product.color_name</td>
+                                        <td>@product.brand_name</td>
+                                        <td>@product.model_factory_code</td>
+                                        <td>@product.product_name</td>
+                                    </tr>
+                                    count++;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row col-12 col-md-12 col-xl-12">
+                <h3>Total Fail/Exist Import Product : @Model.failProducts.Count()</h3>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Group</th>
+                                <th>Sub Group</th>
+                                <th>Category</th>
+                                <th>Type</th>
+                                <th>Class</th>
+                                <th>Size</th>
+                                <th>Color</th>
+                                <th>Brand</th>
+                                <th>Facetory Code</th>
+                                <th>Product Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                
+                                foreach (var item in Model.failProducts)
+                                {
+                                    BT_KimMex.Models.ProductViewModel product = BT_KimMex.Models.ProductViewModel.GetProductItem(item.product_id);
+                                    <tr>
+                                        <td>@product.product_code</td>
+                                        <td>@product.class_name</td>
+                                        <td>@product.sub_group_name</td>
+                                        <td>@product.p_category_name</td>
+                                        <td>@product.product_type_name</td>
+                                        <td>@product.product_class_name</td>
+                                        <td>@product.product_size_name</td>
+                                        <td>@product.color_name</td>
+                                        <td>@product.brand_name</td>
+                                        <td>@product.model_factory_code</td>
+                                        <td>@product.product_name</td>
+                                    </tr>
+                                    count++;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+

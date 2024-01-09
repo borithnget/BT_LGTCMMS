@@ -1,0 +1,569 @@
+﻿@model BT_KimMex.Models.StockTransferViewModel
+@using BT_KimMex.Class
+@{
+    ViewBag.Title = "Detail";
+    string date =CommonClass.ToLocalTime(Convert.ToDateTime(Model.created_date)).ToString("dd/MM/yyyy");
+    bool isMSC = false;
+    bool isCFO = false;
+    bool isAdmin = false;
+    bool isPCH = false;
+    bool isQA = false;
+    bool isQAisPCH = false;
+    if (User.IsInRole(Role.SystemAdmin))
+    {
+        isAdmin = true;
+    }
+    if (User.IsInRole("Procurement"))
+    {
+        isMSC = true;
+    }
+    if(User.IsInRole("Site Manager"))
+    {
+        isCFO = true;
+    }
+    if (User.IsInRole(Role.Purchaser))
+    {
+        isPCH = true;
+    }
+    if (User.IsInRole(Role.QAQCOfficer))
+    {
+        isQA = true;
+    }
+    if (User.IsInRole(Role.QAQCOfficer) && User.IsInRole(Role.Purchaser))
+    {
+        isQAisPCH = true;
+    }
+
+    BT_KimMex.Entities.kim_mexEntities db=new BT_KimMex.Entities.kim_mexEntities();
+}
+<style type="text/css">
+    #st_table tr td{
+        vertical-align:middle !important;
+    }
+    #st_table tr td:nth-child(4),#st_table tr td:nth-child(6){
+        text-align:center !important;
+    }
+</style>
+
+<div class="w3-panel w3-card-4">
+    <div class="w3-container w3-display-container">
+        <h3 class="title">View Stock Transfer Detail</h3>
+        <button class="w3-button w3-tiny w3-display-topright w3-white w3-border w3-border-blue" style="margin-top:20px !important;" id="btn_show_history"><i class="fa fa-history" aria-hidden="true"></i> View History</button>
+    </div>
+    <div class="form-horizontal">
+
+        <div class="row">
+            <div class="form-group">
+                @Html.Label("Date:", new { @class = "control-label col-md-2" })
+                @Html.Label(date, new { @class = "col-md-10" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.stock_transfer_no, new { @class = "control-label col-md-2" })
+                @Html.DisplayFor(model => model.stock_transfer_no, new { @class = "col-md-10" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.item_request_no, new { @class = "control-label col-md-2" })
+                @Html.DisplayFor(model => model.item_request_no, new { @class = "col-md-10" })
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2">Project:</label>
+                <label class="col-md-10">@Model.project_fullname</label>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2">Warehouse:</label>
+                <label class="col-md-10" id="warehouse">@Model.warehouse_name</label>
+            </div>
+        </div>
+
+
+        <div class="row" style="margin:0 !important;">
+            <table class="table table-bordered" id="st_table">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Item Code</th>
+                        <th>Item Name</th>
+                        @*@{
+                                if (string.Compare(Model.stock_transfer_status, "Approved") != 0)
+                                {
+                                    <th>Stock Balance</th>
+                                }
+                            }*@
+                        <th>Requested QTY</th>
+                        <th>From Warehouse</th>
+                        @*<th>Transfer</th>*@
+                        <th>Transfer QTY</th>
+                        <th>Return</th>
+                        <th>Invoice No.</th>
+                        <th>Invoice Date</th>
+                        <th>Feedback</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int count = 1;
+                        bool isFlage = false;
+                        foreach (var item in Model.itemTransfers)
+                        {
+                            foreach (var stitem in Model.inventoryDetails)
+                            {
+                                if (item.itemID == stitem.product_id && item.warehouseID == stitem.warehouse_id)
+                                {
+                                    <tr>
+                                        <td>@count</td>
+                                        <td>@item.itemCode</td>
+                                        <td>@item.itemName</td>
+                                        @*@if (string.Compare(Model.stock_transfer_status, "Approved") != 0)
+                                            {
+                                            <td>@stitem.total_quantity</td>
+                                            }*@
+                                        <td>@string.Format("{0:N2}", Double.Parse(item.requestQty.ToString())) @item.requestUnitName</td> @*item.itemUnit*@
+                                        <td>@item.warehouseName</td>
+                                        @*<td><input type="checkbox" checked disabled /></td>*@
+                                        <td>@string.Format("{0:N2}", Double.Parse(stitem.out_quantity.ToString())) @db.tb_unit.Find(stitem.unit).Name</td>
+                                        <td>@stitem.status</td>
+                                        <td>@stitem.invoice_number</td>
+                                        <td>
+                                            @if (stitem.invoice_date != null)
+                                        {
+                                            <p>@Convert.ToDateTime(stitem.invoice_date).ToString("dd/MM/yyyy")</p>
+                                        }
+                                    </td>
+                                    <td>@stitem.remark</td>
+                                    <td>
+                                        @if (string.Compare(stitem.item_status, Status.Pending) == 0)
+                                        {
+                                            <label style="color:orange !important">@stitem.item_status</label>
+                                        }
+                                        else if (string.Compare(stitem.item_status, Status.Approved) == 0)
+                                        {
+                                            <label style="color:blue !important">@stitem.item_status</label>
+                                        }
+                                        else if (string.Compare(stitem.item_status, Status.Feedbacked) == 0)
+                                        {
+                                            <label style="color:grey !important">@stitem.item_status</label>
+                                        }
+                                    </td>
+                                </tr>
+                                    count++;
+                                }
+                                //count++;
+                                @*foreach (var item in Model.itemTransfers)
+                                            {
+                                    <tr>
+                                        <td>@count</td>
+                                        <td>@item.itemCode</td>
+                                        <td>@item.itemName</td>
+                                        <td>@item.itemUnit</td>
+                                        @foreach (var stitem in Model.inventoryDetails)
+                                        {
+                                            isFlage = false;
+                                            if (item.itemID == stitem.product_id && item.warehouseID == stitem.warehouse_id)
+                                            {
+                                                <td>@stitem.total_quantity</td>
+                                                <td>@item.requestQty</td>
+                                                <td>@item.warehouseName</td>
+                                                <td><input type="checkbox" checked disabled /></td>
+                                                <td>@stitem.out_quantity</td>
+                                                isFlage = true;
+                                                break;
+                                            }
+                                        }
+                                        @if (isFlage == false)
+                                        {
+                                            <td>@item.stockBalance</td>
+                                                    <td>@item.requestQty</td>
+                                                    <td>@item.warehouseName</td>
+                                                    <td><input type="checkbox" disabled /></td>
+                                                    <td>0.00</td>
+                                        }
+                                        </tr>*@
+                                //count++;
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (Model.rejects.Count() > 0)
+        {
+            <div class="form-group">
+                <label class="control-label col-md-2">Reject Command:</label>
+                <div class="col-md-10">
+                    <ul>
+                        @foreach (var reject in Model.rejects)
+                        {
+                            <li>@reject.comment <b>By @reject.rejected_by</b></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                @{
+
+                    if ((isAdmin || isPCH))
+                    {
+                        if (string.Compare(Model.stock_transfer_status, Status.Pending) == 0)
+                        {
+                            @*@Html.ActionLink("Edit", "Edit", new { id = Model.stock_transfer_id }, new { @class = "btn btn-success" })*@
+                            @*<a href="javascript:void(0)" id="@Model.stock_transfer_id" class="btn btn-danger delete-promp">Delete</a>*@
+                            <a href="javascript:void(0)" class="w3-button w3-tiny w3-deep-orange" id="btn-cancel-request">Request Cancel</a>
+                        }
+                        else if (string.Compare(Model.stock_transfer_status, Status.PendingFeedback) == 0)
+                        {
+                            @Html.ActionLink("Prepare Feedback", "PrepareFeedback", new { id = Model.stock_transfer_id }, new { @class = "w3-button w3-tiny w3-green" })
+                        }
+                    }
+
+                    if ((isAdmin || isQA) && (Model.stock_transfer_status == Status.Pending || Model.stock_transfer_status == Status.Feedbacked))
+                    {
+                        @*<a href="javascript:void(0)" id="@Model.stock_transfer_id" class="btn btn-default approve-promp">Approve</a>
+                            <a href="javascript:void(0)" id="@Model.stock_transfer_id" class="btn btn-default reject-promp">Reject</a>*@
+                        @Html.ActionLink("Approve/ Feedback", "ApproveFeedback", "StockTransfer", new { id = Model.stock_transfer_id }, new { @class = "w3-button w3-tiny w3-teal" })
+                    }
+
+                    if ((isAdmin || User.IsInRole(Role.SiteManager)) && string.Compare(Model.stock_transfer_status, Status.Approved) == 0)
+                    {
+                        <a href="javascript:void(0)" id="@Model.stock_transfer_id" class="w3-button w3-tiny w3-teal approve-promp">Approve</a>
+                        <a href="javascript:void(0)" id="@Model.stock_transfer_id" class="w3-button w3-tiny w3-deep-orange reject-promp">Reject</a>
+                    }
+
+                    @*if (isAdmin || isMSC || isQAisPCH || (isPCH && isCFO) || isPCH)
+                        {
+                            if (string.Compare(Model.stock_transfer_status, Status.Pending) == 0)
+                            {
+
+
+                            }
+
+
+                        }
+                        else if (isQA)
+                        {
+                            if (string.Compare(Model.stock_transfer_status, Status.PendingFeedback) == 0)
+                            {
+                                @Html.ActionLink("Prepare Feedback", "PrepareFeedback", new { id = Model.stock_transfer_id }, new { @class = "btn btn-default" })
+                            }
+                        }
+                        else if (isCFO)
+                        {
+                            if (Model.stock_transfer_status == Status.Pending)
+                            {
+                                @Html.ActionLink("Approve/ Feedback", "ApproveFeedback", "StockTransfer", new { id = Model.stock_transfer_id }, new { @class = "btn btn-primary" })
+                            }
+
+                        }
+                        if (isCFO || isAdmin)
+                        {
+                            if (string.Compare(Model.stock_transfer_status, Status.Approved) == 0)
+                            {
+                                @Html.ActionLink("Approve", "ApproveFeedback", "StockTransfer", new { id = Model.stock_transfer_id }, new { @class = "btn btn-primary" })
+
+                                <a href="javascript:void(0)" id="@Model.stock_transfer_id" class="btn btn-default reject-promp">Reject</a>
+                            }
+                        }*@
+
+
+
+
+                }
+                <a href="javascript:history.back()" class="w3-button w3-tiny w3-red">Back</a>
+
+                @*@Html.ActionLink("Back", "Index", "StockTransfer", new { @class = "btn btn-default" })*@
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- approve project modal popup-->
+<div class="modal fade" id="approveModal" tabindex="=-1" role="dialog" aria-labelledby="approveModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-warning">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to <strong>Approve</strong> this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default approve-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="myModal" tabindex="=-1" role="dialog" aria-labelledby="deleteModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to delete this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default delete-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- reject project modal popup-->
+<div class="modal fade" id="rejectModal" tabindex="=-1" role="dialog" aria-labelledby="rejectModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <p class="success-message col-md-12">Are you sure to <strong>Reject</strong> this item?</p>
+                    <label class="col-md-2">Comment:</label>
+                    <div class="col-md-10">
+                        <textarea class="form-control" rows="5" id="reject-comment"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default reject-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- cancel request modal popup-->
+<div class="modal fade" id="cancelRequestModal" tabindex="=-1" role="dialog" aria-labelledby="approveModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-warning">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to cancel this request?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" id="btn-cancel-yes">Yes</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Show History modal popup-->
+<div class="modal fade" id="showHistoryModal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-primary">
+                <h4 class="modal-title" id="myModalLabel">View Process History</h4>
+            </div>
+
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>User</th>
+                                <th>Status</th>
+                                <th>Remark</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                foreach (var history in Model.processWorkFlows)
+                                {
+                                    <tr>
+                                        <td>@CommonClass.ToLocalTime(Convert.ToDateTime(history.created_at)).ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>@history.crated_by_name</td>
+                                        <td>@Html.Raw(ShowStatus.GetStockTransfershowStatus(history.status))</td>
+                                        <td>@history.remark</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                @*<button class="btn btn-default approve-confirm">Yes</button>*@
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            var stockTransferId = '@Model.stock_transfer_id';
+
+            $('#btn_show_history').click(function (e) {
+                $('#showHistoryModal').modal('show');
+            });
+
+            $('.approve-promp').click(function () {
+                $('#approveModal').modal('show');
+            });
+
+            $('.approve-confirm').click(function () {
+                if (stockTransferId != '') {
+                    $.ajax({
+                        url: "/StockTransfer/Approve",
+                        data: {
+                            'id': stockTransferId,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#approveModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been approved!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "StockTransfer")';
+                            }
+                            else if (da.result == "fail")
+                                $.notify('Your data has been error while approving!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while approving!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+            $('.reject-promp').click(function () {
+                $('#rejectModal').modal('show');
+            });
+
+            $('.reject-confirm').click(function () {
+                if (stockTransferId != '') {
+                    var comment = $('#reject-comment').val();
+                    $.ajax({
+                        url: "/StockTransfer/Reject",
+                        data: {
+                            'id': stockTransferId,
+                            'comment':comment,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.reject-confirm').css('display', 'none');
+                            }
+                            $('#rejectModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been rejected!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "StockTransfer")';
+                            }
+                            else if (da.result == "fail")
+                                $.notify('Your data has been error while rejecting!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while rejecting!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+            $('.delete-promp').click(function () {
+
+                $('#myModal').modal('show');
+            });
+
+            $('.delete-confirm').click(function () {
+                if (stockTransferId != '') {
+                    $.ajax({
+                        url: "/StockTransfer/Delete",
+                        data: {
+                            'id': stockTransferId,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#myModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been deleted!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "StockTransfer")';
+                            }
+                            else if (da.result == "fail")
+                                $.notify('Your data has been error while deleting!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while deleting!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+            $('#btn-cancel-request').click(function () {
+                $('#cancelRequestModal').modal('show');
+            });
+            $('#btn-cancel-yes').click(function () {
+                if (stockTransferId != '') {
+                    $.ajax({
+                        url: "/StockTransfer/RequestCancel",
+                        data: {
+                            'id': '@Model.stock_transfer_id',
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#cancelRequestModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been approved!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "StockTransfer")';
+                            }
+                            else
+                                $.notify('Your data has been error while approving!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.approve-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while approving!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+   
+    }

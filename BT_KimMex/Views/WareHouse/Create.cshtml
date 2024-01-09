@@ -1,0 +1,315 @@
+﻿@model BT_KimMex.Models.WareHouseViewModel
+    @using BT_KimMex.Class;
+@{
+    ViewBag.Title = "Create";
+    //Layout = "~/Views/Shared/_LayoutBackend.cshtml";
+    //ViewBag.WarehouseActive = "active";
+    //ViewBag.PageTitle = "Create New Warehouse";
+    //ViewBag.Controller = "Warehouse";
+    //ViewBag.Action = "Create";
+}
+
+<style type="text/css">
+    /*select{
+        width:235px !important;
+    }*/
+</style>
+
+<h3 class="title">Create New Warehouse</h3>
+@using (Html.BeginForm())
+{
+    <div class="form-horizontal">
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Date :</label>
+            <label class="col-md-8" id="current_date">@Convert.ToDateTime(DateTime.Now).ToString("dd/MM/yyyy")</label>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Warehouse Name <strong style="color:red !important;">*</strong>:</label>
+            <div class="col-md-8">
+                @Html.EditorFor(model => model.warehouse_name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.warehouse_name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Telephone :</label>
+            <div class="col-md-8">
+                @Html.EditorFor(model => model.warehouse_telephone, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Address :</label>
+            <div class="col-md-8">
+                @Html.TextAreaFor(model => model.warehouse_address,  new { @class = "form-control",Rows="5" } )
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">QA/ QC Officer <strong style="color:red;">*</strong> :</label>
+            <div class="col-md-8">
+                @*@Html.DropDownList("qaqc_id", new SelectList(ViewBag.QAQCOfficer, "UserId", "Username"), "Select QA/ QC officer ", new { @class = "form-control", id = "qaqc_id", style = "display:inline-block !important;" })*@
+                @Html.DropDownList("qaqcs[]", new SelectList(ViewBag.QAQCOfficer, "UserId", "Username"), new { @class = "form-control", id = "qaqc_id", style = "display:inline-block !important;",multiple="multiple" })
+                <span><b class="text-danger">(**multiple)</b></span>
+                @Html.ValidationMessageFor(model => model.qaqcs, "", new { @class = "text-danger", style = "display:block !important;" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Site Name <strong style="color:red;">*</strong> :</label>
+            <div class="col-md-3">
+                @Html.DropDownList("warehouse_site_id", @ViewBag.SiteID as SelectList, "Select Site Name", new { @class = "form-control", id = "warehouse_site_id", style = "display:inline-block !important;" })
+                @Html.ValidationMessageFor(model => model.warehouse_site_id, "", new { @class = "text-danger", style = "display:block !important;" })
+            </div>
+            <div class="col-md-1" >
+                <button style="text-align:center !important;vertical-align:middle !important;" type="button" class="btn btn-flat btn-sm btn-warning" id="site-promp"><i class='fa fa-plus-circle'></i></button>
+            </div>
+        </div>
+
+        @*<div class="form-group">
+            <label class="control-label col-md-2">Project <strong style="color:red !important">*</strong>:</label>
+            <div class="col-md-8">
+                <select class="form-control" id="warehouse_project_id" name="warehouse_project_id">
+                    <option>Select Project</option>
+                </select>
+            </div>
+        </div>*@
+
+            <!--Add Stock Keeper-->
+        <div class="form-group">
+            <label class="control-label col-md-2">Stock Controller<strong style="color:red;">*</strong> :</label>
+            <div class="col-md-4">
+                @Html.DropDownList("Stock_keeper_id[]", new SelectList(CommonFunctions.GetUserListItemsByRole(Role.SiteStockKeeper), "UserId", "Username"), new { @class = "form-control", id = "Stock_keeper_id", style = "display:inline-block !important;", multiple = "multiple" })
+                <span><b class="text-danger">(**multiple)</b></span>
+                @Html.ValidationMessageFor(model => model.Stock_keeper_id, "", new { @class = "text-danger", style = "display:block !important;" })
+                @*<table style="width:100% !important;" id="StockkeeperTable"></table>
+                @Html.ValidationMessageFor(model => model.Stock_keeper_id, "", new { @class = "text-danger", style = "display:block !important; padding-left:250px; padding-bottom:30px" })*@
+            </div>
+        </div>
+       
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-primary btn-uppercase" />
+                <a href="@Url.Action("Index","WareHouse")" class="btn btn-danger">Back</a>
+            </div>
+        </div>
+
+    </div>
+}
+
+<!-- Site modal popup-->
+<div class="modal fade" id="site_modal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2>Create New Site</h2>
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-horizontal">
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                        <div class="form-group">
+                            <label class="control-label col-md-4">Date:</label>
+                            <label class="col-md-8" id="side_current_date"></label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-4">Site Name <span style="color:red;">*</span>:</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" id="site_name" />
+                                @Html.ValidationMessageFor(model => model.site_name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-4">Address:</label>
+                            <div class="col-md-8">
+                                <textarea class="form-control" id="site_address" rows="5"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-6 ">
+                                <button class="btn btn-default site-confirm">Save</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            //InitailStockKeeperTable();
+
+            $('#qaqc_id').select2();
+            $('#Stock_keeper_id').select2();
+      
+            //$('#current_date').text(getFormattedDateMMDDYYYY(new Date()));
+            $('#site-promp').click(function () {
+                $('#side_current_date').text(getFormattedDateMMDDYYYY(new Date()));
+                $('#site_modal').modal('show');
+            });
+
+            $('.site-confirm').on("click", function (e) {
+                e.preventDefault();
+                var site_name = $('#site_name').val();
+                var site_address = $('#site_address').val();
+                if (site_name == "" || site_name == null) {
+                    alert("Site name is required.");
+                }
+                else {
+                    $.ajax({
+                        url: "/Site/CreateJson",
+                        data: {
+                            site_name: site_name,
+                            site_address: site_address
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#site_modal').modal('hide');
+                            if (da.Message == "Success") {
+                                InitialSiteDropDownList(da.site_id);                            
+                            }
+                            else if (da.Message == "Fail") {
+                                if (!$('.modal-header').hasClass('alert-danger')) {
+                                    $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                    $('.delete-confirm').css('display', 'none');
+                                }
+                                $('.success-message').html('Your data is error while saving!');
+                            }
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html('Your data is error while saving!');
+
+                        }
+                    });
+                }
+            });
+
+            function InitialSiteDropDownList(site_id) {
+                $.ajax({
+                    url: "@Url.Action("SiteDropDown", "Site")",
+                    type: "get",
+                    dataType: "json",
+                    success: function (data) {
+
+                        $('#warehouse_site_id').empty();
+                        $('#warehouse_site_id').append("" +
+                            "<option value>Select Site Name</option>"
+                        );
+                        $.each(data, function (index, item) {
+                            $.each(item, function (index1, item1) {
+
+                                $('#warehouse_site_id').append("" +
+                                        "<option value='" + item1.site_id + "'>" + item1.site_name + "</option>"
+                                    );
+                            });
+                        });
+                        $('#warehouse_site_id').val(site_id);
+                    },
+                    error: function (data) {
+
+                    }
+                });
+            }
+        })
+
+    </script>
+
+    <script type="text/javascript">
+      
+        function InitailStockKeeperTable() {
+            var element = {};
+            var warehouse_Stock_keeper = [];
+            //  var spacement_attachment_id = "";
+            var Stockkeeper = $('.Stock_keeper');
+            for (var i = 0; i < Stockkeeper.length; i++) {
+                if (Stockkeeper[i].value != null || Stockkeeper[i].value != "") {
+                    element = {};
+                    element.Stockkeeper = Stockkeeper[i].value;
+                    warehouse_Stock_keeper.push(element);
+                }
+            }
+            //console.log(warehouse_Stock_keeper);
+            $('#StockkeeperTable').append("" +
+                    "<tr>" +
+                        "<td width='280px'>" +
+                            "<select class='form-control Stock_keeper' name='Stock_keeper_id' id='Stock_keeper_id'>" +
+                                "<option selected disabled value=''>Select Stock Keeper</option>" +
+                            "</select>" +
+                        "</td>" +
+                        "<td style='width:40px !important;'>" +
+                            "<button type='button' class='btn btn-default btn-sm' onclick='RemoveSiteManagerRow(this)'><span class='glyphicon glyphicon-trash'></span></button>" +
+                        "</td>" +
+                        "<td style='width:40px !important;'>" +
+                            "<button type='button' class='btn btn-default btn-sm' onclick='AddSiteManagerRow(this)'><span class='glyphicon glyphicon-plus'></span></button>" +
+                        "</td>" +
+                    "</tr>"
+                );
+            InitialStockkeeper();
+        }
+  
+        function InitialStockkeeper() {
+            $.ajax({
+                url:"@Url.Action("StockKeeperDropDown", "WareHouse")",
+                type: "get",
+            dataType: "json",
+            success: function (data) {
+                $('#StockkeeperTable tr:last-child select.Stock_keeper').empty();
+                $('#StockkeeperTable tr:last-child select.Stock_keeper').append("" +
+                    "<option selected disabled> Select Stock Keeper</option>"
+                );
+                $.each(data, function (index, item) {
+                    $.each(item, function (index1, item1) {                 
+                        var full_name = item1.Username;
+                        $('#StockkeeperTable tr:last-child select.Stock_keeper').append("" +
+                                "<option value='" + item1.UserId + "'>" + full_name + "</option>"
+                            );
+                    });
+                });
+            },
+            error: function (data) {
+                alert('fail');
+            }
+        });
+        }
+        function AddSiteManagerRow(Row) {
+            var index = Row.parentNode.parentNode.rowIndex;
+            InitailStockKeeperTable();
+            $('#StockkeeperTable tbody tr td:nth-child(3)').eq(index).html('');
+        }
+        function RemoveSiteManagerRow(Row) {
+            var index = Row.parentNode.parentNode.rowIndex;
+            var numberOfRow = $('#StockkeeperTable tbody tr').length;
+            if (numberOfRow > 1) {
+                document.getElementById('StockkeeperTable').deleteRow(index);
+                if (Number(index + 1) == numberOfRow)
+                    $('#StockkeeperTable tbody tr td:nth-child(3)').eq(index - 1).html("<button type='button' class='btn btn-default btn-sm' onclick='AddSiteManagerRow(this)'><span class='glyphicon glyphicon-plus'></span></button>");
+            }
+        }
+
+  
+    </script>
+
+    }
+

@@ -1,0 +1,101 @@
+﻿
+@{
+    ViewBag.Title = "SyncPOReportWithGRN";
+}
+
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+<div class="row" style="padding:10px !important;">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Good Receive Note List
+        </div>
+        <div class="panel-body">
+            <div class="well" style="padding:8px !important; padding-bottom:30px !important;">
+                <div class="form-group">
+                    <label class="control-label col-md-2">Requested Date:</label>
+                    <div class="col-md-3">
+                        <div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
+                            <i class="fa fa-calendar"></i>&nbsp;
+                            <span></span> <i class="fa fa-caret-down"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-control" id="ddr_po_report_type">
+                            <option value="0">All PO Type</option>
+                            <option value="true">VAT</option>
+                            <option value="false">NON VAT</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="w3-button w3-tiny w3-blue" onclick="initialDataTable()">Filter</button>
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered" id="table_1">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.3/moment.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            var start = moment().subtract(29, 'days');
+            var end = moment();
+
+            function cb(start, end) {
+                $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            }
+
+            $('#reportrange').daterangepicker({
+                startDate: start,
+                endDate: end,
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                }
+            }, cb);
+
+            cb(start, end);
+            $('#ddr_status').select2();
+            //initialDataTable();
+        });
+
+        function initialDataTable() {
+            var t = $('#table_1').DataTable({
+                "bDestroy": true,
+                "ajax": {
+                    "url": "/Sync/SyncPOReportWithGRNAJAX",
+                    "type": "GET",
+                    "dataType": "json",
+                    "data": {
+                        dateRange: $('#reportrange span').html(),
+                        poReportType: $('#ddr_po_report_type').val(),
+                    }
+                },
+                "columns": [
+                    { "data": "po_report_number" },
+                   
+                    ],
+            "order": [[0, "desc"]],
+                });
+        }
+    </script>
+}

@@ -1,0 +1,230 @@
+﻿@model BT_KimMex.Models.POInvoiceModel
+@{
+    ViewBag.Title = "Create New PO Invoice";
+}
+
+<div class="w3-card-4 w3-panel">
+    <div class="w3-container w3-display-container">
+        <h3 class="title">@ViewBag.Title</h3>
+    </div>
+    <div class="w3-container w3-display-container">
+        @using (Html.BeginForm("Create", "Invoice", FormMethod.Post, new { @class = "form-horizontal", role = "form", id="myform" }))
+        {
+            @Html.AntiForgeryToken()
+        <div class="form-horizontal">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <input type="hidden" id="is_save_addnew" name="is_save_addnew"/>
+            @Html.HiddenFor(model=>model.invoice_id)
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="control-label col-md-4">PO Number <strong class="text-danger">*</strong> :</label>
+                    <div class="col-md-8">
+                        <select class="form-control" id="po_report_id" name="po_report_id">
+                            <option>Select PO Number</option>
+                            @if (!string.IsNullOrEmpty(Model.invoice_id))
+                            {
+                                var isexist = BT_KimMex.Models.PurchaseOrderReportViewModel.GetPONotYetIssueInvoice().Where(s => string.Compare(s.po_report_id, Model.po_report_id) == 0).FirstOrDefault();
+                                if (isexist == null)
+                                {
+                                    <option value="@Model.po_report_id">@Model.po_Report.po_report_number</option>
+                                }
+                            }
+                            @foreach (var item in BT_KimMex.Models.PurchaseOrderReportViewModel.GetPONotYetIssueInvoice())
+                            {
+                                <option value="@item.po_report_id">@item.po_report_number</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-4">Invoice Date <strong class="text-danger">*</strong> :</label>
+                    <div class="col-md-8">
+                        <div class="input-group date" data-provide="datepicker" style="width:280px !important;">
+                            @Html.EditorFor(model => model.invoice_date, new { htmlAttributes = new { @class = "form-control", placeholder = "MM/DD/YYYY" } })
+                            <div class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-4">Inv Number (Shipper):</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" id="invoice_number_shipper" name="invoice_number_shipper" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-4">Inv Amount:</label>
+                    <div class="col-md-8">
+                        <input type="number" class="form-control" id="invoice_amount" name="invoice_amount" value="0" step="any" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-4">VAT Amount:</label>
+                    <div class="col-md-8">
+                        <input type="number" class="form-control" id="invoice_vat_amount" name="invoice_vat_amount" value="0" step="any" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-4">Inv Number (Forwarder):</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" id="invoice_number_forwarder" name="invoice_number_forwarder" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-4">Transportation Fee:</label>
+                    <div class="col-md-8">
+                        <input type="number" class="form-control" id="transporation_fee" name="transporation_fee" value="0" step="any" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-4">Import Duty:</label>
+                    <div class="col-md-8">
+                        <input type="number" class="form-control" id="import_duty" name="import_duty" value="0" step="any" />
+                    </div>
+                </div>
+                <div class="form-group"​ style="display:none !important;">
+                    <label class="control-label col-md-4">Paid Amount:</label>
+                    <div class="col-md-8">
+                        <input type="number" class="form-control" id="paid_amount" name="paid_amount" value="0" step="any" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-4 col-md-8">
+                        <button type="button" class="btn btn-success" id="btn_submit">SAVE</button>
+                        <button type="button" class="btn btn-success" id="btn_submit_addnew">Save and add another</button>
+                        @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-danger" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="w3-card-4 w3-panel" style="margin-top:0px !important;">
+                    <div class="form-group row">
+                        <label class="control-label col-md-4">Project:</label>
+                        <label class="col-md-8" id="lbl_project_name"></label>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-4">MR No.:</label>
+                        <label class="col-md-8" id="lbl_mr_number"></label>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-4">PR No.:</label>
+                        <label class="col-md-8" id="lbl_pr_number"></label>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-4">Quote No.:</label>
+                        <label class="col-md-8" id="lbl_quote_number"></label>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-4">PON No.:</label>
+                        <label class="col-md-8" id="lbl_pon_number"></label>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        }
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+
+            
+
+            $('#po_report_id').select2();
+            $('#invoice_date').val('@Convert.ToDateTime(DateTime.Now).ToString("MM/dd/yyyy")');
+            $('div.date').on('changeDate', function () {
+                $(this).datepicker('hide');
+            });
+
+            //Edit invoice
+            var invoice_id = $('#invoice_id').val();
+            if (invoice_id) {
+                $('#po_report_id').attr('disabled', true);
+                $.ajax({
+                    url: "/Invoice/GetInvoiceDetailAJAX",
+                    data: {
+                        'id': invoice_id,
+                    },
+                    type: 'GET',
+                    success: function (da) {
+                        console.log(da);
+                        if (da.data) {
+                            var data = da.data;
+                            $('#invoice_date').val(data.invoice_date_text);
+                            $('#invoice_number_shipper').val(data.invoice_number_shipper);
+                            $('#invoice_vat_amount').val(data.invoice_vat_amount);
+                            $('#invoice_number_forwarder').val(data.invoice_number_forwarder);
+                            $('#transporation_fee').val(data.transporation_fee);
+                            $('#import_duty').val(data.import_duty);
+                            $('#invoice_amount').val(data.invoice_amount);
+                            //$("#po_report_id").select2('data', { id: data.po_report_id, text: data.po_Report.po_report_number });
+                            $("#po_report_id").val(data.po_report_id).trigger('change.select2');
+                            
+                        }
+                        if (da.reference) {
+                            var ref = da.reference;
+                            $('#lbl_project_name').text(ref.project);
+                            $('#lbl_mr_number').text(ref.mr);
+                            $('#lbl_pr_number').text(ref.pr);
+                            $('#lbl_quote_number').text(ref.quote);
+                            $('#lbl_pon_number').text(ref.po);
+                        }
+                        //var invoice = da.data;
+                        //$('#invoice_amount').val(parseFloat(invoice.outstanding_amount));
+                        //$('#invoice_vat_amount').val(parseFloat(invoice.vat_amount));
+                        
+
+                    },
+                    error: function (err) {
+
+                    }
+                });
+            } 
+
+            $('#po_report_id').change(function (e) {
+                var po_report_id = $(this).val();
+                //console.log(po_report_id);
+                $.ajax({
+                    url: "/Invoice/GetPOAmountByPOReportIDAJAX",
+                            data: {
+                                'id': po_report_id,
+                            },
+                            type: 'GET',
+                    success: function (da) {
+                        //console.log(da.reference);
+                        var invoice = da.data;
+                        console.log(invoice);
+                        $('#invoice_amount').val(parseFloat(invoice.outstanding_amount));
+                        $('#invoice_vat_amount').val(parseFloat(invoice.vat_amount));
+                        var ref = da.reference;
+                        $('#lbl_project_name').text(ref.project);
+                        $('#lbl_mr_number').text(ref.mr);
+                        $('#lbl_pr_number').text(ref.pr);
+                        $('#lbl_quote_number').text(ref.quote);
+                        $('#lbl_pon_number').text(ref.po);
+
+                    },
+                            error: function (err) {
+                                
+                            }
+                        });
+            });
+
+            $('#btn_submit').click(function (e) {
+                $('#is_save_addnew').val(false);
+                $(this).attr('disabled', true);
+                $('#myform').submit();
+            });
+            $('#btn_submit_addnew').click(function (e) {
+                $('#is_save_addnew').val(true);
+                $(this).attr('disabled', true);
+                $('#myform').submit();
+            })
+        });
+    </script>
+    }

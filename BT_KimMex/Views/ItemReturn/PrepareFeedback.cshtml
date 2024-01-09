@@ -1,0 +1,466 @@
+﻿@model BT_KimMex.Models.ItemReturnViewModel
+@using System.Text.RegularExpressions;
+@{
+    ViewBag.Title = "PrepareFeedback";
+}
+<style type="text/css">
+    #returnItemTable tr td {
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+
+    .form-control {
+        padding: 0px !important;
+        font-size: 12px !important;
+    }
+</style>
+
+<h3 class="title">Prepare Feedback Item Return to Supplier</h3>
+<div class="form-horizontal">
+    @Html.HiddenFor(model => model.itemReturnId)
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.created_date, htmlAttributes: new { @class = "col-md-2" })
+        @Html.Label(BT_KimMex.Class.CommonClass.ToLocalTime(Convert.ToDateTime(Model.created_date)).ToString("dd/MM/yyyy"), new { @class = "col-md-10" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.itemReturnNumber, htmlAttributes: new { @class = "col-md-2" })
+        @Html.Label(Model.itemReturnNumber, new { @class = "col-md-10" })
+    </div>
+    <div class="row" style="margin:0 !important;">
+        <table class="table table-bordered table-responsive" id="returnItemTable">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Item Code</th>
+                    <th>Item Name</th>
+                    <th>To Supplier</th>
+                    <th>From Warehouse</th>
+                    <th>Stock Balance</th>
+                    <th>Return Qty</th>
+                    <th>Unit</th>
+                    <th>Invoice No.</th>
+                    <th>Invoice Date</th>
+                    <th>Remark</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int count = 1;
+                    foreach (var item in Model.inventoryDetails)
+                    {
+                        var id = "i" + count;
+                        var itemId = "item" + count;
+                        var itemN = "im" + count;
+
+                        if (string.Compare(item.item_status, BT_KimMex.Class.Status.Approved) == 0)
+                        {
+                            <tr id="@id">
+                                <td>@count</td>
+                                <td>@item.itemCode</td>
+                                <td>@item.itemName</td>
+                                <td>@item.supplier_name</td>
+                                <td>@item.warehouseName</td>
+                                <td>@string.Format("{0:N2}", Double.Parse(item.stock_balance.ToString())) @item.itemunitname</td>
+                                <td>@string.Format("{0:N2}", Double.Parse(item.quantity.ToString()))</td>
+                                <td>@item.unitName</td>
+                                <td>@item.invoice_number</td>
+                                <td>@Convert.ToDateTime(item.invoice_date).ToString("dd/MM/yyyy")</td>
+                                <td>@item.remark</td>
+                                <td></td>
+                            </tr>
+                        }
+                        else
+                        {
+                        <tr id="@id">
+                            <td>@count</td>
+                            <td><input type='hidden' class="item-id" value="@item.inventory_item_id" /><input type='text' class='form-control item-code' id='@itemId' onfocus='getItemDataRow(this)' placeholder='Item Code' value="@item.itemCode" /></td>
+                            <td><input type='text' class='form-control item-name' id='@itemN' onfocus='getItemDataRowByName(this)' value="@item.itemName" placeholder='Item Name' /></td>
+                            <td>@Html.DropDownList("supplier_id", new SelectList(@ViewBag.SupplierID, "supplier_id", "supplier_name", item.supplier_id), new { @class = "form-control supplier" })</td>
+                            <td>@Html.DropDownList("inventory_warehouse_id", new SelectList(@ViewBag.WarehouseID, "warehouse_id", "warehouse_name", item.inventory_warehouse_id), new { @class = "form-control warehouse", @onchange = "InitialItemInventory(this)" })</td>
+                            <td><label class='stock-balance'>@string.Format("{0:G29}", Double.Parse(item.stock_balance.ToString()))</label> <label class="stock-balance-unit-name">@item.itemunitname</label> <input type="hidden" class="stock-balance-unit" value="@item.itemUnit"/> </td>
+                            <td><input type='number' class='form-control return-qty' placeholder='Return Qty' value='@string.Format("{0:G29}", Double.Parse(item.quantity.ToString()))' onchange="checkReturnQty(this)" /></td>
+                            <td>
+                                <select class='form-control item-unit' onchange='checkReturnQty(this)'>
+                                    @if (string.Compare(item.itemUnit, item.unit) == 0)
+                                    {
+                                        <option value="@item.itemUnit" selected>@item.itemunitname</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item.itemUnit">@item.itemunitname</option>
+                                    }
+                                    @{
+                                        if (item.uom != null)
+                                        {
+                                            if (item.uom.uom1_id != null && item.uom.uom1_qty != null)
+                                            {
+                                                string uom1 = Regex.Replace(item.uom.uom1_id, @"\t|\n|\r", "");
+                                                if (string.Compare(uom1, item.unit) == 0)
+                                                {
+                                                    <option value="@uom1,@item.uom.uom1_qty" selected>@uom1</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@uom1,@item.uom.uom1_qty">@uom1</option>
+                                                }
+                                            }
+                                            if (item.uom.uom2_id != null && item.uom.uom2_qty != null)
+                                            {
+                                                string uom2 = Regex.Replace(item.uom.uom2_id, @"\t|\n|\r", "");
+                                                if (string.Compare(uom2, item.unit) == 0)
+                                                {
+                                                    <option value="@uom2,@item.uom.uom2_qty" selected>@uom2</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@uom2,@item.uom.uom2_qty">@uom2</option>
+                                                }
+                                            }
+                                            if (item.uom.uom3_id != null && item.uom.uom3_qty != null)
+                                            {
+                                                string uom3 = Regex.Replace(item.uom.uom3_id, @"\t|\n|\r", "");
+                                                if (string.Compare(uom3, item.unit) == 0)
+                                                {
+                                                    <option value="@uom3,@item.uom.uom3_qty" selected>@uom3</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@uom3,@item.uom.uom3_qty">@uom3</option>
+                                                }
+                                            }
+                                            if (item.uom.uom4_id != null && item.uom.uom4_qty != null)
+                                            {
+                                                string uom4 = Regex.Replace(item.uom.uom4_id, @"\t|\n|\r", "");
+                                                if (string.Compare(uom4, item.unit) == 0)
+                                                {
+                                                    <option value="@uom4,@item.uom.uom4_qty" selected>@uom4</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@uom4,@item.uom.uom4_qty">@uom4</option>
+                                                }
+                                            }
+                                        }
+                                    }
+                                </select>
+                            </td>
+                            <td><input type='text' class='form-control invoice_number' value="@item.invoice_number" /></td>
+                            <td>
+                                <div style="display:inline-block !important;margin-right:5px !important;">
+                                    <div class="input-group date" data-provide="datepicker" data-autoclose="true" style="width:150px !important;">
+                                        <input type="text" class="form-control invoice_date" style="width:130px !important;" value="@Convert.ToDateTime(item.invoice_date).ToString("dd/MM/yyyy")" />
+                                        <div class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><textarea class='form-control remark'>@item.remark</textarea></td>
+                            <td><a href='javascript:void(0)' onclick='removeItemRow(this)' class="btn-sm btn-default"><i class='fa fa-minus-circle'></i></a></td>
+                        </tr>
+                                            }
+                                            count++;
+                                        }
+                                    }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="button" value="Submit" class="btn btn-default" onclick="prepareFeedbackItemReturn()" />
+            @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            $(".date").datepicker({ format: 'dd/mm/yyyy' });
+            $('#returnItemTable').on('changeDate', 'td div.date', function () {
+                $(this).datepicker('hide');
+            });
+        });
+        function prepareFeedbackItemReturn() {
+            var inventories = [];
+            var item_element = {};
+            var warehouses = $('.warehouse');
+            var items = $('.item-id');
+            var stockBalances = $('.stock-balance');
+            var returnQtys = $('.return-qty');
+            var remarks = $('.remark');
+            var suppliers = $('.supplier');
+            var units = $('.item-unit');
+            var invoiceNumbers = $('.invoice_number');
+            var invoiceDates = $('.invoice_date');
+            var remarks = $('.remark');
+            var countInvalid = 0;
+
+            for (var i = 0; i < items.length; i++) {
+                var splitUnit = (units[i].value).split(',');
+                if (warehouses[i].value && items[i] && stockBalances[i].innerHTML && returnQtys[i].value) { //&& Number(stockBalances[i].innerHTML) > Number(returnQtys[i].value)
+                    item_element = {};
+                    item_element.warehouse_id = warehouses[i].value;
+                    item_element.product_id = items[i].value;
+                    item_element.total_quantity = stockBalances[i].innerHTML;
+                    item_element.out_quantity = returnQtys[i].value;
+                    item_element.remark = remarks[i].value;
+                    item_element.supplier_id = suppliers[i].value;
+                    item_element.unit = splitUnit[0].trim();
+                    item_element.invoice_number = invoiceNumbers[i].value;
+                    item_element.invoice_date = convertDDMMYYYtoMMDDYYYY(invoiceDates[i].value);
+                    item_element.remark = remarks[i].value;
+                    inventories.push(item_element);
+                }
+                else {
+                    countInvalid++;
+                }
+            }
+            if (countInvalid > 0) {
+                alert("Please select warehouse,supplier and fill in issue qty");
+                return;
+            }
+
+            var model = {
+                itemReturnId: $('#itemReturnId').val(),
+                inventories: inventories,
+            };
+
+            $.ajax({
+                url: "/ItemReturn/PrepareFeedback",
+                type: "post",
+                dataType: "json",
+                async: false,
+                data: { id: $('#itemReturnId').val(), models: inventories },
+                success: function (da) {
+                    if (da.result == "success") {
+                        $.notify('Your data has been saved!', { className: 'success' });
+                        window.location.href = '@Url.Action("Index")';
+                    } else if (da.result == "error") {
+                        alert(da.message);
+                    }
+                },
+                error: function (err) {
+                    $.notify('Your data is error while saving!', { className: 'error' });
+                }
+            });
+        }
+        function removeItemRow(row) {
+            var arrItemId = [];
+            var ind = row.parentNode.parentNode.rowIndex;
+            var isLastChild = $('#returnItemTable tr').eq(ind).find("td:nth-child(13) a").length == 0 ? false : true;
+            var itemId = $('#returnItemTable tr').eq(ind).attr('id');
+            var count_table_row = $('#returnItemTable tr').length;
+            for (var i = 1; i <= count_table_row; i++) {
+                var id = $('#returnItemTable tr').eq(i).attr('id');
+                if (id != undefined)
+                    arrItemId.push(id);
+            }
+            if (arrItemId.length == 1) {
+                return;
+            }
+            document.getElementById('returnItemTable').deleteRow(ind);
+            if (isLastChild)
+                $('#returnItemTable tr#' + arrItemId[arrItemId.length - 2]).find('td:nth-child(13)').html("<a href='javascript:void(0)' class='btn-sm btn-default' onclick='appendItemRow(this)'><i class='fa fa-plus-circle'></i></a>");
+            else {
+                var deleted_index = arrItemId.indexOf(itemId);
+                arrItemId.splice(deleted_index, 1);
+                for (var i = 0; i < arrItemId.length; i++) {
+                    $('tr#' + arrItemId[i] + ' td:nth-child(1)').html(Number(i) + 1);
+                }
+            }
+        }
+        function getItemDataRow(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var rowId = $('#returnItemTable tr').eq(ind).find('input.item-code').attr('id');
+            var itemClass = $('#returnItemTable tr').eq(ind).attr('id');
+            var itemTypeId = $('#returnItemTable tr#type' + itemClass).find('input.type-id').val();
+            //var itemId;
+            autocompleted(rowId);
+
+            function autocompleted(rowId) {
+                $("#" + rowId).autocomplete({
+                    //source: '/Product/GetProductAutoSuggest',
+                    source: '@Url.Action("GetProductAutoSuggestName", "Product")',
+                    select: function (event, ui) {
+                        AutoCompleteSelectHandler(event, ui, ind);
+                        $(this).val('');
+                    }
+                });
+            }
+
+            function AutoCompleteSelectHandler(event, ui, ind) {
+                var selectedObj = ui.item;
+                var item = (selectedObj.value).split(' ');
+                itemId = selectedObj.id;
+                GetItemDataRow(ind, itemId);
+                //$('#stockIssueTable tr').eq(ind).find('input.item-code').val(item[0]);
+            }
+
+            function GetItemDataRow(ind, itemId) {
+                if (itemId != "") {
+                    $.ajax({
+                        url: '/Product/GetProductDataByCode',
+                        type: "get",
+                        dataType: "json",
+                        async: false,
+                        data: { id: itemId },
+                        success: function (da) {
+                            $('#returnItemTable tr').eq(ind).find('input[type="hidden"].item-id').val('');
+                            $('#returnItemTable tr').eq(ind).find('select.warehouse').val('');
+                            $('#returnItemTable tr').eq(ind).find('select.supplier').val('');
+                            $('#returnItemTable tr').eq(ind).find('label.stock-balance').text(0);
+                            $('#returnItemTable tr').eq(ind).find('label.stock-balance-unit-name').text('');
+                            $('#returnItemTable tr').eq(ind).find('input.stock-balance-unit').val('');
+                            $('#returnItemTable tr').eq(ind).find('input.return-qty').text(0);
+                            $('#returnItemTable tr').eq(ind).find('select.item-unit').empty();
+                            $('#returnItemTable tr').eq(ind).find('.remark').val('');
+                            if (da.data) {
+                                var item = da.data;
+                                console.log(item);
+                                $('#returnItemTable tr').eq(ind).find('input[type="hidden"].item-id').val(item.product_id);
+                                $('#returnItemTable tr').eq(ind).find('input[type="text"].item-code').val(item.product_code);
+                                $('#returnItemTable tr').eq(ind).find('input.item-name').val(item.product_name);
+                                //$('#returnItemTable tr').eq(ind).find('label.item-unit').text(item.product_unit);
+                                var mou = "<option value='" + item.product_unit + "'>" + item.product_unit + "</option>";
+                                if (item.uom1_id && item.uom1_qty)
+                                    mou = mou + "<option value='" + item.uom1_id + "," + item.uom1_qty + "'>" + item.uom1_id + "</option>";
+                                if (item.uom2_id && item.uom2_qty)
+                                    mou = mou + "<option value='" + item.uom2_id + "," + item.uom2_qty + "'>" + item.uom2_id + "</option>";
+                                if (item.uom3_id && item.uom3_qty)
+                                    mou = mou + "<option value='" + item.uom3_id + "," + item.uom3_qty + "'>" + item.uom3_id + "</option>";
+                                if (item.uom4_id && item.uom4_qty)
+                                    mou = mou + "<option value='" + item.uom4_id + "," + item.uom4_qty + "'>" + item.uom4_id + "</option>";
+                                if (item.uom5_id && item.uom5_qty)
+                                    mou = mou + "<option value='" + item.uom5_id + "," + item.uom5_qty + "'>" + item.uom5_id + "</option>";
+                                $('#returnItemTable tr').eq(ind).find('select.item-unit').append(mou);
+                            } else {
+                                $('#returnItemTable tr').eq(ind).find('input[type="hidden"].item-id').val('');
+                                $('#returnItemTable tr').eq(ind).find('select.warehouse').val('');
+                                $('#returnItemTable tr').eq(ind).find('select.supplier').val('');
+                                $('#returnItemTable tr').eq(ind).find('label.stock-balance').text(0);
+                                $('#returnItemTable tr').eq(ind).find('label.stock-balance-unit-name').text('');
+                                $('#returnItemTable tr').eq(ind).find('input.stock-balance-unit').val('');
+                                $('#returnItemTable tr').eq(ind).find('input.return-qty').text(0);
+                                $('#returnItemTable tr').eq(ind).find('select.item-unit').empty();
+                                $('#returnItemTable tr').eq(ind).find('.remark').val('');
+                            }
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            $('#returnItemTable tr').eq(ind).find('input[type="hidden"].item-id').val('');
+                            $('#returnItemTable tr').eq(ind).find('select.warehouse').val('');
+                            $('#returnItemTable tr').eq(ind).find('select.supplier').val('');
+                            $('#returnItemTable tr').eq(ind).find('label.stock-balance').text(0);
+                            $('#returnItemTable tr').eq(ind).find('label.stock-balance-unit-name').text('');
+                            $('#returnItemTable tr').eq(ind).find('input.stock-balance-unit').val('');
+                            $('#returnItemTable tr').eq(ind).find('input.return-qty').text(0);
+                            $('#returnItemTable tr').eq(ind).find('select.item-unit').empty();
+                            $('#returnItemTable tr').eq(ind).find('.remark').val('');
+                            alert(textStatus);
+                        }
+                    });
+                }
+            }
+        }
+        function checkReturnQty(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var stockBalance = $('#returnItemTable tr').eq(ind).find('label.stock-balance').text();
+            var stockBalanceUnit = $('#returnItemTable tr').eq(ind).find('input.stock-balance-unit').val();
+            var returnQty = $('#returnItemTable tr').eq(ind).find('input.return-qty').val();
+            var returnUnit = $('#returnItemTable tr').eq(ind).find('select.item-unit').val();
+            //console.log(stockBalance + " " + stockBalanceUnit + " " + damageQty + " " + damageUnit);
+
+            if (!returnQty && !returnUnit)
+                return;
+            var splitDamageUnit = returnUnit.split(',');
+            if (stockBalanceUnit == splitDamageUnit[0]) {
+                if (returnQty && Number(returnQty) > Number(stockBalance)) {
+                    alert("Return quantity must be smaller or equal to balance.");
+                    $('#returnItemTable tr').eq(ind).find('input.return-qty').focus();
+                    $('#returnItemTable tr').eq(ind).find('input.return-qty').val(0);
+                }
+            }
+            else {
+                var quantity = 0;
+                var selectedIndex = $('#returnItemTable tr').eq(ind).find('select.item-unit').prop('selectedIndex');
+                if (returnQty) {
+                    if (selectedIndex == 1) {
+                        var splitElement = $('#returnItemTable tr').eq(ind).find('select.item-unit option').eq(selectedIndex).val().split(',');
+                        quantity = returnQty / splitElement[1];
+                    }
+                    else if (selectedIndex == 2) {
+                        var splitElement = $('#returnItemTable tr').eq(ind).find('select.item-unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#returnItemTable tr').eq(ind).find('select.item-unit option').eq(2).val().split(',');
+                        quantity = (returnQty / splitElement[1]) / splitElement2[1];
+                    }
+                    else if (selectedIndex == 3) {
+                        var splitElement = $('#returnItemTable tr').eq(ind).find('select.item-unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#returnItemTable tr').eq(ind).find('select.item-unit option').eq(2).val().split(',');
+                        var splitElement3 = $('#returnItemTable tr').eq(ind).find('select.item-unit option').eq(3).val().split(',');
+                        quantity = ((returnQty / splitElement[1]) / splitElement3[1]) / splitElement2[1];
+                    }
+                    else if (selectedIndex == 4) {
+                        var splitElement = $('#returnItemTable tr').eq(ind).find('select.item-unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#returnItemTable tr').eq(ind).find('select.item-unit option').eq(2).val().split(',');
+                        var splitElement3 = $('#returnItemTable tr').eq(ind).find('select.item-unit option').eq(3).val().split(',');
+                        var splitElement4 = $('#returnItemTable tr').eq(ind).find('select.item-unit option').eq(4).val().split(',');
+                        quantity = ((((returnQty / splitElement[1]) / splitElement4[1]) / splitElement3[1]) / splitElement2[1]);
+                    } else if (selectedIndex == 5) {
+                        var splitElement = $('#returnItemTable tr').eq(ind).find('select.item-unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#returnItemTable tr').eq(ind).find('select.item-unit option').eq(2).val().split(',');
+                        var splitElement3 = $('#returnItemTable tr').eq(ind).find('select.item-unit option').eq(3).val().split(',');
+                        var splitElement4 = $('#returnItemTable tr').eq(ind).find('select.item-unit option').eq(4).val().split(',');
+                        var splitElement5 = $('#returnItemTable tr').eq(ind).find('select.item-unit option').eq(5).val().split(',');
+                        quantity = ((((returnQty / splitElement[1]) / splitElement5[1]) / splitElement4[1]) / splitElement3[1]) / splitElement2;
+                    }
+                    if (quantity > Number(stockBalance)) {
+                        alert("Return quantity must be smaller or equal to balance.");
+                        $('#returnItemTable tr').eq(ind).find('input.return-qty').focus();
+                        $('#returnItemTable tr').eq(ind).find('input.return-qty').val(0);
+                        return;
+                    }
+                }
+            }
+        }
+        function InitialItemInventory(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var itemId = $('#returnItemTable tr').eq(ind).find('input[type="hidden"].item-id').val();
+            var warehouseId = $('#returnItemTable tr').eq(ind).find('select.warehouse').val();
+            if (!itemId || !warehouseId) {
+                return;
+            }
+            $.ajax({
+                url: '/StockIssue/GetInventoryItem',
+                type: "get",
+                dataType: "json",
+                async: false,
+                data: { itemId: itemId, warehouseId: warehouseId },
+                success: function (da) {
+                    if (da.result == "success") {
+                        var returnQty = $('#returnItemTable tr').eq(ind).find('input.return-qty').val();
+                        if (da.data) {
+                            console.log(da.data);
+                            $('#returnItemTable tr').eq(ind).find('label.stock-balance').text(da.data.total_quantity);
+                            $('#returnItemTable tr').eq(ind).find('label.stock-balance-unit').text(da.data.itemUnit);
+                            if (Number(da.data.total_quantity) < Number(returnQty)) {
+                                alert("Return item quantity must be smaller than Stock balance.");
+                                return;
+                            }
+                        } else {
+                            $('#returnItemTable tr').eq(ind).find('label.stock-balance').text(0);
+                            $('#returnItemTable tr').eq(ind).find('label.stock-balance-unit').text('');
+                            if (Number(returnQty) > 0) {
+                                alert("Return item quantity must be smaller than Stock balance.");
+                                return;
+                            }
+                        }
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+
+                }
+            });
+        }
+    </script>
+    }

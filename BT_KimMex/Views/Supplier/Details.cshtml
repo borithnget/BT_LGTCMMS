@@ -1,0 +1,88 @@
+﻿@model BT_KimMex.Models.SupplierViewModel
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h3 class="title">View Supplier Detail</h3>
+
+<div class="form-horizontal">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="col-md-4">Date:</label>
+                <label class="col-md-8">@Convert.ToDateTime(Model.created_date).ToString("dd/MM/yyyy")</label>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4">Supplier Name:</label>
+                <label class="col-md-8">@Model.supplier_name</label>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4">VAT (%):</label>
+                <label class="col-md-8">@Model.discount</label>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4">Contact Phone:</label>
+                <label class="col-md-8">@Model.supplier_phone</label>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4">Email:</label>
+                <label class="col-md-8">@Model.supplier_email</label>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4">Address:</label>
+                <label class="col-md-8">@Model.supplier_address</label>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4">Supplier Type:</label>
+                <label class="col-md-8">@Model.supplier_type</label>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-4 col-md-8">
+                    @Html.ActionLink("Edit", "Edit", "Supplier", new { id = Model.supplier_id }, new { @class = "btn btn-warning" })
+                    <a href="@Url.Action("Index","Supplier")" class="btn btn-danger">Back</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <h4>TERMS & CONDITIONS</h4>
+                    <div class="form-group">
+                        <label class="col-md-4">Incoterms:</label>
+                        <label class="col-md-8">@Model.incoterm</label>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4">Payment:</label>
+                        <label class="col-md-8">@Model.payment</label>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4">Delivery:</label>
+                        <label class="col-md-8">@Model.delivery</label>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4">Shipment:</label>
+                        <label class="col-md-8">@Model.shipment</label>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4">Warranty:</label>
+                        <label class="col-md-8">@Model.warranty</label>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4">Vendor Ref:</label>
+                        <label class="col-md-8">@Model.vendor_ref</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('#supplier_created_date').text(getFormattedDateMMDDYYYY(new Date('@Model.created_date')));
+        });
+    </script>
+}

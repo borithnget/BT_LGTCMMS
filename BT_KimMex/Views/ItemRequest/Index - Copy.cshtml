@@ -1,0 +1,626 @@
+﻿
+
+@model IEnumerable<BT_KimMex.Models.ItemRequestViewModel>
+@using BT_KimMex.Class;
+@{
+    ViewBag.Title = "Index";
+    bool isSM = false;
+    bool isEE = false;
+    bool isMSC = false;
+    bool isAdmin = false;
+    string smName = string.Empty;
+    string status = string.Empty;
+    if (User.IsInRole("Admin"))
+    {
+        isAdmin = true;
+    }
+    if (User.IsInRole("Site Manager"))
+    {
+        isSM = true;
+        smName = User.Identity.Name;
+    }
+    if (User.IsInRole("Economic Engineer"))
+    {
+        isEE = true;
+    }
+    if (User.IsInRole("Main Stock Controller"))
+    {
+        isMSC = true;
+    }
+    if (string.IsNullOrWhiteSpace(Request.QueryString["status"]))
+    {
+        status = string.Empty;
+    }
+    else
+    {
+        status = Request.QueryString["status"].ToString();
+    }
+}
+<style type="text/css">
+    #item_request_table tr td:nth-child(3),#item_request_table tr td:nth-child(4),#item_request_table tr td:nth-child(5){
+        text-align:left !important;
+    }
+    #item_request_table tr td{
+        vertical-align:middle !important;
+    }
+</style>
+<h3 class="title">Purchase Requisition List</h3>
+<div class="row">
+    <div class="form-group">
+        <label class="control-label col-md-3">Purchase Requisition Status:</label>
+        <div class="col-md-9">
+            <select class="form-control" id="p_status">
+                <option value="All" selected>All</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Completed">Completed</option>
+                <option value="Rejected">Rejected</option>
+            </select>
+        </div>
+    </div>
+</div>
+@*<div class="row">
+    <div class="form-group">
+        <label class="control-label col-md-3">Date:</label>
+        <div class="col-md-9">
+
+        </div>
+    </div>
+</div>*@
+<h1></h1>
+<table class="table table-bordered" id="item_request_table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Date</th>
+            <th>PR No</th>
+            <th>Project Name</th>
+            <th>Purpost of Purchase</th>
+            <th>Status</th>
+            <th>Approve</th>
+            <th>Reject</th>
+            <th>View</th>
+            <th>Edit</th>
+            <th>Delete</th>
+            <th>Link To ST</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<!-- delete project modal popup-->
+<div class="modal fade" id="myModal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to delete this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default delete-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- approve project modal popup-->
+<div class="modal fade" id="approveModal" tabindex="=-1" role="dialog" aria-labelledby="approveModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-warning">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to <strong>Approve</strong> this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default approve-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- reject project modal popup-->
+<div class="modal fade" id="rejectModal" tabindex="=-1" role="dialog" aria-labelledby="rejectModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-warning">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <p class="success-message col-md-12">Are you sure to <strong>Reject</strong> this item?</p>
+                    <label class="col-md-2">Comment:</label>
+                    <div class="col-md-10">
+                        <textarea class="form-control" rows="5" id="reject-comment"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default reject-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            var ir_id;
+           
+            //@{
+            //    if (!string.IsNullOrEmpty(status))
+            //    {
+            //        <text>                    
+            //        initial_datatable('@status', '@isAdmin', '@isSM', '@smName');
+            //        $('#p_status').val('@status');
+            //        </text>
+            //    }
+            //    else {
+            //        if (isSM)
+            //        {
+            //            <text>
+            //                initial_datatable("All", '@isAdmin', 'true', '@smName');
+            //            </text>
+            //        }
+            //        else
+            //        {
+                       
+                       
+            //            //<text>
+            //            //    initial_datatable("All", '@isAdmin', 'false');
+            //            //</text>
+            //        }
+            //    }
+            //}
+
+            $('#item_request_table tbody').on('click', 'td a.delete-promp', function () {
+                ir_id = $(this).attr('id');
+                $('#myModal').modal('show');
+            });
+            $('.delete-confirm').click(function () {
+                    if (ir_id != '') {
+                    $.ajax({
+                            url: "/ItemRequest/Delete",
+                        data: {
+                                'id': ir_id,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                                if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                                }
+                            $('#myModal').modal('hide');
+                                if (da.result == "success") {
+                                $.notify('Your data has been deleted!', { className: 'success' });
+                                    window.location.href = '@Url.Action("Index", "ItemRequest")';
+                                }
+                                else if (da.Message == "fail")
+                                $.notify('Your data has been error while deleting!', { className: 'error' });
+                            },
+                        error: function (err) {
+                                if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                                }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while deleting!', { className: 'error' });
+                            }
+                        });
+                    }
+                });
+
+            $('#item_request_table tbody').on('click', 'td a.approve-promp', function () {
+                    ir_id = $(this).attr('id');
+                $('#approveModal').modal('show');
+                });
+            $('.approve-confirm').click(function () {
+                    if (ir_id != '') {
+                    $.ajax({
+                            url: "/ItemRequest/Approve",
+                        data: {
+                                'id': ir_id,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                                if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                                }
+                            $('#approveModal').modal('hide');
+                                if (da.result == "success") {
+                                $.notify('Your data has been approved!', { className: 'success' });
+                                    window.location.href = '@Url.Action("Index","ItemRequest")';
+                                }
+                                else
+                                $.notify('Your data has been error while approving!', { className: 'error' });
+                            },
+                        error: function (err) {
+                                if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.approve-confirm').css('display', 'none');
+                                }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while approving!', { className: 'error' });
+                            }
+                        });
+                    }
+                });
+
+            $('#item_request_table tbody').on('click', 'td a.reject-promp', function () {
+                    ir_id = $(this).attr('id');
+                $('#rejectModal').modal('show');
+                });
+            $('.reject-confirm').click(function () {
+                    if (ir_id != '') {
+                        var rejectComment = $('#reject-comment').val();
+                    $.ajax({
+                            url: "/ItemRequest/Reject",
+                        data: {
+                                'id': ir_id,
+                            'comment': rejectComment,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                                if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                                }
+                            $('#rejectModal').modal('hide');
+                                if (da.result == "success") {
+                                $.notify('Your data has been rejected!', { className: 'success' });
+                                    window.location.href = '@Url.Action("Index","ItemRequest")';
+                                }
+                                else
+                                $.notify('Your data has been error while rejecting!', { className: 'error' });
+                            },
+                        error: function (err) {
+                                if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.reject-confirm').css('display', 'none');
+                                }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while rejecting!', { className: 'error' });
+                            }
+                        });
+                    }
+                });
+
+            $('#p_status').change(function () {
+                    var ir_status = $(this).val();
+                    if (ir_status != null || ir_status != "")
+                        initial_datatable(ir_status, '@isAdmin', '@isSM', '@smName');
+                });
+        });
+
+        function initial_datatable(ir_status, isAdmin, isSM, smName) {
+            //get only one day
+            var date = new Date();
+            var fDate = formatDateYYYYMMDD(date);
+            console.log(fDate);
+
+            var t;
+            if (isAdmin == "True") {
+                t = $('#item_request_table').DataTable({
+                    "bDestroy": true,
+                    "ajax": {
+                        "url": "@Url.Action("ItemRequestDataTable", "ItemRequest")",
+                        "type": "GET",
+                        "dataType": "json",
+                        "data": { ir_status: ir_status, date: fDate },
+                    },
+                    "columns": [
+                        { "data": "ir_id" },
+                        {
+                            "data": "created_date", render: function (data, type, full, meta) {
+                                return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                            }
+                        },
+                        { "data": "ir_no" },
+                        { "data": "project_full_name" },
+                        { "data": "purpose_description" },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.ir_status == "Pending")
+                                    return '<label style="color:orange !important;">' + full.ir_status + '</label>';
+                                else if (full.ir_status == "Approved")
+                                    return '<label style="color:blue !important;">' + full.ir_status + '</label>';
+                                else if (full.ir_status == "Completed")
+                                    return '<label style="color:green !important;">' + full.ir_status + '</label>';
+                                else if (full.ir_status == "Rejected")
+                                    return '<label style="color:gray !important;">' + full.ir_status + '</label>';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.ir_status == "Pending")
+                                    return '<a href="/ItemRequest/Approved/' + full.ir_id + '">Approve</a>';
+                                return '';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.ir_status == "Pending")
+                                    return '<a href="javascript:void(0)" id="' + full.ir_id + '" class="reject-promp">Reject</a>';
+                                return '';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return '<a href="/ItemRequest/Detail/' + full.ir_id + '">View Detail</a>';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.ir_status == "Rejected" || full.ir_status == "Pending")
+                                    return '<a href="/ItemRequest/Edit/' + full.ir_id + '">Edit</a>';
+                                else
+                                    return '';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.ir_status == "Rejected" || full.ir_status == "Pending")
+                                    return '<a href="javascript:void(0)" id="' + full.ir_id + '" class="delete-promp">Delete</a>';
+                                else return '';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.isCompleted == false)
+                                    return '<a href="/StockTransfer/Create/' + full.ir_id + '">Link to ST</a>';
+                                return '';
+                            }
+                        },
+                    ],
+                    "order": [[2, "desc"]],
+                });
+                $('#item_request_table_filter').append('<a href="@Url.Action("NewRequest","ItemRequest")" class="btn btn-default pull-left" style="margin-right:10px !important;">Add New</a>');
+            }
+            else if (isSM == "true") {
+                t = $('#item_request_table').DataTable({
+                    "bDestroy": true,
+                    "ajax": {
+                        "url": "@Url.Action("ItemRequestDataTable", "ItemRequest")",
+                        "type": "GET",
+                        "dataType": "json",
+                        "data": { ir_status: ir_status, role: smName,date: fDate },
+                    },
+                    "columns": [
+                        { "data": "ir_id" },
+                        {
+                            "data": "created_date", render: function (data, type, full, meta) {
+                                return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                            }
+                        },
+                        { "data": "ir_no" },
+                        { "data": "project_full_name" },
+                        { "data": "purpose_description" },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.ir_status == "Pending")
+                                    return '<label style="color:orange !important;">' + full.ir_status + '</label>';
+                                else if (full.ir_status == "Approved")
+                                    return '<label style="color:blue !important;">' + full.ir_status + '</label>';
+                                else if (full.ir_status == "Completed")
+                                    return '<label style="color:green !important;">' + full.ir_status + '</label>';
+                                else if (full.ir_status == "Rejected")
+                                    return '<label style="color:gray !important;">' + full.ir_status + '</label>';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return '<a href="javascript:void(0)" id="' + full.ir_id + '" class="approve-promp">Approve</a>';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return '<a href="javascript:void(0)" id="' + full.ir_id + '" class="reject-promp">Reject</a>';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return '<a href="/ItemRequest/Detail/' + full.ir_id + '">View Detail</a>';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.ir_status == "Rejected" || full.ir_status == "Pending")
+                                    return '<a href="/ItemRequest/Edit/' + full.ir_id + '">Edit</a>';
+                                else
+                                    return '';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.ir_status == "Rejected" || full.ir_status == "Pending")
+                                    return '<a href="javascript:void(0)" id="' + full.ir_id + '" class="delete-promp">Delete</a>';
+                                else return '';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return '<a href="/StockTransfer/Create/' + full.ir_id + '">Link to ST</a>';
+                            }
+                        },
+                    ],
+                    "order": [[2, "desc"]],
+                    "columnDefs": [
+                        {
+                            "targets": [6],
+                            "visible": false,
+                        },
+                        {
+                            "targets": [7],
+                            "visible": false,
+                        },
+                        {
+                            "targets": [11],
+                            "visible": false,
+                        }
+                    ]
+                });
+                $('#item_request_table_filter').append('<a href="@Url.Action("Create","ItemRequest")" class="btn btn-default pull-left" style="margin-right:10px !important;">Add New</a>');
+            } else {
+                t = $('#item_request_table').DataTable({
+                    "bDestroy": true,
+                    "ajax": {
+                        "url": "@Url.Action("ItemRequestDataTable", "ItemRequest")",
+                        "type": "GET",
+                        "dataType": "json",
+                        "data": { ir_status: ir_status,date: fDate },
+                    },
+                    "columns": [
+                        { "data": "ir_id" },
+                        {
+                            "data": "created_date", render: function (data, type, full, meta) {
+                                return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                            }
+                        },
+                        { "data": "ir_no" },
+                        { "data": "project_full_name" },
+                        { "data": "purpose_description" },
+                        //{ "data": "ir_status" },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.ir_status == "Pending")
+                                    return '<label style="color:orange !important;">' + full.ir_status + '</label>';
+                                else if (full.ir_status == "Approved")
+                                    return '<label style="color:purple !important;">' + full.ir_status + '</label>';
+                                else if (full.ir_status == "Completed")
+                                    return '<label style="color:green !important;">' + full.ir_status + '</label>';
+                                else if (full.ir_status == "Rejected")
+                                    return '<label style="color:red !important;">' + full.ir_status + '</label>';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                @{ if (isEE)
+                                    {
+                                        <text>
+                                if (full.ir_status == "Pending") {
+                                    //return '<a href="javascript:void(0)" id="' + full.ir_id + '" class="approve-promp">Approve</a>';
+                                    return '<a href="/ItemRequest/Approved/' + full.ir_id + '">Approve</a>';
+                                }
+                                else
+                                    return '';
+                                </text>
+                                    }else
+                                    {
+                                        <text>
+                                return ' ';
+                                </text>
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                @{ if (isEE)
+                                {
+                                    <text>
+                                if (full.ir_status == "Pending") {
+                                    return '<a href="javascript:void(0)" id="' + full.ir_id + '" class="reject-promp">Reject</a>';
+                                }
+                                else
+                                    return '';
+                                </text>
+                                }else
+                                {
+                                    <text>
+                                return ' ';
+                                </text>
+                                }
+                                }
+
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return '<a href="/ItemRequest/Detail/' + full.ir_id + '">View Detail</a>';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return '<a href="/ItemRequest/Edit/' + full.ir_id + '">Edit</a>';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return '<a href="javascript:void(0)" id="' + full.ir_id + '" class="delete-promp">Delete</a>';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                @{
+                                    if (isMSC)
+                                    {
+                                        <text>
+                                if (full.isCompleted == false) {
+                                    return '<a href="/StockTransfer/Create/' + full.ir_id + '">Link to ST</a>';
+                                }
+                                else {
+                                    return '';
+                                }
+                                </text>
+                                    }
+                                    else
+                                    {
+                                        <text>
+                                return '';
+                                </text>
+                                    }
+                                }
+
+                            }
+                        },
+                    ],
+                    "order": [[2, "desc"]],
+                    "columnDefs": [
+                        {
+                            "targets": [9],
+                            "visible": false,
+                        },
+                        {
+                            "targets": [10],
+                            "visible": false,
+                        },
+                        {
+                            "targets": [11],
+                            "visible": false,
+                        }
+                    ]
+                });
+            }
+
+            t.on('order.dt search.dt', function () {
+                t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+            $('select[name="item_request_table_length"]').addClass('datatable-control');
+            $('input[aria-controls="item_request_table"]').addClass('datatable-control');
+
+        }
+
+        function formatDateYYYYMMDD(date) {
+            var d = new Date(date),
+                month = '' + (d.getMonth() + 1),
+                day = '' + d.getDate(),
+                year = d.getFullYear();
+
+            if (month.length < 2) month = '0' + month;
+            if (day.length < 2) day = '0' + day;
+
+            return [year, month, day].join('-');
+        }
+    </script>
+}

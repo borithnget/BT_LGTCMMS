@@ -1,0 +1,779 @@
+﻿@model BT_KimMex.Models.Home
+@{
+    ViewBag.Title = "Home Page";
+}
+@*<link href="~/Assets/style.min.css"  type="text/css" rel="stylesheet"/>*@
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<style>
+    /*.bg {
+       
+        background-image: url(../Assets/Images/kim_mex_cover1.jpg);
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center;
+        height: 100%;
+        background-size: cover;
+    }*/
+    .widget-overview {
+                margin-bottom: 10px;
+                /*border-radius:50% !important;*/
+            }
+
+                .widget-overview > .inner {
+                    padding: 15px;
+                    color: #fff;
+                }
+
+                    .widget-overview > .inner > h2 {
+                        font-weight: 900;
+                    }
+
+                    .widget-overview > .inner > p {
+                        font-weight: bold;
+                    }
+
+                .widget-overview > .icon {
+                    position: absolute;
+                    right: 25px;
+                    top: 5px;
+                    font-size: 60px;
+                    color: rgba(0, 0, 0, 0.25);
+                }
+
+                .widget-overview > .details {
+                    padding: 3px;
+                    color: #fff;
+                    text-align: center;
+                    /*font-size: 0.688rem;*/
+                    opacity: 0.85;
+                }
+
+                    .widget-overview > .details:hover {
+                        opacity: 1;
+                        cursor: pointer;
+                    }
+
+                    .widget-overview > .details > span i {
+                        margin-left: 5px;
+                    }
+
+            .text-primary-1 {
+                color: #65A6CC;
+            }
+
+            .bg-primary-1 {
+                background-color: #65A6CC;
+            }
+
+            .bg-primary-2 {
+                background-color: #398DBD;
+            }
+
+            .bg-primary-3 {
+                background-color: #2380B6;
+            }
+
+            .bg-primary-4 {
+                background-color: #0E74AF;
+            }
+
+            .bg-primary-5 {
+                background-color: #0D6AA0;
+            }
+
+            .bg-success-1 {
+                background-color: #8EBE86;
+            }
+
+            .bg-success-2 {
+                background-color: #69A95E;
+            }
+
+            .bg-success-3 {
+                background-color: #569E4A;
+            }
+
+            .bg-success-4 {
+                background-color: #3C7D30;
+            }
+
+            .bg-success-5 {
+                background-color: #2D7D1F;
+            }
+
+            .bg-danger-1 {
+                background-color: #FF9C9C;
+            }
+
+            .bg-danger-2 {
+                background-color: #FF7474;
+            }
+
+            .bg-danger-3 {
+                background-color: #FF4D4D;
+            }
+
+            .bg-danger-4 {
+                background-color: #FF3939;
+            }
+
+            .bg-danger-5 {
+                background-color: #FF2626;
+            }
+
+            .bg-warning-1 {
+                background-color: #FAB68E;
+            }
+
+            .bg-warning-2 {
+                background-color: #F99E69;
+            }
+
+            .bg-warning-3 {
+                background-color: #F89256;
+            }
+
+            .bg-warning-4 {
+                background-color: #F78643;
+            }
+
+            .bg-warning-5 {
+                background-color: #F77A31;
+            }
+
+            .bg-info-1 {
+                background-color: red;
+            }
+
+            .bg-info-2 {
+                background-color: #67979E;
+            }
+
+            .bg-info-3 {
+                background-color: #468189;
+            }
+
+            .bg-info-4 {
+                background-color: #40767D;
+            }
+
+            .bg-info-5 {
+                background-color: #3A6A71;
+            }
+
+            h1, h2, h3, h4, h5, h6 {
+                font-family: 'Gothic A1',sans-serif !important;
+            }
+
+            .shortcuts {
+                text-align: center;
+            }
+            /*.btn-lg {
+            padding: 10px 60px;
+            font-size: 40px;
+            line-height: 1.33;
+            /*border-radius: 6px;
+            margin-bottom: 5px;
+        }*/
+            .box {
+                border-radius: 0px;
+                padding: 10px;
+                margin-bottom: 5px !important;
+            }
+
+            .text-center {
+                text-align: center !important;
+            }
+
+            .bg-cyan {
+                background-color: #27a9e3 !important;
+                /*background-color:red;*/
+            }
+
+            .text-white {
+                color: #fff !important;
+            }
+
+            .card-hover:hover {
+                webkit-transform: translateY(-4px) scale(1.01);
+                -moz-transform: translateY(-4px) scale(1.01);
+                -ms-transform: translateY(-4px) scale(1.01);
+                -o-transform: translateY(-4px) scale(1.01);
+                -o-transform: translateY(-4px) scale(1.01);
+                -webkit-transform: translateY(-4px) scale(1.01);
+                transform: translateY(-4px) scale(1.01);
+                -webkit-box-shadow: 0 14px 24px rgba(62, 57, 107, 0.1);
+                box-shadow: 0 14px 24px rgba(62, 57, 107, 0.1);
+                cursor: pointer;
+            }
+
+            body {
+                padding-top: 50px;
+                padding-bottom: 20px;
+                font-family: 'Gothic A1',sans-serif;
+                font-size: 14px;
+            }
+
+            .mySlides {
+                display: none;
+            }
+            .customLogo{
+                 width:65px;
+                 height:65px; 
+                 border-radius:50%; 
+                 margin-top:-20px;
+            }
+            .customLogo2{
+                 width:50px;
+                 height:50px;
+                 border-radius:50%;     
+            }
+            .page-title{
+                color: white !important;
+            }
+    
+</style>
+<body style="background-color:rgba(20, 76, 70, 0.2); " class="row" >
+    <div class="row" style="background-color:#d0cecf; margin-top:-30px !important">
+        <div class="w3-content w3-section" style="max-width:100%">
+            @*KimMex side bar*@
+            @*<img class="mySlides" src="~/Assets/img/photo_2018-06-07_08-55-06.jpg" style="width:100%">*@
+            <img class="mySlides" src="~/Assets/img/photo_2018-06-07_09-01-00.jpg" style="width:100%">
+            <img class="mySlides" src="~/Assets/img/photo_2018-06-07_09-14-46.jpg" style="width:100%">
+            @*<img class="mySlides" src="~/Assets/img/Kim_mex_cover1.jpg" style="width:100%">*@
+            @*<img class="mySlides" src="~/Assets/img/Kim_mex_cover2.jpg" style="width:100%">*@
+            @*<img class="mySlides" src="~/Assets/img/kim_mex_cover3.jpg" style="width:100%">*@
+            @*<img class="mySlides" src="~/Assets/img/kim_mex_cover4.jpg" style="width:100%">
+            <img class="mySlides" src="~/Assets/img/kim_mex_cover5.jpg" style="width:100%">*@
+             
+            @*add slider pro bk*@
+            @*<img class="mySlides" src="~/Assets/img/Pro_BK_index1.jpg" style="width:100%"/>
+            <img class="mySlides" src="~/Assets/img/Pro_BK_index2.jpg" style="width:100%" />*@
+
+        </div>
+    </div>
+    <div style="background-color:#d0cecf">
+        <div class="row" Style="background-color:#3b3280;margin-top:-10px;">
+            <div class="col-md-12">
+                <h4 class="page-title">Pending Request</h4>
+            </div>
+        </div>
+        <div class="row" style="border:1px solid #f8f8f8;padding-bottom:5px; background-color:white ">
+            <div style="margin-top:15px; ">
+                <!-- start row 1-->
+                @if (User.IsInRole("Admin") || User.IsInRole("Project Manager"))
+            {
+                    <div class="col-lg-2 col-xs-6">
+                        <div class="widget-overview" style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5);">
+                            <div class="inner">
+                                <h2>@Model.PendingBOQ</h2>
+                                <p>BoQ for PM</p>
+                            </div>
+                            <div class="icon">
+                                @*<i class="fa fa-map-o"></i>*@
+                                <img src="~/Assets/Images/logo1.jpg" class="customLogo" />
+                                @*<i class="fa fa-book"></i>*@
+                            </div>
+                            <div class="details bg-info-3">
+                                <a href="@Url.Action("Index", "BOQ", new { status = "Pending" })" style="color:white!important;text-decoration:none !important;">View Details <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (User.IsInRole("Admin") || User.IsInRole("Director"))
+            {
+                    <div class="col-lg-2 col-xs-6">
+                        <div class="widget-overview " style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                            <div class="inner">
+                                <h2>@Model.ApprovedBOQ</h2>
+                                <p>BoQ for Dir.</p>
+                            </div>
+                            <div class="icon" style="color:white">
+                                <img src="~/Assets/Images/logo1.jpg" class="customLogo" />
+                                @*<i class="fa fa-book"></i>*@
+                            </div>
+                            <div class="details bg-info-3">
+                                <a href="@Url.Action("Index", "BOQ", new { status = "Approved" })" style="color:white!important;text-decoration:none !important;">View Details <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (User.IsInRole("Admin") || User.IsInRole("Economic Engineer"))
+            {
+                    <div class="col-lg-2 col-xs-6">
+                        <div class="widget-overview " style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                            <div class="inner">
+                                <h2>@Model.pendingIR</h2>
+                                <p>Item Request</p>
+                            </div>
+                            <div class="icon">
+                                <img src="~/Assets/Images/logo2.jpg" class="customLogo" />
+                                @*<i class="fa fa-spinner"></i>*@
+                            </div>
+                            <div class="details bg-info-3">
+                                <a href="@Url.Action("Index", "ItemRequest", new { status = "Pending" })" style="color:white!important;text-decoration:none !important;">View Details <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (User.IsInRole("Admin") || User.IsInRole("Chief of Finance Officer"))
+            {
+                    <div class="col-lg-2 col-xs-6">
+                        <div class="widget-overview " style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                            <div class="inner">
+                                <h2>@Model.PendingPO</h2>
+                                <p>PO for CFO</p>
+                            </div>
+                            <div class="icon">
+                                <img src="~/Assets/Images/logo3.jpg" class="customLogo" />
+                                @*<i class="fa fa-money"></i>*@
+                            </div>
+                            <div class="details bg-info-3">
+                                <a href="@Url.Action("Index", "PurchaseOrder", new { status = "Pending" })" style="color:white!important;text-decoration:none !important;">View Details <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (User.IsInRole("Admin") || User.IsInRole("Director"))
+            {
+                    <div class="col-lg-2 col-xs-6">
+                        <div class="widget-overview " style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                            <div class="inner">
+                                <h2>@Model.ApprovedPO</h2>
+                                <p>PO for Dir.</p>
+                            </div>
+                            <div class="icon">
+                                <img src="~/Assets/Images/logo3.jpg" class="customLogo" />
+                                @*<i class="fa fa-money"></i>*@
+                            </div>
+                            <div class="details bg-info-3">
+                                <a href="@Url.Action("Index", "PurchaseOrder", new { status = "Approved" })" style="color:white!important;text-decoration:none !important;">View Details <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                <!-- end row 1-->
+                <!-- start row 2-->
+                @if (User.IsInRole("Admin") || User.IsInRole("Main Stock Controller") || User.IsInRole("Purchaser"))
+            {
+                    <div class="col-lg-2 col-xs-6">
+                        <div class="widget-overview " style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                            <div class="inner">
+                                <h2>@Model.PendingIRec</h2>
+                                <p>Item Receive</p>
+                            </div>
+                            <div class="icon">
+                                <img src="~/Assets/Images/logo4.jpg" class="customLogo" />
+                                @*<i class="fa fa-download"></i>*@
+                            </div>
+                            <div class="details bg-info-3">
+                                <a href="@Url.Action("Index", "ItemReceive", new { status = "Pending" })" style="color:white!important;text-decoration:none !important;">View Details <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (User.IsInRole("Admin") || User.IsInRole("Chief of Finance Officer"))
+            {
+                    <div class="col-lg-2 col-xs-6">
+                        <div class="widget-overview " style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                            <div class="inner">
+                                <h2>@Model.PendingIRet</h2>
+                                <p>Item Return</p>
+                            </div>
+                            <div class="icon">
+                                <img src="~/Assets/Images/logo5.jpg" class="customLogo" />
+                                @*<i class="fa fa-reply-all"></i>*@
+                            </div>
+                            <div class="details bg-info-3">
+                                <a href="@Url.Action("Index", "ItemReturn", new { status = "Pending" })" style="color:white!important;text-decoration:none !important;">View Details <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (User.IsInRole("Admin") || User.IsInRole("Chief of Finance Officer"))
+            {
+                    <div class="col-lg-2 col-xs-6">
+                        <div class="widget-overview " style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                            <div class="inner">
+                                <h2>@Model.PendingST</h2>
+                                <p>Stock Transfer</p>
+                            </div>
+                            <div class="icon">
+                                <img src="~/Assets/Images/logo6.jpg" class="customLogo" />
+                                @*<i class="fa fa-exchange"></i>*@
+                            </div>
+                            <div class="details bg-info-3">
+                                <a href="@Url.Action("Index", "StockTransfer", new { status = "Pending" })" style="color:white!important;text-decoration:none !important;">View Details <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (User.IsInRole("Admin") || User.IsInRole("Main Stock Controller") || User.IsInRole("Purchaser"))
+            {
+                    <div class="col-lg-2 col-xs-6">
+                        <div class="widget-overview " style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                            <div class="inner">
+                                <h2>@Model.PendingSD</h2>
+                                <p>Stock Damage</p>
+                            </div>
+                            <div class="icon">
+                                <img src="~/Assets/Images/logo7.jpg" class="customLogo" />
+                                @*<i class="fa fa-chain-broken"></i>*@
+                            </div>
+                            <div class="details bg-info-3">
+                                <a href="@Url.Action("Index", "StockDamage", new { status = "Pending" })" style="color:white!important;text-decoration:none !important;">View Details <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (User.IsInRole("Admin") || User.IsInRole("Main Stock Controller") || User.IsInRole("Purchaser"))
+            {
+                    <div class="col-lg-2 col-xs-6">
+                        <div class="widget-overview " style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                            <div class="inner">
+                                <h2>@Model.PendingSIss</h2>
+                                <p>Stock Issue</p>
+                            </div>
+                            <div class="icon">
+                                <img src="~/Assets/Images/logo8.jpg" class="customLogo" />
+                                @*<i class="fa fa-location-arrow"></i>*@
+                            </div>
+                            <div class="details bg-info-3">
+                                <a href="@Url.Action("Index", "StockIssue", new { status = "Pending" })" style="color:white!important;text-decoration:none !important;">View Details <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (User.IsInRole("Admin") || User.IsInRole("Main Stock Controller") || User.IsInRole("Purchaser"))
+            {
+                    <div class="col-lg-2 col-xs-6">
+                        <div class="widget-overview " style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                            <div class="inner">
+                                <h2>@Model.PendingIssRe</h2>
+                                <p>Issue Return</p>
+                            </div>
+                            <div class="icon">
+                                <img src="~/Assets/Images/logo9.jpg" class="customLogo" />
+                                @*<i class="fa fa-refresh"></i>*@
+                            </div>
+                            <div class="details bg-info-3">
+                                <a href="@Url.Action("Index", "StockIssueReturn", new { status = "Pending" })" style="color:white!important;text-decoration:none !important;">View Details <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!--end row 2-->
+            </div>
+        </div>
+
+
+
+        @*<div class="row" Style="background-color:#3b3280; border-top:20px solid #d0cecf">
+            <div class="col-md-12">
+                <h4 class="page-title">Quick Link</h4>
+            </div>
+        </div>
+            <div class="row" style="border:1px solid #f8f8f8;padding-bottom:10px;background-color:white;">
+                <div style="margin-top:15px; ">
+                    @if (User.IsInRole("Admin") || User.IsInRole("Economic Engineer"))
+            {
+                        <div class="col-md-6 col-lg-2 col-xlg-3">
+                            <div class="card card-hover">
+                                <a href="@Url.Action("Create","BOQ")" style="text-decoration:none;">
+                                    <div class="box  text-center" style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                                        <h1 class="font-light text-white">
+                                  
+                                            <img src="~/Assets/Images/logo1.jpg" class="customLogo2" />
+
+                                        </h1>
+                                        <h6 class="text-white" style="font-size:14px;font-weight:700;">BoQ</h6>
+                                    </div>
+
+                                </a>
+
+                            </div>
+                        </div>
+                    }
+                    @if (User.IsInRole("Admin") || User.IsInRole("Site Manager"))
+            {
+                        <div class="col-md-6 col-lg-2 col-xlg-3">
+                            <div class="card card-hover">
+                                <a href="@Url.Action("Create","ItemRequest")" style="text-decoration:none;">
+                                    <div class="box  text-center" style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                                        <h1 class="font-light text-white">
+                                     
+                                            <img src="~/Assets/Images/logo2.jpg" class="customLogo2" />
+
+                                        </h1>
+                                        <h6 class="text-white" style="font-size:14px;font-weight:700;">Item Request</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-2 col-xlg-3">
+                            <div class="card card-hover">
+                                <a href="@Url.Action("Create","ItemReceive")" style="text-decoration:none;">
+                                    <div class="box  text-center" style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                                        <h1 class="font-light text-white">
+                       
+                                            <img src="~/Assets/Images/logo4.jpg" class="customLogo2" />
+                                        </h1>
+                                        <h6 class="text-white" style="font-size:14px;font-weight:700;">Item Receive</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                    @if (User.IsInRole("Admin") || User.IsInRole("Main Stock Controller") || User.IsInRole("Purchaser"))
+            {
+                        <div class="col-md-6 col-lg-2 col-xlg-3">
+                            <div class="card card-hover">
+                                <a href="@Url.Action("Create","PurchaseOrder")" style="text-decoration:none;">
+                                    <div class="box  text-center" style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                                        <h1 class="font-light text-white">
+                         
+                                            <img src="~/Assets/Images/logo3.jpg" class="customLogo2" />
+                                        </h1>
+                                        <h6 class="text-white" style="font-size:14px;font-weight:700;">Purchase Order</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-2 col-xlg-3">
+                            <div class="card card-hover">
+                                <a href="@Url.Action("Create","ItemReturn")" style="text-decoration:none;">
+                                    <div class="box  text-center" style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                                        <h1 class="font-light text-white">
+           
+                                            <img src="~/Assets/Images/logo5.jpg" class="customLogo2" />
+                                        </h1>
+                                        <h6 class="text-white" style="font-size:14px;font-weight:700;">Item Return</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-2 col-xlg-3">
+                            <div class="card card-hover">
+                                <a href="@Url.Action("Create","StockTransfer")" style="text-decoration:none;">
+                                    <div class="box  text-center" style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                                        <h1 class="font-light text-white">
+                           
+                                            <img src="~/Assets/Images/logo6.jpg" class="customLogo2" />
+                                        </h1>
+                                        <h6 class="text-white" style="font-size:14px;font-weight:700;">Stock Transfer</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                    @if (User.IsInRole("Admin") || User.IsInRole("Price Manager"))
+            {
+                        <div class="col-md-6 col-lg-2 col-xlg-3">
+                            <div class="card card-hover">
+                                <a href="@Url.Action("Create","Quote")" style="text-decoration:none;">
+                                    <div class="box  text-center" style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                                        <h1 class="font-light text-white">
+                                      
+                                            <img src="~/Assets/Images/logo16.jpg" class="customLogo2" />
+                                        </h1>
+                                        <h6 class="text-white" style="font-size:14px;font-weight:700;">Quote</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                    @if (User.IsInRole("Admin") || User.IsInRole("Stock Keeper"))
+            {
+                        <div class="col-md-6 col-lg-2 col-xlg-3">
+                            <div class="card card-hover">
+                                <a href="@Url.Action("Create","StockDamage")" style="text-decoration:none;">
+                                    <div class="box  text-center" style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                                        <h1 class="font-light text-white">
+                           
+                                            <img src="~/Assets/Images/logo7.jpg" class="customLogo2" />
+                                        </h1>
+                                        <h6 class="text-white" style="font-size:14px;font-weight:700;">Stock Damage</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-2 col-xlg-3">
+                            <div class="card card-hover">
+                                <a href="@Url.Action("Create","StockIssue")" style="text-decoration:none;">
+                                    <div class="box  text-center" style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                                        <h1 class="font-light text-white">
+                                
+                                            <img src="~/Assets/Images/logo8.jpg" class="customLogo2" />
+                                        </h1>
+                                        <h6 class="text-white" style="font-size:14px;font-weight:700;">Stock Issue</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-2 col-xlg-3">
+                            <div class="card card-hover">
+                                <a href="@Url.Action("Create","StockIssueReturn")" style="text-decoration:none;">
+                                    <div class="box  text-center" style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                                        <h1 class="font-light text-white">
+                                            <img src="~/Assets/Images/logo9.jpg" class="customLogo2" />
+                                        </h1>
+                                        <h6 class="text-white" style="font-size:14px;font-weight:700;">Issue Return</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                    @if (User.IsInRole("Admin"))
+            {
+                        <div class="col-md-6 col-lg-2 col-xlg-3">
+                            <div class="card card-hover">
+                                <a href="@Url.Action("Create","Project")" style="text-decoration:none;">
+                                    <div class="box  text-center" style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                                        <h1 class="font-light text-white">
+                                            <img src="~/Assets/Images/logo1.jpg" class="customLogo2" />
+                                        </h1>
+                                        <h6 class="text-white" style="font-size:14px;font-weight:700;">Project</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-2 col-xlg-3">
+                            <div class="card card-hover">
+                                <a href="@Url.Action("Create","Customer")" style="text-decoration:none;">
+                                    <div class="box  text-center" style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                                        <h1 class="font-light text-white">
+                                            <img src="~/Assets/Images/logo15.jpg" class="customLogo2" />
+                                        </h1>
+                                        <h6 class="text-white" style="font-size:14px;font-weight:700;">Customer</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-2 col-xlg-3">
+                            <div class="card card-hover">
+                                <a href="@Url.Action("Create","Product")" style="text-decoration:none;">
+                                    <div class="box  text-center" style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                                        <h1 class="font-light text-white">
+                                            <img src="~/Assets/Images/logo10.jpg" class="customLogo2" />
+                                        </h1>
+                                        <h6 class="text-white" style="font-size:14px;font-weight:700;">Item</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-2 col-xlg-3">
+                            <div class="card card-hover">
+                                <a href="@Url.Action("Create","ProductCategory")" style="text-decoration:none;">
+                                    <div class="box  text-center" style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                                        <h1 class="font-light text-white">
+                                            <img src="~/Assets/Images/logo11.jpg" class="customLogo2" />
+                                        </h1>
+                                        <h6 class="text-white" style="font-size:14px;font-weight:700;">Item Type</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-2 col-xlg-3">
+                            <div class="card card-hover">
+                                <a href="@Url.Action("Create","JobCategory")" style="text-decoration:none;">
+                                    <div class="box  text-center" style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                                        <h1 class="font-light text-white">
+                                            <img src="~/Assets/Images/logo12.jpg" class="customLogo2" />
+                                        </h1>
+                                        <h6 class="text-white" style="font-size:14px;font-weight:700;">Job Category</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-2 col-xlg-3">
+                            <div class="card card-hover">
+                                <a href="@Url.Action("Create","Site")" style="text-decoration:none;">
+                                    <div class="box  text-center" style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                                        <h1 class="font-light text-white">
+                                            <img src="~/Assets/Images/logo14.jpg" class="customLogo2" />
+                                        </h1>
+                                        <h6 class="text-white" style="font-size:14px;font-weight:700;">Site</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-2 col-xlg-3">
+                            <div class="card card-hover">
+                                <a href="@Url.Action("Create","Supplier")" style="text-decoration:none;">
+                                    <div class="box  text-center" style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                                        <h1 class="font-light text-white">
+                                            <img src="~/Assets/Images/logo13.jpg" class="customLogo2" />
+                                        </h1>
+                                        <h6 class="text-white" style="font-size:14px;font-weight:700;">Supplier</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-2 col-xlg-3">
+                            <div class="card card-hover">
+                                <a href="@Url.Action("Create","Unit")" style="text-decoration:none;">
+                                    <div class="box  text-center" style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                                        <h1 class="font-light text-white">
+                                            <img src="~/Assets/Images/logo17.jpg" class="customLogo2" />
+                                        </h1>
+                                        <h6 class="text-white" style="font-size:14px;font-weight:700;">Unit</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-2 col-xlg-3">
+                            <div class="card card-hover">
+                                <a href="@Url.Action("Create","WareHouse")" style="text-decoration:none;">
+                                    <div class="box  text-center" style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                                        <h1 class="font-light text-white">
+                                            <img src="~/Assets/Images/logo18.jpg" class="customLogo2" />
+                                        </h1>
+                                        <h6 class="text-white" style="font-size:14px;font-weight:700;">Warehouse</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-2 col-xlg-3">
+                            <div class="card card-hover">
+                                <a href="@Url.Action("Register","Account")" style="text-decoration:none; ">
+                                    <div class="box  text-center" style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                                        <h1 class="font-light text-white">
+                                            <img src="~/Assets/Images/logo15.jpg" class="customLogo2" />
+                                        </h1>
+                                        <h6 class="text-white" style="font-size:14px;font-weight:700;">User</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>*@
+
+
+
+        </div>
+
+</body>
+@section Scripts{
+    <script type="text/javascript">
+        var myIndex = 0;
+        $(function () {
+            carousel();
+        });
+
+        function carousel() {
+            var i;
+            var x = document.getElementsByClassName("mySlides");
+            for (i = 0; i < x.length; i++) {
+                x[i].style.display = "none";
+            }
+            myIndex++;
+            if (myIndex > x.length) { myIndex = 1 }
+            x[myIndex - 1].style.display = "block";
+            setTimeout(carousel, 5000); // Change image every 2 seconds
+        }
+    </script>
+    }

@@ -1,0 +1,662 @@
+﻿@model BT_KimMex.Models.PurchaseOrderViewModel
+@using BT_KimMex.Class
+@{
+    ViewBag.Title = "Create";
+    //ViewBag.LayoutStyle = "big";
+    bool isPur;
+    if (!User.IsInRole("Purchaser"))
+    {
+        isPur = false;
+    }
+    else
+    {
+        isPur = true;
+    }
+}
+@*<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />*@
+<style type="text/css">
+    /*body {
+        margin: 0 20px !important;
+    }*/
+
+    #po_table select {
+        width: 150px !important;
+    }
+    /*#po_table input[type="number"]{
+        width:100px !important;
+    }*/
+    #po_table thead th,#po_table tr td {
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+    #po_table tr td:nth-child(3){
+        text-align:left !important;
+    }
+</style>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <h3 class="title">Create New Quote Request</h3>
+        <div class="form-group">
+            @Html.Label("Quote Date :", htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.Label("Date", new { @class = "col-md-10", id = "current_date" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.purchase_oder_number, htmlAttributes: new { @class = "control-label col-md-2" })
+            <label class="control-label col-md-2"></label>
+            @Html.Label("PO Number", new { @class = "col-md-10", id = "purchase_oder_number" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.ir_project_id, htmlAttributes: new { @class = "control-label col-md-2" })
+            @*@Html.Label(" ", new { @class = "col-md-10", id = "ir_project_id" })*@
+            <div class="col-md-10">
+                @Html.DropDownList("ir_project_id", ViewBag.Projects as SelectList, "Select Project", new { @class = "form-control" })
+            </div>
+        </div>
+
+        <!--Rathana add 10.04.2019-->
+        <div class="form-group">
+            @Html.LabelFor(model => model.POLNumber, htmlAttributes: new { @class = "control-label col-md-2" })
+            @*@Html.Label(" ", new { @class = "col-md-10", id = "ir_project_id" })*@
+            <div class="col-md-10">
+                <label id="POLNumber"></label>
+            </div>
+        </div>
+        <!--End Rathana Add-->
+
+        <div class="form-group">
+            <label class="control-label col-md-2">MR Ref.<strong style="color:red;">*</strong> :</label>
+            <div class="col-md-10">
+                @*@Html.DropDownList("item_request_id", @ViewBag.IRID as SelectList, "Select Purchase Requisition", new { @class = "form-control", id = "item_request_id" })*@
+                <select class="form-control" id="item_request_id" name="item_request_id">
+                    <option>Select Purchase Requisition</option>
+                </select>
+                @Html.ValidationMessageFor(model => model.item_request_id, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <!--Rathana add 10.04.2019-->
+        <div class="form-group">
+            @Html.LabelFor(model => model.ShippingTo, htmlAttributes: new { @class = "control-label col-md-2" })
+            @*@Html.Label(" ", new { @class = "col-md-10", id = "ir_project_id" })*@
+            <div class="col-md-10">
+                @Html.HiddenFor(m => m.ShippingTo)
+               @Html.TextBox("ShippingUser","",null, new { @class = "form-control" })
+            </div>
+
+        </div>
+        <!--End Rathana Add-->
+
+        <div class="row" style="margin:0 !important;">
+            <table class="table table-responsive table-bordered" id="po_table">
+                <thead>
+                    <tr>
+                        <th rowspan="2">No.</th>
+                        <th rowspan="2">Item Code</th>
+                        <th rowspan="2">Item Name</th>
+                        <th rowspan="2">Requested QTY</th>
+                        <th rowspan="2">Unit</th>
+                        <th colspan="2">Supplier 1</th>
+                        <th colspan="2">Supplier 2</th>
+                        <th colspan="2">Supplier 3</th>
+                        <th rowspan="2"></th>
+                        <th rowspan="2"></th>
+                    </tr>
+                    <tr>
+                        <th>Name</th>
+                        <th>Unit Price</th>
+                        <th>Name</th>
+                        <th>Unit Price</th>
+                        <th>Name</th>
+                        <th>Unit Price</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label">Attachment Reference :</label>
+            <div class="col-md-10">
+                <input type="file" class="form-control" name="attachment_reference" id="attachment_reference" multiple />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="button" id="btnCreate" value="Submit" class="btn btn-default" />
+                <a href="javascript:history.back()" class="btn btn-default">Back</a>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts{
+    @*<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js"></script>*@
+    @*<script type="text/javascript" src="~/Scripts/custom/po-custom-script.js"></script>*@
+    <script type="text/javascript">
+        $(function () {
+            $('#current_date').text('@ViewBag.Date');
+            $('#purchase_oder_number').text('@ViewBag.PONumber');
+            
+            $('#item_request_id').change(function () {
+                var irID = $(this).val();
+                //GetProjectName(irID);
+                GetItemRequestData(irID, false);
+            });
+            
+            $('#ir_project_id').on('change', function (e) {
+                e.preventDefault();
+                var projectId = $(this).val();
+                $('#item_request_id').empty().append("<option>Select Purchase Requisition</option>");;
+                $('#po_table tbody').empty();
+                if (projectId) {
+                    $.ajax({
+                        url: '@Url.Action("GetItemRequestsbyProject", "PurchaseOrder")',
+                        type: "get",
+                        dataType: "json",
+                        data: { id: projectId },
+                        success: function (da) {
+                            //console.log(da);
+                            $.each(da, function (index, item) {
+                                $('#item_request_id').append("<option value='" + item.ir_id + "'>" + item.ir_no + "</option>");
+                            });
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            console.log(XMLHttpRequest);
+                        }
+                    });
+                }
+
+            });
+
+            $('#btnCreate').click(function (sel,name) {
+                var ir_id = $('#item_request_id').val();
+                var po_number = $('#purchase_oder_number').text();
+                var items = $('.item_id');
+                var item_units = $('.item_unit');
+                var po_qtys = $('.approved_qty');
+                var ir_detail2_id = $('.ir_detail2_id');
+                var supplier1_name = $('.sup1_name');
+                var supplier2_name = $('.sup2_name');
+                var supplier3_name = $('.sup3_name');
+                var supplier1_price = $('.sup1_unit_price');
+                var supplier2_price = $('.sup2_unit_price');
+                var supplier3_price = $('.sup3_unit_price');
+                var select_vat = $('.select_vat');
+                var selected_supplier = $('.selected_supplier');
+                var item_element = {};
+                var pDetails = [];
+                var supplier1_element = {};
+                var poSupplier1 = [];
+                var supplier2_element = {};
+                var poSupplier2 = [];
+                var supplier3_element = {};
+                var poSupplier3 = [];
+                var arrAttachment = [];
+                var countSupplier = 0;
+                //Rathana Add 10.04.2018
+                var ir_project_id = $('#ir_project_id').val();
+                var ShippingTo = $('#ShippingTo').val();
+                if ($('#ShippingUser').val() == "") {
+                    ShippingTo = "";
+                }              
+                //End Rathana Add
+                var arrSup = [];
+                if (!ir_id) {
+                    alert("Item Request Reference is required.");
+                    return;
+                }
+                if (items.length == 0) {
+                    alert("Item is required.");
+                    return;
+                }
+                var form_data = new FormData();
+                var file_input = document.getElementById('attachment_reference');
+                if (file_input != undefined) {
+                    if (file_input.files.length > 0) {
+                        for (var i = 0; i < file_input.files.length; i++) {
+                            form_data = new FormData();
+                            form_data.append(file_input.files[i].name, file_input.files[i]);
+                            $.ajax({
+                                url: '@Url.Action("UploadAttachment","PurchaseOrder")',
+                                type: "POST",
+                                data: form_data,
+                                async: false,
+                                cache: false,
+                                contentType: false,
+                                processData: false,
+                                success: function (da) {
+                                    if (da.result == "success")
+                                        arrAttachment.push(da.attachment_id);
+                                },
+                                error: function (xhr, error, status) {
+                                    console.log(error, status);
+                                }
+                            });
+                        }
+                    }
+                }
+                for (var i = 0; i < items.length; i++) {
+                    item_element = {};
+                    item_element.po_detail_id = (i + 1);
+                    item_element.item_id = items[i].value;
+                    item_element.item_unit = item_units[i].innerHTML;
+                    item_element.quantity = po_qtys[i].innerHTML;
+                    item_element.ir_detail2_id = ir_detail2_id[i].value;
+                    arrSup = [];
+                    //blocked oct 02 2018
+                    /*
+                    $('.selected_supplier:checkbox:checked').each(function () {
+                        countSupplier++;
+                        var supNumber = $(this).val();
+                        arrSup.push(supNumber);
+                    });
+                    */
+
+                    $('.selected_supplier:checkbox').each(function () {
+                        countSupplier++;
+                        var supNumber = $(this).val();
+                        arrSup.push(supNumber);
+                    });
+
+                    var po_supplier = {};
+                    var poSuppliers = [];
+                    var c = 1;
+                    for (var j = 0; j < arrSup.length; j++) {
+                        var n = arrSup[j];
+                        n = n.substr(0, n.length - 1);
+                        if (Number(n) == Number(item_element.po_detail_id)) {
+                            var supselect = $('#sselect' + arrSup[j]).is(':checked');
+                            var supname = $('#sname' + arrSup[j]).val();
+                            var supprice = $('#sprice' + arrSup[j]).text();
+                            var isChecked = $('#svat' + arrSup[j]).is(':checked');
+                            //var vatvalue;
+                            //{
+                            //    if (supvat.checked) {
+                            //        vatvalue = "True";
+                            //        alert("1");
+                            //    } else {
+                            //        vatvalue = "False";
+                            //        alert("0");
+                            //    }
+                            //}
+                            po_supplier = {};
+                            po_supplier.po_detail_id = item_element.po_detail_id;
+                            //po_supplier.po_detail_id = item_element.po_detail_id;
+                            po_supplier.supplier_id = supname;
+                            po_supplier.unit_price = supprice;
+                            item_element.item_vat = isChecked;
+                            po_supplier.vat = isChecked;
+                            po_supplier.sup_number = c;
+                            po_supplier.is_check = supselect;
+                            poSuppliers.push(po_supplier);
+                            c++;
+                        }
+                    }
+
+                    item_element.poSuppliers = poSuppliers;
+                    pDetails.push(item_element);
+                }
+                var model = {
+                    purchase_oder_number: po_number,
+                    item_request_id: ir_id,
+                    ir_project_id: ir_project_id,
+                    ShippingTo: ShippingTo
+                }
+
+                $.ajax({
+                    url: "@Url.Action("CreatePO", "PurchaseOrder")",
+                    type: "post",
+                    dataType: "json",
+                    async: false,
+                    data: { model: model, pDetails: pDetails, supplier1: poSupplier1, supplier2: poSupplier2, supplier3: poSupplier3, Attachment: arrAttachment },                   
+                    success: function (da) {
+                        if (da.result == "success") {
+                            
+                            $.notify('Your data has been saved!', { className: 'success' });
+                            window.location.href = '@Url.Action("MyRequest","PurchaseOrder")';
+                        }
+                        else if (da.result == "error") {
+                            alert(da.message);
+                        }
+                        else {
+                            console.log(da.message);
+                            $.notify('Your data is error while saving!', { className: 'error' });
+                        }
+                    },
+                    error: function (err) {
+                        $.notify('Your data is error while saving!!', { className: 'error' });
+                    }
+                });
+            });
+        });
+    </script>
+
+
+    <script type="text/javascript">
+        function GetProjectName(irID) {
+            if (irID) {
+                $.ajax({
+                    url: '@Url.Action("GetProjectNameByIRID", "PurchaseOrder")',
+                    type: "get",
+                    dataType: "json",
+                    data: { id: irID },
+                    success: function (da) {
+                        if (da.result == "success") {
+                            $('#ir_project_id').text(da.data);
+                        } else {
+                            $('#ir_project_id').text(' ');
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        $('#ir_project_id').text(' ');
+                    }
+                });
+            }
+            else {
+                $('#ir_project_id').text(' ');
+            }
+        }
+        function GetItemRequestData(irID, isPur) {
+            if (irID) {
+                $.ajax({
+                    //url: '@Url.Action("GetItemRequest", "PurchaseOrder")',
+                    url: '@Url.Action("GetItemRequestJson", "PurchaseOrder")',
+                    type: "get",
+                    dataType: "json",
+                    data: { id: irID },
+                    success: function (da) {
+                        if (da.result == "success") {
+                            $('#po_table tbody').empty();
+                            var maxSupplier = 0;
+                            $.each(da.data, function (index, item) {
+
+                                if (da.quotes) {
+                                    var quotes = da.quotes;
+                                    var count = 0;
+                                    $.each(quotes, function (index1, item1) {
+                                        if (item1.item_id == item.ir_item_id) {
+                                            count++;
+                                        }
+                                    });
+
+                                    if (maxSupplier < count)
+                                        maxSupplier = count;
+                                }
+                            });
+
+                            initialPOTable(maxSupplier, irID);
+
+                        } else {
+                            $('#po_table tbody tr').empty();
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        $('#po_table tbody tr').empty();
+                    }
+                });
+            } else {
+                $('#po_table tbody tr').empty();
+            }
+        }
+
+        function initialPOTable(num_supplier, ir_id) {
+            var firstRowSupplier = "";
+            var secondRowSupplier = "";
+            $('#po_table').empty();
+
+            firstRowSupplier = "";
+            secondRowSupplier = "";
+            for (var i = 1; i <= num_supplier; i++) {
+                firstRowSupplier = firstRowSupplier + "<th colspan='4'>Supplier " + i + "</th>";
+                //secondRowSupplier = secondRowSupplier + "<th><input type='checkbox' class='selected_supplier' value='"+i+"'/></th><th>Name</th><th>Unit Price</th>";
+                secondRowSupplier = secondRowSupplier + "<th></th><th>VAT</th><th>Name</th><th>Unit Price</th>";
+            }
+            $('#po_table').append("" +
+                "<thead>" +
+                    "<tr>" +
+                        "<th rowspan='2'>No.</th>" +
+                        "<th rowspan='2'>Item Code</th>" +
+                        "<th rowspan='2'>Item Name</th>" +
+                        "<th rowspan='2'>Requested QTY</th>" +
+                        "<th rowspan='2'>Requested Unit</th>" +
+                        firstRowSupplier +
+                        "<th rowspan='2'></th>" +
+                    "</tr>" +
+                "</thead>"
+            );
+            $('#po_table thead').append("" +
+                    "<tr>" +
+                        secondRowSupplier +
+                    "</tr>"
+            );
+            initialPOData(num_supplier, ir_id);
+            function initialPOData(num_supplier, ir_id) {
+                $.ajax({
+                    //url: '@Url.Action("GetItemRequest", "PurchaseOrder")',
+                    url: '@Url.Action("GetItemRequestJson", "PurchaseOrder")',
+                    type: "get",
+                    dataType: "json",
+                    data: { id: ir_id},
+                    success: function (da) {
+                        if (da.result == "success") {
+                            var maxSupplier = 0;
+                            $.each(da.data, function (index, item) {
+                                var suppliers = "";
+
+                                if (da.quotes) {
+                                    var quotes = da.quotes;
+                                    var count = 0;
+
+                                    $.each(quotes, function (index1, item1) {
+                                        if (item1.item_id == item.ir_item_id) {
+                                            count++;
+                                            var sup_name_cls = "sup" + Number(count) + "_name";
+                                            var sup_vat_cls = "sup" + Number(count) + "_vat";
+                                            var sup_price_cls = "sup" + Number(count) + "_unit_price";
+                                            var sup_select_id = "sselect" + Number(index + 1) + count;
+                                            var sup_name_id = "sname" + Number(index + 1) + count;
+                                            var sup_vat = "svat" + Number(index + 1) + count;
+                                            var sup_price_id = "sprice" + Number(index + 1) + count;
+                                            var name = "itemvat" + Number(index + 1) + count;
+
+                                            suppliers = suppliers + "<td><input type='checkbox' class='selected_supplier' id='" + sup_select_id + "' value='" + Number(index + 1) + count + "'/></td><td><input type='checkbox' id='" + sup_vat + "' class='" + sup_vat_cls + " select_vat' name='" + name + "' value='" + Number(index + 1) + count + "'/></td><td><input type='hidden' id='" + sup_name_id + "' class='" + sup_name_cls + "' value='" + item1.supplier_id + "'/><label>" + item1.supplier_name + "</label></td><td><label class='" + sup_price_cls + "' id='" + sup_price_id + "'>" + parseFloat(item1.price).toFixed(4) + "</label></td>";
+
+                                            //var test = $('.selected_supplier').is(':checked');
+                                            //var test2 = $('.select_vat').is(':checked');
+                                            //if (test == false) {
+                                            //    $('.select_vat').attr("disabled", "disabled");
+                                            //    //alert("Hello");
+                                            //} else {
+                                            //    //$(".select_vat").removeAttr('disabled');
+                                            //}
+
+                                        }
+                                    });
+                                    for (var i = 1; i <= Number(num_supplier - count) ; i++)
+                                        suppliers = suppliers + "<td></td><td></td><td></td><td></td>";
+                                }
+                                $('#po_table').append("" +
+                                    "<tr id='item" + Number(index + 1) + "'>" +
+                                        "<td>" + Number(index + 1) + "</td>" +
+                                        "<td><input type='hidden' class='ir_detail2_id' value='" + item.ir_detail2_id + "'/><input type='hidden' class='item_id' value='" + item.ir_item_id + "'/><label class='item_code'>" + item.product_code + "</label></td>" +
+                                        "<td><label class='item_name'>" + item.product_name + "</label></td>" +
+                                        "<td><label class='approved_qty' style='vertical-align:middle;'>" + item.remain_qty + "</label></td>" + //item.remain_approved_qty
+                                        "<td><label class='item_unit'>" + item.ir_item_unit + "</label></td>" + //item.requested_unit
+                                        suppliers +
+                                        "<td width=50px;><a href='javascript:void(0)' class='btn-default btn-sm' onclick='remove_po_item(this)'><span class='glyphicon glyphicon-trash'></span></a></td>" +
+                                    "</tr>"
+                                );
+                            });
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        $('#po_table tbody tr').empty();
+                    }
+                });
+            }
+        }
+
+        function InitialSupplierDropdownlist(isBtn) {
+            $.ajax({
+                url: '@Url.Action("GetSupplierDropdownList", "PurchaseOrder")',
+                type: "get",
+                dataType: "json",
+                success: function (da) {
+                    if (da.data) {
+                        if (isBtn) {
+                            $('#po_table tr:last-child').find('select.sup1_name').empty();
+                            $('#po_table tr:last-child').find('select.sup2_name').empty();
+                            $('#po_table tr:last-child').find('select.sup3_name').empty();
+                            $('#po_table tr:last-child').find('select.sup1_name').append("<option value=''>Select supplier</option>");
+                            $('#po_table tr:last-child').find('select.sup2_name').append("<option value=''>Select supplier</option>");
+                            $('#po_table tr:last-child').find('select.sup3_name').append("<option value=''>Select supplier</option>");
+                            $.each(da.data, function (index, item) {
+                                $('#po_table tr:last-child').find('select.sup1_name').append("<option value='" + item.supplier_id + "'>" + item.supplier_name + "</option>");
+                                $('#po_table tr:last-child').find('select.sup2_name').append("<option value='" + item.supplier_id + "'>" + item.supplier_name + "</option>");
+                                $('#po_table tr:last-child').find('select.sup3_name').append("<option value='" + item.supplier_id + "'>" + item.supplier_name + "</option>");
+                            });
+                        } else {
+                            $('#po_table select.sup1_name').empty();
+                            $('#po_table select.sup2_name').empty();
+                            $('#po_table select.sup3_name').empty();
+                            $('#po_table select.sup1_name').append("<option value=''>Select supplier</option>");
+                            $('#po_table select.sup2_name').append("<option value=''>Select supplier</option>");
+                            $('#po_table select.sup3_name').append("<option value=''>Select supplier</option>");
+                            $.each(da.data, function (index, item) {
+                                $('#po_table select.sup1_name').append("<option value='" + item.supplier_id + "'>" + item.supplier_name + "</option>");
+                                $('#po_table select.sup2_name').append("<option value='" + item.supplier_id + "'>" + item.supplier_name + "</option>");
+                                $('#po_table select.sup3_name').append("<option value='" + item.supplier_id + "'>" + item.supplier_name + "</option>");
+                            });
+                        }
+                    } else {
+
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+
+                }
+            });
+        }
+        function remove_po_item(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var item_cls = $('#po_table tr').eq(ind).attr('class');
+            var item_id = $('#po_table tr').eq(ind).attr('id');
+            var arr_item_id = new Array();
+            var count_table_row = $('#po_table tr').length;
+
+            for (var i = 1; i <= count_table_row; i++) {
+                var id = $('#po_table tr').eq(i).attr('id');
+                if (id != undefined && id.substr(0,4) == "item")
+                    arr_item_id.push(id);
+            }
+            document.getElementById('po_table').deleteRow(ind);
+            var deletedIndex = ind - 1;
+            var maxSupplier = 0;
+            var supCheckboxes = $('input[type=checkbox].selected_supplier');
+            var vatCheckboxes = $('input[type=checkbox].select_vat');
+            for (var i = 0; i < supCheckboxes.length; i++) {
+                var newCheckbox;
+                var oldCheckbox = supCheckboxes[i].value;
+                var firstDigit = oldCheckbox.substr(0, oldCheckbox.length - 1);
+                var secondDigit = oldCheckbox.substr(oldCheckbox.length - 1, 1);
+                if (Number(secondDigit) > Number(maxSupplier))
+                    maxSupplier = secondDigit;
+                if (firstDigit > deletedIndex) {
+                    newCheckbox = (Number(firstDigit)-1) + secondDigit;
+                } else
+                    newCheckbox = firstDigit + secondDigit;
+                supCheckboxes[i].value = newCheckbox;
+                supCheckboxes[i].id = "sselect" + newCheckbox;
+                vatCheckboxes[i].value = newCheckbox;
+                vatCheckboxes[i].id = "svat" + newCheckbox;
+                vatCheckboxes[i].name = "itemvat" + newCheckbox;
+                //console.log(newCheckbox);
+            }
+            for (var j = 1; j <= maxSupplier; j++) {
+                var sup1Names = $('input[type=hidden].sup' + j + '_name');
+                var supPrices = $('label.sup' + j + '_unit_price');
+                for (var i = 0; i < sup1Names.length; i++) {
+                    var newSupnameId,newSupPriceId;
+                    var oldSupnameId = sup1Names[i].id.replace(/[^\d]/g, '');
+                    var firstDigit = oldSupnameId.substr(0, oldSupnameId.length - 1);
+                    var secondDigit = oldSupnameId.substr(oldSupnameId.length - 1, 1);
+                    if (firstDigit > deletedIndex) {
+                        newSupnameId = (Number(firstDigit) - 1) + secondDigit;
+                    } else
+                        newSupnameId = firstDigit + secondDigit;
+                    newSupPriceId = "sprice" + newSupnameId;
+                    newSupnameId = "sname" + newSupnameId;
+                    sup1Names[i].id = newSupnameId;
+                    supPrices[i].id = newSupPriceId;
+
+                    //console.log(newSupnameId);
+                }
+            }
+            if (arr_item_id.length > 1) {
+                var deleted_index = arr_item_id.indexOf(item_id);
+                arr_item_id.splice(deleted_index, 1);
+                for (var i = 0; i < arr_item_id.length; i++)
+                    $('tr#' + arr_item_id[i]).find('td:first-child').html(Number(i + 1));
+            }
+        }
+    </script>
+
+    <!-- Rathana Script -->
+    <script type="text/javascript">
+
+        $("#ir_project_id").change(function () {
+            if (this.value != "") {
+                GetPOLNumberProduct(this.value, function (data) {
+                    var pol = '@ViewBag.PONumber';
+                    var splitPol = pol.split('-');
+                    $('#POLNumber').html(splitPol[0] + "-" + data + "-" + splitPol[1] + "-" + splitPol[2] + "-" + splitPol[3]);
+                })  
+            }
+            else {
+                $('#POLNumber').html('');
+            }
+        });
+
+        function GetPOLNumberProduct(id, callback) {
+            $.ajax({
+                url: "/PurchaseOrder/GetProjectShortNameByProjectID",
+                type: "post",
+                data: { id: id },
+                success: function (respone) {
+                    console.log(respone.ProShortName)
+                    if (respone.success) {
+                        callback(respone.ProShortName);
+                    }
+                }
+            });
+        }
+
+        $("#ShippingUser").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/PurchaseOrder/GetUserDetailAutocomplete",
+                    dataType: "json",
+                    type: "post",
+                    data: {
+                        term: request.term
+                    },
+                    success: function (data) {
+                        response(data);
+                    }
+                });
+            },
+            select: function (event, ui) {
+                var selectedObj = ui.item;
+                $("#ShippingUser").val(selectedObj.label);
+                $('#ShippingTo').val(selectedObj.value);
+                return false;
+            }
+        });
+
+        
+
+    </script>
+}
+

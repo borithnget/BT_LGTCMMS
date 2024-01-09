@@ -1,0 +1,64 @@
+﻿@model IEnumerable<BT_KimMex.Models.InventoryViewModel>
+@{
+    ViewBag.Title = "ReStockByRemoveGRNItem";
+}
+
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @{ 
+                foreach(var item in Model)
+                {
+                    <tr>
+                        <td>@Convert.ToDateTime(item.inventory_date).ToString("dd/MM/yyyy HH:mm:ss")</td>
+                        <td>@item.itemCode</td>
+                        <td>@item.inventory_status_id</td>
+                        <td>@item.ref_id</td>
+                        <td>@item.total_quantity</td>
+                        <td>@item.in_quantity</td>
+                        <td>@item.out_quantity</td>
+                        <td><a href="javascript:void(0)" class="btn btn-icon-only btn_remove" data-id="@item.inventory_id"><i class="fa fa-trash"></i></a></td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(function(){
+            $('.btn_remove').click(function (e) {
+                var id = $(this).attr('data-id');
+                console.log(id);
+                $.ajax({
+                    url: "/Sync/DeleteInventoryItem",
+                        data: {
+                            'inv_id': id,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            console.log(da);
+                            window.location.reload();
+                        },
+                        error: function (err) {
+                            
+                            $.notify('Your data has been error while approving!', { className: 'error' });
+                        }
+                    });
+            });
+        });
+    </script>
+    }

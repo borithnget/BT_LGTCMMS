@@ -1,0 +1,314 @@
+MIME-Version: 1.0
+X-Document-Type: Workbook
+Content-Type: multipart/related; boundary="----=_NextPart_dummy"
+
+------=_NextPart_dummy
+Content-Location: WorkBook.htm
+Content-Type: text/html; charset=windows-1252
+
+<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><meta http-equiv="content-type" content="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8">
+<head>
+<meta name="Excel Workbook Frameset">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<link rel="File-List" href="filelist.xml">
+<!--[if gte mso 9]><xml>
+ <x:ExcelWorkbook>
+  <x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Purchase Order</x:Name><x:WorksheetSource HRef="sheet0.htm"/></x:ExcelWorksheet></x:ExcelWorksheets>
+  <x:ActiveSheet>0</x:ActiveSheet>
+ </x:ExcelWorkbook>
+</xml><![endif]-->
+</head>
+<frameset>
+  <frame src="sheet0.htm" name="frSheet">
+  <noframes><body><p>This page uses frames, but your browser does not support them.</p></body></noframes>
+</frameset>
+</html>
+
+------=_NextPart_dummy
+Content-Location: sheet0.htm
+Content-Type: text/html; charset=windows-1252
+
+<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><meta http-equiv="content-type" content="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <link id="Main-File" rel="Main-File" href="../WorkBook.htm">
+  <link rel="File-List" href="filelist.xml">
+</head>
+<body><table>
+                <tbody><tr>
+                    <td colspan="3"><img src="https://lgtss.com/Assets/images/lotusgreeenteam.png" style="height:100px; width:300px; margin-top:10px; "></td>
+                    <td colspan="7"></td>
+                </tr>
+                <tr>
+                    <td colspan="10"><h3></h3></td>
+                </tr>
+                <tr>
+                    <td colspan="10"><h3></h3></td>
+                </tr>
+            <tr>
+                <td colspan="6"><h3 style="font-family:Century Gothic;color:green;font-style:italic; font-size:35px;"></h3></td>
+                <td colspan="3"></td>
+                <td colspan="4"><h3 style="font-family:Century Gothic;color:green;font-style:italic; font-size:35px;">LOCAL PURCHASE ORDER</h3></td>
+            </tr>
+            <!-- Start Header Information -->
+            <tr>
+                <td colspan="11"></td>
+            </tr>
+            <tr>
+                <td colspan="6" style="font-size:30px !important; font-family:Century Gothic;font-size:12px;text-align:left;">VENDOR</td>
+                <td colspan="3"></td>
+                <td colspan="4" style="font-size:30px !important; font-family:Century Gothic;font-size:12px;text-align:left;">REFERENCE</td>
+            </tr>
+            <tr>
+                <td colspan="4" style="border-top: 1px solid #000000;border-left: 1px solid #000000;border-right: 1px solid #000000;border-collapse: collapse; font-family:Century Gothic;font-size:27px !important;text-align:left">ELV SOLUTIONS AND SECURITY SYSTEMS CO., LTD</td>
+                <td colspan="5"></td>
+                <td colspan="2" style="border-top:1px solid #000000; border-left: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left;">P. Order No.</td>
+                <td colspan="2" style="border-top:1px solid #000000; border-right: 1px solid #000000; border-collapse: collapse; font-family:Century Gothic;font-size:27px;text-align:left">:LPO2311-1752</td>
+            </tr>
+            <tr>
+                <td colspan="4" style="border-left: 1px solid #000000;border-right: 1px solid #000000;border-collapse: collapse; font-family:Century Gothic;font-size:27px;text-align:left">#3AE0E1 street 167 krom ti 4 khan chamkar mon Phnom penh </td>
+                <td colspan="5"></td>
+                <td colspan="2" style="border-left: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left">Date</td>
+                <td colspan="2" style="border-right: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left">:01-Nov-2023</td>
+            </tr>
+            <tr>
+                <td colspan="4" style="border-left: 1px solid #000000;border-right: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left">Attn.:</td>
+                <td colspan="5"></td>
+                <td colspan="2" style="border-left: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left">Project</td>
+                <td colspan="2" style="border-right: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left">:MEP Work MOJ in PP(LGT2023-384)</td>
+            </tr>
+            <tr>
+                <td colspan="4" style="border-left: 1px solid #000000;border-right: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left">H/P:085 679 657</td>
+                <td colspan="5" style="font-family:Century Gothic;font-size:27px;text-align:left"></td>
+                <td colspan="2" style="border-left: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left">S. Order No</td>
+                <td colspan="2" style="border-right: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left">:LGT2023-384</td>
+            </tr>
+            <tr>
+                <td colspan="4" style="border-bottom: 1px solid #000000;border-left: 1px solid #000000;border-right: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left">Email:sale5@ketworkshop.com</td>
+                <td colspan="5"></td>
+                <td colspan="2" style="border-bottom: 1px solid #000000;border-left: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left">MR No.</td>
+                <td colspan="2" style="border-bottom: 1px solid #000000;border-right: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left">:MR-23-10-205</td>
+            </tr>
+
+            <tr>
+                <td colspan="6" style="font-family:Century Gothic;font-size:30px;text-align:left;">SHIP TO</td>
+                <td colspan="5"></td>
+            </tr>
+                <tr>
+                    <td colspan="4" style="border-top: 1px solid #000000;border-left:1px solid #000000; border-right : 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left;font-weight:bold;">LOTUS GREEN TEAM CO., LTD</td>
+                    <td colspan="7"></td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="border-left:1px solid #000000; border-right : 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left;font-weight:bold;">VAT No.: L001-105012696</td>
+                    <td colspan="7"></td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="border-left:1px solid #000000; border-right : 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left;">#24, Street 552, Phum 10 Sangkat Boeung Kak 1 Khan Toul Kork, Phnom Penh 120407, Cambodia</td>
+                    <td colspan="7"></td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="border-left:1px solid #000000; border-right : 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left;">Tel.Fax: +855 23 881 370 / +855 23 880 930</td>
+                    <td colspan="7"></td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="border-left:1px solid #000000; border-right : 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left;">Email: info@lotusgreenteam.com</td>
+                    <td colspan="7"></td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="border-bottom: 1px solid #000000; border-left:1px solid #000000;border-right: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left;">Consignee: Lotus Green Team</td>
+                    <td colspan="7"></td>
+                </tr>
+
+
+            <!-- End Header Information -->
+            <!-- Start Item Table -->
+            <tr>
+                <td colspan="11"><h1></h1></td>
+            </tr>
+            <tr>
+                <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">Item</td>
+                <td colspan="2" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">Description</td>
+                <td colspan="2" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">Brand</td>
+                <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">P/N</td>
+                <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">Picture</td>
+                <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">Qty</td>
+                <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">Unit</td>
+                <td colspan="2" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">Unit Price USD</td>
+                <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">Dis. %</td>
+                <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">Amount USD</td>
+            </tr>
+                    <tr style="line-height: 50px;">
+                        <td style="border: thin solid #000000;-webkit-background-clip: padding-box;background-clip: padding-box;border-collapse: collapse; font-family:Century Gothic; font-size:27px;text-align:center; vertical-align:middle;">1</td>
+                        <td colspan="2" style="line-height: 50px;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left; vertical-align:middle;"><br> Pre-Galvanized Cable Tray Elbow90° c/w Cover Thk1.2mm W100mmxH100mm MGE<br><br></td>
+                        <td colspan="2" style="border:thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left; vertical-align:middle;">MGE</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left; vertical-align:middle;">E-1-03387</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right; vertical-align:middle;"></td>
+                        <td style="border: thin solid #000000;border-collapse: collapse; font-family:Century Gothic; font-size:27px;text-align:center; vertical-align:middle;">9</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left; vertical-align:middle;">pcs</td>
+                        <td colspan="2" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;vertical-align:middle; mso-number-format:'#,##0.000' ">14.040</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;vertical-align:middle; mso-number-format:'#,##0.000' ">0.000</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;vertical-align:middle; mso-number-format:'#,##0.000'">126.360</td>
+                    </tr>
+                    <tr style="line-height: 50px;">
+                        <td style="border: thin solid #000000;-webkit-background-clip: padding-box;background-clip: padding-box;border-collapse: collapse; font-family:Century Gothic; font-size:27px;text-align:center; vertical-align:middle;">2</td>
+                        <td colspan="2" style="line-height: 50px;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left; vertical-align:middle;"><br> Pre Galvanized Cable Tray Bolt+Nut+Washer Ø6mmx15mm No Brand<br><br></td>
+                        <td colspan="2" style="border:thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left; vertical-align:middle;">No Brand</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left; vertical-align:middle;">E-1-02586</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right; vertical-align:middle;"></td>
+                        <td style="border: thin solid #000000;border-collapse: collapse; font-family:Century Gothic; font-size:27px;text-align:center; vertical-align:middle;">500</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left; vertical-align:middle;">Set</td>
+                        <td colspan="2" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;vertical-align:middle; mso-number-format:'#,##0.000' ">0.010</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;vertical-align:middle; mso-number-format:'#,##0.000' ">100.000</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;vertical-align:middle; mso-number-format:'#,##0.000'">0.000</td>
+                    </tr>
+                    <tr style="line-height: 50px;">
+                        <td style="border: thin solid #000000;-webkit-background-clip: padding-box;background-clip: padding-box;border-collapse: collapse; font-family:Century Gothic; font-size:27px;text-align:center; vertical-align:middle;">3</td>
+                        <td colspan="2" style="line-height: 50px;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left; vertical-align:middle;"><br> Pre-Galvanized Cable Tray Elbow90° c/w Cover Thk1.2mm W200mmxH100mm MGE<br><br></td>
+                        <td colspan="2" style="border:thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left; vertical-align:middle;">MGE</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left; vertical-align:middle;">E-1-03386</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right; vertical-align:middle;"></td>
+                        <td style="border: thin solid #000000;border-collapse: collapse; font-family:Century Gothic; font-size:27px;text-align:center; vertical-align:middle;">3</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left; vertical-align:middle;">pcs</td>
+                        <td colspan="2" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;vertical-align:middle; mso-number-format:'#,##0.000' ">15.240</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;vertical-align:middle; mso-number-format:'#,##0.000' ">0.000</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;vertical-align:middle; mso-number-format:'#,##0.000'">45.720</td>
+                    </tr>
+                    <tr style="line-height: 50px;">
+                        <td style="border: thin solid #000000;-webkit-background-clip: padding-box;background-clip: padding-box;border-collapse: collapse; font-family:Century Gothic; font-size:27px;text-align:center; vertical-align:middle;">4</td>
+                        <td colspan="2" style="line-height: 50px;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left; vertical-align:middle;"><br> Pre-Galvanized Cable Tray c/w Cover Thk1.2mm W100mmxH100mm MGE<br><br></td>
+                        <td colspan="2" style="border:thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left; vertical-align:middle;">MGE</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left; vertical-align:middle;">E-1-03381</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right; vertical-align:middle;"></td>
+                        <td style="border: thin solid #000000;border-collapse: collapse; font-family:Century Gothic; font-size:27px;text-align:center; vertical-align:middle;">24</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left; vertical-align:middle;">Length(2.5m)</td>
+                        <td colspan="2" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;vertical-align:middle; mso-number-format:'#,##0.000' ">21.260</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;vertical-align:middle; mso-number-format:'#,##0.000' ">0.000</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;vertical-align:middle; mso-number-format:'#,##0.000'">510.240</td>
+                    </tr>
+                    <tr style="line-height: 50px;">
+                        <td style="border: thin solid #000000;-webkit-background-clip: padding-box;background-clip: padding-box;border-collapse: collapse; font-family:Century Gothic; font-size:27px;text-align:center; vertical-align:middle;">5</td>
+                        <td colspan="2" style="line-height: 50px;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left; vertical-align:middle;"><br> Pre-Galvanized Cable Tray Connector Thk1.2mm H95mm MGE<br><br></td>
+                        <td colspan="2" style="border:thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left; vertical-align:middle;">MGE</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left; vertical-align:middle;">E-1-03459</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right; vertical-align:middle;"></td>
+                        <td style="border: thin solid #000000;border-collapse: collapse; font-family:Century Gothic; font-size:27px;text-align:center; vertical-align:middle;">110</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left; vertical-align:middle;">pcs</td>
+                        <td colspan="2" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;vertical-align:middle; mso-number-format:'#,##0.000' ">0.010</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;vertical-align:middle; mso-number-format:'#,##0.000' ">100.000</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;vertical-align:middle; mso-number-format:'#,##0.000'">0.000</td>
+                    </tr>
+                <tr>
+                    <td colspan="12" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;font-weight:bold;vertical-align:middle;">Total purchasing amount in USD</td>
+                    <td style="vertical-align:middle;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic; font-size:27px;text-align:right;font-weight: bold; mso-number-format:'#,##0.000'"><br>682.3200</td>
+                </tr>
+                <tr>
+                    <td colspan="12" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;font-weight:bold;vertical-align:middle;">Discount</td>
+                    <td style="vertical-align:middle;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic; font-size:27px;text-align:right;font-weight: bold; mso-number-format:'#,##0.000'"><br>0.0000</td>
+                </tr>
+                <tr>
+                    <td colspan="12" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;font-weight:bold;vertical-align:middle;">Total purchasing amount after discount in USD</td>
+                    <td style="vertical-align:middle;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic; font-size:27px;text-align:right;font-weight: bold; mso-number-format:'#,##0.000'"><br>682.3200</td>
+                </tr>
+                <tr>
+                    <td colspan="12" style="vertical-align:middle;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;font-weight:bold;">Total amount VAT 10% in USD</td>
+                    <td style="vertical-align:middle;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic; font-size:27px;text-align:right;font-weight: bold; mso-number-format:'#,##0.000'">68.2300</td>
+                </tr>
+                <tr>
+                    <td colspan="12" style="vertical-align:middle;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic; font-size:27px;text-align:right;font-weight:bold;">Total purchasing amount after 10% in USD</td>
+                    <td style="vertical-align:middle;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic; font-size:27px;text-align:right;font-weight:bold; mso-number-format:'#,##0.000'">750.5500</td>
+                </tr>
+
+            <!--End ITem Table-->
+            <!-- Start Supplier T&C-->
+            <tr>
+                <td colspan="13"><h1></h1></td>
+            </tr>
+            <tr>
+                <td colspan="9" style="border-right: 1px solid #000000;border-left: 1px solid #000000;border-top: 1px solid #000000;border-collapse: collapse; font-family:Century Gothic; font-size:27px;text-align:left;font-weight:bold;">TERMS &amp; CONDITIONS</td>
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td colspan="9" style="border-collapse: collapse;border-right: 1px solid #000000;border-left: 1px solid #000000;font-family:Century Gothic;font-size:27px;text-align:left;">1- Incoterm: DDP Phnom Penh</td>
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td colspan="9" style="border-collapse: collapse;border-right: 1px solid #000000;border-left: 1px solid #000000;font-family:Century Gothic;font-size:27px;text-align:left;">2- Payment: 100% 30 days after delivery</td>
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td colspan="9" style="border-collapse: collapse;border-right: 1px solid #000000;border-left: 1px solid #000000;font-family:Century Gothic;font-size:27px;text-align:left;">3- Delivery: Ex.Stock</td>
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td colspan="9" style="border-collapse: collapse;border-right: 1px solid #000000;border-left: 1px solid #000000;font-family:Century Gothic;font-size:27px;text-align:left;">4- Shipment: Road</td>
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td colspan="9" style="border-collapse: collapse;border-right: 1px solid #000000;border-left: 1px solid #000000;font-family:Century Gothic;font-size:27px;text-align:left;">5- Warranty: N/A</td>
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td colspan="9" style="border-collapse: collapse;border-right: 1px solid #000000;border-left: 1px solid #000000;font-family:Century Gothic;font-size:27px;text-align:left;">6- Vendor Ref: QT-2311-002</td>
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td colspan="9" style="border-collapse: collapse;border-right: 1px solid #000000;border-left: 1px solid #000000;border-bottom: 1px solid #000000;"></td>
+                <td colspan="4"></td>
+            </tr>
+            <!-- End Supplier T&C-->
+            <!-- Start Signature-->
+
+            <tr>
+                <td colspan="13"><h1></h1></td>
+            </tr>
+            <tr>
+                <td colspan="13"><h1></h1></td>
+            </tr>
+                <tr>
+                    <td></td>
+                    <td colspan="2" style="font-family:Century Gothic;font-size:27px;text-align:center;"><img src="http://localhost:8680/Documents/Signature/Blank.jpg" style="margin-top: 10px; object-fit: cover;" width="200" height="150"></td>
+
+                    <td></td>
+                    <td colspan="4" style="font-family:Century Gothic;font-size:27px;text-align:center;"><img src="" style="height: 50px !important; width: 50px !important; margin-top: 10px; object-fit: cover;" width="200" height="150"></td>
+                    <td></td>
+                    <td colspan="4" style="font-family:Century Gothic;font-size:27px;text-align:center;"><img src="http://localhost:8680/Documents/Signature/PuthyOffical.png" style="height: 50px !important; width: 50px !important; margin-top: 10px; object-fit: cover;" width="200" height="150"></td>
+                </tr>
+
+
+            <tr>
+                <td colspan="13"><h1></h1></td>
+            </tr>
+            <tr>
+
+                <td colspan="2" style="border-top: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">Acknowledge by</td>
+                <td></td>
+                <td></td>
+                <td colspan="4" style="border-top: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">Operation/Service Director</td>
+                <td></td>
+                <td colspan="4" style="border-top: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">Finance/Account Manager</td>
+            </tr>
+            <tr>
+
+                <td colspan="2" style="font-family:Century Gothic;font-size:27px;text-align:center;">Sothea Pol</td>
+                <td></td>
+                <td></td>
+                <td colspan="4" style="font-family:Century Gothic;font-size:27px;text-align:center;"></td>
+                <td></td>
+                <td colspan="4" style="font-family:Century Gothic;font-size:27px;text-align:center;">Puthy Heng</td>
+            </tr>
+
+
+
+            <!-- End Signature-->
+
+        </tbody></table></body>
+</html>
+Content-Location: filelist.xml
+Content-Type: text/xml; charset="utf-8"
+
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+  <o:MainFile HRef="../WorkBook.htm"/>
+  <o:File HRef="sheet0.htm"/>
+  <o:File HRef="filelist.xml"/>
+</xml>
+------=_NextPart_dummy--

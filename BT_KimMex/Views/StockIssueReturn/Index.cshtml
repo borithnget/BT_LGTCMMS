@@ -1,0 +1,789 @@
+﻿@model IEnumerable<BT_KimMex.Models.StockIssueReturnViewModel>
+@using BT_KimMex.Class
+@{
+    ViewBag.Title = "Index";
+
+
+    string status = string.Empty;
+    if (string.IsNullOrWhiteSpace(Request.QueryString["status"]))
+    {
+        status = string.Empty;
+    }
+    else
+    {
+        status = Request.QueryString["status"].ToString();
+    }
+}
+
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+<style type="text/css">
+    #stockIssueReturnTable tr td{
+        text-align:center !important;
+        vertical-align:middle !important;
+    }
+</style>
+
+<div class="w3-container">
+    <h3 class="">Stock Return List</h3>
+</div>
+
+<div class="well" style="padding:8px !important; padding-bottom:30px !important;">
+    <div class="form-group">
+        <label class="control-label col-md-2">Requested Date:</label>
+        <div class="col-md-3">
+            <div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
+                <i class="fa fa-calendar"></i>&nbsp;
+                <span></span> <i class="fa fa-caret-down"></i>
+            </div>
+        </div>
+        <label class="control-label col-md-2">Status:</label>
+        <div class="col-md-3">
+            <select class="form-control" id="ddr_status" name="ddr_status" style="width:100% !important;">
+                <option value="0">All</option>
+                <option value="@Status.Pending">@ShowStatus.SRCreated</option>
+                <option value="@Status.PendingFeedback">@ShowStatus.PendingFeedback</option>
+                <option value="@Status.Approved">@ShowStatus.SRChecked</option>
+                <option value="@Status.Completed">@ShowStatus.SRApproved</option>
+                <option value="@Status.CheckRejected">Check Rejected</option>
+                <option value="@Status.RequestCancelled">@ShowStatus.RequestCancelled</option>
+                
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="w3-button w3-tiny w3-blue" onclick="initialDataTable()">Filter</button>
+        </div>
+    </div>
+</div>
+
+@*<div class="row">
+    <div class="form-group">
+        <label class="control-label col-md-3">Stock Issue Return Status:</label>
+        <div class="col-md-9 id_100">
+            <select class="form-control" id="sir_status">
+                <option value="All" id="all" selected>All</option>
+                <option value="Feedbacked" id="feedback">Feedbacked</option>
+                <option value="Pending" id="pending">Pending</option>
+                <option value="Pending Feedback" id="pf">Pending Feedback</option>
+                <option value="Complete" id="complete">Complete</option>
+                <option value="Completed" id="completed">Completed</option>
+            </select>
+        </div>
+    </div>
+</div>*@
+<div class="w3-container">
+    <table class="table table-bordered" id="stockIssueReturnTable">
+        <thead>
+            <tr>
+                <th rowspan="2">ID</th>
+                <th rowspan="2">Requester</th>
+                <th rowspan="2">Return No.</th>
+                <th rowspan="2">Transfer Ref.</th>
+                <th rowspan="2">Date</th>
+                <th rowspan="2">Warehouse</th>
+                @*<th rowspan="2">Invoice No.</th>
+                <th rowspan="2">Invoice Date</th>*@
+                <th colspan="2">Status</th>
+                <th rowspan="2">Detail</th>
+                @*<th>Approve/ Feedback</th>
+                    <th>Detail</th>
+                    <th>Edit/ Prepare Feedback</th>
+                    <th>Delete</th>*@
+            </tr>
+            <tr>
+                <th>Return</th>
+                <th>GRN</th>
+            </tr>
+        </thead>
+        <tbody>
+            @*@{
+                int count = 1;
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@count</td>
+                        <td>@BT_KimMex.Class.CommonFunctions.GetUserFullnamebyUserId(item.created_by)</td>
+                        <td><a href="@Url.Action("Details","StockIssueReturn",new { id = item.stock_issue_return_id })">@item.issue_return_number</a></td>
+                        <td>@item.stock_issue_number</td>
+                        <td>@CommonClass.ToLocalTime(Convert.ToDateTime(item.created_date)).ToString("dd/MM/yyyy"))</td>
+                        <td>@item.strWarehouse</td>
+                        <td class="text-center">
+                            @{
+                                if (string.Compare(item.issue_return_status, Status.Pending) == 0 || string.Compare(item.issue_return_status, Status.Feedbacked) == 0)
+                                {
+                                    <span class="label label-danger">@ShowStatus.SRCreated</span>
+                                }
+                                else if (string.Compare(item.issue_return_status, Status.PendingFeedback) == 0)
+                                {
+                                    <span class="label label-info">Pending Feedback</span>
+                                }
+                                else if (string.Compare(item.issue_return_status, Status.Approved) == 0)
+                                {
+                                    <span class="label label-primary">@ShowStatus.SRChecked</span>
+                                }
+                                else if (string.Compare(item.issue_return_status, Status.Completed) == 0)
+                                {
+                                    <span class="label label-success">@ShowStatus.SRApproved</span>
+                                }
+                                else if (string.Compare(item.issue_return_status, Status.CheckRejected) == 0)
+                                {
+                                    <span class="label label-danger">Check Rejected</span>
+                                }
+                                else if (string.Compare(item.issue_return_status, Status.RequestCancelled) == 0)
+                                {
+                                    <span class="label w3-red">Request Cancelled</span>
+                                }
+                            }
+                        </td>
+                        <td>
+                            <span class="label label-danger">@item.received_status</span>
+                        </td>
+                        <td><a href="@Url.Action("Details","StockIssueReturn",new { id = item.stock_issue_return_id })" class="w3-button w3-tiny w3-green">View Detail</a></td>
+                    </tr>
+                                    count++;
+                                }
+            }*@
+        </tbody>
+    </table>
+</div>
+
+
+<!-- delete project modal popup-->
+<div class="modal fade" id="myModal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to delete this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default delete-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- approve project modal popup-->
+<div class="modal fade" id="approveModal" tabindex="=-1" role="dialog" aria-labelledby="approveModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-warning">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to <strong>Approve</strong> this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default approve-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- reject project modal popup-->
+<div class="modal fade" id="rejectModal" tabindex="=-1" role="dialog" aria-labelledby="rejectModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <p class="success-message col-md-12">Are you sure to <strong>Reject</strong> this item?</p>
+                    <label class="col-md-2">Comment:</label>
+                    <div class="col-md-10">
+                        <textarea class="form-control" rows="5" id="reject-comment"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default reject-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.3/moment.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+
+            var start = moment().subtract(29, 'days');
+            var end = moment();
+
+            function cb(start, end) {
+                $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            }
+
+            $('#reportrange').daterangepicker({
+                startDate: start,
+                endDate: end,
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                }
+            }, cb);
+
+            cb(start, end);
+            $('#ddr_status').select2();
+            initialDataTable();
+
+            @*$('#stockIssueReturnTable').DataTable({});
+            @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser))
+            {
+                <text>
+            $('#stockIssueReturnTable_filter').append('<a href="@Url.Action("Create", "StockIssueReturn")" class="w3-button w3-tiny w3-teal pull-left" style="margin-right:10px !important;">New Request</a>');
+            </text>
+            }*@
+           
+
+            var issueReturnId;
+            var isSM = false;
+            var isAdmin = false;
+            var isPCH = false;
+            var isQA = false;
+
+            @{
+                if (User.IsInRole("Admin"))
+                {
+                    <text>isAdmin = true;</text>
+                }
+                if(User.IsInRole("Procurement Manager"))
+                {
+                    <text>isMSC = true;</text>
+                }
+                if(User.IsInRole("Site Manager"))
+                {
+                    <text>isSM = true;</text>
+                }
+                if(User.IsInRole("Purchaser"))
+                {
+                    <text>isPCH = true;</text>
+                }
+                if(User.IsInRole("QA/QC Officer"))
+                {
+                    <text>isQA = true;</text>
+                }
+
+            }          
+
+                @*@if (!string.IsNullOrEmpty(status))
+            {
+                <text>
+                    initialStockIssueReturnTable('@status', isAdmin, isPCH, isSM, isQA );
+                    $('#sir_status').val('@status');
+                </text>
+             }
+                else
+             {
+                    <text>initialStockIssueReturnTable(status, isAdmin, isPCH, isSM, isQA); </text>
+
+               }*@
+
+            $('#sir_status').change(function () {
+                var status = $(this).val();
+                if (status != null || status != "")
+                    initialStockIssueReturnTable(status, isAdmin, isPCH, isSM,  isQA);
+            });
+
+            $('#stockIssueReturnTable tbody').on('click', 'td a.delete-promp', function () {
+                issueReturnId = $(this).attr('id');
+                $('#myModal').modal('show');
+            });
+
+            $('.delete-confirm').click(function () {
+                if (issueReturnId != '') {
+                    $.ajax({
+                        url: "/StockIssueReturn/Delete",
+                        data: {
+                            'id': issueReturnId,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#myModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been deleted!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "StockIssueReturn")';
+                            }
+                            else if (da.result == "fail")
+                                $.notify('Your data has been error while deleting!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while deleting!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+            $('#stockIssueReturnTable tbody').on('click', 'td a.approve-promp', function () {
+                issueReturnId = $(this).attr('id');
+                $('#approveModal').modal('show');
+            });
+
+            $('.approve-confirm').click(function () {
+                if (issueReturnId != '') {
+                    $.ajax({
+                        url: "/StockIssueReturn/Approve",
+                        data: {
+                            'id': issueReturnId,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#approveModal').modal('hide');
+                            if (da.result == "success") {
+                                alert('Your data has been approved!');
+                                window.location.href = '@Url.Action("Index", "StockIssueReturn")';
+                            }
+                            else if (da.result == "error"){
+                                alert("Approved stock issue return fail::"+da.message);
+                            }
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while approving!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+            $('#stockIssueReturnTable tbody').on('click', 'td a.reject-promp', function () {
+                issueReturnId = $(this).attr('id');
+                $('#rejectModal').modal('show');
+            });
+
+            $('.reject-confirm').click(function () {
+                if (issueReturnId != '') {
+                    var comment = $("#reject-comment").val();
+                    $.ajax({
+                        url: "/StockIssueReturn/Reject",
+                        data: {
+                            'id': issueReturnId,
+                            'comment': comment
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.reject-confirm').css('display', 'none');
+                            }
+                            $('#rejectModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been rejected!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "StockIssueReturn")';
+                            }
+                            else if (da.result == "fail")
+                                $.notify('Your data has been error while rejecting!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while rejecting!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+        });
+    </script>
+    
+    <script type="text/javascript">
+
+        function initialDataTable(){
+            var t = $('#stockIssueReturnTable').DataTable({
+                "bDestroy": true,
+                "ajax": {
+                    "url": "/StockIssueReturn/GetStockReturnListItemsDaterangeAndStatusAJAX",
+                    "type": "GET",
+                    "dataType": "json",
+                    "data": {
+                        dateRange: $('#reportrange span').html(),
+                        status: $('#ddr_status').val(),
+                    }
+                },
+                "columns": [
+                    { "data": "stock_issue_return_id" },
+                    { "data": "created_by_text" },
+                    {
+                        "render": function (data, type, full, meta) {
+                            return '<a href="/StockIssueReturn/Details/' + full.stock_issue_return_id + '">' + full.issue_return_number + '</a>';
+                        }
+                    },
+                    { "data": "stock_issue_number" },
+                    { "data": "created_at_text" },
+                    { "data": "strWarehouse" },
+                    //{ "data": "strInvoiceNumber" },
+
+                    //{ "data": "strInvoiceDate" },
+                    { "data": "show_status" },
+                    { "data": "received_status" },
+                    {
+                        "render": function (data, type, full, meta) {
+                            return '<a href="/StockIssueReturn/Details/' + full.stock_issue_return_id + '" class="w3-button w3-tiny w3-green">View Detail</a>';
+                        }
+                    },
+
+
+                ],
+                "order": [[2, "desc"]],
+            });
+            t.on('order.dt search.dt', function () {
+                t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+
+            @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser))
+            {
+                <text>
+            $('#stockIssueReturnTable_filter').append('<a href="@Url.Action("Create", "StockIssueReturn")" class="w3-button w3-tiny w3-teal pull-left" style="margin-right:10px !important;">New Request</a>');
+                </text>
+            }
+        }
+
+
+
+        function initialStockIssueReturnTable(siStatus,isAdmin, isPCH, isSM, isQA) {
+            var t;
+            if(isAdmin || ( isQA && isPCH) || (isPCH && isQA && isSM)){
+                t = $('#stockIssueReturnTable').DataTable({
+                    "bDestroy": true,
+                    "ajax": {
+                        "url": "@Url.Action("GetIssueReturnDataTable", "StockIssueReturn")",
+                        "type": "GET",
+                        "dataType": "json",
+                        "data": { status: siStatus },
+                    },
+                    "columns": [
+                        { "data": "stock_issue_return_id" },
+                        { "data": "issue_return_number" },
+                        { "data": "stock_issue_number" },
+                        {
+                            "data": "created_date", render: function (data, type, full, meta) {
+                                return new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)).toISOString().slice(0, 10);
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strWarehouse;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strInvoiceNumber;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strInvoiceDate;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+
+                                if (full.issue_return_status == "Pending" || full.issue_return_status == "Feedbacked")
+                                    return '<label style="color:orange !important;">' + full.issue_return_status + '</label>';
+                                else if (full.issue_return_status == "Pending Feedback")
+                                    return '<label style="color:blue !important;">' + full.issue_return_status + '</label>';
+                                else if (full.issue_return_status == "Completed")
+                                    return '<label style="color:green !important;">' + full.issue_return_status + '</label>';
+                                else if (full.issue_return_status == "Rejected")
+                                    return '<label style="color:gray !important;">' + full.issue_return_status + '</label>';
+                                else if (full.issue_return_status == "Complete")
+                                    return '<label style="color:red !important;">' + full.issue_return_status + '</label>';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.issue_return_status == "Pending")
+                                    return '<a href="/StockIssueReturn/ApproveFeedback/' + full.stock_issue_return_id + '">Approve/ Feedback</a>';
+                                if (full.issue_return_status == "Complete" || full.issue_return_status == "Feedbacked")
+                                    return '<a href="/StockIssueReturn/ApproveFeedback/' + full.stock_issue_return_id + '">Completed</a>';
+                                    //return '<a href="javascript:void(0)" id="' + full.stock_issue_return_id + '" class="approve-promp">Approve</a>';
+                                return '';
+                            }
+                        },
+                        //{
+                        //    "render": function (data, type, full, meta) {
+                        //        if (full.issue_return_status == "Pending")
+                        //            return '<a href="javascript:void(0)" id="' + full.stock_issue_return_id + '" class="reject-promp">Reject</a>';
+                        //        return '';
+                        //    }
+                        //},
+                        {
+                            "render": function (data, type, full, meta) {
+                                return '<a href="/StockIssueReturn/Details/' + full.stock_issue_return_id + '">View Detail</a>';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.issue_return_status == "Pending"||full.issue_return_status=="Rejected")
+                                    return '<a href="/StockIssueReturn/Edit/' + full.stock_issue_return_id + '">Edit</a>';
+                                else if(full.issue_return_status == "Pending Feedback")
+                                    return '<a href="/StockIssueReturn/PrepareFeedback/' + full.stock_issue_return_id + '">Prepare Feedback</a>';
+                                return '';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.issue_return_status == "Pending" || full.issue_return_status == "Rejected")
+                                    return '<a href="javascript:void(0)" id="' + full.stock_issue_return_id + '" class="delete-promp">Delete</a>';
+                                return '';
+                            }
+                        }
+                    ],
+                    "order": [[1, "desc"]],
+                });
+                $('#stockIssueReturnTable_filter').append('<a href="@Url.Action("Create", "StockIssueReturn")" class="btn btn-default pull-left" style="margin-right:10px !important;">Add New</a>');
+            }
+
+            else if ((isPCH && isSM) || isPCH ) {
+                t = $('#stockIssueReturnTable').DataTable({
+                    "bDestroy": true,
+                    "ajax": {
+                        "url": "@Url.Action("GetIssueReturnDataTable", "StockIssueReturn")",
+                        "type": "GET",
+                        "dataType": "json",
+                        "data": { status: siStatus },
+                    },
+                    "columns": [
+                        { "data": "stock_issue_return_id" },
+                        { "data": "issue_return_number" },
+                        { "data": "stock_issue_number" },
+                        {
+                            "data": "created_date", render: function (data, type, full, meta) {
+                                return new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)).toISOString().slice(0, 10);
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strWarehouse;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strInvoiceNumber;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strInvoiceDate;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+
+                                if (full.issue_return_status == "Pending" || full.issue_return_status == "Feedbacked")
+                                    return '<label style="color:orange !important;">' + full.issue_return_status + '</label>';
+                                else if (full.issue_return_status == "Pending Feedback")
+                                    return '<label style="color:blue !important;">' + full.issue_return_status + '</label>';
+                                else if (full.issue_return_status == "Completed")
+                                    return '<label style="color:green !important;">' + full.issue_return_status + '</label>';
+                                else if (full.issue_return_status == "Rejected")
+                                    return '<label style="color:gray !important;">' + full.issue_return_status + '</label>';
+                                else if (full.issue_return_status == "Complete")
+                                    return '<label style="color:red !important;">' + full.issue_return_status + '</label>';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.issue_return_status == "Complete")
+                                    return '<a href="/StockIssueReturn/ApproveFeedback/' + full.stock_issue_return_id + '">Completed</a>';
+                                //return '<a href="javascript:void(0)" id="' + full.stock_issue_return_id + '" class="approve-promp">Approve</a>';
+                                return '';
+                            }
+                        },
+                        //{
+                        //    "render": function (data, type, full, meta) {
+                        //        if (full.issue_return_status == "Pending")
+                        //            return '<a href="javascript:void(0)" id="' + full.stock_issue_return_id + '" class="reject-promp">Reject</a>';
+                        //        return '';
+                        //    }
+                        //},
+                        {
+                            "render": function (data, type, full, meta) {
+                                return '<a href="/StockIssueReturn/Details/' + full.stock_issue_return_id + '">View Detail</a>';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.issue_return_status == "Pending"||full.issue_return_status=="Rejected")
+                                    return '<a href="/StockIssueReturn/Edit/' + full.stock_issue_return_id + '">Edit</a>';
+                                else if(full.issue_return_status == "Pending Feedback")
+                                    return '<a href="/StockIssueReturn/PrepareFeedback/' + full.stock_issue_return_id + '">Prepare Feedback</a>';
+                                return '';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.issue_return_status == "Pending" || full.issue_return_status == "Rejected")
+                                    return '<a href="javascript:void(0)" id="' + full.stock_issue_return_id + '" class="delete-promp">Delete</a>';
+                                return '';
+                            }
+                        }
+                    ],
+                    "order": [[1, "desc"]],
+                    //"columnDefs": [
+                    //    {
+                    //        "targets": [8],
+                    //        "visible": false,
+                    //    },
+                        //{
+                        //    "targets": [6],
+                        //    "visible": false,
+                        //},
+                    //]
+                });
+                $('#stockIssueReturnTable_filter').append('<a href="@Url.Action("Create", "StockIssueReturn")" class="btn btn-default pull-left" style="margin-right:10px !important;">Add New</a>');
+            } else {
+                alert("3");
+                t = $('#stockIssueReturnTable').DataTable({
+                        "bDestroy": true,
+                        "ajax": {
+                            "url": "@Url.Action("GetIssueReturnDataTable", "StockIssueReturn")",
+                            "type": "GET",
+                            "dataType": "json",
+                            "data": { status: siStatus },
+                        },
+                    "columns": [
+                        { "data": "stock_issue_return_id" },
+                        { "data": "issue_return_number" },
+                        { "data": "stock_issue_number" },
+                        {
+                            "data": "created_date", render: function (data, type, full, meta) {
+                                return new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)).toISOString().slice(0, 10);
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strWarehouse;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strInvoiceNumber;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strInvoiceDate;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+
+                                if (full.issue_return_status == "Pending" || full.issue_return_status == "Feedbacked")
+                                    return '<label style="color:orange !important;">' + full.issue_return_status + '</label>';
+                                else if (full.issue_return_status == "Pending Feedback")
+                                    return '<label style="color:blue !important;">' + full.issue_return_status + '</label>';
+                                else if (full.issue_return_status == "Completed")
+                                    return '<label style="color:green !important;">' + full.issue_return_status + '</label>';
+                                else if (full.issue_return_status == "Rejected")
+                                    return '<label style="color:gray !important;">' + full.issue_return_status + '</label>';
+                                else if (full.issue_return_status == "Complete")
+                                    return '<label style="color:red !important;">' + full.issue_return_status + '</label>';
+
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.issue_return_status == "Pending")
+                                    return '<a href="/StockIssueReturn/ApproveFeedback/' + full.stock_issue_return_id + '">Approve/ Feedback</a>';
+                                else if (full.issue_return_status == "Feedbacked")
+                                     return '<a href="/StockIssueReturn/ApproveFeedback/' + full.stock_issue_return_id + '">Approved</a>';
+                                else if(full.issue_return_status == "Pending Feedback")
+                                    return '<a href="/StockIssueReturn/PrepareFeedback/' + full.stock_issue_return_id + '">Prepare Feedback</a>';
+                                else if(full.issue_return_status == "Complete")
+                                    return '<a href="/StockIssueReturn/ApproveFeedback/' + full.stock_issue_return_id + '">Completed</a>';
+                                //return '<a href="javascript:void(0)" id="' + full.stock_issue_return_id + '" class="approve-promp">Approve</a>';
+                                return '';
+                            }
+                        },
+                        //{
+                        //    "render": function (data, type, full, meta) {
+                        //        if (full.issue_return_status == "Pending")
+                        //            return '<a href="javascript:void(0)" id="' + full.stock_issue_return_id + '" class="reject-promp">Reject</a>';
+                        //        return '';
+                        //    }
+                        //},
+                        {
+                            "render": function (data, type, full, meta) {
+                                return '<a href="/StockIssueReturn/Details/' + full.stock_issue_return_id + '">View Detail</a>';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.issue_return_status == "Pending"||full.issue_return_status=="Rejected")
+                                    return '<a href="/StockIssueReturn/Edit/' + full.stock_issue_return_id + '">Edit</a>';
+                                else if(full.issue_return_status == "Pending Feedback")
+                                    return '<a href="/StockIssueReturn/PrepareFeedback/' + full.stock_issue_return_id + '">Prepare Feedback</a>';
+                                if (full.issue_return_status == "Complete") {
+                                     return '<a href="/StockIssueReturn/PrepareFeedback/' + full.stock_issue_return_id + '">Prepare Feedback</a>';
+                                }
+                                return '';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.issue_return_status == "Pending" || full.issue_return_status == "Rejected")
+                                    return '<a href="javascript:void(0)" id="' + full.stock_issue_return_id + '" class="delete-promp">Delete</a>';
+                                return '';
+                            }
+                        }
+                    ],
+                        "order": [[1, "desc"]],
+                        "columnDefs": [
+                            {
+                                "targets": [10],
+                                "visible": false,
+                            },
+                            {
+                                "targets": [11],
+                                "visible": false,
+                            },
+                        ]
+                    });
+                }
+            t.on('order.dt search.dt', function () {
+                t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+            $('select[name="stockIssueReturnTable_length"]').addClass('datatable-control');
+            $('input[aria-controls="stockIssueReturnTable"]').addClass('datatable-control');
+        }
+    </script>
+    }

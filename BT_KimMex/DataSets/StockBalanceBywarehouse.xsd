@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="StockBalanceBywarehouse" targetNamespace="http://tempuri.org/StockBalanceBywarehouse.xsd" xmlns:mstns="http://tempuri.org/StockBalanceBywarehouse.xsd" xmlns="http://tempuri.org/StockBalanceBywarehouse.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="StockBalanceBywarehouse" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="StockBalanceBywarehouse" msprop:Generator_UserDSName="StockBalanceBywarehouse">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="StockBalanceBywarehouse" msprop:Generator_TableClassName="StockBalanceBywarehouseDataTable" msprop:Generator_TableVarName="tableStockBalanceBywarehouse" msprop:Generator_RowChangedName="StockBalanceBywarehouseRowChanged" msprop:Generator_TablePropName="_StockBalanceBywarehouse" msprop:Generator_RowDeletingName="StockBalanceBywarehouseRowDeleting" msprop:Generator_RowChangingName="StockBalanceBywarehouseRowChanging" msprop:Generator_RowEvHandlerName="StockBalanceBywarehouseRowChangeEventHandler" msprop:Generator_RowDeletedName="StockBalanceBywarehouseRowDeleted" msprop:Generator_RowClassName="StockBalanceBywarehouseRow" msprop:Generator_UserTableName="StockBalanceBywarehouse" msprop:Generator_RowEvArgName="StockBalanceBywarehouseRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="itemCode" msprop:Generator_ColumnVarNameInTable="columnitemCode" msprop:Generator_ColumnPropNameInRow="itemCode" msprop:Generator_ColumnPropNameInTable="itemCodeColumn" msprop:Generator_UserColumnName="itemCode" type="xs:string" minOccurs="0" />
+              <xs:element name="itemName" msprop:Generator_ColumnVarNameInTable="columnitemName" msprop:Generator_ColumnPropNameInRow="itemName" msprop:Generator_ColumnPropNameInTable="itemNameColumn" msprop:Generator_UserColumnName="itemName" type="xs:string" minOccurs="0" />
+              <xs:element name="itemUnit" msprop:Generator_ColumnVarNameInTable="columnitemUnit" msprop:Generator_ColumnPropNameInRow="itemUnit" msprop:Generator_ColumnPropNameInTable="itemUnitColumn" msprop:Generator_UserColumnName="itemUnit" type="xs:string" minOccurs="0" />
+              <xs:element name="itemTypeName" msprop:Generator_ColumnVarNameInTable="columnitemTypeName" msprop:Generator_ColumnPropNameInRow="itemTypeName" msprop:Generator_ColumnPropNameInTable="itemTypeNameColumn" msprop:Generator_UserColumnName="itemTypeName" type="xs:string" minOccurs="0" />
+              <xs:element name="warehouseName" msprop:Generator_ColumnVarNameInTable="columnwarehouseName" msprop:Generator_ColumnPropNameInRow="warehouseName" msprop:Generator_ColumnPropNameInTable="warehouseNameColumn" msprop:Generator_UserColumnName="warehouseName" type="xs:string" minOccurs="0" />
+              <xs:element name="unit_price" msprop:Generator_ColumnVarNameInTable="columnunit_price" msprop:Generator_ColumnPropNameInRow="unit_price" msprop:Generator_ColumnPropNameInTable="unit_priceColumn" msprop:Generator_UserColumnName="unit_price" type="xs:string" minOccurs="0" />
+              <xs:element name="total_quantity" msprop:Generator_ColumnVarNameInTable="columntotal_quantity" msprop:Generator_ColumnPropNameInRow="total_quantity" msprop:Generator_ColumnPropNameInTable="total_quantityColumn" msprop:Generator_UserColumnName="total_quantity" type="xs:string" minOccurs="0" />
+              <xs:element name="total" msprop:Generator_ColumnVarNameInTable="columntotal" msprop:Generator_ColumnPropNameInRow="total" msprop:Generator_ColumnPropNameInTable="totalColumn" msprop:Generator_UserColumnName="total" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

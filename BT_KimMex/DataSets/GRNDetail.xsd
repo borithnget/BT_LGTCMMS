@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="GRNDetail" targetNamespace="http://tempuri.org/GRNDetail.xsd" xmlns:mstns="http://tempuri.org/GRNDetail.xsd" xmlns="http://tempuri.org/GRNDetail.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="GRNDetail" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="GRNDetail" msprop:Generator_UserDSName="GRNDetail">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="GRNDetail" msprop:Generator_TableClassName="GRNDetailDataTable" msprop:Generator_TableVarName="tableGRNDetail" msprop:Generator_TablePropName="_GRNDetail" msprop:Generator_RowDeletingName="GRNDetailRowDeleting" msprop:Generator_RowChangingName="GRNDetailRowChanging" msprop:Generator_RowEvHandlerName="GRNDetailRowChangeEventHandler" msprop:Generator_RowDeletedName="GRNDetailRowDeleted" msprop:Generator_UserTableName="GRNDetail" msprop:Generator_RowChangedName="GRNDetailRowChanged" msprop:Generator_RowEvArgName="GRNDetailRowChangeEvent" msprop:Generator_RowClassName="GRNDetailRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="receive_number" msprop:Generator_ColumnVarNameInTable="columnreceive_number" msprop:Generator_ColumnPropNameInRow="receive_number" msprop:Generator_ColumnPropNameInTable="receive_numberColumn" msprop:Generator_UserColumnName="receive_number" type="xs:string" minOccurs="0" />
+              <xs:element name="receive_type" msprop:Generator_ColumnVarNameInTable="columnreceive_type" msprop:Generator_ColumnPropNameInRow="receive_type" msprop:Generator_ColumnPropNameInTable="receive_typeColumn" msprop:Generator_UserColumnName="receive_type" type="xs:string" minOccurs="0" />
+              <xs:element name="vendor_name" msprop:Generator_ColumnVarNameInTable="columnvendor_name" msprop:Generator_ColumnPropNameInRow="vendor_name" msprop:Generator_ColumnPropNameInTable="vendor_nameColumn" msprop:Generator_UserColumnName="vendor_name" type="xs:string" minOccurs="0" />
+              <xs:element name="vendor_telephone" msprop:Generator_ColumnVarNameInTable="columnvendor_telephone" msprop:Generator_ColumnPropNameInRow="vendor_telephone" msprop:Generator_ColumnPropNameInTable="vendor_telephoneColumn" msprop:Generator_UserColumnName="vendor_telephone" type="xs:string" minOccurs="0" />
+              <xs:element name="receiver_name" msprop:Generator_ColumnVarNameInTable="columnreceiver_name" msprop:Generator_ColumnPropNameInRow="receiver_name" msprop:Generator_ColumnPropNameInTable="receiver_nameColumn" msprop:Generator_UserColumnName="receiver_name" type="xs:string" minOccurs="0" />
+              <xs:element name="receiver_telephone" msprop:Generator_ColumnVarNameInTable="columnreceiver_telephone" msprop:Generator_ColumnPropNameInRow="receiver_telephone" msprop:Generator_ColumnPropNameInTable="receiver_telephoneColumn" msprop:Generator_UserColumnName="receiver_telephone" type="xs:string" minOccurs="0" />
+              <xs:element name="ref_number" msprop:Generator_ColumnVarNameInTable="columnref_number" msprop:Generator_ColumnPropNameInRow="ref_number" msprop:Generator_ColumnPropNameInTable="ref_numberColumn" msprop:Generator_UserColumnName="ref_number" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

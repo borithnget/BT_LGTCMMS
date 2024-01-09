@@ -1,0 +1,253 @@
+﻿@using BT_KimMex.Class;
+@{
+    ViewBag.Title = "MyRequest";
+
+}
+
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+<h3 class="title">My Material Request List</h3>
+
+<div class="well" style="padding:8px !important; padding-bottom:30px !important;">
+    <div class="form-group">
+        <label class="control-label col-md-2">Requested Date:</label>
+        <div class="col-md-3">
+            <div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
+                <i class="fa fa-calendar"></i>&nbsp;
+                <span></span> <i class="fa fa-caret-down"></i>
+            </div>
+        </div>
+        <label class="control-label col-md-2">MR Status:</label>
+        <div class="col-md-3">
+            <select class="form-control" id="ddr_status" name="ddr_status" style="width:100% !important;">
+                <option value="0">All</option>
+                <option value="Pending">@ShowStatus.MRCreated</option>
+                <option value="edit">@ShowStatus.MREditted</option>
+                <option value="Approved">@ShowStatus.MRApproved</option>
+                <option value="Completed">@ShowStatus.MRCompleted</option>
+                <option value="Rejected">@ShowStatus.MRRejected</option>
+                <option value="@Status.RequestCancelled">@ShowStatus.MRRequestCancelled</option>
+                <option value="@Status.PendingFeedback">@ShowStatus.MRPendingFeedback</option>
+                <option value="@Status.Feedbacked">@ShowStatus.MRFeedbacked</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="w3-button w3-tiny w3-blue" onclick="initialDataTable()">Filter</button>
+        </div>
+    </div>
+</div>
+
+
+<div class="col-12 col-xl-12 col-md-12 col-sm-12">
+    <table class="table table-bordered" id="item_request_table">
+        <thead class="bg-success">
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>MR No</th>
+                <th>Project Name</th>
+                <th>Purpost of Purchase</th>
+                <th>Status</th>
+                <th>Action</th>
+                @*<th>View</th>*@
+                @*<th>Action</th>*@
+                @*<th>Delete</th>*@
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<!-- delete project modal popup-->
+<div class="modal fade" id="myModal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to delete this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default delete-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.3/moment.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script type="text/javascript">
+        var ir_id;
+        $(function () {
+
+            var start = moment().subtract(29, 'days');
+            var end = moment();
+
+            function cb(start, end) {
+                $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            }
+
+            $('#reportrange').daterangepicker({
+                startDate: start,
+                endDate: end,
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                }
+            }, cb);
+
+            cb(start, end);
+            $('#ddr_status').select2();
+
+            initialDataTable();
+
+            $('#item_request_table tbody').on('click', 'td a.delete-promp', function () {
+                ir_id = $(this).attr('id');
+                $('#myModal').modal('show');
+            });
+
+            $('.delete-confirm').click(function () {
+                if (ir_id != '') {
+                    $.ajax({
+                        url: "/ItemRequest/Delete",
+                        data: {
+                            'id': ir_id,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#myModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been deleted!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "ItemRequest")';
+                            }
+                            else if (da.Message == "fail")
+                                $.notify('Your data has been error while deleting!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while deleting!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+        });
+
+        function initialDataTable() {
+            var t=$('#item_request_table').DataTable({
+                "bDestroy": true,
+                "ajax": {
+                    "url": "@Url.Action("GetMyRequestJson", "ItemRequest")",
+                    "type": "GET",
+                    "dataType": "json",
+                    "data": {
+                        dateRange: $('#reportrange span').html(),
+                        status: $('#ddr_status').val(),
+                    }
+                },
+
+                        "columns": [
+                            { "data": "count" },
+                            {
+                                "data": "created_date", render: function (data, type, full, meta) {
+                                    return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                                }
+                            },
+                            //{ "data": "ir_no" },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    return '<a href="/ItemRequest/Detail/' + full.ir_id + '">'+full.ir_no+'</a>';
+                                }
+                            },
+                            { "data": "project_full_name" },
+                            { "data": "purpose_description" },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    if (full.ir_status == "Pending")
+                                        return '<label class="label w3-red">MR Created</label>';
+                                    else if (full.ir_status == "edit")
+                                        return '<label class="label w3-red">MR Edited</label>';
+                                    else if (full.ir_status == "Approved")
+                                        return '<label class="label w3-blue">MR Approved</label>';
+                                    else if (full.ir_status == "Completed")
+                                        return '<label class="label w3-green">' + full.ir_status + '</label>';
+                                    else if (full.ir_status == "request cancelled")
+                                    {
+                                        if(full.is_po_partial){
+                                            return '<label class="label w3-grey">@ShowStatus.MRPartialRequestCancelled</label>';
+                                        }else{
+                                            return '<label class="label w3-grey">MR Request Cancelled</label>';
+                                        }
+                                    }
+                                        
+                                    else if (full.ir_status == "Rejected")
+                                        return '<label class="label w3-red w3-text-black">@ShowStatus.MRRejected</label>';
+                                    else if (full.ir_status == "@Status.PendingFeedback") {
+                                        return '<label class="label w3-orange">@ShowStatus.MRPendingFeedback</label>';
+                                    }
+                                    else if (full.ir_status == "@Status.Feedbacked") {
+                                        return '<label class="label w3-orange">@ShowStatus.MRFeedbacked</label>';
+                                    } else {
+                                        return '<label class="label w3-gray">' + full.ir_status + '</label>';
+                                    }
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    //console.log(full.po_status)
+                                    var btn = '<a href="/ItemRequest/Detail/' + full.ir_id + '" class="w3-button w3-tiny w3-blue">View Detail</a>';
+                                    //if (full.po_status != 'GRN Created' && full.po_status != 'GRN Approved' && full.po_status != 'GRN Approved' && full.po_status != 'GRN Completed'
+                                    //    && full.po_status != 'GRN Cancelled' && full.po_status != 'GRN Rejected'
+                                    //&& full.po_status != 'GRN Partial Created' && full.po_status != 'GRN Partial Approved' && full.po_status != 'GRN Partial Completed'
+                                    //    && full.po_status != 'GRN Partial Cancelled' && full.po_status != 'Remain GRN Pending'
+                                    //&& full.po_status != 'GRN Partial Rejected' && full.po_status != 'MR Completed' && full.ir_status != 'Rejected' && full.ir_status != 'request cancelled' && full.ir_status != 'Pending' && full.ir_status != 'edit'
+                                    //    &&full.po_status!='PO Approved' && full.po_status!='PO Completed')
+                                        //if(full.is_grn==null || full.is_grn==false)
+                                        if (full.ir_status != 'Rejected' && full.ir_status != 'request cancelled' && full.ir_status != 'Pending' && full.ir_status != 'edit' && full.is_po_completed!=true)
+                                        btn = btn + ' <a href="/ItemRequest/EditRequest/' + full.ir_id + '" class="w3-button w3-tiny w3-blue">Edit</a>';
+                                    return btn;
+                                       
+                                }
+                            },
+                            //{
+                            //    "render": function (data, type, full, meta) {
+                            //        if (full.ir_status == "Rejected" || full.ir_status == "Pending")
+                            //            return '<a class="btn btn-xs btn-warning" href="/ItemRequest/Edit/' + full.ir_id + '"><i class="fa fa-edit"></i> Edit</a> | <a href="javascript:void(0)" id="' + full.ir_id + '" class="delete-promp btn btn-xs btn-danger"><i class="fa fa-trash-o"></i> Delete</a>';
+                            //        else
+                            //            return '';
+                            //    }
+                            //},
+                            //{
+                            //    "render": function (data, type, full, meta) {
+                            //        if (full.ir_status == "Rejected" || full.ir_status == "Pending")
+                            //            return '<a href="javascript:void(0)" id="' + full.ir_id + '" class="delete-promp">Delete</a>';
+                            //        else return '';
+                            //    }
+                            //},
+                        ],
+                        "order": [[0, "asc"]],
+            });
+            t.on('order.dt search.dt', function () {
+                t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+        }
+    </script>
+    }

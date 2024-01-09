@@ -1,0 +1,472 @@
+﻿@model BT_KimMex.Models.ItemReceiveViewModel
+@using BT_KimMex.Class
+@{
+    Layout = null;
+    string title = string.Compare(Model.received_type, "Purchase Order") == 0 ? "PURCHASE ORDER RECEIVING SLIP " : "LGT STOCK RECEIVING SLIP";
+    int countHis = Model.receivedHistories.Count() + 1;
+    BT_KimMex.Entities.kim_mexEntities db = new BT_KimMex.Entities.kim_mexEntities();
+    string host = HttpContext.Current.Request.Url.Authority;
+
+
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Export to Excel</title>
+</head>
+<body>
+    @if (Convert.ToBoolean(Model.is_export_grn))
+    {
+        <table width="100%" style="border-collapse: collapse; " id="table" data-SheetName="Good Received Note">
+            <tr>
+                <td colspan="10" style="text-align:center;"><h3 style="font-family:Century Gothic;color:green;font-style:italic;">@title</h3></td>
+            </tr>
+            <tr>
+                <td colspan="10"></td>
+            </tr>
+
+            <!-- Start Header Data -->
+            <tr>
+                <td colspan="3" style="font-family:Century Gothic;font-size:12px; font-weight:bold;">VENDOR</td>
+                <td colspan="3"></td>
+                <td colspan="4" style="font-family:Century Gothic;font-size:12px;font-weight:bold;">REFERENCE</td>
+            </tr>
+            <tr>
+                <td colspan="3" style="font-family:Century Gothic;font-size:10px;text-align:left">@Model.inventories.FirstOrDefault().supplier_name</td>
+                <td colspan="3"></td>
+                <td colspan="2" style="font-family:Century Gothic;font-size:10px;text-align:left">P. Order No.</td>
+                <td colspan="3" style="font-family:Century Gothic;font-size:10px;text-align:left;"> : @Model.ref_number</td>
+            </tr>
+            <tr>
+                <td colspan="3"></td>
+                <td colspan="3"></td>
+                <td colspan="2" style="font-family:Century Gothic;font-size:10px;text-align:left">Date</td>
+                <td colspan="3" style="font-family:Century Gothic;font-size:10px;text-align:left;">: @Model.ref_number_date</td>
+            </tr>
+            <tr>
+                <td colspan="3"></td>
+                <td colspan="3"></td>
+                <td colspan="2" style="font-family:Century Gothic;font-size:10px;text-align:left">Project</td>
+                <td colspan="3" style="font-family:Century Gothic;font-size:10px;text-align:left;">: @Model.project_full_name</td>
+            </tr>
+            <tr>
+                <td colspan="3"></td>
+                <td colspan="3"></td>
+                <td colspan="2" style="font-family:Century Gothic;font-size:10px;text-align:left">S. Order No.</td>
+                <td colspan="3" style="font-family:Century Gothic;font-size:10px;text-align:left;">: @Model.project_so_number</td>
+            </tr>
+            <tr>
+                <td colspan="3" style="font-family:Century Gothic;font-size:12px; font-weight:bold;">SHIP TO</td>
+                <td colspan="3"></td>
+                <td colspan="2" style="font-family:Century Gothic;font-size:10px;text-align:left">MR No.</td>
+                <td colspan="3" style="font-family:Century Gothic;font-size:10px;text-align:left;">: @Model.mr_ref_number</td>
+            </tr>
+            <tr>
+                <td colspan="3" style="font-family:Century Gothic;font-size:10px;text-align:left">Delivery  : Mr.  </td>
+                <td colspan="7"></td>
+            </tr>
+            <tr>
+                <td colspan="3" style="font-family:Century Gothic;font-size:10px;text-align:left">Tel : </td>
+                <td colspan="7"></td>
+            </tr>
+
+            <tr>
+                <td colspan="10"><h3></h3></td>
+            </tr>
+            <!-- End Header Data -->
+
+            <tr>
+                <td rowspan="2" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic; font-weight:bold;text-align:center;font-size:12px;">Item</td>
+                <td rowspan="2" colspan="2" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-weight:bold;text-align:center;font-size:12px;">Description</td>
+                <td rowspan="2" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-weight:bold;text-align:center;font-size:12px;">Brand</td>
+                <td rowspan="2" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-weight:bold;text-align:center;font-size:12px;">P/N</td>
+                <td rowspan="2" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-weight:bold;text-align:center;font-size:12px;">Picture</td>
+                <td rowspan="2" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-weight:bold;text-align:center;font-size:12px;">Qty</td>
+                <td rowspan="2" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-weight:bold;text-align:center;font-size:12px;">Unit</td>
+                @for (int i = 1; i <= Model.receivedHistories.Count(); i++)
+                {
+                    <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-weight:bold;text-align:center;font-size:12px;">Delivery @i</td>
+                }
+                <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-weight:bold;text-align:center;font-size:12px;">Delivery @countHis</td>
+                <td rowspan="2" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-weight:bold;text-align:center;font-size:12px;">Remaining</td>
+            </tr>
+            <tr>
+                @for (int i = 0; i < Model.receivedHistories.Count(); i++)
+                {
+                    <td style="font-size:12px;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-weight:bold;text-align:center;background-color:red;">@Convert.ToDateTime(Model.receivedHistories[i].created_date).ToString("dd-MMM-yy")</td>
+                }
+                <td style="font-size:12px;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-weight:bold;text-align:center;background-color:red;">@Convert.ToDateTime(Model.created_date).ToString("dd-MMM-yy")</td>
+            </tr>
+            @{
+                int count = 1;
+                decimal countReceive = 0;
+                decimal countRemain = 0;
+                decimal[] countHistories = new decimal[Model.receivedHistories.Count()];
+                foreach (var item in Model.receivedItems)
+                {
+                    foreach (var inv in Model.inventories)
+                    {
+                        if (string.Compare(item.product_id, inv.product_id) == 0)
+                        {
+                            string qty = string.Empty;
+                            string brand = (from prod in db.tb_product
+                                            join br in db.tb_brand on prod.brand_id equals br.brand_id into pbr
+                                            from br in pbr.DefaultIfEmpty()
+                                            where string.Compare(prod.product_id, item.product_id) == 0
+                                            select br.brand_name).FirstOrDefault();
+                            if (string.Compare(Model.received_type, "Purchase Order") == 0)
+                            {
+                                qty = string.Format("{0:G29}", Decimal.Parse(item.total_quantity.ToString()));
+                            }
+                            else
+                            {
+                                qty = string.Format("{0:G29}", Decimal.Parse(item.out_quantity.ToString()));
+                            }
+
+                            countReceive = countReceive + (decimal)inv.in_quantity;
+                            <tr>
+                                <td style="font-size:12px;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;text-align:center;">@count</td>
+                                <td colspan="2" style="font-size:12px;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;text-align:left;">@item.itemName</td>
+                                <td style="font-size:12px;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;text-align:left;">@brand</td>
+                                <td style="font-size:12px;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;text-align:center;">@item.itemCode</td>
+                                <td style="font-size:12px;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;"></td>
+                                <td style="font-size:12px;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;text-align:center;">@qty</td>
+                                <td style="font-size:12px;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;text-align:left;">@item.itemUnitName</td>
+
+                                @foreach (var obj in Model.receivedHistories)
+                                {
+                                    int cindex = 0;
+                                    var re = obj.inventories.Where(s => string.Compare(s.product_id, item.product_id) == 0).FirstOrDefault();
+                                    if (re != null)
+                                    {
+                                        if (string.Compare(obj.received_status, Status.Completed) == 0)
+                                        {
+                                            <td style="font-size:12px;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;text-align:center;">@string.Format("{0:G29}", re.in_quantity)</td>
+                                        }
+                                        else
+                                        {
+                                            <td style="font-size:12px;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;text-align:center;">@string.Format("{0:G29}", re.in_quantity)</td>
+                                        }
+                                        countHistories[cindex] = countHistories[cindex] + (decimal)re.in_quantity;
+                                    }
+                                    else
+                                    {
+                                        <td style="font-size:12px;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;text-align:center;"></td>
+                                    }
+                                    //countHistories[cindex] = countHistories[cindex] +(decimal) re.in_quantity;
+                                    cindex++;
+                                }
+                                <td style="font-size:12px;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;text-align:center;">@string.Format("{0:G29}", Decimal.Parse(inv.in_quantity.ToString()))</td>
+
+                                <td style="font-size:12px;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;text-align:center;">
+                                    @{
+                                        if (string.Compare(Model.received_type, "Stock Transfer") == 0)
+                                        {
+                                            countRemain = countRemain + CommonFunctions.GetStokTransferRemainBalancebyItem(Model.ref_id, item.product_id);
+                                            <label class="text-center">@string.Format("{0:G29}", BT_KimMex.Class.CommonFunctions.GetStokTransferRemainBalancebyItem(Model.ref_id, item.product_id))</label>
+                                        }
+                                        else if (string.Compare(Model.received_type, "Transfer Workshop") == 0)
+                                        {
+                                            countRemain = countRemain + (decimal)item.remain_quantity;
+                                            <label class="text-center">@string.Format("{0:G29}", item.remain_quantity)</label>
+                                        }
+                                        else if (string.Compare(Model.received_type, "Purchase Order") == 0)
+                                        {
+                                            countRemain = countRemain + (decimal)item.remain_quantity;
+                                            <label class="text-center">@string.Format("{0:G29}", item.remain_quantity)</label>
+                                        }
+                                        else
+                                        {
+                                            countRemain = countRemain + (decimal)item.remain_quantity;
+                                            <label class="text-center">@string.Format("{0:G29}", item.remain_quantity)</label>
+                                        }
+
+                                    }
+
+                                </td>
+
+                            </tr>
+                            count++;
+                        }
+                    }
+                }
+                <tr>
+                    <td colspan="8" style="font-weight:bold; font-size:12px;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;text-align:center;">TOTAL Receiving & Remaining</td>
+                    @for (int i = 0; i < countHistories.Count(); i++)
+                    {
+                        <td style="font-size:12px;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;text-align:center;">@string.Format("{0:G29}", countHistories[i])</td>
+                    }
+                    <td style="font-size:12px;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;text-align:center;">@string.Format("{0:G29}", countReceive)</td>
+                    <td style="font-size:12px;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;text-align:center;">@string.Format("{0:G29}", countRemain)</td>
+                </tr>
+            }
+            <!-- start signature section -->
+            <tr>
+                <td colspan="11"><h3></h3></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td colspan="2" style="font-family:Century Gothic; font-weight:bold;text-align:left;font-size:12px;">Site Manager</td>
+                <td colspan="4" style="font-family:Century Gothic; font-weight:bold;text-align:left;font-size:12px;">QA/QC Officer</td>
+                <td colspan="4" style="font-family:Century Gothic; font-weight:bold;text-align:left;font-size:12px;">Site Stock Keeper</td>
+                <td></td>
+
+            </tr>
+
+            @if (Convert.ToBoolean(Model.is_export_signature))
+            {
+                string createdBySignature = string.Format("http://{0}{1}", host, Model.created_by_signature);
+                string approvedBySignature = string.Format("http://{0}{1}", host, Model.approved_by_signature);
+                string checkedBySignature = string.Format("http://{0}{1}", host, Model.checked_by_signature);
+                <tr>
+                    <td></td>
+                    <td colspan="2" style="font-family:Century Gothic; font-weight:bold;text-align:left;font-size:11px;"><img src="@checkedBySignature" style="height:50px !important; width:50px !important; margin-top:10px; object-fit:cover;" width="100" height="100" /></td>
+                    <td colspan="4" style="font-family:Century Gothic; font-weight:bold;text-align:left;font-size:11px;"><img src="@approvedBySignature" style="height:50px !important; width:50px !important; margin-top:10px; object-fit:cover;" width="100" height="100" /></td>
+                    <td colspan="4" style="font-family:Century Gothic; font-weight:bold;text-align:left;font-size:11px;"><img src="@createdBySignature" style="height:50px !important; width:50px !important; margin-top:10px; object-fit:cover;" width="100" height="100" /></td>
+                    <td></td>
+                </tr>
+            }
+            else
+            {
+                <tr>
+                    <td colspan="11"><h1></h1></td>
+                </tr>
+                <tr>
+                    <td colspan="11"><h1></h1></td>
+                </tr>
+
+            }
+            <tr>
+                <td colspan="11"><h1></h1></td>
+            </tr>
+
+            <tr>
+                <td></td>
+                <td colspan="2" style="font-family:Century Gothic; font-weight:bold;text-align:left;font-size:11px;">Date, Name & Signature</td>
+                <td colspan="4" style="font-family:Century Gothic; font-weight:bold;text-align:left;font-size:11px;">Date, Name & Signature</td>
+                <td colspan="4" style="font-family:Century Gothic; font-weight:bold;text-align:left;font-size:11px;">Date, Name & Signature</td>
+                <td></td>
+
+            </tr>
+            <tr>
+                <td></td>
+                <td colspan="2" style="font-family:Century Gothic; font-weight:bold;text-align:left;font-size:12px;">@Model.checked_by</td>
+                <td colspan="4" style="font-family:Century Gothic; font-weight:bold;text-align:left;font-size:12px;">@Model.approved_by</td>
+                <td colspan="4" style="font-family:Century Gothic; font-weight:bold;text-align:left;font-size:12px;">@Model.created_by</td>
+                <td></td>
+
+            </tr>
+            <tr>
+                <td></td>
+                <td colspan="2" style="font-family:Century Gothic;text-align:left;font-size:12px;">@Model.checked_date_text</td>
+                <td colspan="4" style="font-family:Century Gothic;text-align:left;font-size:12px;">@Model.approved_date_text</td>
+                <td colspan="4" style="font-family:Century Gothic;text-align:left;font-size:12px;">@Convert.ToDateTime(Model.created_date).ToString("dd-MMM-yyyy")</td>
+                <td></td>
+
+            </tr>
+
+            <!-- end signature section -->
+
+        </table>
+    }
+
+
+    <!-- START Delivery Order -->
+    @if (Convert.ToBoolean(Model.is_export_do))
+    {
+
+        <table width="100%" style="border-collapse: collapse; " id="table1" data-SheetName="Delivery Order">
+            @if (Convert.ToBoolean(Model.is_export_signature))
+            {
+                foreach (var doAtt in Model.doAttachments)
+                {
+                    string urlDOAttachment = string.Format("http://{0}/Documents/IRe Attachment/{1}_watermark{2}", host, doAtt.attachment_id, doAtt.attachment_extension);
+                    <tr>
+                        <td><img src="@urlDOAttachment" width="100%" @*style="height:100px; width:300px; margin-top:10px; "*@ /></td>
+                    </tr>
+                }
+            }
+            else
+            {
+                foreach (var doAtt in Model.doAttachments)
+                {
+                    string urlDOAttachment = string.Format("http://{0}/Documents/IRe Attachment/{1}{2}", host, doAtt.attachment_id, doAtt.attachment_extension);
+                    <tr>
+                        <td><img src="@urlDOAttachment" width="100%" @*style="height:100px; width:300px; margin-top:10px; "*@ /></td>
+                    </tr>
+                }
+            }
+
+
+        </table>
+    }
+
+
+    <script type="text/javascript" src="~/Scripts/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/jQuery.print.min.js"></script>
+    <script type="text/javascript">
+
+        $(function () {
+
+            if ('@Model.process_type' == "excel") {
+                //exportTableToExcel('table', '@Model.project_full_name' + '-' + '@Model.received_number');
+                tablesToExcel1('#table,#table1', '@Model.project_full_name' + '-' + '@Model.received_number' + new Date() +'.xls');
+                window.top.close();
+
+            } else if ('@Model.process_type' == "print") {
+                $.print("#table");
+                window.onfocus = function () { setTimeout(function () { window.close(); }, 500); }
+            }
+            else {
+                window.top.close();
+            }
+
+        });
+
+        function exportTableToExcel(tableId, filename) {
+            let dataType = 'application/vnd.ms-excel';
+            let extension = '.xls';
+
+            let base64 = function (s){
+                //return window.btoa(unescape(encodeURIComponent(s)))
+                //return window.btoa(unescape(escape(s)))
+                //return window.btoa(unescape(escape(s)))
+
+                try {
+                    return window.btoa(unescape(escape(s)));
+                }
+                catch (err) {
+                    return window.btoa(unescape(encodeURIComponent(s)));
+                }
+
+            };
+
+            let template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>';
+            let render = function (template, content) {
+                return template.replace(/{(\w+)}/g, function (m, p) { return content[p]; });
+            };
+
+            let tableElement = document.getElementById(tableId);
+
+            let tableExcel = render(template, {
+                worksheet: filename,
+                //table: tableElement.innerHTML
+                table: tableElement.innerHTML.normalize('NFD').replace("–", "-")
+            });
+
+            filename = filename + extension;
+
+            if (navigator.msSaveOrOpenBlob) {
+                let blob = new Blob(
+                    ['\ufeff', tableExcel],
+                    { type: dataType }
+                );
+
+                navigator.msSaveOrOpenBlob(blob, filename);
+            } else {
+                let downloadLink = document.createElement("a");
+                document.body.appendChild(downloadLink);
+                downloadLink.href = 'data:' + dataType + ';base64,' + base64(tableExcel);
+                downloadLink.download = filename;
+                downloadLink.click();
+            }
+        }
+
+        var tablesToExcel1 = (function ($) {
+            var uri = 'data:application/vnd.ms-excel;base64,'
+                , html_start = `<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">`
+                , template_ExcelWorksheet = `<x:ExcelWorksheet><x:Name>{SheetName}</x:Name><x:WorksheetSource HRef="sheet{SheetIndex}.htm"/></x:ExcelWorksheet>`
+                , template_ListWorksheet = `<o:File HRef="sheet{SheetIndex}.htm"/>`
+                , template_HTMLWorksheet = `
+------=_NextPart_dummy
+Content-Location: sheet{SheetIndex}.htm
+Content-Type: text/html; charset=windows-1252
+
+` + html_start + `
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <link id="Main-File" rel="Main-File" href="../WorkBook.htm">
+  <link rel="File-List" href="filelist.xml">
+</head>
+<body><table>{SheetContent}</table></body>
+</html>`
+                , template_WorkBook = `MIME-Version: 1.0
+X-Document-Type: Workbook
+Content-Type: multipart/related; boundary="----=_NextPart_dummy"
+
+------=_NextPart_dummy
+Content-Location: WorkBook.htm
+Content-Type: text/html; charset=windows-1252
+
+` + html_start + `
+<head>
+<meta name="Excel Workbook Frameset">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<link rel="File-List" href="filelist.xml">
+<!--[if gte mso 9]><xml>
+ <x:ExcelWorkbook>
+  <x:ExcelWorksheets>{ExcelWorksheets}</x:ExcelWorksheets>
+  <x:ActiveSheet>0</x:ActiveSheet>
+ </x:ExcelWorkbook>
+</xml><![endif]-->
+</head>
+<frameset>
+  <frame src="sheet0.htm" name="frSheet">
+  <noframes><body><p>This page uses frames, but your browser does not support them.</p></body></noframes>
+</frameset>
+</html>
+{HTMLWorksheets}
+Content-Location: filelist.xml
+Content-Type: text/xml; charset="utf-8"
+
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+  <o:MainFile HRef="../WorkBook.htm"/>
+  {ListWorksheets}
+  <o:File HRef="filelist.xml"/>
+</xml>
+------=_NextPart_dummy--
+`
+                , base64 = function (s) { return window.btoa(unescape(encodeURIComponent(s))) }
+                , format = function (s, c) { return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; }) }
+            return function (tables, filename) {
+                var context_WorkBook = {
+                    ExcelWorksheets: ''
+                    , HTMLWorksheets: ''
+                    , ListWorksheets: ''
+                };
+                var tables = jQuery(tables);
+                $.each(tables, function (SheetIndex) {
+                    var $table = $(this);
+                    var SheetName = $table.attr('data-SheetName');
+                    if ($.trim(SheetName) === '') {
+                        SheetName = 'Sheet' + SheetIndex;
+                    }
+                    context_WorkBook.ExcelWorksheets += format(template_ExcelWorksheet, {
+                        SheetIndex: SheetIndex
+                        , SheetName: SheetName
+                    });
+                    context_WorkBook.HTMLWorksheets += format(template_HTMLWorksheet, {
+                        SheetIndex: SheetIndex
+                        , SheetContent: $table.html()
+                    });
+                    context_WorkBook.ListWorksheets += format(template_ListWorksheet, {
+                        SheetIndex: SheetIndex
+                    });
+                });
+
+                var link = document.createElement("A");
+                link.href = uri + base64(format(template_WorkBook, context_WorkBook));
+                link.download = filename || 'Workbook.xls';
+                link.target = '_blank';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        })(jQuery);
+    </script>
+
+</body>
+</html>

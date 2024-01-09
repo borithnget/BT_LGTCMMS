@@ -1,0 +1,241 @@
+﻿@model BT_KimMex.Models.StockIssueViewModel
+@using Microsoft.AspNet.Identity;
+@using BT_KimMex.Class
+@{
+    ViewBag.Title = "Edit Work Order Issued";
+    string userid = User.Identity.GetUserId().ToString();
+    string date =CommonClass.ToLocalTime(Convert.ToDateTime(Model.created_date)).ToString("dd/MM/yyyy");
+
+    BT_KimMex.Entities.kim_mexEntities db = new BT_KimMex.Entities.kim_mexEntities();
+    var wh = db.tb_warehouse.Where(s => string.Compare(s.warehouse_project_id, Model.project_id) == 0).FirstOrDefault();
+    string whname = string.Empty;
+    if (wh != null)
+    {
+        whname = wh.warehouse_name;
+    }
+
+}
+<style type="text/css">
+    #stockIssueTable tr td {
+        vertical-align: middle !important;
+        text-align: center !important;
+    }
+        #stockIssueTable tr td:nth-child(3) {
+            text-align: left !important;
+        }
+</style>
+
+<div class="w3-panel w3-card-4">
+    <div class="w3-container w3-display-container">
+        <h3 class="title">@ViewBag.Title</h3>
+    </div>
+    <div class="w3-container w3-display-container">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal">
+                
+                @Html.HiddenFor(model => model.stock_issue_id)
+                @*<div class="form-group">
+                    @Html.LabelFor(model => model.created_date, new { @class = "col-md-2" })
+                    @Html.Label(date, new { @class = "col-md-10" })
+                </div>*@
+                <div class="form-group">
+                    @Html.LabelFor(model => model.stock_issue_number, new { @class = "col-md-2" })
+                    <label class="col-md-10">@Model.stock_issue_number</label>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2">Project:</label>
+                    <label class="col-md-10">@db.tb_project.Find(Model.project_id).project_full_name</label>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2">Warehouse:</label>
+                    <label class="col-md-10">@whname</label>
+                </div>
+                <div class="row" style="margin:0 !important;">
+                    <table class="table table-bordered table-responsive" id="stockIssueTable">
+                        <thead>
+                            <tr>
+                                <th rowspan="2">No.</th>
+                                <th rowspan="2">Item Code</th>
+                                <th rowspan="2">Item Name</th>
+                                <th rowspan="2">Labour Hour</th>
+                                @*<th>Warehouse</th>*@
+                                <th rowspan="2">Stock Balance</th>
+                                <th rowspan="2">Issue Qty</th>
+                                @if (Model.inventorieshistoryqty.Count() > 0)
+                                {
+                                    int i = @Model.inventorieshistoryqty.Count() + 1;
+                                    <th colspan="@i">Issue Qty History</th>
+
+                                }
+                                <th rowspan="2">Unit</th>
+                                <th rowspan="2">Inovice No.</th>
+                                <th rowspan="2">Inovice Date</th>
+                                <th rowspan="2">Reason</th>
+                                <th rowspan="2">Status</th>
+                            </tr>
+                            @if ((Model.inventorieshistoryqty.Count() + 1) > 0)
+                            {
+                                int js = @Model.inventorieshistoryqty.Count() + 1;
+
+                                <tr>
+
+                                    @for (int i = 1; i <= js; i++)
+                                    {
+                                        <th>@i</th>
+                                    }
+                                </tr>
+                            }
+
+                        </thead>
+                        <tbody>
+                            @{
+                                int count = 1;
+                                foreach (var item in Model.inventoryDetails)
+                                {
+                                    decimal total_issued_qty = Convert.ToDecimal(BT_KimMex.Class.WorkOrderIssue.GetWorkOrderIssueItembyItemId(Model.stock_issue_id, item.inventory_item_id).Sum(s => s.issue_qty));
+                                    <tr>
+                                        <td>@count</td>
+                                        <td hidden>
+                                            <input class="item-id" value="@item.inventory_detail_id" />
+                                        </td>
+                                        <td>@item.itemCode</td>
+                                        <td style="text-align:left !important;">@item.itemName</td>
+                                        <td>@Convert.ToDecimal(item.item_labour_hour).ToString("N0")</td>
+                                        <td><label class="stock-balance">@string.Format("{0:G29}", decimal.Parse(item.stock_balance.ToString()))</label> </td>
+                                        @*<td>@string.Format("{0:G29}", decimal.Parse(item.quantity.ToString()))</td>*@
+                                        <td>@string.Format("{0:G29}", decimal.Parse(total_issued_qty.ToString()))</td>
+
+                                        @foreach (var obj in db.tb_history_issue_qty.Where(s => string.Compare(s.inventory_detail_id, @item.inventory_detail_id) == 0).OrderBy(s => s.create_at).ToList())
+                                        {
+                                            <td class="text-center">@obj.issue_qty</td>
+                                        }
+                                        <td><input type="number" value='0' class="form-control history_quantity" onchange="checkQTY(this)" /></td>
+                                        <td>@item.unitName</td>
+                                        <td>@item.invoice_number</td>
+                                        <td>@Convert.ToDateTime(item.invoice_date).ToString("dd/MM/yyyy")</td>
+                                        <td>@item.remark</td>
+                                        <td>
+                                            @{
+                                                if (string.Compare(item.item_status, "pending") == 0)
+                                                {
+                                                    <label style="color:orange">@item.item_status</label>
+                                                }
+                                                else if (string.Compare(item.item_status, "approved") == 0)
+                                                {
+                                                    <label style="color:blue">@item.item_status</label>
+                                                }
+                                                else if (string.Compare(item.item_status, "feedbacked") == 0)
+                                                {
+                                                    <label style="color:grey !important;">@item.item_status</label>
+                                                }
+                                            }
+                                        </td>
+                                    </tr>
+                                    count++;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                @{
+                    foreach (var invid in Model.inventories)
+                    {
+                        <input type="hidden" class="invid" value="@invid.inventory_id" />
+                    }
+                }
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <button type="button" class="btn btn-success" id="btnSubmit">
+                            Submit</button>
+
+                            @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-danger" })
+</div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('#btnSubmit').click(function (e) {
+
+                $('#btnSubmit').attr("disabled", true);
+                $('#btnSubmit').text("Submitting");
+
+                var inventories = [];
+                var item_element = {};
+                var items = $('.item-id');
+                var history_quantity = $('.history_quantity');
+                var inventory_id = $('.invid');
+                var stockBalances = $('.stock-balance');
+          
+                var countInvalid = 0;
+
+                for (var i = 0; i < items.length; i++) {
+                    item_element = {};
+                    var stockblance = Number(stockBalances[i].innerHTML);
+                    var issuedQTY = Number(history_quantity[i].value);
+                    if (Number(stockblance) < Number(issuedQTY)) {
+                        countInvalid++;
+                    }
+                    item_element.inventory_detail_id = items[i].value;
+                    item_element.history_quantity = history_quantity[i].value;
+                    item_element.inventory_id = inventory_id[i].value;
+                    inventories.push(item_element);
+                }
+                if (countInvalid > 0) {
+                    alert("Issue item quantity must be smaller than Stock balance.");
+                    $('#btnSubmit').attr("disabled", false);
+                    $('#btnSubmit').text("Submit");
+                    return;
+                }
+                var model = {
+                    stock_issue_id: $('#stock_issue_id').val(),
+                   inventories: inventories,
+                };
+                //return;
+                $.ajax({
+                    url: "/StockIssue/EditNew",
+                    type: "post",
+                    dataType: "json",
+                    async: false,
+                    data: { model: model },
+                    success: function (da) {
+                        if (da.result == "success") {
+                            $.notify('Your data has been saved!', { className: 'success' });
+                            window.location.href = '/StockIssue/Index';
+                        } else if (da.result == "error") {
+                            $.notify(da.message, { className: 'error' });
+                            $('#btnSubmit').attr("disabled", false);
+                            $('#btnSubmit').text("Submit");
+                        }
+                    },
+                    error: function (err) {
+                        $.notify('Your data is error while saving!', { className: 'error' });
+                        $('#btnSubmit').attr("disabled", false);
+                        $('#btnSubmit').text("Submit");
+                    }
+                });
+            });
+        })
+        
+
+        function checkQTY(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var stockBalance =Number($('#stockIssueTable tr').eq(ind).find('label.stock-balance').text());
+            var issueQty =Number($('#stockIssueTable tr').eq(ind).find('input.history_quantity').val());
+            if (Number(stockBalance) < Number(issueQty)) {
+                alert("Issue item quantity must be smaller than Stock balance.");
+                $('#stockIssueTable tr').eq(ind).find('input.history_quantity').val(stockBalance);
+                return;
+            }
+        }
+    </script>
+}
+

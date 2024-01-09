@@ -1,0 +1,169 @@
+﻿@model IEnumerable<BT_KimMex.Models.InventoryDetailViewModel>
+@using Microsoft.AspNet.Identity;
+@{
+    ViewBag.Title = "WorkShopBalance";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row" style="padding:10px !important;">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Workshop Balance
+            @if (string.Compare(User.Identity.Name, "bt_admin") == 0)
+            {
+                <a href="javascript:void(0)" class="w3-button w3-tiny w3-teal pull-right" id="btn_product_adjustment"><span class="glyphicon glyphicon-plus-sign"></span> Product Adjustment</a>
+            }
+        </div>
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="stockBalanceTable" style="margin-top:0px !important;">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Item Code</th>
+                            <th>Item Name</th>
+                            <th>Item Unit</th>
+                            <th>Stock Balance</th>
+                            @*<th>Amount</th>*@
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @*@{
+                                int count = 1;
+                                foreach(var item in Model)
+                                {
+                                    <tr>
+                                        <td>@count</td>
+                                        <td>@item.itemCode</td>
+                                        <td>@item.itemName</td>
+                                        <td>@item.unitName</td>
+                                        <td>@item.quantity</td>
+                                    </tr>
+                                    count++;
+                                }
+                            }*@
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal_adjust_balance" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel" >
+    <div class="modal-dialog " role="document">
+        <div class="modal-content ">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Workshop Balance Adjustment</h4>
+            </div>
+            <div class="modal-body col-sm-12" style="width:100% !important">
+                <div class="row">
+                    <div class="form-group row">
+                        <label class="control-label col-md-4">Product Code:</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" id="md_product_code" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-4">Stock Balance:</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" min="0" step="any" value="0" id="md_stock_balance"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="md_btn_save_adjust_balance" type="button">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            //$('#stockBalanceTable').DataTable({
+            //    "order": [[1, "asc"]],
+            //});
+
+            $('#btn_product_adjustment').click(function (e) {
+                $('#md_product_code').val('');
+                $('#md_stock_balance').val(0);
+                $('#modal_adjust_balance').modal('show');
+            });
+
+            $('#md_btn_save_adjust_balance').click(function (e) {
+                var product_code = $('#md_product_code').val();
+                var stock_balance = $('#md_stock_balance').val();
+                if (product_code.length == 0 || stock_balance.length == 0) {
+                    alert("Please fill in required fields.");
+                    return;
+                }
+                $.ajax({
+                    beforeSend: function () {
+                        // Handle the beforeSend event
+                        //alert("Start ajax");
+                        $('#md_btn_save_adjust_balance').text("Submitting...");
+                        $('#md_btn_save_adjust_balance').prop('disabled', true);
+                    },
+                    url: "@Url.Action("WorkShopBalanceAdjustmentAJAX", "Stock")",
+                    type: "post",
+                    dataType: "json",
+                    //async: false,
+                    data: { product_code: product_code, stock_balance: parseFloat(stock_balance) },
+                    success: function (da) {
+                        if (da.isSuccess) {
+                            alert('Your data has been saved successfully.');
+                            $('#md_product_code').val('');
+                            $('#md_stock_balance').val(0);
+                        } else {
+                            alert(da.message);
+                            
+                        }
+                        $('#md_btn_save_adjust_balance').text("Save");
+                        $('#md_btn_save_adjust_balance').prop('disabled', false);
+                    },
+                    error: function (err) {
+                        alert('Your data is error while saving.');
+                        enable_submit_button(false);
+                    }
+                });
+            });
+
+            $('#stockBalanceTable').width("100%");
+            var t = $('#stockBalanceTable').DataTable({
+                "bDestroy": true,
+                "processing": true,
+                "serverSide": false,
+                "ajax": {
+                    "url": "/StockAdjustment/GetAllItemsbyWarehouseJson",
+                    "type": "GET",
+                    "dataType": "json",
+                    "data": { id: '@BT_KimMex.Class.EnumConstants.WORKSHOP' },
+                },
+                "columns": [
+                    { "data": "product_id" },
+                    { "data": "itemCode" },
+                    { "data": "itemName" },
+                    { "data": "itemUnitName" },
+                    { "data": "total_quantity" },
+                ],
+                "columnDefs": [
+                    {
+                        'className': 'text-center',
+                        'targets': [4]
+                    },
+                ],
+                "order": [[1, "asc"]],
+            });
+            if (t) {
+                t.on('order.dt search.dt', function () {
+                    t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                        cell.innerHTML = i + 1;
+                    });
+                }).draw();
+            }
+        })
+    </script>
+}

@@ -1,0 +1,1600 @@
+﻿@model BT_KimMex.Models.ProjectViewModel
+@using BT_KimMex.Class
+@{
+    ViewBag.Title = "Create";
+}
+
+<style type="text/css">
+    .col-md-4 {
+        width: 27.33333333333333% !important;
+    }
+    .jumbotron {
+        padding: 10px !important;
+        font-size: 14px !important;
+    }
+    select{
+        width:220px !important;
+    }
+</style>
+
+@*@using (Html.BeginForm("Create", "Project",null,FormMethod.Post, new { enctype = "multipart/form-data" }))
+{*@
+<form id="FormProject" enctype="multipart/form-data" method="post">
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <div class="jumbotron">
+
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <h3 class="control-label col-md-5">Create Project</h3>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-5">Date:</label>
+                        <label class="col-md-7" id="current_date"></label>
+                    </div>
+                    <div class="form-group ">
+                        <label class="control-label col-md-5">SO No:</label>
+                        <div class="col-md-7">
+                            @Html.EditorFor(model => model.project_no, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.project_no, "", new { @class = "text-danger" })
+                        </div>
+                    </div>                    
+                </div>
+
+
+                @*<div class="col-md-6"></div>*@
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label col-md-5">Project Short Name <strong style="color:red !important">*</strong>:</label>
+                        <div class="col-md-7">
+                            @Html.EditorFor(model => model.project_short_name, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.project_short_name, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.project_start_date, htmlAttributes: new { @class = "control-label col-md-5" })
+                        <div class="col-md-7">
+                            <div class="input-group date" data-provide="datepicker" style="width:280px !important;">
+                                @Html.EditorFor(model => model.project_start_date, new { htmlAttributes = new { @class = "form-control" } })
+                                <div class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.project_end_date, htmlAttributes: new { @class = "control-label col-md-5" })
+                        <div class="col-md-7">
+                            <div class="input-group date" data-provide="datepicker" style="width:280px !important;">
+                                @Html.EditorFor(model => model.project_end_date, new { htmlAttributes = new { @class = "form-control" } })
+                                <div class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    @*<div class="form-group">
+                        <label class="control-label col-md-5">Project Engineer <strong style="color:red !important">*</strong>:</label>
+                        <div class="col-md-7">
+                            <select class="form-control" id="project_manager" style="display:inline-block !important;">
+                                <option selected disabled value="">Select Project Engineer</option>
+                            </select>
+                            <button type="button" class="btn btn-default" id="project_manager_promp"><span class='glyphicon glyphicon-plus'></span></button>
+                            @Html.ValidationMessageFor(model => model.project_manager, "", new { @class = "text-danger" })
+                        </div>
+                    </div>*@
+
+                    <!--Site Name-->
+                    <div class="form-group">
+                        <label class="control-label col-md-5">Site Name <strong style="color:red !important">*</strong>:</label>
+                        <div class="col-md-7">
+                            <select class="form-control" id="site_id" style="display:inline-block !important;">
+                                <option selected disabled value="">Select Site</option>
+                            </select>
+                            <button type="button" class="btn btn-default" id="side_promp"><span class='glyphicon glyphicon-plus'></span></button>
+                            @Html.ValidationMessageFor(model => model.site_name, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-5">Warehouse <strong style="color:red !important">*</strong>:</label>
+                        <div class="col-md-7">
+                            <select class="form-control" id="warehouse_project_id" style="display:inline-block !important;">
+                                <option selected disabled value="">Select Warehouse</option>
+                            </select>
+                            <button type="button" class="btn btn-default" id="warehouse_promp"><span class='glyphicon glyphicon-plus'></span></button>
+                            @Html.ValidationMessageFor(model => model.warehouse_project_id, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-5">Project Manager <strong style="color:red !important">*</strong>:</label>
+                        <div class="col-md-7">
+                            @Html.DropDownList("project_pm_id", new SelectList(BT_KimMex.Class.GlobalMethod.GetUserListItemsbyRole(BT_KimMex.Class.Role.ProjectManager), "UserId", "user_first_name"), new { @class = "form-control js-example-basic-multiple", multiple = "multiple" })
+                            <span><b class="text-danger">(**multiple)</b></span>
+                            @Html.ValidationMessageFor(model => model.project_pm_id, "", new { @class = "text-danger" })
+
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-5">Site Manager <strong style="color:red !important">*</strong>:</label>
+                        <div class="col-md-7">
+                            @*<a href="javascript:" id="site_manager_promp">New Site Manager</a>*@
+                            @*<table style="width:100% !important;" id="siteManagerTable"></table>*@       
+                            @Html.DropDownList("site_manager", new SelectList(BT_KimMex.Class.GlobalMethod.GetUserListItemsbyRole(BT_KimMex.Class.Role.SiteManager), "UserId", "user_first_name"), new { @class = "form-control js-example-basic-multiple site_manager",id= "site_manager", multiple = "multiple" })
+                            <span><b class="text-danger">(**multiple)</b></span>
+                            @Html.ValidationMessageFor(model => model.project_pm_id, "", new { @class = "text-danger" })                  
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-md-5 control-label">Spacemen Signature:</label>
+                        <div class="col-md-7">
+                            <input type="file" class="form-control" name="spacemen_signature" id="spacemen_signature" />
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label col-md-5">Project Full Name <strong style="color:red !important">*</strong>:</label>
+                        <div class="col-md-7">
+                            @Html.EditorFor(model => model.project_full_name, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.project_full_name, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.project_actual_start_date, htmlAttributes: new { @class = "control-label col-md-5" })
+                        <div class="col-md-7">
+                            <div class="input-group date" data-provide="datepicker" style="width:280px !important;">
+                                @Html.EditorFor(model => model.project_actual_start_date, new { htmlAttributes = new { @class = "form-control" } })
+                                <div class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.project_actual_end_date, htmlAttributes: new { @class = "control-label col-md-5" })
+                        <div class="col-md-7">
+                            <div class="input-group date" data-provide="datepicker" style="width:280px !important;">
+                                @Html.EditorFor(model => model.project_actual_end_date, new { htmlAttributes = new { @class = "form-control" } })
+                                <div class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.project_telephone, htmlAttributes: new { @class = "control-label col-md-5" })
+                        <div class="col-md-7">
+                            @Html.EditorFor(model => model.project_telephone, new { htmlAttributes = new { @class = "form-control" } })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.project_address, htmlAttributes: new { @class = "control-label col-md-5" })
+                        <div class="col-md-7">
+                            @Html.TextAreaFor(model => model.project_address, new { @class = "form-control", rows = "4" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-5">Project Status:</label>
+                        <div class="col-md-7">
+                            <select class="form-control" id="p_status" style="width:280px !important;">
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-5">Site Supervisor <span style="color:red !important;">*</span>:</label>
+                        <div class="col-md-7">
+                            @Html.DropDownList("sitesupervisors", new SelectList(GlobalMethod.GetUserListItemsbyRole(Role.SiteSupervisor), "UserId", "user_first_name"), new { @class= "form-control sitesupervisors js-example-basic-multiple", multiple = "multiple" })
+                            <span><b class="text-danger">(**multiple)</b></span>
+                            @*<table style="width:100% !important;" id="table_sitesup"></table>*@
+                        </div>
+                    </div>
+
+                    <!-- New Enhancement 2022 Sep 12 -->
+                    @*<div class="form-group" >
+                        <label class="control-label col-md-5">Site Admin <span style="color:red !important;">*</span>:</label>
+                        <div class="col-md-7">
+                            @Html.DropDownList("site_admin_id", new SelectList(BT_KimMex.Class.GlobalMethod.GetUserListItemsbyRole(Role.SiteAdmin), "UserId", "user_first_name"), "Selete Admin", new { @class = "form-control js-example-basic-multiple" })
+                            @Html.ValidationMessageFor(model => model.site_name, "", new { @class = "text-danger" })
+                        </div>
+                    </div>*@
+
+                </div>
+            </div>
+        </div>
+
+        <div class="jumbotron">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label col-md-5">Customer:</label>
+                        <div class="col-md-7">
+                            <select class="form-control" id="cutomer_id" style="display:inline-block !important;">
+                                <option selected disabled value="">select customer</option>
+                            </select>
+                            <button type="button" class="btn btn-default" id="customer_promp"><span class='glyphicon glyphicon-plus'></span></button>
+                            @Html.ValidationMessageFor(model => model.cutomer_id, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.cutomer_signatory, htmlAttributes: new { @class = "control-label col-md-5" })
+                        <div class="col-md-7">
+                            @Html.EditorFor(model => model.cutomer_signatory, new { htmlAttributes = new { @class = "form-control" } })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.cutomer_project_manager, htmlAttributes: new { @class = "control-label col-md-5" })
+                        <div class="col-md-7">
+                            @Html.EditorFor(model => model.cutomer_project_manager, new { htmlAttributes = new { @class = "form-control" } })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.customer_telephone, htmlAttributes: new { @class = "control-label col-md-5" })
+                        <div class="col-md-7">
+                            @Html.EditorFor(model => model.customer_telephone, new { htmlAttributes = new { @class = "form-control" } })
+                        </div>
+                    </div>
+                </div>
+            </div>        
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-5 col-md-7">
+                <input type="button" value="Create" id="btnCreate" class="btn btn-default" />
+                <input type="button" value="Cancel" id="btnCancel" class="btn btn-default" />
+            </div>
+        </div>
+
+    </div>
+</form>
+@*}*@
+
+<!-- Site modal popup-->
+<div class="modal fade" id="site_modal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2>Create new Site</h2>
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-horizontal">
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                        <div class="form-group">
+                            <label class="control-label col-md-4">Date:</label>
+                            <label class="col-md-8" id="side_current_date"></label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-4">Site Name <span style="color:red;">*</span>:</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" id="site_name" />
+                                @Html.ValidationMessageFor(model => model.site_name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-4">Address:</label>
+                            <div class="col-md-8">
+                                <textarea class="form-control" id="site_address" rows="5"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-6 ">
+                                <button class="btn btn-default site-confirm">Save</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- customer modal popup-->
+<div class="modal fade" id="customer_modal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2>Create new Customer</h2>
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-horizontal">
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                        <div class="form-group">
+                            <label class="control-label col-md-4">Date:</label>
+                            <label class="col-md-8" id="customer_current_date"></label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-4">Customer Name <span style="color:red;">*</span>:</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" id="customer_name" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-4">Telephone:</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" id="cus_telephone" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-4">Email:</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" id="customer_email" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-4">Address:</label>
+                            <div class="col-md-8">
+                                <textarea class="form-control" id="customer_address" rows="5"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-6 ">
+                                <button class="btn btn-default customer-confirm">Save</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- project manager modal popup-->
+<div class="modal fade" id="user_modal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2>Create new Project Manager</h2>
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-horizontal">
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                        <div class="form-group">
+                            <label class="control-label col-md-5">Date:</label>
+                            <label class="col-md-7" id="user_current_date"></label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class = "col-md-5 control-label">First Name:</label>
+                            <div class="col-md-7">
+                                <input type="text" class="form-control" id="user_first_name" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">Last Name:</label>
+                            <div class="col-md-7">
+                                <input type="text" class="form-control" id="user_last_name" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">Telephone:</label>
+                            <div class="col-md-7">
+                                <input type="text" class="form-control" id="user_telephone" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">Email:</label>
+                            <div class="col-md-7">
+                                <input type="text" class="form-control" id="user_email" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-6 ">
+                                <button class="btn btn-default user-confirm">Save</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Site Manager Modal -->
+<div class="modal fade" id="site_manager_modal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2>Create New Site Manager</h2>
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-horizontal">
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">First Name <strong style="color:red;">*</strong>: </label>
+                            <div class="col-md-7">
+                                <input type="text" class="form-control" id="site_manager_first_name" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">Last Name <strong style="color:red;">*</strong>:</label>
+                            <div class="col-md-7">
+                                <input type="text" class="form-control" id="site_manager_last_name" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">Telephone:</label>
+                            <div class="col-md-7">
+                                <input type="text" class="form-control" id="site_manager_telephone" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">Email:</label>
+                            <div class="col-md-7">
+                                <input type="text" class="form-control" id="site_manager_email" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-6 ">
+                                <button class="btn btn-default site-manager-confirm">Save</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Start Modal Create New Modal Warehouse -->
+<div class="modal fade" id="warehouse_modal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2>Create New Warehouse</h2>
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-horizontal">
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                        <div class="form-group">
+                            <label class="control-label col-md-5">Date :</label>
+                            <label class="col-md-7" id="warehouse_current_date"></label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">Warehouse Name <strong style="color:red !important;">*</strong>:</label>
+                            <div class="col-md-7">
+                                <input type="text" class="form-control" id="project_warehouse_name" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">Telephone :</label>
+                            <div class="col-md-7">
+                                <input type="text" class="form-control" id="project_warehouse_telephone" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">Address :</label>
+                            <div class="col-md-7">
+                                @*<input type="text" class="form-control" id="warehouse_address" />*@
+                                <textarea class="form-control" id="project_warehouse_address" rows="4"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">QA/ QC Officer <strong style="color:red;">*</strong> :</label>
+                            <div class="col-md-7">
+                                @*@Html.DropDownList("project_qaqc_id", new SelectList(BT_KimMex.Class.CommonFunctions.GetUserListItemsByRole(BT_KimMex.Class.Role.QAQCOfficer), "UserId", "Username"), "Select QA/ QC officer ", new { @class = "form-control" })*@
+                               @Html.DropDownList("project_qaqc_id[]", new SelectList(BT_KimMex.Class.CommonFunctions.GetUserListItemsByRole(BT_KimMex.Class.Role.QAQCOfficer), "UserId", "Username"), new { @class = "form-control",multiple="multiple",id= "project_qaqc_id" })
+                                <span><b class="text-danger">(**multiple)</b></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">Site Name <strong style="color:red;">*</strong> :</label>
+                            <div class="col-md-7">
+                                @*@Html.DropDownList("warehouse_site_id", @ViewBag.SiteID as SelectList, "Select Site Name", new { @class = "form-control", id = "warehouse_site_id", style = "display:inline-block !important;" })*@
+                                <select class="form-control" id="project_warehouse_site_id" name="project_warehouse_site_id">
+                                   <option selected disabled>Select Site Name</option>
+                                </select>
+                                @*<table style="width:100% !important;" id="project_SiteTable"></table>*@
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">Stock Controller <strong style="color:red;">*</strong> :</label>
+                            <div class="col-md-7">
+                                @*<table style="width:100% !important;" id="project_StockkeeperTable"></table>*@
+                                @Html.DropDownList("warehouse_stock_keeper_id[]", new SelectList(BT_KimMex.Class.CommonFunctions.GetUserListItemsByRole(BT_KimMex.Class.Role.SiteStockKeeper), "UserId", "Username"), new { @class = "form-control warehouse_stock_keeper_id", multiple = "multiple", id = "warehouse_stock_keeper_id" })
+                                <span><b class="text-danger">(**multiple)</b></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-6 ">
+                                <button type="button" class="btn btn-success" id="warehouse-confirm-yes">Save</button>
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Modal Create Warehouse -->
+@section Scripts{
+    
+    <script type="text/javascript">
+
+        $(function () {
+            $('#current_date').text(getFormattedDateMMDDYYYY(new Date()));
+            InitialCustomerDropDownList();
+            InitialSiteDropDownList();
+            //InitialProjectManager();
+            //InitialSiteManager();
+            //InitialProjectNo();
+
+            //InitailSiteManagerTable();
+            InitialUserPosition();
+            InitialUserGroup();
+            //initialSiteSupervisorTable();
+            InitailStockKeeperTable();
+            InitailSiteTable();
+
+            $('.js-example-basic-multiple').select2({
+                //placeholder: "Select Project Managers"
+            });
+
+            $('#project_qaqc_id').select2();
+            $('#warehouse_stock_keeper_id').select2();
+
+            if ('@TempData["message"]' != null) {
+                $.notify('@TempData["message"]', { className: 'error' });
+            }
+
+            $('#site_id').click(function (e) {
+                e.preventDefault();
+                initialWarehousebySite($(this).val());
+            })
+
+            $('#btnCreate').click(function (e) {
+                e.preventDefault();
+
+                var project_managers = [];
+                var element = {};
+                var project_site_managers = [];
+                var spacement_attachment_id = "";
+
+                //project manager section
+                $.each($('#project_pm_id').select2('data'), function (index, item) {
+                    project_managers.push(item.id);
+                    
+                });
+                //console.log(project_managers);
+                //var site_managers = $('.site_manager');
+                //for (var i = 0; i < site_managers.length; i++) {
+                //    if (site_managers[i].value != null || site_managers[i].value != "") {
+                //        element = {};
+                //        element.site_manager = site_managers[i].value;
+                //        project_site_managers.push(element);
+                //    }
+                //}
+                $.each($('#site_manager').select2('data'), function (index, item) {
+                    element = {};
+                    element.site_manager = item.id;
+                    project_site_managers.push(element);
+                });
+
+                if (project_site_managers.length == 0) {
+                     alert("Please assign Site Manager to project.");
+                    return;
+                }
+
+                //var siteSupervisors = $('.sitesupervisors');
+                var projectSiteSupervisors = [];
+                //for (var i = 0; i < siteSupervisors.length; i++) {
+                //    if (siteSupervisors[i].value != null || siteSupervisors[i].value != "") {
+                //        element = {};
+                //        element.site_supervisor_id = siteSupervisors[i].value;
+                //        projectSiteSupervisors.push(element);
+                //    }
+                //}
+
+                $.each($('#sitesupervisors').select2('data'), function (index, item) {
+                    element = {};
+                    element.site_supervisor_id = item.id;
+                    projectSiteSupervisors.push(element);
+                });
+
+                if (projectSiteSupervisors.length == 0) {
+                    alert("Please assign site supervisor to project.");
+                    return;
+                }
+
+                
+
+                var project_short_name = $('#project_short_name').val();
+                var project_full_name=$('#project_full_name').val();
+                var warehouse_project_id = $('#warehouse_project_id').val();
+                var project_pm_id = $('#project_pm_id').val();
+                var site_id = $('#site_id').val();              
+                var customer_id = $('#cutomer_id').val();
+                if (project_short_name == null || project_short_name == "") {
+                    alert("Project short name is required.");
+                    return;
+                }
+                if (project_full_name == null || project_full_name == "") {
+                    alert("Project full name is required.")
+                    return;
+                }
+                if (warehouse_project_id == null || warehouse_project_id == "") {
+                    alert("Warehouse Project name is required.");
+                    return;
+                } 
+                 if (project_pm_id == null || project_pm_id == "") {
+                    alert("Project manager is required.");
+                    return;
+                 }                     
+                else if (site_id == null || site_id == "") {
+                    alert("Site name is required.");
+                    return;
+                }
+
+
+
+                 //return;
+
+                var form_data = new FormData();
+                var file_input = document.getElementById('spacemen_signature');
+                if (file_input.files.length > 0) {
+                    for (var i = 0; i < file_input.files.length; i++) {
+                        form_data.append(file_input.files[i].name, file_input.files[i]);
+                    }
+                    $.ajax({
+                        url: '@Url.Action("UploadAttachment","Project")',
+                        type: "POST",
+                        data: form_data,
+                        async: false,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (data) {
+                            spacement_attachment_id = data.attachment_id;
+                        },
+                        error: function (xhr, error, status) {
+                            console.log(error, status);
+                        }
+                    });
+                }
+
+                
+                
+                var model = {
+                    project_no: $('#project_no').val(),
+                    project_short_name: $('#project_short_name').val(),
+                    project_full_name: $('#project_full_name').val(),
+                    project_start_date: $('#project_start_date').val(),
+                    project_actual_start_date: $('#project_actual_start_date').val(),
+                    project_end_date: $('#project_end_date').val(),
+                    project_actual_end_date: $('#project_actual_end_date').val(),
+                    project_address: $('#project_address').val(),
+                    cutomer_id: $('#cutomer_id').val(),
+                    cutomer_signatory: $('#cutomer_signatory').val(),
+                    cutomer_project_manager: $('#cutomer_project_manager').val(),
+                    site_id: $('#site_id').val(),
+                    site_name: $('#site_name').val(),
+                    //project_manager: $('#project_manager').val(),
+                    project_site_managers: project_site_managers,
+                    project_telephone: $('#project_telephone').val(),
+                    customer_telephone:$('#customer_telephone').val(),
+                    spacemen_att_id: spacement_attachment_id,
+                    project_pm_id: $('#project_pm_id').val(),
+                    warehouse_project_id: $('#warehouse_project_id').val(),
+                    siteSupervisors: projectSiteSupervisors,
+                    //site_admin_id: $('#site_admin_id').val(),
+                    projectManagers: project_managers,
+                }
+
+                console.log(model);
+                //return;
+                $.ajax({
+                    url: "@Url.Action("CreateProject", "Project")",
+                    type: "post",
+                    dataType: "json",
+                    data: { model: model },
+                    success: function (da) {
+                        if (da.Message == "Success") {
+                            if ('@TempData["message"]' != null) {
+                                $.notify('@TempData["message"]', { className: 'success' });
+                            }
+                            window.location.href = '@Url.Action("Index", "Project")';
+                        }
+                        else if (da.Message == "fail") {
+                            if ('@TempData["message"]' != null) {
+                                $.notify('@TempData["message"]', { className: 'error' });
+                            }
+                        }
+                    },
+                    error: function (err) {
+                        $.notify('Your data is error while saving!', { className: 'error' });
+                    }
+                });
+            });
+
+            $('#side_promp').click(function () {
+                $('#side_current_date').text(getFormattedDateMMDDYYYY(new Date()));
+                $('#site_modal').modal('show');
+            });
+
+            $('#customer_promp').click(function () {
+                $('#customer_current_date').text(getFormattedDateMMDDYYYY(new Date()));
+                $('#customer_modal').modal('show');
+            });
+
+            $('#project_manager_promp').click(function () {
+                $('#user_current_date').text(getFormattedDateMMDDYYYY(new Date()));
+                $('#user_modal').modal('show');
+            });
+
+            $('#site_manager_promp').click(function (e) {
+                $('#site_manager_modal').modal('show');
+            });
+
+            $('#warehouse_promp').click(function () {
+                $('#warehouse_current_date').text(getFormattedDateMMDDYYYY(new Date()));
+                $('#warehouse_modal').modal('show');
+                $('#project_StockkeeperTable').empty();
+                InitialPorjectSitewareHouseDropDownList();
+                InitailWarehouseStockKeeperTable();
+            });
+
+            $('#btnCancel').click(function () {
+                window.location.href = "@Url.Action("Index","Project")";
+            });
+
+            $('.site-confirm').on("click", function (e) {
+                e.preventDefault();
+                var site_name = $('#site_name').val();
+                var site_address = $('#site_address').val();
+                if (site_name == "" || site_name == null) {
+                    alert("Site name is required.");
+                }
+                else {
+                    $.ajax({
+                        url: "/Site/CreateJson",
+                        data: {
+                            site_name: site_name,
+                            site_address: site_address
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#site_modal').modal('hide');
+                            if (da.Message == "Success"){
+                                InitialSiteDropDownList();
+                            }
+                            else if (da.Message == "Fail") {
+                                if (!$('.modal-header').hasClass('alert-danger')) {
+                                    $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                    $('.delete-confirm').css('display', 'none');
+                                }
+                                $('.success-message').html('Your data is error while saving!');
+                            }
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html('Your data is error while saving!');
+
+                        }
+                    });
+                }
+            });
+
+            $(".customer-confirm").on("click", function (e) {
+                e.preventDefault();
+                var customer_name = $('#customer_name').val();
+                var customer_telephone = $('#cus_telephone').val();
+                var customer_email = $("#customer_email").val();
+                var customer_address = $('#customer_address').val();
+                if (customer_name == null || customer_name == "") {
+                    alert("Customer name is required.");
+                } else {
+                    $.ajax({
+                        url: "/Customer/CreateJson",
+                        data: {
+                            customer_name: customer_name,
+                            customer_telephone: customer_telephone,
+                            customer_email: customer_email,
+                            customer_address: customer_address
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#customer_modal').modal('hide');
+                            if (da.Message == "Success") {
+                                InitialCustomerDropDownList();
+                                $('#cutomer_id').val(da.cus_id);
+                            }
+                            else if (da.Message == "Fail") {
+                                if (!$('.modal-header').hasClass('alert-danger')) {
+                                    $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                    $('.delete-confirm').css('display', 'none');
+                                }
+                                $('.success-message').html('Your data is error while saving!');
+                            }
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html('Your data is error while saving!');
+
+                        }
+                    });
+                }
+            });
+
+            $('.user-confirm').on("click", function (e) {
+                e.preventDefault();
+
+                var email = $('#user_email').val();
+                var first_name = $('#user_first_name').val();
+                var last_name = $('#user_last_name').val();
+                var telephone = $('#user_telephone').val();
+
+                $.ajax({
+                    url: "/User/RegisterProjectManager",
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        user_first_name: first_name,
+                        user_last_name: last_name,
+                        user_telephone: telephone,
+                        email: email,
+                    },
+                    success: function (da) {
+                        if ($('.modal-header').hasClass('alert-danger')) {
+                            $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                            $('.delete-confirm').css('display', 'none');
+                        }
+                        $('#user_modal').modal('hide');
+                        if (da.Message == "Success") {
+                            InitialProjectManager();
+                        }
+                        else if (da.Message == "Fail") {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html('Your data is error while saving!');
+                        }
+                    },
+                    error: function (err) {
+                        if (!$('.modal-header').hasClass('alert-danger')) {
+                            $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                            $('.delete-confirm').css('display', 'none');
+                        }
+                        $('.success-message').html('Your data is error while saving!');
+                    }
+                });
+
+            });
+
+            $('.site-manager-confirm').click(function (e) {
+                e.preventDefault();
+
+                var firstName = $('#site_manager_first_name').val();
+                var lastName = $('#site_manager_last_name').val();
+                var contactPhone = $('#site_manager_telephone').val();
+                var email = $('#site_manager_email').val();
+
+                if (firstName == '' || firstName == null || lastName == null || lastName == '') {
+                    alert('Please fill all required field.');
+                    return;
+                }
+
+                $.ajax({
+                    url: "/User/CreateNewSiteManager",
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        firstName: firstName,
+                        lastName: lastName,
+                        contactPhone: contactPhone,
+                        email: email,
+                    },
+                    success: function (da) {
+                        if ($('.modal-header').hasClass('alert-danger')) {
+                            $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                            $('.delete-confirm').css('display', 'none');
+                        }
+                        $('#site_manager_modal').modal('hide');
+                        if (da.Message == "Success") {
+                            InitialSiteManager();
+                        }
+                        else if (da.Message == "Fail") {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html('Your data is error while saving!');
+                        }
+                    },
+                    error: function (err) {
+                        if (!$('.modal-header').hasClass('alert-danger')) {
+                            $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                            $('.delete-confirm').css('display', 'none');
+                        }
+                        $('.success-message').html('Your data is error while saving!');
+                    }
+                });
+            });
+
+            $('#warehouse-confirm-yes').on("click", function (e) {
+                e.preventDefault();
+
+                var Stock_keeper_id = [];
+                var qaqcs = [];
+                var warehouse_name = $('#project_warehouse_name').val();
+                var warehouse_telephone = $('#project_warehouse_telephone').val();
+                var warehouse_address = $('#project_warehouse_address').val();
+
+                var project_qaqc_id = $('#project_qaqc_id').val();
+                var warehouse_site_id = $('#project_warehouse_site_id').val();
+
+                //var stockkeepers = $('.warehouse_stock_keeper_id');
+                //for (var i = 0; i < stockkeepers.length; i++) {
+                //    if (stockkeepers[i].value != 'Select Stock Keeper')
+                //        Stock_keeper_id.push(stockkeepers[i].value);
+                //}
+
+                //qaqc section
+                $.each($('#project_qaqc_id').select2('data'), function (index, item) {
+                    qaqcs.push(item.id);
+
+                });
+                //stockkeeper warehouse section
+                $.each($('#warehouse_stock_keeper_id').select2('data'), function (index, item) {
+                    Stock_keeper_id.push(item.id);
+
+                });
+                //return;
+
+                if (warehouse_name == "" || warehouse_name == null) {
+                    alert("Warehouse name is required.");
+                    return;
+                }
+                if (project_qaqc_id == "" || project_qaqc_id == null) {
+                    alert("QA/ QC Officer is required.");
+                    return;
+                }
+                if (qaqcs.length==0) {
+                    alert("QA/ QC Officer is required.");
+                    return;
+                }
+                if (warehouse_site_id == "" || warehouse_site_id == null) {
+                    alert("Site name is required.");
+                    return;
+                }
+                if(Stock_keeper_id.length==0){
+                    alert("Stock Controller is required.");
+                    return;
+                }
+
+                //var model = {
+                //    warehouse_name: warehouse_name,
+                //    warehouse_telephone: warehouse_telephone,
+                //    warehouse_address: warehouse_address,
+                //    qaqc_id: project_qaqc_id,
+                //    warehouse_site_id: warehouse_site_id,
+                //    Stock_keeper_id: Stock_keeper_id,
+                //    qaqcs:qaqcs
+                //}
+                
+                //console.log(model);
+                //return;
+                $.ajax({
+                    type: "post",
+                        url: "/WareHouse/CreateJson",
+                        dataType: "json",
+                        async: false,
+                        data: {
+                            warehouse_name: warehouse_name,
+                            warehouse_telephone: warehouse_telephone,
+                            warehouse_address: warehouse_address,
+                            qaqc_id: project_qaqc_id,
+                            warehouse_site_id: warehouse_site_id,
+                            Stock_keeper_id: Stock_keeper_id,
+                            qaqcs: qaqcs
+                        },
+                        success: function (da) {
+                            console.log(da);
+                           
+                            if (da.result == "success") {
+                                $('#warehouse_modal').modal('hide');
+                                initialWarehousebySite(warehouse_site_id);
+                                $('#warehouse_project_id').val(da.warehouse_id);
+                            } else {
+                                alert("Your data has been error while saving.");
+                                return;
+                            }
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html('Your data is error while saving!');
+                        }
+                    });
+                
+            });
+        });
+    </script>
+
+    <script type="text/javascript">
+
+        function initialWarehousebySite(id) {
+            $.ajax({
+                url:"@Url.Action("GetWarehouseBySiteJSON", "Warehouse")",
+                type: "get",
+                dataType: "json",
+                data:{id:id,isCreate:true},
+                success: function (data) {
+                    $('#warehouse_project_id').empty().append("" +
+                        "<option selected disabled>Select Warehouse</option>"
+                    );
+                    $.each(data, function (index, item) {
+                        console.log(item);
+                        
+                        $.each(item, function (index1, item1) {
+                            $('#warehouse_project_id').append("" +
+                                "<option value='" + item1.warehouse_id + "'>" + item1.warehouse_name + "</option>"
+                            );                 
+                        });
+                    });
+                },
+                error: function (data) {
+                    
+                }
+            });
+        }
+
+        function InitialCustomerDropDownList() {
+            $.ajax({
+                url:"@Url.Action("CustomerDropDown", "Customer")",
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    $('#cutomer_id').empty();
+                    $('#cutomer_id').append("" +
+                        "<option selected disabled>Select Customer</option>"
+                    );
+                    $.each(data, function (index, item) {
+                        $.each(item, function (index1, item1) {
+                            $('#cutomer_id').append("" +
+                                    "<option value='" + item1.customer_id + "'>" + item1.customer_name + "</option>"
+                                );
+                        });
+                    });
+                },
+                error: function (data) {
+                    //alert('fail');
+                }
+            });
+        }
+        function InitialSiteDropDownList() {
+            $.ajax({
+                url:"@Url.Action("SiteDropDown", "Site")",
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    $('#site_id').empty();
+                    $('#site_id').append("" +
+                        "<option selected disabled>Select Site</option>"
+                    );
+                    $.each(data, function (index, item) {
+                        $.each(item, function (index1, item1) {
+                            $('#site_id').append("" +
+                                    "<option value='" + item1.site_id + "'>" + item1.site_name + "</option>"
+                            );
+                      
+
+                        });
+                    });
+                },
+                error: function (data) {
+                    alert('fail');
+                }
+            });
+        }
+        function InitialProjectManager() {
+            $.ajax({
+                url:"@Url.Action("ProjectManagerDropdownList", "Project")",
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    $('#project_manager').empty();
+                    $('#project_manager').append("" +
+                        "<option selected disabled>Select Project Engineer</option>"
+                    );
+                    $.each(data, function (index, item) {
+                        $.each(item, function (index1, item1) {
+                            var full_name = item1.user_first_name + " " + item1.user_last_name;
+                            $('#project_manager').append("" +
+                                    "<option value='" + full_name + "'>" + full_name + "</option>"
+                                );
+                        });
+                    });
+                },
+                error: function (data) {
+                    alert('fail');
+                }
+            });
+        }
+        function InitialSiteManager() {
+            $.ajax({
+                url:"@Url.Action("SiteManagerDropDown", "Project")",
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    $('#siteManagerTable tr:last-child select.site_manager').empty();
+                    $('#siteManagerTable tr:last-child select.site_manager').append("" +
+                        "<option selected disabled>Select Site manager</option>"
+                    );
+                    $.each(data, function (index, item) {
+                        $.each(item, function (index1, item1) {
+                            var full_name = item1.user_first_name + " " + item1.user_last_name;
+                            $('#siteManagerTable tr:last-child select.site_manager').append("" +
+                                    "<option value='" + item1.user_id + "'>" + full_name + "</option>"
+                                );
+                        });
+                    });
+                },
+                error: function (data) {
+                    alert('fail');
+                }
+        });
+        }
+
+        function InitialUserPosition() {
+            $.ajax({
+                url:"@Url.Action("GetPositionDropdownList", "User")",
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    $('#user_position').empty();
+                    $('#user_position').append("" +
+                        "<option selected disabled>Select Position</option>"
+                    );
+                    $.each(data, function (index, item) {
+                        $.each(item, function (index1, item1) {
+                            $('#user_position').append("" +
+                                    "<option value='" + item1.position_id + "'>" + item1.position_name + "</option>"
+                                );
+                        });
+                    });
+                },
+                error: function (err) {
+                    alert("Position:" + err.statusText);
+                }
+            });
+        }
+
+        function InitialUserGroup() {
+            $.ajax({
+                url:"@Url.Action("GetUserGroupDropdownList", "User")",
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    $('#user_group').empty();
+                    $('#user_group').append("" +
+                        "<option selected disabled>Select User Group</option>"
+                    );
+                    $.each(data, function (index, item) {
+                        $.each(item, function (index1, item1) {
+                            $('#user_group').append("" +
+                                    "<option value='" + item1.Role + "'>" + item1.Role + "</option>"
+                                );
+                        });
+                    });
+                },
+                error: function (err) {
+                    alert("User Group:"+err.statusText);
+                }
+            });
+        }
+
+        function InitialProjectNo() {
+            $.ajax({
+                url:"@Url.Action("ProjectNo", "Project")",
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    $.each(data, function (index, item) {
+                      //  console.log(item);
+                        $('#project_no').text(item);
+                    });
+                },
+                error: function (data) {
+                    alert('fail');
+                }
+            });
+        }
+        function AddSiteManagerRow(Row){
+            var index = Row.parentNode.parentNode.rowIndex;
+            InitailSiteManagerTable();
+            $('#siteManagerTable tbody tr td:nth-child(3)').eq(index).html('');
+        }
+        function RemoveSiteManagerRow(Row) {
+            var index = Row.parentNode.parentNode.rowIndex;
+            var numberOfRow = $('#siteManagerTable tbody tr').length;
+            if (numberOfRow > 1) {
+                document.getElementById('siteManagerTable').deleteRow(index);
+                if(Number(index+1)==numberOfRow)
+                    $('#siteManagerTable tbody tr td:nth-child(3)').eq(index - 1).html("<button type='button' class='btn btn-default btn-sm' onclick='AddSiteManagerRow(this)'><span class='glyphicon glyphicon-plus'></span></button>");
+            }
+        }
+
+        function InitailSiteManagerTable() {
+            $('#siteManagerTable').append(""+
+                    "<tr>"+
+                        "<td width='280px'>"+
+                            "<select class='form-control site_manager'>"+
+                                "<option selected disabled value=''>select site manager</option>"+
+                            "</select>"+
+                        "</td>"+
+                        "<td style='width:40px !important;'>"+ 
+                            "<button type='button' class='btn btn-default btn-sm' onclick='RemoveSiteManagerRow(this)'><span class='glyphicon glyphicon-trash'></span></button>" +
+                        "</td>"+
+                        "<td style='width:40px !important;'>"+
+                            "<button type='button' class='btn btn-default btn-sm' onclick='AddSiteManagerRow(this)'><span class='glyphicon glyphicon-plus'></span></button>" +
+                        "</td>"+
+                    "</tr>"
+                );
+            InitialSiteManager();
+        }
+
+        //Start Site Supervisor
+        function initialSiteSupervisorTable() {
+            $('#table_sitesup').append("" +
+                    "<tr>" +
+                        "<td width='280px'>" +
+                            "<select class='form-control sitesupervisors' name='sitesupervisors'>" +
+                                "<option selected disabled value=''>Select Site Supervisor</option>" +
+                            "</select>" +
+                        "</td>" +
+                        "<td style='width:40px !important;'>" +
+                            "<button type='button' class='w3-button w3-tiny w3-red' onclick='RemoveSiteSuperVisorRow(this)'><span class='glyphicon glyphicon-trash'></span></button>" +
+                        "</td>" +
+                        "<td style='width:40px !important;'>" +
+                            "<button type='button' class='w3-button w3-tiny w3-teal' onclick='AddSiteSuperVisorRow(this)'><span class='glyphicon glyphicon-plus'></span></button>" +
+                        "</td>" +
+                    "</tr>"
+                );
+            InitialSiteSupervisor();
+        }
+        function InitialSiteSupervisor() {
+            $.ajax({
+                url:"@Url.Action("SiteSupervisorDropDownJSON", "Site")",
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    $('#table_sitesup tr:last-child select.sitesupervisors').empty();
+                    $('#table_sitesup tr:last-child select.sitesupervisors').append("" +
+                        "<option selected disabled value=''> Select Site Supervisor</option>"
+                    );
+                    $.each(data, function (index, item) {
+                        $.each(item, function (index1, item1) {
+                            var full_name = item1.Username;
+                            $('#table_sitesup tr:last-child select.sitesupervisors').append("" +
+                                    "<option value='" + item1.UserId + "'>" + full_name + "</option>"
+                                );
+                        });
+                    });
+                },
+                error: function (data) {
+                    alert('fail');
+                }
+            });
+        }
+        function AddSiteSuperVisorRow(Row) {
+            var index = Row.parentNode.parentNode.rowIndex;
+            initialSiteSupervisorTable();
+            $('#table_sitesup tbody tr td:nth-child(3)').eq(index).html('');
+        }
+
+        function RemoveSiteSuperVisorRow(Row) {
+            var index = Row.parentNode.parentNode.rowIndex;
+            var numberOfRow = $('#table_sitesup tbody tr').length;
+            if (numberOfRow > 1) {
+                document.getElementById('table_sitesup').deleteRow(index);
+                if (Number(index + 1) == numberOfRow)
+                    $('#table_sitesup tbody tr td:nth-child(3)').eq(index - 1).html("<button type='button' class='w3-button w3-tiny w3-teal' onclick='AddSiteSuperVisorRow(this)'><span class='glyphicon glyphicon-plus'></span></button>");
+            }
+        }
+
+        //End Site Supervisor
+
+         function InitailSiteTable() {
+            var element = {};
+            var site_id= [];
+            var Site = $('.warehouse_site_id');
+            for (var i = 0; i < Site.length; i++) {
+                if (Site[i].value != null || Site[i].value != "") {
+                    element = {};
+                    element.Site = Site[i].value;
+                    site_id.push(element);
+                }
+             }
+            
+            //console.log(site);
+            $('#SiteTable').append("" +
+                    "<tr>" +
+                        "<td width='280px'>" +
+                            "<select class='form-control warehouse_site_id' name='warehouse_site_id' id='warehouse_site_id'>" +
+                                "<option selected disabled value=''>Select Site</option>" +
+                            "</select>" +
+                        "</td>" +
+
+                    "</tr>"
+                );
+            InitialSitewareDropDownList();
+         }
+         function InitialSitewareDropDownList() {
+                $.ajax({
+                    url: "@Url.Action("SiteDropDown", "Site")",
+                    type: "get",
+                    dataType: "json",
+                    success: function (data) {
+
+                        $('#SiteTable tr:last-child select.warehouse_site_id').empty();
+                        $('#SiteTable tr:last-child select.warehouse_site_id').append("" +
+                            "<option value>Select Site Name</option>"
+                        );
+                        $.each(data, function (index, item) {
+                            $.each(item, function (index1, item1) {
+
+                                $('#SiteTable tr:last-child select.warehouse_site_id').append("" +
+                                        "<option value='" + item1.site_id + "'>" + item1.site_name + "</option>"
+                                    );
+                            });
+                        });
+                       // $('#warehouse_site_id').val(site_id);
+                    },
+                    error: function (data) {
+
+                    }
+                });
+           }
+    
+        function InitailStockKeeperTable() {
+            var element = {};
+            var warehouse_Stock_keeper = [];
+            //  var spacement_attachment_id = "";
+            var Stockkeeper = $('.Stock_keeper');
+            for (var i = 0; i < Stockkeeper.length; i++) {
+                if (Stockkeeper[i].value != null || Stockkeeper[i].value != "") {
+                    element = {};
+                    element.Stockkeeper = Stockkeeper[i].value;
+                    warehouse_Stock_keeper.push(element);
+                }
+            }         
+            console.log(warehouse_Stock_keeper);
+            $('#StockkeeperTable').append("" +
+                    "<tr>" +
+                        "<td width='280px'>" +
+                            "<select class='form-control Stock_keeper_id' name='Stock_keeper_id' id='Stock_keeper_id'>" +
+                                "<option selected disabled value=''>Select Stock Controller</option>" +
+                            "</select>" +
+                        "</td>" +
+                        "<td style='width:40px !important;'>" +
+                            "<button type='button' class='btn btn-default btn-sm' onclick='RemoveStockRow(this)'><span class='glyphicon glyphicon-trash'></span></button>" +
+                        "</td>" +
+                        "<td style='width:40px !important;'>" +
+                            "<button type='button' class='btn btn-default btn-sm' onclick='AddStockRow(this)'><span class='glyphicon glyphicon-plus'></span></button>" +
+                        "</td>" +
+                    "</tr>"
+                );
+            InitialStockkeeper();
+        }
+
+        function InitialStockkeeper() {
+            $.ajax({
+                url:"@Url.Action("StockKeeperDropDown", "WareHouse")",
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    $('#StockkeeperTable tr:last-child select.Stock_keeper_id').empty();
+                    $('#StockkeeperTable tr:last-child select.Stock_keeper_id').append("" +
+                        "<option selected disabled> Select Stock Controller</option>"
+                    );
+                    $.each(data, function (index, item) {
+                        $.each(item, function (index1, item1) {
+                            var full_name = item1.Username;
+                            $('#StockkeeperTable tr:last-child select.Stock_keeper_id').append("" +
+                                    "<option value='" + item1.UserId + "'>" + full_name + "</option>"
+                                );
+                        });
+                    });
+                },
+                error: function (data) {
+                    alert('fail');
+                }
+        });
+        }
+        function AddStockRow(Row) {
+            var index = Row.parentNode.parentNode.rowIndex;
+            InitailStockKeeperTable();
+            $('#StockkeeperTable tbody tr td:nth-child(3)').eq(index).html('');
+        }
+        function RemoveStockRow(Row) {
+            var index = Row.parentNode.parentNode.rowIndex;
+            var numberOfRow = $('#StockkeeperTable tbody tr').length;
+            if (numberOfRow > 1) {
+                document.getElementById('StockkeeperTable').deleteRow(index);
+                if (Number(index + 1) == numberOfRow)
+                    $('#StockkeeperTable tbody tr td:nth-child(3)').eq(index - 1).html("<button type='button' class='btn btn-default btn-sm' onclick='AddStockRow(this)'><span class='glyphicon glyphicon-plus'></span></button>");
+            }
+        }
+
+        //Start initial data in Create New Warehouse modal
+        function InitialPorjectSitewareHouseDropDownList() {
+            $.ajax({
+                url: "@Url.Action("SiteDropDown", "Site")",
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                    $('#project_warehouse_site_id').empty().append("" +
+                        "<option value>Select Site Name</option>"
+                    );
+                    $.each(data.data, function (index, item) {
+                        $('#project_warehouse_site_id').append("" +
+                            "<option value='" + item.site_id + "'>" + item.site_name + "</option>"
+                        );
+                    });
+                },
+                error: function (data) {
+
+                }
+            });
+        }
+        function InitailWarehouseStockKeeperTable() {
+            var element = {};
+            var warehouse_Stock_keeper = [];
+            //  var spacement_attachment_id = "";
+            var Stockkeeper = $('.warehouse_stock_keeper');
+            for (var i = 0; i < Stockkeeper.length; i++) {
+                if (Stockkeeper[i].value != null || Stockkeeper[i].value != "") {
+                    element = {};
+                    element.Stockkeeper = Stockkeeper[i].value;
+                    warehouse_Stock_keeper.push(element);
+                }
+            }         
+            console.log(warehouse_Stock_keeper);
+            $('#project_StockkeeperTable').append("" +
+                    "<tr>" +
+                        "<td width='280px'>" +
+                            "<select class='form-control warehouse_stock_keeper_id' name='warehouse_stock_keeper_id'>" +
+                                "<option selected disabled value=''>Select Stock Controller</option>" +
+                            "</select>" +
+                        "</td>" +
+                        "<td style='width:40px !important;'>" +
+                            "<button type='button' class='btn btn-default btn-sm' onclick='RemoveStockkeeperRow(this)'><span class='glyphicon glyphicon-trash'></span></button>" +
+                        "</td>" +
+                        "<td style='width:40px !important;'>" +
+                            "<button type='button' class='btn btn-default btn-sm' onclick='AddStockkeeperRow(this)'><span class='glyphicon glyphicon-plus'></span></button>" +
+                        "</td>" +
+                    "</tr>"
+                );
+            InitialWarehouseStockkeeper();
+        }
+
+        function InitialWarehouseStockkeeper() {
+            $.ajax({
+                url:"@Url.Action("StockKeeperDropDown", "WareHouse")",
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    $('#project_StockkeeperTable tr:last-child select.warehouse_stock_keeper_id').empty();
+                    $('#project_StockkeeperTable tr:last-child select.warehouse_stock_keeper_id').append("" +
+                        "<option selected disabled>Select Stock Controller</option>"
+                    );
+                    $.each(data, function (index, item) {
+                        $.each(item, function (index1, item1) {
+                            var full_name = item1.Username;
+                            $('#project_StockkeeperTable tr:last-child select.warehouse_stock_keeper_id').append("" +
+                                    "<option value='" + item1.UserId + "'>" + full_name + "</option>"
+                                );
+                        });
+                    });
+                },
+                error: function (data) {
+                    alert('fail');
+                }
+            });
+        }
+        function AddStockkeeperRow(Row) {
+            var index = Row.parentNode.parentNode.rowIndex;
+            var stockKeeperName = $('#project_StockkeeperTable tr').eq(index).find("select.warehouse_stock_keeper_id").val();
+            console.log(stockKeeperName);
+            if (stockKeeperName == null)
+                return;
+            InitailWarehouseStockKeeperTable();
+            $('#project_StockkeeperTable tbody tr td:nth-child(3)').eq(index).html('');
+        }
+        function RemoveStockkeeperRow(Row) {
+            var index = Row.parentNode.parentNode.rowIndex;
+            var numberOfRow = $('#project_StockkeeperTable tbody tr').length;
+            if (numberOfRow > 1) {
+                document.getElementById('project_StockkeeperTable').deleteRow(index);
+                if (Number(index + 1) == numberOfRow)
+                    $('#project_StockkeeperTable tbody tr td:nth-child(3)').eq(index - 1).html("<button type='button' class='btn btn-default btn-sm' onclick='AddStockkeeperRow(this)'><span class='glyphicon glyphicon-plus'></span></button>");
+            }
+        }
+
+        //End intitial data in create new warehouse modal
+
+    </script>
+
+    }

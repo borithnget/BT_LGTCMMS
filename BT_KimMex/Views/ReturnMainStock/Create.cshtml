@@ -1,0 +1,428 @@
+﻿@model BT_KimMex.Models.ReturnMainStockViewModel
+@{
+    ViewBag.Title = "Create";
+}
+
+<style type="text/css">
+
+    #transfer_table tr th {
+        vertical-align: middle !important;
+        text-align: center !important;
+    }
+
+    #transfer_table tr td {
+        vertical-align: middle !important;
+    }
+</style>
+
+<h3 class="title">Create New Return To Workshop</h3>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+<div class="row">
+    <div class="col-6 col-xl-6 col-lg-6 col-md-6 col-sm-6">
+        <div class="form-group row">
+            @Html.Label("Date:", htmlAttributes: new { @class = "col-md-3 col-form-label" })
+            <label class="col-md-9" id="ir_current_date">@BT_KimMex.Class.CommonClass.ToLocalTime(Convert.ToDateTime(DateTime.Now)).ToString("dd/MM/yyyy")</label>
+        </div>
+        <div class="form-group row">
+            <label class="control-label col-md-3">Return Number:</label>
+            <label class="col-md-9" id="return_main_stock_no">@ViewBag.PurchaseRequisitionNumber</label>
+        </div>
+
+        @*<div class="form-group row">
+            <label class="control-label col-md-3">Return Type <strong class="text-danger">*</strong>:</label>
+            <div class="col-md-9">
+                <select class="form-control" id="return_type" name="return_type">
+                    <option value="transfer">Transfer from Workshop</option>
+                    <option value="project">Project</option>
+                </select>
+            </div>
+        </div>*@
+
+        @*<div class="form-group row" id="project_panel">
+            <label class="col-md-3 control-label">Project Name <strong class="text-danger">*</strong>:</label>
+            <div class="col-md-9">
+                @Html.DropDownList("return_project_id", ViewBag.ProjectID as SelectList, "Select Project", new { @class = "form-control", id = "return_project_id", style = "width:300px !important;" })
+                @Html.ValidationMessageFor(model => model.return_project_id, "", new { @class = "text-danger" })
+            </div>
+        </div>*@
+
+        @*<div class="form-group row">
+            <label class="control-label col-md-3">Transfer Ref. <strong class="text-danger">*</strong>:</label> 
+            <div class="col-md-9">
+                @Html.DropDownList("transfer_id",new SelectList(ViewBag.Transfers,"stock_transfer_id","stock_transfer_no"),"Select Transfer Reference", new { @class="form-control",id="transfer_id" })
+            </div>
+        </div>*@
+
+        <div class="form-group row">
+            <label class="control-label col-md-3">Project <strong class="text-danger">*</strong>:</label>
+            <div class="col-md-9">
+                @Html.DropDownList("project_id", new SelectList(ViewBag.Projects, "project_id", "project_full_name"), "Select Project", new { @class = "form-control", id = "project_id" })
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="control-label col-md-3">From Warehouse<strong style="color:red;">*</strong>:</label>
+            <label class="col-md-9" id="warehouse_name"></label>
+            <input type="hidden" id="warehouse_id" />
+        </div>
+    </div>
+    <div class="row" style="margin:0 !important;">
+        <table class="table table-bordered" id="transfer_table">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Item Code</th>
+                    <th>Item Name</th>
+                    <th>Stock Balance</th>
+                    @*<th>Remain QTY</th>*@
+                    <th><input type='checkbox' value='' class='' id="head_return" /> Return</th>
+                    <th>Return QTY</th>
+                    <th>Unit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="7">No item to return.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="button" value="Submit" id="btnCreate" class="btn btn-success" />
+            <a href="javascript:history.back()" class="btn btn-danger">Back</a>
+        </div>
+    </div>
+</div>
+   
+}
+    @section Scripts{
+        <script type="text/javascript">
+
+            $(function () {
+
+                $('#project_panel').hide();
+
+                $('#project_id').change(function (e) {
+                    e.preventDefault();
+                    var projectId = $(this).val();
+                    $('#warehouse_id').val('');
+                    $('#warehouse_name').text('');
+                    $('#transfer_table tbody').empty();
+                    if (projectId) {
+                        $.ajax({
+                            url: '@Url.Action("GetReturnInformationbyProject", "ReturnMainStock")',
+                            type: "GET",
+                            data: { projectId: projectId },
+                            success: function (data) {
+                                //console.log(data);
+                                var model = data.data;
+                                //console.log(model);
+                                if (model.warehouse != null) {
+                                    $("#warehouse_name").text(model.warehouse.warehouse_name);
+                                    $("#warehouse_id").val(model.warehouse.warehouse_id);
+                                }
+                                if (model.inventories.length == 0) {
+                                    $('#transfer_table tbody').append("" +
+                                            "<tr><td colspan='7'>No item from warehouse to return.</td></tr>"
+                                        );
+                                } else {
+                                    var count = 0;
+                                    $.each(model.inventories, function (index, item) {
+                                        //console.log(item);
+                                        
+                                        var itemFound = findObjectInArrayByProperty(data.pendingItems, "st_item_id", item.product_id);
+                                        var totalQuantity = item.total_quantity;
+                                        if (itemFound != null)
+                                            totalQuantity = totalQuantity - Number(itemFound.quantity);
+                                        if (totalQuantity > 0) {
+                                            var mou = "<option value='" + item.itemUnit.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "'>" + item.itemUnitName.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                                            $('#transfer_table tbody').append("" +
+                                                "<tr>" +
+                                                    "<td>" + Number(count + 1) + "</td>" +
+                                                    "<td><input type='hidden' class='item_id' value='" + item.product_id + "'>" + item.itemCode + "</td>" +
+                                                    "<td>" + item.itemName + "</td>" +
+                                                    "<td class='text-center'><input type='hidden' class='requested_unit' value='" + item.itemUnit + "'/><label class='remain_qty'>" + totalQuantity + "</label> " + item.itemUnitName + "</td>" +
+                                                '<td style="text-align:center !important;vertical-align:middle !important;"><input type="checkbox" value="" class="is_return" name="is_return" /></td>' +
+                                                "<td><input type='number' class='form-control return_qty' value='" + totalQuantity + "'onchange='checkQty(this)'/></td>" +
+                                                    "<td><select class='form-control return_unit' onchange='checkQty(this)'>" + mou + "</select></td>" +
+                                                "</tr>"
+                                            );
+                                            count++;
+                                        }
+
+                                        
+                                    });
+                                }
+
+                            }
+                        });
+                    }
+                });
+
+                $('#head_return').click(function () {
+                if ($(this).prop("checked") == true) {
+                    //alert("Checkbox is checked.");
+                    check_uncheck_checkbox(true);
+                }
+                else if ($(this).prop("checked") == false) {
+                    //alert("Checkbox is unchecked.");
+                    check_uncheck_checkbox(false);
+                }
+            });
+
+                $('#transfer_id').change(function (e) {
+                    e.preventDefault();
+                    var transferId = $(this).val();
+                    $('#warehouse_id').val('');
+                    $('#warehouse_name').text('');
+                    $('#transfer_table tbody').empty();
+                    if (transferId) {
+
+                        $.ajax({
+                            url: '@Url.Action("GetWarehouseItembyTransferWorkshopJson","ReturnMainStock")',
+                            type: "GET",
+                            data: { transferId: transferId },
+                            success: function (data) {                              
+                                $("#warehouse_name").text(data.data.warehouse_name);
+                                        $("#warehouse_id").val(data.data.warehouse_id);
+
+                            }
+                        });
+
+                        $.ajax({
+                            url: '@Url.Action("GetTransferItemDetailsJson","ReturnMainStock")',
+                            type: "GET",
+                            data: { id: transferId },
+                            success: function (data) {                              
+                                console.log(data);
+                                if (data.data.length > 0) {
+                                    $.each(data.data, function (index, item) {
+                                        var mou = "<option value='" + item.itemUnit.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "'>" + item.itemUnitName.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                                        $('#transfer_table tbody').append("" +
+                                            "<tr>" +
+                                                "<td>" + Number(index + 1) + "</td>" +
+                                                "<td><input type='hidden' class='item_id' value='"+item.product_id+"'>"+item.itemCode+"</td>" +
+                                                "<td>"+item.itemName+"</td>" +
+                                                "<td class='text-center'><input type='hidden' class='requested_unit' value='"+item.unit+"'/>"+item.quantity+" "+item.unitName+"</td>" +
+                                                "<td class='text-center remain_qty'>"+item.remain_quantity+"</td>" +
+                                                "<td><input type='number' class='form-control return_qty' value='0'/></td>" +
+                                                "<td><select class='form-control return_unit' onchange='checkQty(this)'>" + mou + "</select></td>" +
+                                            "</tr>"
+                                            );
+                                    });
+                                }
+                            }
+                        });
+                    }
+                });
+
+                $('#btnCreate').click(function () {
+                    var arrIndex = [];
+                    var items = [];
+                    var itemIds = $('.item_id');
+                    var returnQtys = $('.return_qty');
+                    var returnUnits = $('.return_unit');
+                    var remainQtys = $('.remain_qty');
+                    var isReturns = $('.is_return');
+                   
+                    var countvalidation = 0;
+
+                    for (var i = 0; i < isReturns.length; i++) {
+
+                        if ($(isReturns[i]).is(':checked')) {
+                            var itemId = itemIds[i].value;
+                            var stockBalance = parseFloat(remainQtys[i].innerHTML);
+                            var returnQty = parseFloat( returnQtys[i].value);
+                            var returnUnit = returnUnits[i].value;
+
+                            console.log(returnQty + " " + stockBalance);
+                           
+                            if (Number(returnQty) <= 0 || Number(returnQty) == '') {
+                                alert('Please fill return quantity.');
+                                return;
+                            }
+
+                            if (returnQty > stockBalance) {
+                                countvalidation++;
+                            }
+
+                            element_item = {};
+                            element_item.product_id = itemId;
+                            element_item.stockBalance = stockBalance;
+                            element_item.warehouse_id = $('#warehouse_id').val();
+                            element_item.in_quantity = returnQty;
+                            element_item.unit = returnUnit;
+                        
+                            items.push(element_item);
+                        }                    
+                    }
+
+                    if (items.length == 0) {
+                        alert("No item to return.");
+                        return;
+                    }
+                    if (countvalidation > 0) {
+                        alert("Return Qty must be smaller than Stock Balance.");
+                        return;
+                    }
+                     
+                    var model = {
+                        return_type:$("#return_type").val(),
+                            return_ref_id: $('#project_id').val(),
+                    }
+
+                        $.ajax({
+                            url: "@Url.Action("CreateReturnMainStock", "ReturnMainStock")",
+                            type: "post",
+                            dataType: "json",
+                            async: false,
+                            data: { model: model, inventories: items },
+                            success: function (da) {
+                                if (da.result == "success") {
+                                    alert('Your data has been saved successfully.!');
+                                    window.location.href = '@Url.Action("Index", "ReturnMainStock")';
+                                } else if (da.result == "fail") {
+                                    //alert(da.message);
+                                    alert(da.message);
+                                }
+                            },
+                            error: function (err) {
+                                alert('Your data is error while saving!');
+                            }
+                        });
+                });
+             
+                $('#return_project_id').change(function () {
+                    
+                    var itemRequest = $(this).val();
+                    if (itemRequest) {
+
+                         $.ajax({
+                            url: '@Url.Action("GetWarehouse","ReturnMainStock")',
+                            type: "GET",
+                            data: { id: itemRequest },
+                            success: function (data) {                              
+                                if (data.result == "success") {                                   
+                                    if (data != null) {                                     
+                                        $("#warehouse").html(data.data.warehouse_name);
+                                        $("#idwarehouse").text(data.data.warehouse_id);
+                                    }
+                                    else {
+                                        $("#warehouse").html("");
+                                        $("#idwarehouse").html("");
+                                    }
+                                }
+                                else if (data.result == "error") {
+                                    alert(data.message);
+                                    return;
+                                }
+
+                            }
+                        });
+                       
+                        $.ajax({
+                            url: '@Url.Action("GetItemFromWarehouse", "ReturnMainStock")',
+                            type: "get",
+                            dataType: "json",
+                            data: { id: itemRequest },
+                            success: function (da) {
+                                console.log(da);
+
+                                if (da.result == "success") {
+                                    $('#st_table tbody').empty();
+                                    var count = 1;
+                                    if (da.data.length == 0) {
+                                        $('#st_table tbody').append("" +
+                                            "<tr><td colspan='11'>No item from warehouse to transfer.</td></tr>"
+                                        );
+                                    } else {
+                                        $.each(da.data, function (index, item) {
+                                            if (item) {
+                                                console.log(item);
+                                                var mou = "<option value='" + item.itemUnit.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "'>" + item.itemUnitName.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                                                if (item.uom1_id && item.uom1_qty) {
+                                                    mou = mou + "<option value='" + item.uom1_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom1_qty + "'>" + item.uom1_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                                                }
+                                                if (item.uom2_id && item.uom2_qty) {
+                                                    mou = mou + "<option value='" + item.uom2_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom2_qty + "'>" + item.uom2_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                                                }
+                                                if (item.uom3_id && item.uom3_qty) {
+                                                    mou = mou + "<option value='" + item.uom3_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom3_qty + "'>" + item.uom3_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                                                }
+                                                if (item.uom4_id && item.uom4_qty) {
+                                                    mou = mou + "<option value='" + item.uom4_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom4_qty + "'>" + item.uom4_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                                                }
+                                                if (item.uom5_id && item.uom5_qty) {
+                                                    mou = mou + "<option value='" + item.uom5_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom5_qty + "'>" + item.uom5_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                                                }
+                                                $('#st_table').append("" +
+                                                    "<tr>" +
+                                                    "<td>" + count + "</td>" +
+                                                    "<td><input type='hidden' class='item_id' value='" + item.itemID + "'/>" + item.itemCode + "</td>" +
+                                                    "<td><label>" + item.itemName + "</label></td>" +
+                                                    "<td><label class='stock_balance'>" + item.stockBalance + "</label> <input type='hidden' class='stock_balance_unit' value='" + item.itemUnit + "'/> <label class=''>" + item.itemUnitName + "</label></td>" +
+                                                    //"<td><label class='request_qty'>" + item.requestQty + "</label> <input type='hidden' class='request_unit' value='" + item.requestUnit + "'/> <label class=''>" + item.requestUnitName + "</label></td>" +
+                                                    //"<td><input type='hidden' class='warehouse_id' value='" + item.warehouseID + "' />" + item.warehouseName + "</td>" +
+                                                    //"<td><input type='checkbox' value='' class='transfer'/></td>" +
+                                                    "<td><input type='checkbox' value='' id='return1' class='return'/></td>" +
+                                                    //"<td hidden><input type='text' id='hidcheck1' class='hidcheck'></td>" +
+                                                    "<td><input type='number' class='form-control transfer_qty ' value='0' onchange='checkQty(this)'/></td>" +
+                                                    //"<td><input type='number' class='form-control transfer_qty' value='0.00' onchange='checkQty(this)'/></td>" +
+                                                    "<td><select class='form-control transfer-unit' onchange='checkQty(this)'>" + mou + "</select></td>" +
+                                                    "<td><input type='text' class='form-control invoice_no'/></td>" +
+                                                    "<td>" +
+                                                    '<div style="display:inline-block !important;margin-right:5px !important;">' +
+                                                    '<div class="input-group date" data-provide="datepicker" data-autoclose="true" style="width:150px !important;">' +
+                                                    '<input type="text" class="form-control invoice_date" style="width:130px !important;"/>' +
+                                                    '<div class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></div>' +
+                                                    "<td><textarea class='form-control remark'></textarea></td>" +
+                                                    '</div>' +
+                                                    '</div>' +
+                                                    "</td>" +
+                                                    "</tr>"
+                                                );
+                                                count++;
+                                                $(".date").datepicker({ format: 'dd/mm/yyyy' });
+                                            }
+                                        });
+                                    }
+
+                                }
+                            },
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                console.log(textStatus);
+                            }
+                        });
+                    } else {
+                        $('#st_table tbody').empty().append("" +
+                            "<tr><td colspan='11'>No item from warehouse to transfer.</td></tr>"
+                        );;
+                    }
+
+                });
+            });
+            function check_uncheck_checkbox(isChecked) {
+            if (isChecked) {
+                $('input[name="is_return"]').each(function () {
+                    this.checked = true;
+                });
+            } else {
+                $('input[name="is_return"]').each(function () {
+                    this.checked = false;
+                });
+            }
+            }
+
+            function findObjectInArrayByProperty(array, propertyName, propertyValue) {
+                return array.find((o) => { return o[propertyName] === propertyValue });
+            }
+        </script>
+        }
+    
+

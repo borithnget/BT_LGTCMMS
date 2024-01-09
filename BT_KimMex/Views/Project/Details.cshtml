@@ -1,0 +1,315 @@
+﻿@model BT_KimMex.Models.ProjectViewModel
+
+@{
+    ViewBag.Title = "Details";
+    string projectManagerName = string.Empty;
+    BT_KimMex.Entities.kim_mexEntities db = new BT_KimMex.Entities.kim_mexEntities();
+    if (Model.projectProjectManagers.Count() > 0)
+    {
+        projectManagerName = BT_KimMex.Class.CommonFunctions.GetUserFullnamebyUserId(Model.projectProjectManagers[0].project_manager_id);
+    }
+
+}
+
+<style type="text/css">
+    .jumbotron {
+        padding: 10px !important;
+        font-size: 14px !important;
+    }
+</style>
+
+<div class="w3-container">
+    <h3>View Project Detail</h3>
+</div>
+
+@*<h3 class="title">View Project Detail</h3>*@
+<div class="jumbotron">
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="control-label col-md-4">Date:</label>
+                <label class="control-label col-md-8" id="created_date">@Convert.ToDateTime(Model.created_date).ToString("dd/MM/yyyy")</label>
+            </div>
+            @*<div class="form-group ">
+                <label class="control-label col-md-4">SO No:</label>
+                <div class="col-md-8">
+                    @Html.EditorFor(model => model.project_no, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.project_no, "", new { @class = "text-danger" })
+                </div>
+
+            </div>*@
+            <div class="form-group">
+                <label class="control-label col-md-4"> SO No:</label>
+                <label class="control-label col-md-8">@Model.project_no</label>
+            </div>
+        </div>
+        <div class="col-md-6">
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.project_short_name, new { @class = "control-label col-md-4" })
+                <label class="control-label col-md-8">@Model.project_short_name</label>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.project_full_name, new { @class = "control-label col-md-4" })
+                <label class="control-label col-md-8">@Model.project_full_name</label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.project_start_date, new { @class = "control-label col-md-4" })
+                <label class="control-label col-md-8" id="project_start_date"></label>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.project_actual_start_date, new { @class = "control-label col-md-4" })
+                <label class="control-label col-md-8" id="project_actual_start_date"></label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.project_end_date, new { @class = "control-label col-md-4" })
+                <label class="control-label col-md-8" id="project_end_date"></label>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.project_actual_end_date, new { @class = "control-label col-md-4" })
+                <label class="control-label col-md-8" id="project_actual_end_date"></label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        @*<div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.project_manager, new { @class = "control-label col-md-4" })
+                <label class="control-label col-md-8">@Model.project_manager</label>
+            </div>
+        </div>*@
+        <div class="col-md-6">
+            <label class="control-label col-md-4">Project Manager:</label>
+            @*<label class="control-label col-md-8">@projectManagerName</label>*@
+            <div class="col-md-8">
+                @foreach (var pm in Model.projectProjectManagers)
+                {
+                    <label>@BT_KimMex.Class.CommonFunctions.GetUserFullnamebyUserId(pm.project_manager_id)</label>
+                }
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.project_telephone, new { @class = "control-label col-md-4" })
+                <label class="control-label col-md-8">@Model.project_telephone</label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="control-label col-md-4">Site Name:</label>
+                <label class="control-label col-md-8">@Model.site_name</label>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.project_address, new { @class = "control-label col-md-4" })
+                <label class="control-label col-md-8">@Model.project_address</label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="control-label col-md-4">Site Manager:</label>
+                <div class="col-md-8">
+                    @foreach (var item in Model.project_site_managers)
+                    {
+                        <label>@item.site_manager_name</label>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="control-label col-md-4">Project Status:</label>
+                <label class="control-label col-md-8">@Model.p_status</label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="control-label col-md-4">Spacemen Signature:</label>
+                <div class="col-md-8">
+                    <a class="title" href="/Project/Download/?p=@(Model.spacemen_att_id + Model.spacemen_extension)&d=@Model.spacemen_filename">@Model.spacemen_filename</a>
+                    @*<a href="javascript:void(0);" data-id="@Model.spacemen_att_id" class="deleteItem">X</a>*@
+                </div>
+            </div>
+        </div>
+        @*<div class="col-md-6">
+            <label class="control-label col-md-4">Project Manager:</label>
+            <div class="col-md-8">
+                @foreach(var pm in Model.projectProjectManagers)
+                {
+                    <p>@BT_KimMex.Class.CommonFunctions.GetUserFullnamebyUserId(pm.project_manager_id)</p>
+                }
+            </div>
+        </div>*@
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="col-md-4">Warehouse:</label>
+                <label class="col-md-8">
+                    @if (db.tb_warehouse.Where(s => string.Compare(s.warehouse_project_id, Model.project_id) == 0).Select(s => s.warehouse_name).FirstOrDefault() != null)
+                    {
+                        @db.tb_warehouse.Where(s => string.Compare(s.warehouse_project_id, Model.project_id) == 0).Select(s => s.warehouse_name).FirstOrDefault().ToString()
+                    }
+
+                </label>
+            </div>
+        </div>
+
+    </div>
+    <div class="form-horizontal">
+        <div class="row col-md-12">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="col-md-4">Site Supervisor:</label>
+                    <label class="col-md-8">
+                        @foreach(var i in Model.siteSupervisors)
+                        {
+                            <p>@i.site_supervisor_name</p>
+                        }
+                    </label>
+                </div>
+                <!-- New Enhancement 2022 Sep 12-->
+                <div class="form-group">
+                    <label class="col-md-4">Site Admin:</label>
+                    <label class="col-md-8">
+                        @foreach(var i in Model.siteAdmins)
+                        {
+                            <p>@i.site_admin_fullname</p>
+                        }
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4">Stock Controller:</label>
+                    <label class="col-md-8">
+                        @{ 
+                            foreach(var i in Model.warehouseStockKeepers)
+                            {
+                                <p>@i.stock_keeper</p>
+                            }
+                        }
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4">QA/ QC Officer:</label>
+                    <label class="col-md-8">
+                        @foreach(var i in Model.warehouseQAQCs)
+                        {
+                            <p>@i.qaqc_id</p>
+                        }
+                    </label>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+<div class="jumbotron">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="control-label col-md-4">Customer Name:</label>
+                <label class="control-label col-md-8">@Model.customer_name</label>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.cutomer_project_manager, new { @class = "control-label col-md-5" })
+                <label class="control-label col-md-7">@Model.cutomer_project_manager</label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.cutomer_signatory, new { @class = "control-label col-md-4" })
+                <label class="control-label col-md-8">@Model.cutomer_signatory</label>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.customer_telephone, new { @class = "control-label col-md-5" })
+                <label class="control-label col-md-7">@Model.customer_telephone</label>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row" style="background-color:white">
+    <div class="col-md-12">
+        <div class="form-group" style="background-color:white">
+            <div class="col-md-offset-4 col-md-8">
+                @if (!string.IsNullOrEmpty(Model.boq_id))
+                {
+                    @Html.ActionLink("View BoQ Detail", "Details", "BOQ", new { id = Model.boq_id }, new { @class = "btn btn-default" })
+                }
+                @Html.ActionLink("Edit", "Edit", "Project", new { id = Model.project_id }, new { @class = "btn btn-default" })
+                <a href="@Url.Action("Index","Project")" class="btn btn-default">Back</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*<div class="w3-container">
+    <a href="" class="w3-button w3-small w3-green w3-round-small">Edit</a>
+    <a href="javascript:histroy.back()" class="w3-button w3-small w3-red w3-round-small">Back</a>
+</div>*@
+
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            var project_start_date, project_actual_start_date, project_end_date, project_actual_end_date;
+            project_start_date = '@Model.project_start_date';
+            project_actual_start_date = '@Model.project_actual_start_date';
+            project_end_date = '@Model.project_end_date';
+            project_actual_end_date = '@Model.project_actual_end_date';
+            //$('#created_date').text(getFormattedDateMMDDYYYY(new Date('@Model.created_date')));
+            if (project_start_date == null || project_start_date == "")
+                $('#project_start_date').text("");
+            else
+                $('#project_start_date').text(getFormattedDateMMDDYYYY(new Date(project_start_date)));
+
+            if (project_actual_start_date == null || project_actual_start_date == "")
+                $('#project_actual_start_date').text("");
+            else
+                $('#project_actual_start_date').text(getFormattedDateMMDDYYYY(new Date(project_actual_start_date)));
+
+            if (project_end_date == null || project_end_date == "")
+                $('#project_end_date').text("");
+            else
+                $('#project_end_date').text(getFormattedDateMMDDYYYY(new Date(project_end_date)));
+
+            if (project_actual_end_date==null||project_actual_end_date=="")
+                $('#project_actual_end_date').text("");
+            else
+                $('#project_actual_end_date').text(getFormattedDateMMDDYYYY(new Date(project_actual_end_date)));
+        });
+    </script>
+    }
+
+

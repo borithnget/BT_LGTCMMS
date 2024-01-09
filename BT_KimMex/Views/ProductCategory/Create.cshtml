@@ -1,0 +1,101 @@
+﻿@model BT_KimMex.Models.CategoryViewModel
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        Create New Category
+    </div>
+    <div class="panel-body">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="form-group">
+                    <label class="control-label col-md-2">Group <strong style="color:red;">*</strong> :</label>
+                    <div class="col-md-10">
+                        <select class="form-control select2" id="class_id" name="class_id">
+                            <option value="">Select Group</option>
+                            @{
+                                BT_KimMex.Entities.kim_mexEntities db = new BT_KimMex.Entities.kim_mexEntities();
+                                var Class = db.tb_class.OrderBy(o => o.class_name).Where(w => w.active == true).ToList();
+                                foreach (var item in Class)
+                                {
+                                    <option value="@item.class_id">@item.class_name</option>
+                                }
+                            }
+                        </select>
+                        @Html.ValidationMessageFor(model => model.class_id, "", new { @class = "text-danger", style = "display:block !important;" })
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="control-label col-md-2">Sub Group <strong class="text-danger">*</strong>:</label>
+                    <div class="col-md-10">
+                        <select class="form-control select2" id="sub_group_id" name="sub_group_id"></select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-md-2">Category Name <strong style="color:red;">*</strong>:</label>
+                    @*@Html.LabelFor(model => model.p_category_name, htmlAttributes: new { @class = "control-label col-md-2" })*@
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.p_category_name, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.p_category_name, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                @*<div class="form-group">
+                    <label class="control-label col-md-2">Item Code</label>
+                </div>*@
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Save" class="w3-button w3-tiny w3-teal" />
+                        <a href="@Url.Action("Index","ProductCategory")" class="w3-button w3-tiny w3-red">Back</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            //$('#current_date').text(getFormattedDateMMDDYYYY(new Date()));
+            $('.select2').select2();
+            if ('@TempData["message"]' != null) {
+                $.notify('@TempData["message"]', { className: 'error' });
+            }
+
+            $('#class_id').change(function (e) {
+                var group_id = $(this).val();
+
+                $('#sub_group_id').empty();
+
+                $.ajax({
+                    url: "/SubGroup/GetSubGroupDataTable/",
+                    dataType: "json",
+                    data: { group_id: group_id },
+                    success: function (data) {
+                        console.log(data);
+                        $.each(data.data, function (index, item) {
+                            $('#sub_group_id').append("<option value='" + item.sub_group_id + "'>" + item.sub_group_name + "</option>");
+                        });
+
+                    }
+                });
+
+            });
+
+        });
+    </script>
+}

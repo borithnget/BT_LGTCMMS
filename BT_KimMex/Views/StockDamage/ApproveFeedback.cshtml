@@ -1,0 +1,150 @@
+﻿@model BT_KimMex.Models.StockDamageViewModel
+
+@{
+    ViewBag.Title = "ApproveFeedback";
+}
+<style type="text/css">
+    #stockDamageTable tr td{
+        vertical-align:middle !important;
+    }
+    #stockDamageTable tr td:nth-child(5),#stockDamageTable tr td:nth-child(6){
+        text-align:center !important;
+    }
+</style>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        @Html.HiddenFor(model=>model.stock_damage_id)
+        <h3 class="title">Approve/ Feedback Stock Damage</h3>
+        <div class="form-group">
+            @Html.LabelFor(model => model.created_date, new { @class = "col-md-2" })
+            @Html.Label(Convert.ToDateTime(Model.created_date).ToString("dd/MM/yyyy"), new { @class = "col-md-10" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.stock_damage_number, new { @class = "col-md-2" })
+            @Html.Label(Model.stock_damage_number, new { @class = "col-md-10" })
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered" id="stockDamageTable">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Code</th>
+                        <th>Description</th>
+                        <th>From Warehouse</th>
+                        <th>Stock Balance</th>
+                        <th>Damage QTY</th>
+                        <th>Unit</th>
+                        <th>Invoice No.</th>
+                        <th>Invoice Date</th>
+                        <th>Approve</th>
+                        <th>Feedback</th>
+                        <th>Remark</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int count = 1;
+                        int countPending = 1;
+                        foreach (var item in Model.inventoryDetails)
+                        {
+                            //decimal stockBalance =Convert.ToDecimal(item.total_quantity + item.out_quantity);
+                            string damageQty = string.Format("{0:G29}", decimal.Parse(item.quantity.ToString()));
+                            if (string.Compare(item.item_status, "approved") == 0)
+                            {
+                                <tr>
+                                    <td>@count</td>
+                                    <td>@item.itemCode</td>
+                                    <td>@item.itemName</td>
+                                    <td>@item.warehouseName</td>
+                                    <td>@string.Format("{0:G29}", decimal.Parse(item.stock_balance.ToString())) @item.itemUnit</td>
+                                    <td>@damageQty</td>
+                                    <td>@item.unit</td>
+                                    <td>@item.invoice_number</td>
+                                    <td>@Convert.ToDateTime(item.invoice_date).ToString("dd/MM/yyyy")</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>@item.remark</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                string name = "item" + countPending;
+                                <tr>
+                                    <td>@count</td>
+                                    <td><input type="hidden" class="inventory_detail" value="@item.inventory_detail_id"/> @item.itemCode</td>
+                                    <td>@item.itemName</td>
+                                    <td>@item.warehouseName</td>
+                                    <td>@string.Format("{0:G29}", decimal.Parse(item.stock_balance.ToString())) @item.itemUnit</td>
+                                    <td>@damageQty</td>
+                                    <td>@item.unit</td>
+                                    <td>@item.invoice_number</td>
+                                    <td>@Convert.ToDateTime(item.invoice_date).ToString("dd/MM/yyyy")</td>
+                                    <td><label><input type="radio" class="approval" name="@name" value="approved"> Approve</label></td>
+                                    <td><label><input type="radio" class="approval" name="@name" value="feedbacked"> Feedback</label></td>
+                                    <td><textarea class="form-control feedback_comment">@item.remark</textarea></td>
+                                    
+                                </tr>
+                                                    countPending++;
+                                                }
+                                                count++;
+                                            }
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="button" value="Submit" class="btn btn-default" onclick="approveFeedbackStockDamage()" />
+                @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-default" })
+            </div>
+        </div>
+    </div>
+}
+@section Scripts{
+    <script type="text/javascript">
+        function approveFeedbackStockDamage() {
+            var models = [];
+            var item_element = {};
+            var countInvalidStatus=0;
+            var stockDamageId = $('#stock_damage_id').val();
+            var stockDamageDetails = $('.inventory_detail');
+            var feedbackComments = $('.feedback_comment');
+            for (var i = 1; i <= stockDamageDetails.length; i++) {
+                var item_status = $('input[name=item' + i + ']:checked').val();
+                if (!item_status) countInvalidStatus++;
+                var idx = Number(i - 1);
+                item_element = {};
+                item_element.inventory_detail_id = stockDamageDetails[idx].value;
+                item_element.item_status = item_status;
+                item_element.remark = feedbackComments[idx].value;
+                models.push(item_element);
+            }
+            if (countInvalidStatus > 0) {
+                alert("Please select Approve or Feedback option for each item.");
+                return;
+            }
+            $.ajax({
+                url: "@Url.Action("ApproveFeedback", "StockDamage")",
+                type: "post",
+                dataType: "json",
+                async: false,
+                data: { id: stockDamageId, models: models },
+                success: function (da) {
+                    if (da.result == "success") {
+                        alert('Your data has been sumitted successfully.');
+                        window.location.href = '@Url.Action("Index")';
+                    } else {
+                        alert('Your data is error while sumiting.');
+                    }
+                },
+                error: function (err) {
+                    alert('Your data is error while sumiting.');
+                }
+            });
+        }
+    </script>
+    }

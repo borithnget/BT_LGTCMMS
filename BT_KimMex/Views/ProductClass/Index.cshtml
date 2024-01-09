@@ -1,0 +1,103 @@
+﻿@model IEnumerable<BT_KimMex.Models.ProductClassViewModel>
+@{
+    ViewBag.Title = "Index";
+}
+
+<h3 class="title">Product Class List </h3>
+<table class="table table-bordered mb-0" id="productclasstable">
+    <thead>
+        <tr>
+            <th style="width: 100px;">ID</th>
+            <th>Product Class Name</th>
+            <th>Class Type</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            initialProductClassDataTable();
+        });
+
+        function initialProductClassDataTable() {
+            var t = $('#productclasstable').DataTable({
+                "ajax": {
+                    "url": "@Url.Action("GetProductClassListJson", "ProductClass")",
+                    "type": "GET",
+                    "dataType": "json"
+                },
+                    "columns": [
+                        { "data": "product_class_id" },
+                        {
+                                        "render": function (data, type, full, meta) {
+                                            return '<a href="/ProductClass/Details/' + full.product_class_id + '">' + full.product_class_name + '</a>';
+                                        }
+                        },
+                        { "data": "class_type_name" },
+                        //{
+
+                        //    "data": "updated_at", render: function (data, type, full, meta) {
+                        //        if (data == null) {
+                        //            return "";
+                        //        }
+                        //        else {
+                        //            return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                        //        }
+                        //    }
+                        //},
+                        {
+                            "render": function (data, type, full, meta) {
+                                return '<a href="/ProductClass/Details/' + full.product_class_id + '" class="w3-button w3-tiny w3-green">View Detail</a> <a href="/ProductClass/Edit/' + full.product_class_id + '" class="w3-button w3-tiny w3-green">Edit</a>';
+                            }
+                        },
+                    ],
+                    "order": [[1, "asc"]],
+            });
+            t.on('order.dt search.dt', function () {
+                t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+            $('select[name="productclasstable_length"]').addClass('datatable-control');
+            $('input[aria-controls="productclasstable"]').addClass('datatable-control');
+            $('#productclasstable_filter').append('<a href="@Url.Action("Create", "ProductClass")" class="btn btn-default pull-left" style="margin-right:10px !important;">Add New</a>');
+        }
+    </script>
+}
+
+
+
+
+
+
+@*<div class="block block-rounded block-bordered invisible" data-toggle="appear">
+        <div class="block-header block-header-default">
+            <h3 class="block-title">Product Class List</h3>
+            <div class="block-options">
+                @*<button type="button" class="btn-block-option">
+                    <i class="si si-wrench"></i> Add New
+                </button>
+            </div>
+        </div>
+        <div class="block-content block-content-full">
+            <div class="table-responsive">
+                <table class="table table-borderless table-hover table-striped table-vcenter mb-0" id="productclasstable">
+                    <thead>
+                        <tr>
+                            <th style="width: 100px;">ID</th>
+                            <th>Product Class Name</th>
+                            <th>Class Type</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>*@

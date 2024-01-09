@@ -1,0 +1,151 @@
+﻿@model BT_KimMex.Models.PurchaseRequestViewModel
+    @using BT_KimMex.Class;
+@{
+    ViewBag.Title = "Approval";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    BT_KimMex.Entities.kim_mexEntities db = new BT_KimMex.Entities.kim_mexEntities();
+}
+
+<h3 class="title">Purchase Order Approval</h3>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <input id="purchase_order_id" class="hidden" type="number" value="@Model.pruchase_request_id" />
+        @Html.HiddenFor(model=>model.pruchase_request_id)
+        <div class="form-group">
+            <label class="col-md-2">Date : </label>
+            <label class="col-md-10">@Convert.ToDateTime(Model.updated_date)</label>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-2">PO Number :</label>
+            <label class="col-md-10" id="purchase_number">@Model.purchase_request_number</label>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-2">PR Ref. Number:</label>
+            <label class="col-md-10" id="purchase_number">@Model.purchaseRequisition.purchase_oder_number</label>
+        </div>
+
+
+        <div class="row" style="margin:0 !important;">
+            <table class="table table-bordered" id="purchaseOrderTable">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Supplier Name</th>
+                        <th>PO Number</th>
+                        <th>Total Amount($)</th>
+                        <th>Status</th>
+                        <th><label><input type="radio" class="approval" name="app_header" value="approved"> Approve</label></th>
+                        <th><label><input type="radio" class="approval" name="app_header" value="feedbacked"> Void</label></th>
+                </thead>
+                <tbody>
+                    @{
+                        int count = 1;
+                        foreach (var item in Model.poDetails)
+                        {
+                            var por = db.tb_po_report.Where(s => string.Compare(s.po_report_id, item.po_report_id) == 0).FirstOrDefault();
+                            var name = "item" + count;
+                            <tr>
+                                <td>@count
+                                    <input type='hidden' value='@item.pr_detail_id' class='detail_id' />
+                                </td>
+                                <td>@db.tb_supplier.Find(por.po_supplier_id).supplier_name</td>
+                                <td>@por.po_report_number</td>
+                                <td>@item.amount</td>
+                                <td>@item.status</td>
+                                <td><label><input type="radio" class="approval" name="@name" value="@Status.Approved"> Approve</label></td>
+                                <td><label><input type="radio" class="approval" name="@name" value="@Status.Void"> Void</label></td>
+                            </tr>
+                            count++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+
+                <input type="button" class="btn btn-success" value="Submit" id="btnsubmit"/>
+                <a href="javascript:history.back()" class="btn btn-danger">Back</a>
+
+            </div>
+        </div>
+
+    </div>
+
+                        }
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+
+            $('input:radio[name="app_header"]').change(
+            function () {
+                if ($(this).is(':checked') && $(this).val() == 'approved') {
+                    // append goes here
+                    var inventoryDetailsId = $('.adjustment_detail_id');
+                    var countTableRow = $('#purchaseOrderTable tbody tr').length;
+                    for (var i = 1; i <= countTableRow; i++) {
+                        $("input[name=item" + i + "][value='approved']").prop("checked", true);
+                    }
+                } else {
+                    var inventoryDetailsId = $('.adjustment_detail_id');
+                    var countTableRow = $('#purchaseOrderTable tbody tr').length;
+                    for (var i = 1; i <= countTableRow; i++) {
+                        $("input[name=item" + i + "][value='void']").prop("checked", true);
+                    }
+                }
+            });
+
+            $('#btnsubmit').click(function (e) {
+                e.preventDefault();
+                var models = [];
+                var item_element = {};
+                var countInvalidStatus = 0;
+                var Id = $('#pruchase_request_id').val();
+                var inventoryDetailsId = $('.detail_id');
+                //var feedbackComments = $('.feedback_comment');
+                var countTableRow = $('#purchaseOrderTable tbody tr').length;
+                for (var i = 1; i <= inventoryDetailsId.length; i++) {
+                    var item_status = $('input[name=item' + i + ']:checked').val();
+                    if (!item_status) countInvalidStatus++;
+                    var idx = Number(i - 1);
+                    item_element = {};
+                    item_element.pr_detail_id = inventoryDetailsId[idx].value;
+                    item_element.status = item_status;
+                    models.push(item_element);
+                }
+                if (countInvalidStatus > 0) {
+                    alert("Please select Approve or Rejeect option for each item.");
+                    return;
+                }
+
+                $.ajax({
+                    url: "@Url.Action("Approval", "PurchaseOrderAandR")",
+                    type: "post",
+                    dataType: "json",
+                    async: false,
+                    data: { id: Id, models: models },
+                    success: function (da) {
+                        if (da.result == "success") {
+                            alert('Your data has been submitted successfully.');
+                            window.location.href = '@Url.Action("MyApproval")';
+                        } else {
+                            alert('Your data is error while sumiting.');
+                        }
+                    },
+                    error: function (err) {
+                        alert('Your data is error while sumiting.');
+                    }
+                });
+            })
+
+        });
+    </script>
+    }

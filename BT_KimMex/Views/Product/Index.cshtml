@@ -1,0 +1,198 @@
+﻿@model IEnumerable<BT_KimMex.Models.ProductViewModel>
+@using BT_KimMex.Class;
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<style type="text/css">
+    table tr th,table tr td{
+        font-size:12px !important;
+    }
+    table tr td{
+        vertical-align:middle !important;
+        
+    }
+</style>
+
+<h3 class="title">Product List</h3>
+<div class="col-12 col-xl-12 col-md-12 col-sm-12">
+    <div data-label="Example" class="df-example demo-table">
+        <table class="table table-bordered" id="ProductTable">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Group</th>
+                    <th>Sub Group</th>
+                    <th>Category</th>
+                    <th>Type</th>
+                    <th>Class</th>
+                    <th>Size</th>
+                    <th>Color</th>
+                    <th>Brand</th>
+                    <th>Factory Code</th>
+                    <th>Unit</th>
+                    <th>Description</th>
+                    <th>Unit Price ($)</th>
+                    <th>Labour Hour</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+
+
+        </table>
+    </div>
+</div>
+<!-- Bootstrap modal popup-->
+<div class="modal fade" id="myModal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to delete this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success delete-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+
+        $(function () {
+
+            var product_id;
+            InitialDataTable();
+            $('#nav-action').append(""+
+                '<a href="@Url.Action("Create","Product")" class="btn btn-sm pd-x-15 btn-primary btn-uppercase"><i data-feather="mail" class="wd-10 mg-r-5"></i> Add Product</a> '+
+                '<a href="@Url.Action("ImportExcel", "Product")" class="btn btn-sm pd-x-15 btn-primary btn-uppercase" style=""><i class="far fa-bell"></i> Import from Excel</a>'
+
+                );
+
+            $('#ProductTable tbody').on('click', 'td a.delete-promp', function () {
+                product_id = $(this).attr('id');
+                $('#myModal').modal('show');
+            });
+
+            $('.delete-confirm').click(function () {
+
+                if (product_id != '') {
+
+                    $.ajax({
+                        url: "/Product/Delete",
+                        data: {
+                            'id': product_id,
+                        },
+                        type: 'GET',
+                        success: function (response) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#myModal').modal('hide');
+                            if (response.Message == "Success")
+                            {
+                                if ('@TempData["message"]' != null) {
+                                    $.notify('Your data has been deleted!', { className: 'success' });
+                                }
+                                window.location.href = '@Url.Action("Index", "Product")';
+                            }
+                            else if (da.Message == "fail")
+                                $.notify('Your data has been error while deleting!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while deleting!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+        });
+
+        function InitialDataTable() {
+            var t=$('#ProductTable').DataTable({
+                "ajax": {
+                    "url": "@Url.Action("ProductDataTable", "Product")",
+                    "type": "GET",
+                    "dataType": "json"
+                },
+                dom: 'Bfrtip',
+                buttons: [
+                  //'copyHtml5',
+                  'excelHtml5',
+                  //'pdfHtml5',
+                  //'csvHtml5',
+                ],
+                "pageLength": 50,
+                "columns": [
+                    { "data": "product_code" },
+                    {
+                        "render": function (data, type, full, meta) {
+                            return '<a href="/Product/Details/' + full.product_id + '">' + full.class_name + '</a>';
+                        }
+                    },
+                    { "data": "sub_group_name" },
+                       { "data": "p_category_name" },
+                        { "data": "product_type_name" },
+                        { "data": "product_class_name" },
+                        { "data": "product_size_name" },
+                        { "data": "color_name" },
+                        { "data": "brand_name" },
+                        { "data": "model_factory_code" },
+                        { "data": "product_unit" },
+                        { "data": "product_name" },
+                        {
+                            "render": function (data, type, full, meta) {
+                                console.log(full);
+                                return parseFloat(full.unit_price).toFixed(2);
+                            }
+                    },
+                    { "data": "labour_hour" },
+
+                        ],
+                "order": [[0, "asc"]],
+            });
+
+            //t.on('order.dt search.dt', function () {
+            //    t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+            //        cell.innerHTML = i + 1;
+            //    });
+            //}).draw();
+            $('button[aria-controls="ProductTable"]').removeClass('dt-button');
+            $('button[aria-controls="ProductTable"]').addClass('btn btn-sm btn-primary');
+            $('button[aria-controls="ProductTable"]').html('Export to Excel');
+
+            $('.dt-buttons').append('<a href="@Url.Action("Create","Product")" class="btn btn-sm btn-primary btn-uppercase pull-left" style="margin-right:10px !important;">Add New</a><a href="@Url.Action("ImportExcel", "Product")" class="btn btn-sm pd-x-15 btn-primary btn-uppercase pull-left" style="margin-right:10px !important;">Import from Excel</a>' +
+                '<a href="@Url.Action("UploadExcelLabourHour", "Product")" class="btn btn-sm btn-primary btn-uppercase pull-left" style="margin-right:10px !important;">Upload Labour Hour</a>');
+
+        }
+    </script>
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

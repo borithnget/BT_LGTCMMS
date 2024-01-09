@@ -1,0 +1,442 @@
+﻿@model BT_KimMex.Models.ItemReceiveViewModel
+@using BT_KimMex.Class
+@{
+    ViewBag.Title = "Detail";
+    //Layout = "~/Views/Shared/_LayoutBackend.cshtml";
+    string date = Convert.ToDateTime(Model.created_date).ToString("dd/MM/yyyy");
+    bool isSM = false;
+    bool isMSC = false;
+    bool isAdmin = false;
+    if (User.IsInRole("Admin"))
+    {
+        isAdmin = true;
+    }
+    if (User.IsInRole("Stock Keeper"))
+    {
+        isSM = true;
+    }
+    if (User.IsInRole("Site Manager"))
+    {
+        isMSC = true;
+    }
+}
+<style type="text/css">
+    table tr td{
+        text-align:left !important;
+        vertical-align:middle !important;
+    }
+</style>
+
+<h3 class="title">View Good Receive Note Detail</h3>
+
+<div class="form-horizontal">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.Label("Date:", new { @class = "col-md-4" })
+                @Html.Label(date, new { @class = "col-md-8" })
+            </div>
+            
+            <div class="form-group">
+                @Html.Label("Receive Type:", new { @class = "col-md-4" })
+                @Html.Label(Model.received_type, new { @class = "col-md-8" })
+            </div>
+            
+            <div class="form-group">
+                <label class="col-md-4">MR Ref. No.:</label>
+                <label class="col-md-8">@Model.mr_ref_number</label>
+            </div>
+
+            <div class="form-group">
+@if (string.Compare(Model.received_type, "Stock Return") == 0 || string.Compare(Model.received_type,"Return Workshop")==0)
+{
+    <label class="col-md-4">From Warehouse:</label>
+}
+else
+{
+    <label class="col-md-4">To Warehouse:</label>
+}
+                
+                <label class="col-md-8">@Model.inventories[0].warehouseName</label>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.received_number, new { @class = "col-md-4" })
+                @Html.Label(Model.received_number, new { @class = "col-md-8" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.ref_number, new { @class = "col-md-4" })
+                @Html.Label(Model.ref_number, new { @class = "col-md-8" })
+            </div>
+            <div class="form-group">
+                <label class="col-md-4">Project: </label>
+                @Html.Label(Model.project_full_name, new { @class = "col-md-8" })
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin:0 !important;">
+        <table class="table table-bordered " id="itemReceiveTable">
+            <thead class="bg-success">
+                <tr>
+                    <th rowspan="2">No.</th>
+                    <th rowspan="2">Item Code</th>
+                    <th rowspan="2">Item Name</th>
+                    @*<th rowspan="2">Quantity</th>*@
+                    <th rowspan="2">Received QTY</th>
+                    <th rowspan="2">Unit</th>
+                    @if (string.Compare(Model.received_type, "Stock Return") == 0 || string.Compare(Model.received_type, "Return Workshop") == 0)
+                    {
+                        <th rowspan="2">To Warehouse</th>
+                    }
+                    else
+                    {
+                        <th rowspan="2">From Supplier/ Warehouse</th>
+                    }
+                    
+                    @*<th rowspan="2" id="historyHeader">History</th>*@
+                    <th rowspan="2">Remain</th>
+                    @*<th>Received</th>*@
+                    <th rowspan="2">Invoice No.</th>
+                    <th rowspan="2">Invoice Date</th>
+                    @*<th>Received Unit</th>*@
+                    @*<th rowspan="2">To Warehouse</th>*@
+                    <th rowspan="2">Status</th>
+                    <th rowspan="2">Note</th>
+                </tr>
+                <tr id="secondheader"></tr>
+            </thead>
+            <tbody>
+                @{ 
+                    int count = 1;
+                    @*foreach (var item in Model.receivedItems){
+                        <tr>
+                            <td>@count</td>
+                            <td>@item.itemCode</td>
+                            <td>@item.itemName</td>
+                            <td>@string.Format("{0:G29}",Decimal.Parse(item.out_quantity.ToString())) @item.itemUnit</td>
+                            @foreach (var inv in Model.inventories)
+                            {
+                                if (string.Compare(item.product_id, inv.product_id) == 0)
+                                {
+                                    <td>@string.Format("{0:G29}",Decimal.Parse(inv.in_quantity.ToString()))</td>
+                                    <td>@inv.unit</td>
+                                    <td>@inv.warehouseName</td>
+                                    @*<td><input type="number" class="form-control received_qty" value="@inv.in_quantity" /></td>
+                                        <td>@Html.DropDownList("warehouse_id", new SelectList(@ViewBag.WarehouseID, "warehouse_id", "warehouse_name", inv.warehouseName), new { @class = "form-control warehouse" })</td>
+                                }
+                                
+                            }
+                            <td>@item.in_quantity</td>
+                            <td>@item.warehouseName</td>
+                        </tr>
+                        count++;
+                    }*@
+                foreach (var item in Model.receivedItems)
+                {
+                    foreach (var inv in Model.inventories)
+                    {
+                        if (string.Compare(item.product_id, inv.product_id) == 0)
+                        {
+                                    <tr>
+                                        <td>@count</td>
+                                        <td>@item.itemCode</td>
+                                        <td>@item.itemName</td>
+                                        @*<td>@string.Format("{0:G29}", Decimal.Parse(item.out_quantity.ToString())) @item.itemUnitName</td>*@
+                                        <td>@string.Format("{0:G29}", Decimal.Parse(inv.in_quantity.ToString()))</td>
+                                        <td>@inv.unitName</td>
+                                        <td>@inv.supplier_name</td>
+                                        <td class="text-center">
+                                            @{ 
+                                                if(string.Compare(Model.received_type,"Stock Transfer") == 0)
+                                                {
+                                                    <label class="text-center">@BT_KimMex.Class.CommonFunctions.GetStokTransferRemainBalancebyItem(Model.ref_id, item.product_id)</label>
+                                                }
+                                                else if (string.Compare(Model.received_type, "Transfer Workshop") == 0)
+                                                {
+                                                    <label class="text-center">@item.remain_quantity</label>
+                                                }
+                                                else if (string.Compare(Model.received_type, "Purchase Order") == 0)
+                                                {
+                                                    <label class="text-center">@item.remain_quantity</label>
+                                                }
+                                                else
+                                                {
+                                                    <label class="text-center">@item.remain_quantity</label>
+                                                }
+                                                
+                                            }
+                                        
+                                        </td>
+                                        <td>@inv.invoice_number</td>
+                                        <td>@Convert.ToDateTime(inv.invoice_date).ToString("dd/MM/yyyy")</td>
+                                        <td>
+                                            @if (inv.completed) {
+                                                <label style="color:blue !important;">completed</label>
+                                        }
+                                        else
+                                        {
+                                            if (string.Compare(inv.item_status, "approved") == 0)
+                                            {
+                                                <label style="color:blue !important;">@inv.item_status</label>
+                                            }
+                                            else
+                                            {
+                                                <label style="color:grey !important;">@inv.item_status</label>
+                                            }
+                                        }
+                                        </td>
+
+                                    <td>@inv.remark</td>
+
+                                </tr>
+                            count++;
+                        }
+
+                    }
+
+                }
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="row" style="margin:0 !important;">
+        <div class="form-group">
+            @Html.Label("Supporting Document:", new { @class="col-md-2"})
+            <div class="col-md-10">
+                @{ 
+                    var attachments = Model.attachments;
+                    foreach(var att in attachments)
+                    {
+                        <a class="title" href="/ItemReceive/Download/?p=@(att.ire_attachment_id+att.ire_attachment_extension)&d=@att.ire_attachment_name">@att.ire_attachment_name</a><br>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+    @if (Model.rejects.Count() > 0)
+    {
+        <div class="row">
+            <div class="form-group">
+                <label class="control-label col-md-2">Reject Command:</label>
+                <div class="col-md-10">
+                    <ul>
+                        @foreach (var reject in Model.rejects)
+                        {
+                            <li>@reject.comment <b>By @reject.rejected_by</b></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    }
+    <div class="row">
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                @{
+                    if (isAdmin || isSM)//&& (Model.received_status == "Pending" || Model.received_status == "Rejected")
+                    {
+                        if (string.Compare(Model.received_status, "pending") == 0)
+                        {
+                            @*@Html.ActionLink("Edit", "Edit", new { id = Model.receive_item_voucher_id }, new { @class = "btn btn-primary", style="margin-right:10px !important;" })*@
+                            <a href="javascript:void(0)" class="w3-button w3-tiny w3-deep-orange" id="btn-cancel-request">Cancel Request</a>
+                        }
+                        else if (string.Compare(Model.received_status, "pending feedback") == 0)
+                        {
+                            @Html.ActionLink("Prepare Feedback", "PrepareFeedback", new { id = Model.receive_item_voucher_id }, new { @class = "btn btn-primary" })
+                        }
+                    }
+                    if ((isAdmin || isMSC) && (Model.received_status == "pending" || Model.received_status == "feedbacked"))
+                    {
+                        @*<a href="javascript:void(0)" id="@Model.receive_item_voucher_id" class="btn btn-default approve-promp">Approve</a>
+                        <a href="javascript:void(0)" id="@Model.receive_item_voucher_id" class="btn btn-default reject-promp">Reject</a>*@
+                         @Html.ActionLink("Approve/ Feedback", "ApproveFeedback", new { id = Model.receive_item_voucher_id }, new { @class = "w3-button w3-tiny w3-teal" })
+                    }
+                }
+                <a href="javascript:history.back()" class="w3-button w3-tiny w3-red">Back</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- approve project modal popup-->
+<div class="modal fade" id="approveModal" tabindex="=-1" role="dialog" aria-labelledby="approveModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-warning">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to <strong>Approve</strong> this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default approve-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- reject project modal popup-->
+<div class="modal fade" id="rejectModal" tabindex="=-1" role="dialog" aria-labelledby="rejectModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to <strong>Reject</strong> this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default reject-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- cancel request modal popup-->
+<div class="modal fade" id="cancelRequestModal" tabindex="=-1" role="dialog" aria-labelledby="approveModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-warning">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to cancel this request?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" id="btn-cancel-yes">Yes</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            var receivedItemId = '@Model.receive_item_voucher_id';
+            $('.approve-promp').click( function () {
+                $('#approveModal').modal('show');
+            });
+
+            $('.approve-confirm').click(function () {
+                if (receivedItemId != '') {
+                    $.ajax({
+                        url: "/ItemReceive/Approve",
+                        data: {
+                            'id': receivedItemId,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#approveModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been approved!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "ItemReceive")';
+                            }
+                            else if (da.result == "fail")
+                                $.notify('Your data has been error while approving!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while approving!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+            $('.reject-promp').click(function () {
+                $('#rejectModal').modal('show');
+            });
+
+            $('.reject-confirm').click(function () {
+                if (receivedItemId != '') {
+                    $.ajax({
+                        url: "/ItemReceive/Reject",
+                        data: {
+                            'id': receivedItemId,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.reject-confirm').css('display', 'none');
+                            }
+                            $('#rejectModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been rejected!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "ItemReceive")';
+                            }
+                            else if (da.result == "fail")
+                                $.notify('Your data has been error while rejecting!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while rejecting!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+            $('#btn-cancel-request').click(function () {
+                $('#cancelRequestModal').modal('show');
+            });
+            $('#btn-cancel-yes').click(function () {
+                if (receivedItemId != '') {
+                    $.ajax({
+                        url: "/ItemReceive/RequestCancel",
+                        data: {
+                            'id': '@Model.receive_item_voucher_id',
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#cancelRequestModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been approved!', { className: 'success' });
+                                window.location.href = '@Url.Action("MyRequest", "ItemReceive")';
+                            }
+                            else
+                                $.notify('Your data has been error while approving!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.approve-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while approving!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+        });
+
+        function changeColSpan(span) {
+            alert(span);
+        }
+    </script>
+    }
+
+
+    
+

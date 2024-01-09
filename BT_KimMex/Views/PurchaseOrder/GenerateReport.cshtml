@@ -1,0 +1,310 @@
+﻿@model BT_KimMex.Models.PurchaseOrderViewModel
+@{
+    ViewBag.Title = "GenerateReport";
+}
+
+@using (Html.BeginForm())
+{
+    <div class="form-horizontal">
+        <h3 class="title">Generate PO Report</h3>
+        @Html.HiddenFor(model => model.purchase_order_id)
+        <div class="form-group">
+            @Html.Label("PO Date :", htmlAttributes: new { @class = "col-md-2" })
+            @Html.Label(Convert.ToDateTime(Model.created_date).ToString("dd-MMM-yyyy"), new { @class = "col-md-10", id = "current_date" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.purchase_oder_number, htmlAttributes: new { @class = "col-md-2" })
+            @Html.Label(Model.purchase_oder_number, new { @class = "col-md-10", id = "purchase_oder_number" })
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-2">MR Ref. :</label>
+            @Html.Label(Model.ir_no, new { @class = "col-md-10" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ir_project_id, htmlAttributes: new { @class = "col-md-2" })
+            @Html.Label(Model.project_full_name, new { @class = "col-md-10", id = "ir_project_id" })
+        </div>
+        <!--Rathana Add 10.04.2019-->
+        <div class="form-group">
+            @Html.LabelFor(m => m.POLNumber, new { @class = "col-md-2" })
+            <label class="col-md-10">@Model.POLNumber</label>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.ShippingTo, new { @class = "col-md-2" })
+            <label class="col-md-10">@BT_KimMex.Class.CommonClass.ConvertUserDetailIDToName(Model.ShippingTo)</label>
+        </div>
+        <!--End Rathana Add-->
+
+
+        <div class="row" style="margin:0 !important;">
+            <table class="table table-responsive table-bordered" id="po_table">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Supplier's Name</th>
+                        <th style="text-align:center;vertical-align:middle;">Generate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+
+
+                        int rCount = 1;
+                        foreach (var supplier in Model.poSuppliers)
+                        {
+                                    var roman = (Convert.ToChar(8543 + rCount)).ToString();
+                            <tr>
+                                <td>@roman</td>
+                                <td><input type="hidden" class="supplier_id" value="@supplier.supplier_id" />@supplier.supplier_name</td>
+                                @*<td style="text-align:center;vertical-align:middle;"><button type="button" class="btn btn-default" onclick="generateReportNotVAT('@Model.purchase_order_id','@supplier.supplier_id'),generateReport('@Model.purchase_order_id','@supplier.supplier_id') "><i class="fa fa-print" aria-hidden="true"></i></button></td>*@
+                                <td style="text-align:center;vertical-align:middle;">
+                                    <button type="button" class="btn btn-default" onclick="generateNewReport('@Model.purchase_order_id','@supplier.supplier_id') "><i class="fa fa-print" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-default" onclick="generateExportExcelReport('@Model.purchase_order_id','@supplier.supplier_id') "><i class="fa fa-file-excel-o" aria-hidden="true"></i></button>
+                                </td>
+                            </tr>
+
+                            rCount++;
+                        }
+
+                    @*
+                    int rCount = 1;
+                    foreach (var supplier in Model.poDetails)
+                    {
+                        var roman = (Convert.ToChar(8543 + rCount)).ToString();
+                        var test = supplier.poSuppliers;
+                        foreach (var test1 in test)
+                        {
+                            var show = Convert.ToBoolean(supplier.item_vat);
+                                    <tr>
+                                        <td>@roman</td>
+                                        <td><input type="hidden" class="supplier_id" value="@test1.supplier_id" />@test1.supplier_name</td>
+                                        <td style="text-align:center;vertical-align:middle;"><button type="button" class="btn btn-default" onclick="generateReportNotVAT('@Model.purchase_order_id','@test1.supplier_id'),generateReport('@Model.purchase_order_id','@test1.supplier_id') "><i class="fa fa-print" aria-hidden="true"></i></button></td>
+                                    </tr>
+
+                                 rCount++;
+                                
+                            }
+
+                        }
+                        *@
+                    }
+
+                </tbody>
+            </table>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <a href="javascript:history.back()" class="btn btn-danger">Back</a>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Modal Export Option -->
+<div class="modal" tabindex="-1" role="dialog" id="modal_export_option">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Export to Excel Option</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <input type="hidden" id="md_po_id" value=""/>
+                <input type="hidden" id="md_supplier_id" value=""/>
+
+                <div class="form-group row">
+                    <label class="control-label col-md-4">Choose Feature</label>
+                    <div class="col-md-8">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" class="export_option" id="md_is_po" value="1">PO
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" class="export_option" id="md_is_quote" value="2">Quote
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" class="export_option" id="md_is_mr" value="3">MR
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-md-4"></div>
+                    <div class="col-md-8">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" id="is_signature" value="1">with Signature
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="md_btn_export">Export</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('#md_btn_export').click(function () {
+
+                var is_signature = false;
+                var is_po = false;
+                var is_quote = false;
+                var is_mr = false;
+
+                if ($('#is_signature').is(":checked")) {
+                    // it is checked
+                    is_signature = true;
+                }
+                if ($('#md_is_po').is(":checked")) {
+                    // it is checked
+                    is_po = true;
+                }
+                if ($('#md_is_quote').is(":checked")) {
+                    // it is checked
+                    is_quote = true;
+                }
+                if ($('#md_is_mr').is(":checked")) {
+                    // it is checked
+                    is_mr = true;
+                }
+
+                if (!is_po && !is_quote && !is_mr) {
+                    alert("Please select feature to export.")
+                    return;
+                }
+
+                var poId=$('#md_po_id').val();
+                var supplierId = $('#md_supplier_id').val();
+
+                $.ajax({
+                    url: '/PurchaseOrder/GenerateReport',
+                    type: "post",
+                    dataType: "json",
+                    data: { id: poId, supplierID: supplierId },
+                    success: function (da) {
+                        if (da.result == "success") {
+                            //window.location.href = "/PurchaseOrder/Report?id=" + da.poId + "&supplierId=" + supplierId;
+                            if (da.isHasVAT) {
+                                var show1 = window.open("/PurchaseOrder/ExportExcel?id=" + da.poId + "&supplierId=" + supplierId + "&isVAT=true&isPO=" + is_po + "&isQuote=" + is_quote + "&isMR=" + is_mr +"&isSignature="+is_signature, "_blank");
+                                show1.focus();
+                            }
+                            if (da.isHasNotVAT) {
+                                var show = window.open("/PurchaseOrder/ExportExcel?id=" + da.poId + "&supplierId=" + supplierId + "&isVAT=false&isPO=" + is_po + "&isQuote=" + is_quote + "&isMR=" + is_mr + "&isSignature=" + is_signature, "_blank");
+                                show.focus();
+                            }
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        console.log(textStatus);
+                    }
+                });
+                
+                console.log(is_signature);
+            });
+        });
+        function generateReportNotVAT(poId, supplierId, isselected) {
+            $.ajax({
+                url: '/PurchaseOrder/GenerateReport',
+                type: "post",
+                dataType: "json",
+                data: { id: poId, supplierID: supplierId, IsSelected: isselected },
+                success: function (da) {
+                    if (da.result == "success") {
+                        var show = window.open("/PurchaseOrder/ReportNotVAT?id=" + da.poId + "&supplierId=" + supplierId, "_blank");
+                            show.focus();
+
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(textStatus);
+                }
+            });
+        }
+
+
+        function generateReport(poId, supplierId, isselected) {
+
+            $.ajax({
+                url: '/PurchaseOrder/GenerateReport',
+                type: "post",
+                dataType: "json",
+                data: { id: poId, supplierID: supplierId, IsSelected: isselected },
+                success: function (da) {
+                    if (da.result == "success") {
+
+                        window.location.href = "/PurchaseOrder/Report?id=" + da.poId + "&supplierId=" + supplierId;
+
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(textStatus);
+                }
+            });
+        }
+        //added on oct 11 2018
+        function generateNewReport(poId, supplierId) {
+            $.ajax({
+                url: '/PurchaseOrder/GenerateReport',
+                type: "post",
+                dataType: "json",
+                data: { id: poId, supplierID: supplierId },
+                success: function (da) {
+                    if (da.result == "success") {
+                        //window.location.href = "/PurchaseOrder/Report?id=" + da.poId + "&supplierId=" + supplierId;
+                        if (da.isHasVAT) {
+                            var show1 = window.open("/PurchaseOrder/Report?id=" + da.poId + "&supplierId=" + supplierId, "_blank");
+                            show1.focus();
+                        }
+                        if (da.isHasNotVAT) {
+                            var show = window.open("/PurchaseOrder/ReportNotVAT?id=" + da.poId + "&supplierId=" + supplierId, "_blank");
+                            show.focus();
+                        }
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(textStatus);
+                }
+            });
+        }
+
+        function generateExportExcelReport(poId, supplierId) {
+            $('#md_po_id').val(poId);
+            $('#md_supplier_id').val(supplierId);
+            $('#modal_export_option').modal('show');
+            return;
+            $.ajax({
+                url: '/PurchaseOrder/GenerateReport',
+                type: "post",
+                dataType: "json",
+                data: { id: poId, supplierID: supplierId },
+                success: function (da) {
+                    if (da.result == "success") {
+                        //window.location.href = "/PurchaseOrder/Report?id=" + da.poId + "&supplierId=" + supplierId;
+                        if (da.isHasVAT) {
+                            var show1 = window.open("/PurchaseOrder/ExportExcel?id=" + da.poId + "&supplierId=" + supplierId+"&isVAT=true", "_blank");
+                            show1.focus();
+                        }
+                        if (da.isHasNotVAT) {
+                            var show = window.open("/PurchaseOrder/ExportExcel?id=" + da.poId + "&supplierId=" + supplierId + "&isVAT=false", "_blank");
+                            show.focus();
+                        }
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(textStatus);
+                }
+            });
+        }
+
+    </script>
+    }
+

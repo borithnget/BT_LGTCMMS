@@ -1,0 +1,324 @@
+﻿@model BT_KimMex.Models.ProductViewModel
+
+@{
+    ViewBag.Title = "View Detail Product";
+    //Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+    ViewBag.Controller = "Product";
+    ViewBag.PageTitle = "View Product Detail";
+    ViewBag.Action = "Detail";
+    ViewBag.SetupActive = "active";
+    BT_KimMex.Entities.kim_mexEntities db = new BT_KimMex.Entities.kim_mexEntities();
+}
+
+<div class="panel panel-default">
+    <div class="panel-heading">@ViewBag.PageTitle</div>
+    <div class="panel-body">
+        <div class="form-horizontal">
+            <div class="row">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                    <div class="form-group row">
+                        <label class="col-lg-4 control-label">Created At:</label>
+                        <label class="col-lg-8">@BT_KimMex.Class.CommonClass.ToLocalTime(Convert.ToDateTime(Model.created_date)).ToString("dd/MM/yyy HH:mm")</label>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-lg-4 control-label">Product Code:</label>
+                        <label class="col-lg-8">@Model.product_code</label>
+                    </div>
+                    <!--Group-->
+                    <div class="form-group row">
+                        <label class="col-lg-4 control-label">Group:</label>
+                        <label class="col-lg-8">@Model.class_name</label>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-md-4 control-label">Sub Group:</label>
+                        <label class="col-md-8">@Model.sub_group_name</label>
+                    </div>
+
+                    <!--Category-->
+                    <div class="form-group">
+                        <label class="col-lg-4 control-label">Category:</label>
+                        <label class="col-lg-8">@Model.p_category_name</label>
+                    </div>
+
+                    <!--Type-->
+                    <div class="form-group row">
+                        <label class="col-lg-4 control-label">Type:</label>
+                        <label class="col-lg-8">@Model.product_type_name</label>
+                    </div>
+
+                    <!--Class-->
+                    <div class="form-group row">
+                        <label class="col-lg-4 control-label">Class:</label>
+                        <label class="col-lg-8">@Model.product_class_name</label>
+                    </div>
+
+                    <!--Size-->
+                    <div class="form-group row">
+                        <label class="col-lg-4 control-label">Product Size:</label>
+                        <label class="col-lg-8">@Model.product_type_name</label>
+                    </div>
+
+                    <!--Color-->
+                    <div class="form-group row">
+                        <label class="col-lg-4 control-label">Color:</label>
+                        <label class="col-lg-8">@Model.color_name</label>
+                    </div>
+
+                    <!--Brand-->
+                    <div class="form-group row">
+                        <label class="col-lg-4 control-label">Brand:</label>
+                        <label class="col-lg-8">@Model.brand_name</label>
+
+                    </div>
+                    <!--Model/ Factory Code-->
+                    <div class="form-group row control-label">
+                        <label class="col-lg-4"> Factory/ Model:</label>
+                        <label class="col-lg-8">@Model.model_factory_code</label>
+                    </div>
+
+                    <!--Unit-->
+                    <div class="form-group">
+                        <label class="col-lg-4 control-label">Unit:</label>
+                        <label class="col-lg-8">@Model.unit_name </label>
+                    </div>
+
+                    <!--Product Description-->
+                    <div class="form-group row">
+                        <label class="col-lg-4 control-label">Product Description:</label>
+                        <label class="col-lg-8">@Model.product_name</label>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-4 control-label">Unit Price ($):</label>
+                        <label class="col-lg-8">@Model.unit_price</label>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-4 control-label">Labour Hour:</label>
+                        <label class="col-md-8">@Model.labour_hour</label>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-4 control-label">Cash Flow:</label>
+                        <label class="col-md-8">@Model.cash_flow</label>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-4 control-label">SO Number:</label>
+                        <label class="col-md-8">@Model.so_number</label>
+                    </div>
+                    <!--Remark-->
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Remark, new { @class = "col-md-4 control-label" })
+                        <div class="col-md-8">
+                            @{
+                                string remark = Model.Remark + "\n";
+                                if (!string.IsNullOrEmpty(Model.created_by))
+                                {
+                                    remark = "Created by " + BT_KimMex.Class.CommonClass.GetUserFullname(Model.created_by);
+                                }
+                                if (!string.IsNullOrEmpty(Model.updated_by))
+                                {
+                                    remark = remark + " and Updated by " + BT_KimMex.Class.CommonClass.GetUserFullname(Model.updated_by);
+                                }
+                                <p>@remark</p>
+                            }
+
+                        </div>
+
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-lg-8 col-lg-offset-4">
+                            @Html.ActionLink("Edit", "Edit", new { id = Model.product_id }, new { @class = "btn btn-primary" })
+                            <a href="javascript:void(0)" id="@Model.product_id" class="btn btn-primary delete-promp">Delete</a>
+                            @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-danger" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Unit of Measurement</div>
+                        <div class="panel-body">
+                            <div class="row" style="margin-bottom:20px !important;">
+                                <table>
+                                    @if (Model.uom1_id != null && Model.uom1_qty != null && Model.uom1_price != null)
+                                    {
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px">@Html.DisplayFor(model => model.product_unit)</td>
+                                            <td width="50px">=></td>
+                                            <td width="150px">@Model.uom1_qty</td>
+                                            <td width="150px">@db.tb_unit.Find(Model.uom1_id).Name</td>
+                                            <td width="150px">@Html.DisplayFor(model => model.uom1_price)</td>
+                                        </tr>
+                                    }
+                                    @if (Model.uom2_id != null && Model.uom2_qty != null && Model.uom2_price != null)
+                                    {
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px">@Html.DisplayFor(model => model.uom1_id)</td>
+                                            <td width="50px">=></td>
+                                            <td width="150px">@Html.DisplayFor(model => model.uom2_qty)</td>
+                                            <td width="150px">@db.tb_unit.Find(Model.uom2_id).Name</td>
+                                            <td width="150px">@Html.DisplayFor(model => model.uom2_price)</td>
+                                        </tr>
+                                    }
+                                    @if (Model.uom3_id != null && Model.uom3_qty != null && Model.uom3_price != null)
+                                    {
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px">@Html.DisplayFor(model => model.uom2_id)</td>
+                                            <td width="50px">=></td>
+                                            <td width="150px">@Html.DisplayFor(model => model.uom3_qty)</td>
+                                            <td width="150px">@db.tb_unit.Find(Model.uom3_id).Name</td>
+                                            <td width="150px">@Html.DisplayFor(model => model.uom3_price)</td>
+                                        </tr>
+                                    }
+                                    @if (Model.uom4_id != null && Model.uom4_qty != null && Model.uom4_price != null)
+                                    {
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px">@Html.DisplayFor(model => model.uom3_id)</td>
+                                            <td width="50px">=></td>
+                                            <td width="150px">@Html.DisplayFor(model => model.uom4_qty)</td>
+                                            <td width="150px">@db.tb_unit.Find(Model.uom4_id).Name</td>
+                                            <td width="150px">@Html.DisplayFor(model => model.uom4_price)</td>
+                                        </tr>
+                                    }
+                                    @if (Model.uom5_id != null && Model.uom5_qty != null && Model.uom5_price != null)
+                                    {
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px">@Html.DisplayFor(model => model.uom4_id)</td>
+                                            <td width="50px">=></td>
+                                            <td width="150px">@Html.DisplayFor(model => model.uom5_qty)</td>
+                                            <td width="150px">@db.tb_unit.Find(Model.uom5_id).Name</td>
+                                            <td width="150px">@Html.DisplayFor(model => model.uom5_price)</td>
+                                        </tr>
+                                    }
+
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- delete modal popup-->
+<div class="modal fade" id="myModal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to delete this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success delete-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            var productId;
+            $('a.delete-promp').on('click', function () {
+                productId = $(this).attr('id');
+                $('#myModal').modal('show');
+            });
+            $('.delete-confirm').click(function () {
+                if (productId != '') {
+                    $.ajax({
+                        url: "/Product/Delete",
+                        data: {
+                            'id': productId,
+                        },
+                        type: 'GET',
+                        success: function (response) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#myModal').modal('hide');
+                            if (response.Message == "Success") {
+                                if ('@TempData["message"]' != null) {
+                                  //  $.notify('Your data has been deleted!', { className: 'success' });
+                                }
+                                window.location.href = '@Url.Action("Index", "Product")';
+                            }
+                            else if (da.Message == "fail")
+                                $.notify('Your data has been error while deleting!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while deleting!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}
+
+
+@*<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">Supplier's Item Quote</div>
+            <div class="panel-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Quote Number</th>
+                            <th>Supplier's Name</th>
+                            <th>Price ($)</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.quoteSuppliers.Count() == 0)
+                        {
+                            <tr>
+                                <td colspan="4">No Supplier's Quote</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            int count = 1;
+                            foreach (var item in Model.quoteSuppliers)
+                            {
+                                <tr>
+                                    <td>@count</td>
+                                    <td>@item.quote_no</td>
+                                    <td>@item.supplier_name</td>
+                                    <td>@item.price</td>
+                                    <td style="text-align:center !important;">
+                                        <a href="@Url.Action("Details","Quote",new { id=item.quote_id})">View Quote Detail</a>
+                                    </td>
+                                </tr>
+                                count++;
+                            }
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>*@

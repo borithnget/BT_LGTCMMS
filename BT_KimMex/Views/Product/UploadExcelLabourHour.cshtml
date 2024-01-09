@@ -1,0 +1,84 @@
+﻿@model BT_KimMex.Class.ImportProductLabourHourResultResponse
+@{
+    ViewBag.Title = "Upload Labour Hour from Excel";
+}
+
+<div class="panel panel-default">
+    <div class="panel-heading">@ViewBag.Title</div>
+    <div class="panel-body">
+        @using (Html.BeginForm("UploadExcelLabourHour", "Product", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })<div class="row form-group">
+                <label class="control-label col-md-3 ">Excel File (.xlsx || .xls) <strong class="text-danger">*</strong> : </label>
+                <div class="col-md-8">
+                    <input type="file" name="fileName" id="fileName" class="form-control m0" />
+                </div>
+            </div><div class="form-group row">
+
+                <div class="col-lg-offset-3 col-md-9 ml-auto">
+                    <button type="submit" class="btn btn-primary" id="">Submit</button>
+                    <a href="javascript:history.back()" class="btn btn-danger btn-site">Back</a>
+                </div>
+            </div>
+            if (Model != null)
+            {
+                <div class="row col-12 col-md-12 col-xl-12">
+                    <h3>Total Imported Product : @Model.success.Count()</h3>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Product Code</th>
+                                    <th>Labour Hour</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+
+                                    foreach (var item in Model.success)
+                                    {
+                                        //BT_KimMex.Models.ProductViewModel product = BT_KimMex.Models.ProductViewModel.GetProductItem(item.product_id);
+                                        <tr>
+                                            <td>@item.product_code</td>
+                                            <td>@item.labour_hour</td>
+                                        </tr>
+
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row col-12 col-md-12 col-xl-12">
+                    <h3>Total Fail/Exist Imported Product : @Model.error.Count()</h3>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Product Code</th>
+                                    <th>Labour Hour</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+
+                                    foreach (var item in Model.error)
+                                    {
+                                        //BT_KimMex.Models.ProductViewModel product = BT_KimMex.Models.ProductViewModel.GetProductItem(item.product_id);
+                                        <tr>
+                                            <td>@item.product_code</td>
+                                            <td>@item.labour_hour</td>
+                                        </tr>
+
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+
+        }
+    </div>
+</div>

@@ -1,0 +1,134 @@
+﻿@model BT_KimMex.Models.SupplierViewModel
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h3 class="title">Create New Supplier</h3>
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="control-label col-md-4">Date:</label>
+                    <label class="col-md-8" id="current_date"></label>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-md-4">Supplier Name <span style="color:red;">*</span>:</label>
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.supplier_name, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.supplier_name, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.discount, htmlAttributes: new { @class = "control-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.discount, new { htmlAttributes = new { @class = "form-control", type = "Number", Value = "0.00" } })
+                        @Html.ValidationMessageFor(model => model.supplier_name, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.supplier_phone, htmlAttributes: new { @class = "control-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.supplier_phone, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.supplier_phone, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.supplier_email, htmlAttributes: new { @class = "control-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.supplier_email, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.supplier_email, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.supplier_address, htmlAttributes: new { @class = "control-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.TextAreaFor(model => model.supplier_address, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.supplier_address, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-md-4">Supplier Type:</label>
+                    <div class="col-md-8">
+                        <select class="form-control" id="supplier_type" name="supplier_type">
+                            <option value="local">Local</option>
+                            <option value="oversea">Oversea </option>
+                        </select>
+                        @Html.ValidationMessageFor(model => model.supplier_type, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-4 col-md-8">
+                        <input type="submit" value="Save" class="btn btn-success" />
+                        <a href="@Url.Action("Index","Supplier")" class="btn btn-danger">Back</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <h4>TERMS & CONDITIONS</h4>
+                        <div class="form-group">
+                            <label class="col-md-4">Incoterms:</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" name="incoterm" id="incoterm"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4">Payment:</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" name="payment" id="payment" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4">Delivery:</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" name="delivery" id="delivery" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4">Shipment:</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" name="shipment" id="shipment" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4">Warranty:</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" name="warranty" id="warranty" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4">Vendor Ref:</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" name="vendor_ref" id="vendor_ref" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+}
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('#current_date').text(getFormattedDateMMDDYYYY(new Date()));
+            if ('@TempData["message"]' != null) {
+                $.notify('@TempData["message"]', { className: 'error' });
+            }
+        });
+    </script>
+}

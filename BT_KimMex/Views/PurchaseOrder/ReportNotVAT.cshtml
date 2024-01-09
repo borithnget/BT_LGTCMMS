@@ -1,0 +1,17 @@
+﻿
+@{
+    ViewBag.Title = "Report PO with Non-VAT";
+}
+
+<div class="row">
+    <div class="col-md-6">
+        @Html.Partial("ReportController/PurchaseOrderNotVAT")
+    </div>
+    <div class="col-md-6" style="padding-top:0 !important;">
+        <a href='javascript:void(0)' class='btn btn-sm' onclick="printReport('ReportViewer1')" style="margin-right:-10px !important;"><i class="fa fa-print fa-lg" aria-hidden="true" style="color:blue"></i></a>
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript" src="~/Scripts/custom/print-script.js"></script>
+}
+

@@ -1,0 +1,77 @@
+﻿@model BT_KimMex.Models.BrandViewModel
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<div class="w3-container">
+    <h3>Brand List</h3>
+</div>
+
+<div class="w3-container">
+    <table class="table table-bordered mb-0" id="brandtable">
+        <thead>
+            <tr>
+                <th style="width: 100px;">ID</th>
+                <th>Brand Name</th>
+                <th>Product Type</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+    </table>
+
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            initialBrandDataTable();
+        });
+
+        function initialBrandDataTable() {
+            var t = $('#brandtable').DataTable({
+                "ajax": {
+                    "url": "@Url.Action("GetBrandListJson", "Brand")",
+                    "type": "GET",
+                    "dataType": "json"
+                },
+                    "columns": [
+                        { "data": "product_type_id" },
+
+                        {
+                            "render": function (data, type, full, meta) {
+                                return '<a href="/Brand/Details/' + full.brand_id + '">' + full.brand_name + '</a>';
+                            }
+                        },
+
+                        { "data": "product_type_name" },
+
+                        //{
+                        //    "data": "updated_at", render: function (data, type, full, meta) {
+                        //        if (data == null) {
+                        //            return "";
+                        //        }
+                        //        else {
+                        //            return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                        //        }
+                        //    }
+                        //},
+                        {
+                            "render": function (data, type, full, meta) {
+                                return '<a href="/Brand/Details/' + full.brand_id + '" class="w3-button w3-tiny w3-green">View Detail</a>';
+                            }
+                        },
+                    ],
+                    "order": [[1, "asc"]],
+            });
+            t.on('order.dt search.dt', function () {
+                t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+            $('select[name="brandtable_length"]').addClass('datatable-control');
+            $('input[aria-controls="brandtable"]').addClass('datatable-control');
+            $('#brandtable_filter').append('<a href="@Url.Action("Create", "Brand")" class="w3-button w3-tiny w3-teal pull-left" style="margin-right:10px !important;">Add New</a>');
+        }
+    </script>
+}

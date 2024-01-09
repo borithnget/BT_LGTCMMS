@@ -1,0 +1,27 @@
+﻿
+@{
+    ViewBag.Title = "BOQ vs. Item Request by Project Report";
+}
+
+<h3 class="title">BoQ vs. Item Request by Project Report</h3>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="form-group">
+            <label class="col-md-2 control-label">Project Name:</label>
+            <div class="col-md-10">
+                @Html.DropDownList("project_id", ViewBag.Projects as SelectList, "Select Project Name", new { @class = "form-control", name = "project_id" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Generate" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+

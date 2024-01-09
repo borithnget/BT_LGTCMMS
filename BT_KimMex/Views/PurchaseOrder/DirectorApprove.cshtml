@@ -1,0 +1,288 @@
+﻿@model BT_KimMex.Models.PurchaseOrderViewModel
+@using BT_KimMex.Class
+@using Microsoft.AspNet.Identity;
+@{
+    BT_KimMex.Entities.kim_mexEntities db = new BT_KimMex.Entities.kim_mexEntities();
+    ViewBag.Title = "DirectorApprove";
+}
+
+<style type="text/css">
+    #po_table thead th,tr td {
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+    #po_table tr td:nth-child(3) {
+        text-align: left !important;
+    }
+</style>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+<div class="form-horizontal">
+    <h3 class="title">Quote Approval by Technical Director</h3>
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.purchase_order_id)
+    @Html.HiddenFor(model => model.purchase_order_status)
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.Label("Requested Date :", htmlAttributes: new { @class = "control-label col-md-4" })
+                @Html.Label(Convert.ToDateTime(Model.created_date).ToString("dd-MMM-yyyy"), new { @class = "col-md-8", id = "current_date" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.purchase_oder_number, htmlAttributes: new { @class = "control-label col-md-4" })
+                @Html.Label(Model.purchase_oder_number, new { @class = "col-md-8", id = "purchase_oder_number" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.ir_project_id, htmlAttributes: new { @class = "control-label col-md-4" })
+                @Html.Label(Model.project_full_name, new { @class = "col-md-8", id = "ir_project_id" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.ShippingTo, new { @class = "control-label col-md-4" })
+                <label class="col-md-8">@BT_KimMex.Class.CommonClass.ConvertUserDetailIDToName(Model.ShippingTo)</label>
+            </div>
+
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="control-label col-md-4">Requester:</label>
+                <label class="col-md-8">@CommonClass.GetUserFullnameByUserId(Model.created_by)</label>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-4">PR Ref. :</label>
+                @Html.Label(Model.ir_no, new { @class = "col-md-8" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.POLNumber, new { @class = "control-label col-md-4" })
+                @Html.DisplayFor(model => model.POLNumber, new { @class = "col-md-8" })
+            </div>
+
+        </div>
+    </div>
+   
+        <div class="row" style="margin:0 !important;">
+            <table class="table table-responsive table-bordered" id="po_table">
+                <thead>
+                    <tr>
+                        <th rowspan="2">No.</th>
+                        <th rowspan="2">Item Code</th>
+                        <th rowspan="2">Item Name</th>
+                        <th rowspan="2">Req. QTY</th>
+                        <th rowspan="2">Req. Unit</th>
+                        <th colspan="5">Selected Supplier</th>
+                        <th rowspan="2">PO QTY</th>
+                        <th rowspan="2">PO Unit</th>
+                        <th rowspan="2">Reason</th>
+                        @*<th rowspan="2">Approve</th>
+        <th rowspan="2">Reject</th>*@
+                        <th rowspan="2"><input type="radio" onclick="option1()" class="suppliersallselectall" id="suppliersallselectall" name="suppliersallselectall" style="width:15px; height:15px; margin-top:-5px " value=""><span style="margin-left:5px; ">Approve</span></th>
+                        <th rowspan="2"><input type="radio" onclick="option2()" class="suppliersallselectallReject" id="suppliersallselectallReject" name="suppliersallselectall" style="width:15px; height:15px; margin-top:-5px " value=""><span style="margin-left:5px; ">Reject</span></th>
+
+                    </tr>
+                    <tr>
+                        <th>VAT</th>
+                        <th>Name</th>
+                        <th>Dis.(%)</th>
+                        <th>Unit Price</th>
+                        <th>T&C</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int count = 1;
+                        foreach (var item in Model.poDetails)
+                        {
+                            string requestQty = string.Format("{0:G29}", decimal.Parse(item.quantity.ToString()));
+                            string poQty= string.Format("{0:G29}", decimal.Parse(item.po_quantity.ToString()));
+                            <tr>
+                                <td><input type="hidden" class="po-detial-id" value="@item.po_detail_id" />@count</td>
+                                <td>@item.product_code</td>
+                                <td>@item.product_name</td>
+                                <td><label class="request-qty">@requestQty</label> </td>
+                                <td>@item.item_unit</td>
+                                @{
+                                    var sups = item.poSuppliers;
+                                    for (int i = 0; i < sups.Count(); i++)
+                                    {
+                                        if (sups[i].is_selected == true)
+                                        {
+                                            if (sups[i].is_selected == true)
+                                            {
+                                                string tnc = "<ul style='margin:0px !important;padding:0px !important;margin-left:10px !important;'​>";
+
+                                                if (!string.IsNullOrEmpty(sups[i].incoterm))
+                                                {
+                                                    tnc = string.Format("{0}<li>Incoterms: {1}</li>", tnc, sups[i].incoterm);
+                                                }
+                                                if (!string.IsNullOrEmpty(sups[i].payment))
+                                                {
+                                                    tnc = string.Format("{0}<li>Payment: {1}</li>", tnc, sups[i].payment);
+                                                }
+                                                if (!string.IsNullOrEmpty(sups[i].delivery))
+                                                {
+                                                    tnc = string.Format("{0}<li>Delivery: {1}</li>", tnc, sups[i].delivery);
+                                                }
+                                                if (!string.IsNullOrEmpty(sups[i].shipment))
+                                                {
+                                                    tnc = string.Format("{0}<li>Shipment: {1}</li>", tnc, sups[i].shipment);
+                                                }
+                                                if (!string.IsNullOrEmpty(sups[i].warranty))
+                                                {
+                                                    tnc = string.Format("{0}<li>Wanrranty: {1}</li>", tnc, sups[i].warranty);
+                                                }
+                                                if (!string.IsNullOrEmpty(sups[i].vendor_ref))
+                                                {
+                                                    tnc = string.Format("{0}<li>Vendor Ref.: {1}</li>", tnc, sups[i].vendor_ref);
+                                                }
+                                                tnc = string.Format("{0}{1}", tnc, "</ul>");
+
+                                                var name = "item" + count.ToString();
+                                                <td>
+                                                    @if (Convert.ToBoolean(sups[i].vat))
+                                                    {
+                                                        <input type="checkbox" checked disabled />
+                                                    }
+                                                    else
+                                                    {
+                                                        <input type="checkbox" disabled />
+                                                    }
+                                                </td>
+                                                <td style="text-align:left !important"><label>@sups[i].supplier_name</label></td>
+                                                <td><label class="discount" data-discountprice="@sups[i].discount_amount">@sups[i].discount_percentage</label></td>
+                                                <td><label class="ounit-price">@sups[i].original_price</label><input type="hidden" value="@sups[i].unit_price" class="unit-price"/></td>
+                                                <td style="text-align:left !important;">@Html.Raw(tnc)</td>
+                                                <td><label>@poQty</label></td>
+                                                <td><label>@db.tb_unit.Find(item.po_unit).Name</label></td>
+                                                <td>@sups[i].Reason</td>
+
+                                                <td><input type="radio" class="suppliers suppliersallselect" name="@name" value="approved"> Approve</td>
+                                                <td><input type="radio" class="suppliers suppliersallselectReject" name="@name" value="rejected"> Reject</td>
+                                            }
+                                        }
+
+                                    }
+
+                                }
+                            
+                            </tr>
+                            count++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="button" id="btnSubmit" value="Submit" class="btn btn-primary" />
+            <a href="javascript:history.back()" class="btn btn-danger">Back</a>
+        </div>
+    </div>
+</div>
+}
+@section Scripts{
+    <script type="text/javascript">
+
+        $(function () {
+
+            $('#btnSubmit').click(function () {
+                var purchase_order_id = $('#purchase_order_id').val();
+                var count_table_row = $('#po_table tbody tr').length;
+                var po_details_id = $('.po-detial-id');
+                var unit_prices = $('.unit-price');
+                var ounit_prices = $('.ounit-price');
+                var discounts = $('.discount');
+                var po_details = [];
+                var item_element = {};
+                for (var i = 1; i <= count_table_row; i++) {
+                    var status = $('input[name=item' + i + ']:checked').val();
+                    if (!status) {
+                        alert("Please choose one supplier in each item.");
+                        return;
+                    }
+                    var indx = Number(i - 1);
+                    item_element = {};
+                    item_element.po_detail_id = po_details_id[indx].value;
+                    item_element.item_status = status;
+                    item_element.unit_price = unit_prices[indx].value;
+                    item_element.original_price = ounit_prices[indx].innerHTML;
+                    item_element.discount_percentage = discounts[indx].innerHTML;
+                    item_element.discount_amount = $(discounts[indx]).attr('data-discountprice');
+                    po_details.push(item_element);
+                }
+                console.log(po_details);
+                //return;
+                $.ajax({
+                    url: "@Url.Action("DirectorApprove", "PurchaseOrder")",
+                    type: "post",
+                    dataType: "json",
+                    async: false,
+                    data: { id: purchase_order_id, poDetails: po_details },
+                    success: function (da) {
+                        if (da.result == "success") {
+                            $.notify('Your data has been saved!', { className: 'success' });
+                            window.location.href = '@Url.Action("MyApproval","PurchaseOrder")';
+                        } else {
+                            console.log(da.message);
+                            $.notify('Your data is error while saving!', { className: 'error' });
+                        }
+                    },
+                    error: function (err) {
+                        $.notify('Your data is error while saving!', { className: 'error' });
+                    }
+                });
+            });
+       
+          
+        
+            
+          
+        });
+        //function ck() {
+        //    alert("ka");
+        //    $(".suppliersallselect").attr("checked", true);
+
+        //    if ($(this).is(':checked'))
+        //        $(".suppliersallselect'").attr("checked", false);
+        //    else
+        //        $(".suppliersallselect").attr("checked", true); 
+
+        //    $(".suppliersallselect").removeAttr("checked");
+        //    $(".suppliersallselectReject").attr("checked", "checked");
+
+        //}
+        //function ck2() {
+        //    alert("d");
+        //    if ($(this).is(':checked'))
+        //        $(".suppliersallselectReject").attr("checked", false);
+        //    else
+        //        $(".suppliersallselectReject").attr("checked", true); 
+
+        //    $(".suppliersallselect").removeAttr("checked");
+        //    $(".suppliersallselectReject").attr("checked", "checked");
+
+        //}
+
+        var checked = false;
+        function option1() {
+            var aa = document.getElementsByClassName("suppliersallselect");
+            checked = document.getElementById('suppliersallselectall').checked;
+
+            for (var i = 0; i < aa.length; i++) {
+                aa[i].checked = checked;
+            }
+        }
+        function option2() {
+            var aa = document.getElementsByClassName("suppliersallselectReject");
+            checked = document.getElementById('suppliersallselectallReject').checked;
+
+            for (var i = 0; i < aa.length; i++) {
+                aa[i].checked = checked;
+            }
+        }
+
+
+
+    </script>
+    }

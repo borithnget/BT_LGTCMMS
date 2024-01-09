@@ -1,0 +1,1547 @@
+﻿@model BT_KimMex.Models.ItemRequestViewModel
+
+@{
+    ViewBag.Title = "Create";
+    //Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+    //ViewBag.Controller = "Material Request";
+    //ViewBag.Action = "New Request";
+    //ViewBag.PageTitle = "Create New Material Request";
+    //ViewBag.PRActive = "active";
+}
+<style type="text/css">
+    #ir_table tr td {
+        vertical-align: middle !important;
+    }
+</style>
+@*<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />*@
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.Label("PR Date:", htmlAttributes: new { @class = "col-md-2" })
+            <label class="col-md-4" id="ir_current_date"></label>
+            @Html.LabelFor(model => model.ir_no, htmlAttributes: new { @class = "col-md-2" })
+            <label class="col-md-4" id="ir_no">@ViewBag.PurchaseRequisitionNumber</label>
+        </div>
+
+        @*<div class="form-group">
+            @Html.LabelFor(model => model.ir_no, htmlAttributes: new { @class = "col-md-2" })
+            <label class="col-md-10" id="ir_no">@ViewBag.PurchaseRequisitionNumber</label>
+        </div>*@
+
+        <div class="form-group">
+            <label class="col-md-2">Project Name <strong style="color:red;">*</strong>:</label>
+            <div class="col-md-10">
+                @Html.HiddenFor(model => model.boq_id)
+                @Html.DropDownList("ir_project_id", ViewBag.ProjectID as SelectList, "Select Project", new { @class = "form-control", id = "ir_project_id", style = "width:300px !important;" })
+                @Html.ValidationMessageFor(model => model.ir_project_id, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ir_purpose_id, htmlAttributes: new { @class = "col-md-2" })
+            <div class="col-md-8">
+                <select class="form-control" id="ir_purpose_id">
+                    <option selected disabled>Select purpose of request</option>
+                </select>
+                @Html.ValidationMessageFor(model => model.ir_purpose_id, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-default" id="btn_link_to_item" style="float:right !important;">New Item</button>
+            </div>
+        </div>
+        <div class="row" style="margin:0 !important;">
+            <table class="table table-responsive table-bordered" id="ir_table">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Item Code</th>
+                        <th>Item Name</th>
+                        @*<th>Unit</th>*@
+                        @*<th>BOQ Balance</th>*@
+                        <th>Request QTY</th>
+                        <th>Unit</th>
+                        <th>Remark</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        @*<th></th>
+                            <th></th>*@
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-2 control-label">Attachment Reference :</label>
+            <div class="col-md-10">
+                <input type="file" class="form-control" name="attachment_reference" id="attachment_reference" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="button" id="btnCreate" value="Submit" class="btn btn-default" />
+                <a href="@Url.Action("Index")" class="btn btn-default">Cancel</a>
+            </div>
+        </div>
+
+    </div>
+}
+<div class="modal fade" id="item_modal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog " role="document" style="width: 1000px !important;">
+        <div class="modal-content ">
+            <div class="modal-body col-sm-12" style="width:100% !important">
+                <h2 style="margin-top:-5px">Create New Item</h2>
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-horizontal">
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label col-md-4">Date:</label>
+                                    <label class="col-md-8" id="item_current_date"></label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Type Name <span style="color:red;">*</span>:</label>
+                                    <div class="col-md-8">
+                                        <select class="form-control type_name" id="type_name" name="type_name">
+                                            <option selected disabled>select Type Name</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-4">Item Code <span style="color:red;">*</span>:</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="item_code" onchange="itemCheckDuplicate()" />
+                                        <p id="Status"></p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-4">Item Name <span style="color:red;">*</span>:</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="item_name" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Unit <span style="color:red;">*</span>:</label>
+                                    <div class="col-md-8">
+                                        <select class="form-control product_unit" id="product_unit" name="product_unit" onchange="initialUOM1()">
+                                            <option selected disabled>select unit</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-md-4">Remark:</label>
+                                    <div class="col-md-8">
+                                        <textarea class="form-control" id="Remark" rows="5"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-6"></div>
+                                    <div class="col-md-6 ">
+                                        <button class="btn btn-default" id="save-item-promp">Save</button>
+                                        <button type="button" class="btn btn-default" onclick="ClearFields()">Clear</button>
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h3>Unit of Measurement</h3>
+                                <div class="row" style="margin-bottom:20px !important;">
+                                    <table style="margin-right:20px">
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px"><label id="uom1">Unit</label></td>
+                                            <td width="50px">=></td>
+                                            <td><input type="number" id="uom1_qty" class="form-control" value="0" /></td>
+                                            <td width="150px">
+                                                <select class="form-control uom1_id" id="uom1_id" onchange="initialUOM2()">
+                                                    <option selected disabled>Select Unit</option>
+                                                </select>
+                                            </td>
+                                            @*<td><input type="number" id="price_umo1" class="form-control" placeholder="Uom Price" /></td>*@
+                                        </tr>
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px"><label id="uom2">Unit</label></td>
+                                            <td width="50px">=></td>
+                                            <td><input type="number" id="uom2_qty" class="form-control" value="0" /></td>
+                                            <td width="150px">
+                                                <select class="form-control uom2_id" id="uom2_id" onchange="initialUOM3()">
+                                                    <option selected disabled>Select Unit</option>
+                                                </select>
+                                            </td>
+                                            @*<td><input type="number" id="price_umo2" class="form-control" placeholder="Uom Price" /></td>*@
+                                        </tr>
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px"><label id="uom3">Unit</label></td>
+                                            <td width="50px">=></td>
+                                            <td><input type="number" id="uom3_qty" class="form-control" value="0" /></td>
+                                            <td width="150px">
+                                                <select class="form-control uom3_id" id="uom3_id" onchange="initialUOM4()">
+                                                    <option selected disabled>Select Unit</option>
+                                                </select>
+                                            </td>
+                                            @*<td><input type="number" id="price_umo3" class="form-control" placeholder="Uom Price" /></td>*@
+                                        </tr>
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px"><label id="uom4">Unit</label></td>
+                                            <td width="50px">=></td>
+                                            <td><input type="number" id="uom4_qty" class="form-control" value="0" /></td>
+                                            <td width="150px">
+                                                <select class="form-control uom3_id" id="uom4_id" onchange="initialUOM5()">
+                                                    <option selected disabled>Select Unit</option>
+                                                </select>
+                                            </td>
+                                            @*<td><input type="number" id="price_umo4" class="form-control" placeholder="Uom Price" /></td>*@
+                                        </tr>
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px"><label id="uom5">Unit</label></td>
+                                            <td width="50px">=></td>
+                                            <td><input type="number" id="uom5_qty" class="form-control" value="0" /></td>
+                                            <td width="150px">
+                                                <select class="form-control uom3_id" id="uom5_id">
+                                                    <option selected disabled class="uom3_id">Select Unit</option>
+                                                </select>
+                                            </td>
+                                            @*<td><input type="number" id="price_umo5" class="form-control" placeholder="Uom Price" /></td>*@
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    @*<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js"></script>*@
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+    <script>
+    $('#type_name').select2({ width: '96%' });
+    </script>
+
+    <script type="text/javascript">
+        $(function () {
+            var project_id;
+            //$('#ir_current_date').text(getFormattedDateMMDDYYYY(new Date()));
+            //initial_ir_no();
+            initial_ir_purpose_dropdownlist();
+
+            $('#ir_project_id').change(function () {
+                project_id=$(this).val();
+                if (project_id != null || project_id != undefined || project_id != "") {
+                    var count_table_row = $('#ir_table tbody tr').length;
+                    $('#ir_table tbody').empty();
+                    initial_ir_job_category_row(1,1, 1, project_id, true);
+                }
+
+            });
+
+            $('#btnCreate').click(function (e) {
+                e.preventDefault();
+                var item_element = {};
+                var job_element = {};
+                var type_element = {};
+                var ir_item = [];
+                var ir_job = [];
+                var ir_type = [];
+                var ir_no = $('#ir_no').text();
+                var ir_project_id = $('#ir_project_id').val();
+                var ir_purpose = $('#ir_purpose_id').val();
+                var job_categories = $('.job_category_id');
+                var item_types = $('.item_type_id');
+                var items = $('.item_id');
+                var ir_qtys = $('.ir_qty');
+                //var ir_boq_balance = $('.item_qty');
+                var items_unit = $('.item-unit');
+                var item_remarks = $('.item_remark');
+                var att_id = "";
+                var isNullItemName = 0;
+                var isNullQty = 0;
+                var isNullUnit = 0;
+                var isNullJobCategory = 0;
+
+                for (var i = 0; i < job_categories.length; i++) {
+                    var job = job_categories[i].value;
+                    if (job == null || job == "" || job == undefined || job == "Select Job Category")
+                        isNullJobCategory++;
+                }
+
+                for (var i = 0; i < items.length; i++) {
+                    var item_id = items[i].value;
+                    var ir_qty = ir_qtys[i].value;
+                    if (item_id == null || item_id == "" || item_id == undefined)
+                        isNullItemName++;
+                }
+
+                for (var i = 0; i < items.length; i++) {
+                    var ir_qty = ir_qtys[i].value;
+                    if (ir_qty == null || ir_qty == "" || ir_qty == undefined || Number(ir_qty) == 0)
+                        isNullQty++;
+                }
+                for (var i = 0; i < items.length; i++) {
+                    var item_unit = items_unit[i].value;
+                    if (item_unit == null || item_unit == "" || item_unit == undefined || item_unit == "Select Unit")
+                        isNullUnit++;
+                }
+                if (ir_project_id == null || ir_project_id == "" || ir_project_id == undefined) {
+                    alert("Project name is required.");
+                    return;
+                }
+                if (isNullJobCategory > 0) {
+                    alert("Select all Job Category.");
+                    return;
+                }
+                if (items.length == 0) {
+                    alert("Item request are required.");
+                    return;
+                }
+                if (isNullItemName > 0) {
+                    alert("Item name are required.");
+                    return;
+                }
+                if (isNullQty > 0) {
+                    alert("Item request qty are required.");
+                    return
+                }
+                if (isNullUnit > 0) {
+                    alert('Item request unit are required.');
+                    return;
+                }
+
+                var form_data = new FormData();
+                var file_input = document.getElementById('attachment_reference');
+                if (file_input != undefined) {
+                    if (file_input.files.length > 0) {
+                        for (var i = 0; i < file_input.files.length; i++) {
+                            form_data.append(file_input.files[i].name, file_input.files[i]);
+                        }
+                        $.ajax({
+                            url: '@Url.Action("UploadAttachment","ItemRequest")',
+                            type: "POST",
+                            data: form_data,
+                            async: false,
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            success: function (da) {
+                                if (da.result == "success")
+                                    att_id = da.attachment_id;
+                            },
+                            error: function (xhr, error, status) {
+                                console.log(error, status);
+                            }
+                        });
+                    }
+                }
+
+                //else {
+                //    alert("Attachment Reference is required.");
+                //    return;
+                //}
+                for (var i = 0; i < items.length; i++) {
+                    item_element = {};
+                    var job_group = (items[i].id).replace(/[^\d]/g, '');
+                    var type_group = (items[i].id).substr((items[i].id).length - 2, 1);
+                    item_element.ir_item_id = items[i].value;
+                    item_element.ir_qty = ir_qtys[i].value;
+                    //item_element.boq_qty = ir_boq_balance[i].innerHTML;
+                    item_element.product_unit = items_unit[i].value;
+                    item_element.job_group = job_group;
+                    item_element.type_group = type_group;
+                    item_element.remark = item_remarks[i].value;
+                    ir_item.push(item_element);
+                }
+
+                for (var i = 0; i < item_types.length; i++) {
+                    type_element = {};
+                    var job_group = (item_types[i].id).replace(/[^\d]/g, '');
+                    var type_group = (item_types[i].id).replace(new RegExp('[0-9]'), '');
+                    type_element.job_group = job_group;
+                    type_element.type_group = type_group;
+                    type_element.item_type_id = item_types[i].value;
+                    ir_type.push(type_element);
+                }
+
+                for (var i = 0; i < job_categories.length; i++) {
+                    job_element = {};
+                    var job_group = (job_categories[i].id).replace(/[^\d]/g, '');
+                    job_element.ir_job_category_id = job_categories[i].value;
+                    job_element.job_group = job_group;
+                    ir_job.push(job_element);
+                }
+
+                var model = {
+                    ir_no: ir_no,
+                    ir_project_id: ir_project_id,
+                    ir_purpose_id: ir_purpose,
+                    att_id: att_id,
+                }
+
+                $.ajax({
+                    url: "@Url.Action("CreateItemRequest", "ItemRequest")",
+                    type: "post",
+                    dataType: "json",
+                    async: false,
+                    data: { model: model, ir1: ir_job, ir2: ir_item, irType: ir_type },
+                    success: function (da) {
+                        if (da.result == "success") {
+                            alert('Item Request has been saved successfully.');
+                            window.location.href = '@Url.Action("Index","ItemRequest")';
+                        } else {
+                            alert(da.message);
+                        }
+                    },
+                    error: function (err) {
+                        alert('Your data is error while saving!');
+                    }
+                });
+
+            });
+
+            $('#btn_link_to_item').click(function () {
+                ClearFields();
+                InitialUnitDropdownList();
+                InitialItemTypeDropdownList();
+                $('#item_current_date').text(getFormattedDateMMDDYYYY(new Date()));
+                $('#item_modal').modal('show');
+            });
+            $('#save-item-promp').click(function (e) {
+                e.preventDefault();
+                var product_code = $('#item_code').val();
+                var product_name = $('#item_name').val();
+                var product_unit = $('#product_unit').val();
+                //var unit_price = $('#unit_price').val();
+                var p_category_id = $('#type_name').val();
+                var Remark = $('#Remark').val();
+                var uom1_id = $('#uom1_id').val();
+                var uom2_id = $('#uom2_id').val();
+                var uom3_id = $('#uom3_id').val();
+                var uom4_id = $('#uom4_id').val();
+                var uom5_id = $('#uom5_id').val();
+                var uom1_qty = $('#uom1_qty').val();
+                var uom2_qty = $('#uom2_qty').val();
+                var uom3_qty = $('#uom3_qty').val();
+                var uom4_qty = $('#uom4_qty').val();
+                var uom5_qty = $('#uom5_qty').val();
+                /*
+                var uom1_price = $('#price_umo1').val();
+                var uom2_price = $('#price_umo2').val();
+                var uom3_price = $('#price_umo3').val();
+                var uom4_price = $('#price_umo4').val();
+                var uom5_price = $('#price_umo5').val();
+                */
+                if (product_code == "" || product_code == null) {
+                    alert("Item Code is required.")
+                }
+                else if (product_name == "" || product_name == null) {
+                    alert("Item Name is required.")
+                }
+                else if (product_unit == "" || product_unit == null) {
+                    alert("Unit is required.")
+                }
+                else if (p_category_id == "" || p_category_id == null) {
+                    alert("Item Type is required.")
+                }
+                else {
+
+                    $.ajax({
+                        url: "@Url.Action("CreateJson", "Product")",
+                        data: {
+                            product_code: product_code,
+                            product_name: product_name,
+                            product_unit: product_unit,
+                            //unit_price: unit_price,
+                            p_category_id: p_category_id,
+                            Remark: Remark,
+                            uom1_id: uom1_id,
+                            uom2_id: uom2_id,
+                            uom3_id: uom3_id,
+                            uom4_id: uom4_id,
+                            uom5_id: uom5_id,
+
+                            uom1_qty: uom1_qty,
+                            uom2_qty: uom2_qty,
+                            uom3_qty: uom3_qty,
+                            uom4_qty: uom4_qty,
+                            uom5_qty: uom5_qty,
+                            /*
+                            uom1_price: uom1_price,
+                            uom2_price: uom2_price,
+                            uom3_price: uom3_price,
+                            uom4_price: uom4_price,
+                            uom5_price: uom5_price,
+                            */
+                        },
+                        type: 'POST',
+                        success: function (da) {
+                            if (da.Message == "Success") {
+                                if ($('.modal-header').hasClass('alert-danger')) {
+                                    $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                    $('.delete-confirm').css('display', 'none');
+                                }
+                                $('#item_modal').modal('hide');
+                            }
+                            else if (da.Message == "Fail") {
+                                if (!$('.modal-header').hasClass('alert-danger')) {
+                                    $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                    $('.delete-confirm').css('display', 'none');
+                                }
+                                $('.success-message').html('Your data is error while saving!');
+                            }
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html('Your data is error while saving!');
+                        }
+                    });
+                }
+            });
+            $('#type_name').on('change', function (e) {
+                e.preventDefault();
+                var itemTypeId = $(this).val();
+                $('#product_code').val('');
+                if (itemTypeId) {
+                    $.ajax({
+                        url: "@Url.Action("GenerateItemCodebyItemType", "Product")",
+                        type: "get",
+                        dataType: "json",
+                        data: { id: itemTypeId },
+                        success: function (data) {
+                            $('#item_code').val(data.code);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+    <script type="text/javascript">
+
+        function initial_ir_no() {
+            $.ajax({
+                url:"@Url.Action("GetItemRequestNo", "ItemRequest")",
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    $.each(data, function (index, item) {
+                        $('#ir_no').text(item);
+                    });
+                },
+                error: function (data) {
+                    $('#ir_no').text('');
+                    alert('fail');
+                }
+            });
+        }
+        function initial_project_dropdownlist(project_id) {
+            $.ajax({
+                url: '/Project/ProjectDropdownList',
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    $('#ir_project_id').empty();
+                    $('#ir_project_id').append("" +
+                        "<option selected disabled>Select Project Name</option>"
+                    );
+                    $.each(data, function (index, item) {
+                        $.each(item, function (index1, item1) {
+                            $('#ir_project_id').append("" +
+                                    "<option value='" + item1.project_id + "'>" + item1.project_full_name + "</option>"
+                                );
+                        });
+                    });
+                    if (project_id != null || project_id != "" || project_id != undefined) {
+                        $('#project_id').val(project_id);
+                    }
+                },
+                error: function (data) {
+                    alert('fail');
+                }
+            });
+        }
+        function initial_ir_purpose_dropdownlist(purpose_id) {
+            $.ajax({
+                url: '/ItemRequest/GetIRPurposeDropdownList',
+                type: "get",
+                dataType: "json",
+                success: function (da) {
+                    if (da.result == "success") {
+                        $('#ir_purpose_id').empty();
+                        $('#ir_purpose_id').append("" +
+                            "<option selected disabled>Select Purpose of Purchase</option>"
+                        );
+                        $.each(da.data, function (index, item) {
+                            $('#ir_purpose_id').append("" +
+                                        "<option value='" + item.ir_purpose_id + "'>" + item.purpose_description + "</option>"
+                                    );
+
+                        });
+                    } else {
+                        alert('Initial IR Purpose:' + da.message);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Initial IR Purpose:'+textStatus);
+                }
+            });
+        }
+        function initial_ir_job_category_row(num,row_num,row_index,project_id,is_first) {
+            var roman_number = String.fromCharCode(8543 + Number(num));
+            if (is_first == undefined || is_first == null || is_first == "") {
+                $('#ir_table').find('tr').eq(Number(row_index+1)).after("" +
+                    "<tr class='job" + row_num + "' id='job" + row_num + "'>" +
+                        "<td>" + roman_number + "<input type='hidden' class='job_id'></td>" +
+                        "<td colspan='5'>" +
+                            "<select class='form-control job_category_id' id='j" + row_num + "' style='display:inline !important;'>" +
+                                "<option selected disabled>Select Job Category</option>" +
+                            "</select>" +
+                            "  <a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='changeControl(this)'>+</a>"+
+                        "</td>" +
+                        "<td></td>" +
+                        "<td></td>" +
+                        "<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='remove_ir_job_category_row(this)'><span class='glyphicon glyphicon-trash'></span></a></td>" +
+                        "<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='append_ir_job_category_row(this)'><i class='fa fa-plus-square' aria-hidden='true'></i></a></td>" +
+                    "</tr>"
+                );
+                initial_ir_item_row(Number(row_index + 2), "job" + row_num, "A", 1);
+            }
+            else {
+                $('#ir_table tbody').append("" +
+                    "<tr class='job" + row_num + "' id='job" + row_num + "'>" +
+                        "<td>" + roman_number + "<input type='hidden' class='job_id'></td>" +
+                        "<td colspan='5'>" +
+                            "<select class='form-control job_category_id' id='j" + row_num + "' style='display:inline !important;'>" +
+                                "<option selected disabled>Select Job Category</option>" +
+                            "</select>" +
+                            "  <a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='changeControl(this)'>+</a>" +
+                        "</td>" +
+                        "<td></td>" +
+                        "<td></td>" +
+                        "<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='remove_ir_job_category_row(this)'><span class='glyphicon glyphicon-trash'></span></a></td>" +
+                        "<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='append_ir_job_category_row(this)'><i class='fa fa-plus-square' aria-hidden='true'></i></a></td>" +
+                    "</tr>"
+                );
+                initial_ir_item_row(row_index, "job" + row_num, "A", 1);
+            }
+            initial_job_category_data_dropdownlist(row_index, project_id, is_first);
+
+            var classInd = $('.job' + row_num)[0].rowIndex;
+            var count_job_class = $('.job' + row_num).length;
+            $('#ir_table tr').eq(classInd).find('td:nth-child(5)').attr('rowspan', Number(count_job_class));
+            $('#ir_table tr').eq(classInd).find('td:nth-child(6)').attr('rowspan', Number(count_job_class));
+        }
+        function initial_ir_type_row(row_index, job_class, type_letter, type_C_letter) {
+            var job_num = job_class.replace(/[^\d]/g, '');
+            $('#ir_table tbody').find('tr').eq(row_index-1).after(""+
+                    "<tr class='" + job_class + " type" + job_num + type_letter + "' id='type" + job_num + type_letter + "'>" +
+                        "<td>" + type_C_letter + "<input type='hidden' class='type_id'></td>" +
+                        "<td colspan='6'>" +
+                            "<select class='form-control item_type_id' id='"+job_num+type_letter+"' onchange='initial_ir_item_data_row_by_type(this)'>" +
+                                "<option selected disabled>Select Item Type</option>" +
+                            "</select>" +
+                        "</td>" +
+                        "<td></td>" +
+                        "<td></td>" +
+                        "<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='remove_ir_type_row(this)'><span class='glyphicon glyphicon-trash'></span></a></td>" +
+                        "<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='append_ir_type_row(this)'><i class='fa fa-plus-square' aria-hidden='true'></i></a></td>" +
+                        "<td></td>" +
+                        "<td></td>" +
+                    "</tr>"
+                );
+            initial_item_type_data_dropdownlist(row_index - 1);
+        }
+        function initial_ir_item_row(row_ind,job_class,item_letter,item_num) {
+            var job_class_num = job_class.replace(/[^\d]/g, '');
+            $('#ir_table').find('tr').eq(row_ind).after("" +
+                "<tr class='" + job_class + " item" + job_class_num +item_letter + "' id='item" + job_class_num +item_letter + "'>" +
+                    "<td>" + item_num + "</td>" +
+                    "<td><input class='form-control item_code' onfocus='initial_item_data_row_by_itemcode(this)' id='" + job_class_num + item_letter + "' placeholder='Item Code'/><input type='hidden' class='item_id' id='i"+job_class_num+item_letter+"' /></td>" +
+                    "<td><input class='form-control item_name' onfocus='initial_item_data_row_by_itemname(this)' id='name"+job_class_num+item_letter+"' placeholder='Item Name'></td>" +
+                    "<td><input type='number' class='form-control ir_qty' value='" + Number(0) + "'/></td>" +
+                    "<td><select class='form-control item-unit'></select></td>" +
+                    "<td><textarea class='form-control item_remark' placeholder='Remark'></textarea></td>" +
+                    "<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='remove_ir_item_row(this)'><span class='glyphicon glyphicon-trash'></span></a></td>" +
+                    "<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='append_ir_item_row(this)'><span class='glyphicon glyphicon-plus'></span></a></td>" +
+                "</tr>"
+            );
+        }
+        function append_ir_job_category_row(row) {
+            var index = row.parentNode.parentNode.rowIndex;
+            var count_table_row = $('#ir_table tbody tr').length;
+            var row_index = count_table_row-1;
+            var ir_project_id = $('#ir_project_id').val();
+            var row_id = $('#ir_table tr').eq(index).attr('id');
+            var row_num = Number(row_id.replace(/[^\d]/g, '')) + 1;
+            var arr_job_id = new Array();
+            for (var i = 1; i <= count_table_row; i++) {
+                var id = $('#ir_table tr').eq(i).attr('id');
+                if (id != undefined && id.substr(0, 3) == "job")
+                    arr_job_id.push(id);
+            }
+            var num = Number(arr_job_id.length + 1);
+            initial_ir_job_category_row(num,row_num, row_index, ir_project_id);
+            $('#ir_table tr td:nth-child(6)').eq(index - 1).html('');
+        }
+        function remove_ir_job_category_row(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var job_class = $('#ir_table tr').eq(ind).attr('class');
+            var job_id = $('#ir_table tr').eq(ind).attr('id');
+            var job_class_count = $('.' + job_class).length;
+            var is_last_child = $('#ir_table tr td:nth-child(6)').eq(ind - 1).find('a').length == 0 ? false : true;
+            var count_table_row = $('#ir_table tr').length;
+            var arr_job_category_row_id = new Array();
+            for (var i = 1; i <= count_table_row; i++) {
+                var id = $('#ir_table tr').eq(i).attr('id');
+                if (id != undefined && id.substr(0, 3) == "job")
+                    arr_job_category_row_id.push(id);
+            }
+            if (arr_job_category_row_id.length > 1) {
+                for (var i = 0; i < job_class_count; i++) {
+                    document.getElementById('ir_table').deleteRow(ind);
+                }
+                if (is_last_child) {
+                    $('#ir_table tbody tr#' + arr_job_category_row_id[arr_job_category_row_id.length - 2] + ' td:nth-child(6)').html("<a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='append_ir_job_category_row(this)'><i class='fa fa-plus-square' aria-hidden='true'></i></a>");
+                } else {
+                    var delete_index = arr_job_category_row_id.indexOf(job_id);
+                    arr_job_category_row_id.splice(delete_index, 1);
+                    for (var i = 0; i < arr_job_category_row_id.length; i++) {
+                        var roman_number = String.fromCharCode(8544 + Number(i));
+                        $('tr#' + arr_job_category_row_id[i] + ' td:first-child').html(roman_number);
+                    }
+                }
+            }
+        }
+        function append_ir_type_row(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var type_cls = $('#ir_table tr').eq(ind).attr('class').split(' ');
+            var job_class = type_cls[0];
+            var type_class = type_cls[1];
+            var type_old_letter = type_class.substr(type_class.length - 1, 1);
+            var type_new_letter = String.fromCharCode(type_old_letter.charCodeAt(0) + 1);
+            var type_C_old_letter = $('#ir_table tr').eq(ind).find('td:first-child').text();
+            var type_C_new_letter = String.fromCharCode(type_C_old_letter.charCodeAt(0) + 1);
+            var count_type_class = $('.' + type_class).length;
+            var row_index = ind + (count_type_class - 1);
+
+            initial_ir_type_row(row_index, job_class, type_new_letter, type_C_new_letter);
+            $('#ir_table tr td:nth-child(6)').eq(ind - 1).html('');
+        }
+        function remove_ir_type_row(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var classes = $('#ir_table tr').eq(ind).attr('class').split(' ');
+            var type_id=$('#ir_table tr').eq(ind).attr('id');
+            var job_class = classes[0];
+            var type_class = classes[1];
+            var count_type_class_row =$('.'+type_class).length;
+            var job_num = job_class.replace(/[^\d]/g, '');
+            var is_last_child = $('#ir_table tr').eq(ind).find('td:nth-child(6) a').length == 0 ? false : true;
+            var count_table_row = $('#ir_table tr').length;
+            var arr_type_id = new Array();
+            for (var i = 1; i <= count_table_row; i++) {
+                var id = $('#ir_table tr').eq(i).attr('id');
+                if (id != undefined && id.substr(0,id.length-1) == "type"+job_num)
+                    arr_type_id.push(id);
+            }
+            if (arr_type_id.length > 1) {
+                for (var i = 0; i < count_type_class_row; i++) {
+                    document.getElementById('ir_table').deleteRow(ind);
+                }
+                if (is_last_child) {
+                    $('#ir_table tbody tr#' + arr_type_id[arr_type_id.length - 2] + ' td:nth-child(6)').html("<a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='append_ir_type_row(this)'><i class='fa fa-plus-square' aria-hidden='true'></i></a>");
+                } else {
+                    var deleted_index = arr_type_id.indexOf(type_id);
+                    arr_type_id.splice(deleted_index, 1);
+                    for (var i = 0; i < arr_type_id.length; i++) {
+                        var letter = String.fromCharCode(Number(65 + i));
+                        $('tr#' + arr_type_id[i] + ' td:nth-child(1)').html(letter);
+                    }
+                }
+            }
+
+        }
+        function append_ir_item_row(row,isType) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var item_cls = $('#ir_table tr').eq(ind).attr('class').split(' ');
+            var job_class = item_cls[0];
+            var old_item_letter;
+            var type_class;
+            if (isType == undefined || isType == null) {
+                old_item_letter = item_cls[1].substr(item_cls[1].length - 1, 1);
+                type_class = "";
+            }
+            else {
+                type_class = item_cls[1];
+                old_item_letter = item_cls[2].substr(item_cls[2].length - 1, 1);
+            }
+            var item_letter=String.fromCharCode(Number(old_item_letter.charCodeAt(0)+1));
+            var item_num = $('#ir_table tr').eq(ind).find('td:first-child').text();
+            item_num = Number(item_num) + 1;
+
+            var item_value = $('#ir_table tr').eq(ind).find('input.item_id').val();
+            if (item_value == null || item_value == "" || item_value == undefined) {
+                return;
+            }
+
+            initial_ir_item_row(ind, job_class,item_letter, item_num);
+            $('#ir_table tr').eq(ind).find('td:nth-child(8)').html('');
+
+            var classInd = $('.' + job_class)[0].rowIndex;
+            var count_job_class = $('.' + job_class).length;
+            $('#ir_table tr').eq(classInd).find('td:nth-child(5)').attr('rowspan', Number(count_job_class));
+            $('#ir_table tr').eq(classInd).find('td:nth-child(6)').attr('rowspan', Number(count_job_class));
+        }
+        function remove_ir_item_row(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var item_cls = $('#ir_table tr').eq(ind).attr('class').split(' ');
+            var item_id = $('#ir_table tr').eq(ind).attr('id');
+            var job_num = item_cls[0].replace(/[^\d]/g, '');
+            var is_last_child = $('#ir_table tr').eq(ind).find('td:nth-child(8) a').length==0?false:true;
+            var arr_item_id = new Array();
+            var count_table_row = $('#ir_table tr').length;
+            var f_add,type_letter;
+            if (item_cls.length == 3) {
+                f_add = "append_ir_item_row(this,type)";
+                type_letter = item_cls[1].substr(item_cls[1].length - 1, 1);
+            }
+            else {
+                f_add = "append_ir_item_row(this)";
+                type_letter = "";
+            }
+            for (var i = 1; i <= count_table_row; i++) {
+                var id = $('#ir_table tr').eq(i).attr('id');
+                if (id != undefined && id.substr(0, id.length - 1) == "item" + job_num+type_letter)
+                    arr_item_id.push(id);
+            }
+            document.getElementById('ir_table').deleteRow(ind);
+            if (arr_item_id.length > 1) {
+                if (is_last_child)
+                    $('#ir_table tr').eq(ind - 1).find('td:nth-child(8)').html("<a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='" + f_add + "'><span class='glyphicon glyphicon-plus'></span></a>");
+                else {
+                    var deleted_index = arr_item_id.indexOf(item_id);
+                    arr_item_id.splice(deleted_index, 1);
+                    for (var i = 0; i < arr_item_id.length; i++)
+                        $('tr#' + arr_item_id[i]).find('td:first-child').html(Number(i + 1));
+                }
+            }
+            var classInd = $('.' + item_cls[0])[0].rowIndex;
+            var count_job_class = $('.' + item_cls[0]).length;
+            $('#ir_table tr').eq(classInd).find('td:nth-child(5)').attr('rowspan', Number(count_job_class));
+            $('#ir_table tr').eq(classInd).find('td:nth-child(6)').attr('rowspan', Number(count_job_class));
+        }
+        //change on jul 20 2018
+        function initial_job_category_data_dropdownlist(row_index,project_id, is_first_row) {
+            $.ajax({
+                url: '/ItemRequest/GetBOQJobCategoryDropdownlist',
+                type: "get",
+                dataType: "json",
+                data: { id: project_id },
+                async:false,
+                success: function (da) {
+                    if (da.result == "success") {
+                        if (is_first_row == undefined || is_first_row == null || is_first_row == "") {
+                            $.each(da.data, function (index, item) {
+                                $('#ir_table tbody tr').eq(row_index+1).find('select.job_category_id').append("" +
+                                        //"<option value='" + item.job_category_id + "'>" + item.j_category_name + "</option>"
+                                        "<option value='" + item.j_category_id + "'>" + item.j_category_name + "</option>"
+                                    );
+                                $('#boq_id').val(item.boq_id);
+                            });
+                        }
+                        else {
+                            $.each(da.data, function (index, item) {
+                                $('#ir_table tbody tr:first-child').find('select.job_category_id').append(""+
+                                        "<option value='" + item.j_category_id + "'>" + item.j_category_name + "</option>"
+                                    );
+                                $('#boq_id').val(item.boq_id);
+                            });
+                        }
+                    } else {
+                        alert('Initial BOQ Job Category:' + da.message);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Initial BOQ Job Category:' + textStatus);
+                }
+            });
+        }
+        //end change
+        function initial_item_type_data_dropdownlist(row_index) {
+            $.ajax({
+                url: '/ProductCategory/GetItemTypeDataDropdownlist',
+                type: "get",
+                dataType: "json",
+                async: false,
+                success: function (da) {
+                    if (da.result == "success") {
+                        $.each(da.data, function (ind, item) {
+                            $('#ir_table tbody tr').eq(row_index + 1).find('select.item_type_id').append("" +
+                                "<option value='" + item.item_type_id + "'>" + item.item_type_name + "</option>"
+                            );
+                        });
+                    } else {
+                        alert('Initial BOQ Item Type:' + da.message);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Initial BOQ Item Type:' + textStatus);
+                }
+            });
+        }
+        function initial_ir_item_data_row(row) {
+            var index = row.parentNode.parentNode.rowIndex;
+            var boq_id = $('#boq_id').val();
+            var jcat_id = $('#ir_table tr').eq(index).find('select.job_category_id').val();
+            var jcat_name = $('#ir_table tr').eq(index).find('select.job_category_id option:selected').text();
+            var job_class = $('#ir_table tr').eq(index).attr('class');
+            var job_class_num = job_class.replace(/[^\d]/g, '');
+            var count_job_class = $('.' + job_class).length;
+
+            var item_cls = $('.' + job_class);
+            if (item_cls.length > 0) {
+                for (var i = 1; i < item_cls.length; i++) {
+                    var idx = item_cls[i].rowIndex;
+                    document.getElementById('ir_table').deleteRow(idx);
+                }
+            }
+
+            $('#ir_table').find('tr').eq(index).after("" +
+                "<tr class='" + job_class + " item" + job_class_num + "A' id='item" + job_class_num + "A'>" +
+                    "<td>1</td>" +
+                    "<td><input class='form-control item_code' onfocus='initial_item_data_row_by_itemcode(this)' id='" + job_class_num + "A' placeholder='Item Code'/><input type='hidden' class='item_id' id='i"+job_class_num+"A'  /></td>" +
+                    "<td><input class='form-control item_name' onfocus='initial_item_data_row_by_itemname(this)' id='name" + job_class_num + item_letter + "' placeholder='Item Name'></td>" +
+                    "<td><input type='number' class='form-control ir_qty' value='" + Number(0) + "' placeholder='Request Quantity'/></td>" +
+                    //"<td><select class='form-control item-unit'><option disabled selected>Select Unit</option></select></td>" +
+                    "<td><select class='form-control item-unit'></select></td>" +
+                    "<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='remove_ir_item_row(this)'><span class='glyphicon glyphicon-trash'></span></a></td>" +
+                    "<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='append_ir_item_row(this)'><span class='glyphicon glyphicon-plus'></span></a></td>" +
+                    //"<td></td>" +
+                    //"<td></td>" +
+                "</tr>"
+            );
+            var classInd = $('.' + job_class)[0].rowIndex;
+            $('#ir_table tr').eq(classInd).find('td:nth-child(5)').attr('rowspan', Number(count_job_class+1));
+            $('#ir_table tr').eq(classInd).find('td:nth-child(6)').attr('rowspan', Number(count_job_class+1));
+            /*
+            $.ajax({
+                url: '/BOQ/GetBOQItemByJobCategory',
+                type: "get",
+                dataType: "json",
+                data: { boq_id: boq_id, jcat_id: jcat_id },
+                async: false,
+                success: function (da) {
+                    if (da.result == "success") {
+                        var count_item = (da.data).length;
+                        var item_cls = $('.' + job_class);
+                        var str_btn_add = "", count = 0;
+                        if (item_cls.length > 0) {
+                            for (var i = 1; i < item_cls.length; i++) {
+                                var idx = item_cls[i].rowIndex;
+                                document.getElementById('ir_table').deleteRow(idx);
+                            }
+                        }
+                        if ((da.data).length>0) {
+                            $.each(da.data, function (ind, item) {
+                                var item_letter = String.fromCharCode(65 + Number(count));
+                                if (ind == count_item - 1)
+                                    str_btn_add = "<a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='append_ir_item_row(this)'><span class='glyphicon glyphicon-plus'></span></a>";
+                                $('#ir_table').find('tr').eq(index + ind).after("" +
+                                        "<tr class='" + job_class + " item" + job_class_num + item_letter + "' id='item" + job_class_num + item_letter + "'>" +
+                                            "<td>" + Number(count + 1) + "</td>" +
+                                            "<td><input type='hidden' class='item_id' id='" + job_class_num + item_letter + "' value='" + item.item_id + "' ><label class='item_name'>" + item.product_name + "</label></td>" +
+                                            "<td><label class='item_code'>" + item.product_code + "</label></td>" +
+                                            //"<td><label class='item_unit'>" + item.product_unit + "</label></td>" +
+                                            //"<td><label class='item_qty'>" + parseFloat(item.item_qty).toFixed(2) + "</label></td>" +
+                                            "<td><input type='number' class='form-control ir_qty' value='" + parseFloat(0).toFixed(2) + "'/></td>" +
+                                            "<td></td>"+
+                                            "<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='remove_ir_item_row(this)'><span class='glyphicon glyphicon-trash'></span></a></td>" +
+                                            "<td></td>" +
+                                            "<td></td>" +
+                                            "<td></td>" +
+                                            //"<td></td>" +
+                                            //"<td></td>" +
+                                        "</tr>"
+                                    );
+                                count++;
+                            });
+
+                            var type_letter = String.fromCharCode(97);
+                            var type_C_letter = String.fromCharCode(65);
+                            var job_num = job_class.replace(/[^\d]/g, '');
+                            $('#ir_table tbody').find('tr').eq((index-1)+count).after("" +
+                                "<tr class='" + job_class + " type" + job_num + type_letter + "' id='type" + job_num + type_letter + "'>" +
+                                    "<td>" + type_C_letter + "<input type='hidden' class='type_id'></td>" +
+                                    "<td colspan='6'>" +
+                                        "<select class='form-control item_type_id' id='" + job_num + type_letter + "' onchange='initial_ir_item_data_row_by_type(this)'>" +
+                                            "<option selected disabled>Select Item Type</option>" +
+                                        "</select>" +
+                                    "</td>" +
+                                    "<td></td>" +
+                                    "<td></td>" +
+                                    "<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='remove_ir_type_row(this)'><span class='glyphicon glyphicon-trash'></span></a></td>" +
+                                    "<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='append_ir_type_row(this)'><i class='fa fa-plus-square' aria-hidden='true'></i></a></td>" +
+                                    "<td></td>" +
+                                    "<td></td>" +
+                                "</tr>"
+                            );
+                            initial_item_type_data_dropdownlist((index - 1) + count);
+                        } else {
+                            var type_letter = String.fromCharCode(97);
+                            var type_C_letter = String.fromCharCode(65);
+                            var job_num = job_class.replace(/[^\d]/g, '');
+                            $('#ir_table tbody').find('tr').eq(index-1).after("" +
+                                "<tr class='" + job_class + " type" + job_num + type_letter + "' id='type" + job_num + type_letter + "'>" +
+                                    "<td>" + type_C_letter + "<input type='hidden' class='type_id'></td>" +
+                                    "<td colspan='6'>" +
+                                        "<select class='form-control item_type_id' id='" + job_num + type_letter + "' onchange='initial_ir_item_data_row_by_type(this)'>" +
+                                            "<option selected disabled>Select Item Type</option>" +
+                                        "</select>" +
+                                    "</td>" +
+                                    "<td></td>" +
+                                    "<td></td>" +
+                                    "<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='remove_ir_type_row(this)'><span class='glyphicon glyphicon-trash'></span></a></td>" +
+                                    "<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='append_ir_type_row(this)'><i class='fa fa-plus-square' aria-hidden='true'></i></a></td>" +
+                                    "<td></td>" +
+                                    "<td></td>" +
+                                "</tr>"
+                            );
+                            initial_item_type_data_dropdownlist(index - 1);
+                        }
+
+                    } else {
+                        alert('Initial BOQ Item:' + da.message);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Initial BOQ Item:' + textStatus);
+                }
+            });
+            */
+        }
+
+        function initial_ir_item_data_row_by_type(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var item_type_id = $('#ir_table tr').eq(ind).find('select.item_type_id').val();
+            var classes = $('#ir_table tr').eq(ind).attr('class').split(' ');
+            var job_class = classes[0];
+            var job_class_num = job_class.replace(/[^\d]/g, '');
+            var type_class = classes[1];
+            var type_letter=type_class.substr(type_class.length-1,1);
+            $.ajax({
+                url: '@Url.Action("GetProductDataRow","Product")',
+                type: "get",
+                dataType: "json",
+                data:{category_id:item_type_id},
+                async: false,
+                success: function (da) {
+                    var items = da.data;
+                    if (items) {
+                        count_data = items.length;
+                        var item_cls = $('.' + type_class);
+                        if (item_cls.length > 0) {
+                            for (var i = 1; i < item_cls.length; i++) {
+                                var idnx = item_cls[i].rowIndex;
+                                document.getElementById('ir_table').deleteRow(idnx);
+                            }
+                        }
+                        if (count_data > 0) {
+                            var str_btn_add = "", count = 0;
+                            $.each(da.data, function (idx, item) {
+                                var item_letter = String.fromCharCode(65 + Number(count));
+                                if (idx == count_data - 1)
+                                    str_btn_add = "<a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='append_ir_item_row(this,type)'><span class='glyphicon glyphicon-plus'></span></a>";
+                                $('#ir_table').find('tr').eq(ind + idx).after("" +
+                                        "<tr class='" + job_class +" "+ type_class + " item" + job_class_num + type_letter + item_letter + "' id='item" + job_class_num + type_letter + item_letter + "'>" +
+                                            "<td>" + Number(count + 1) + "</td>" +
+                                            "<td><input type='hidden' class='item_id' id='" + job_class_num + type_letter + item_letter + "' value='" + item.product_id + "'/ ><label class='item_name'>" + item.product_name + "</label></td>" +
+                                            "<td><label class='item_code'>" + item.product_code + "</label></td>" +
+                                            "<td><label class='item_unit'>" + item.product_unit + "</label></td>" +
+                                            "<td><label class='item_qty'>" + Number(0) + "</label></td>" +
+                                            "<td><input type='number' class='form-control ir_qty' value='" + Number(0) + "'/></td>" +
+                                            "<td></td>"+
+                                            "<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='remove_ir_item_row(this)'><span class='glyphicon glyphicon-trash'></span></a></td>" +
+                                            "<td>" + str_btn_add + "</td>" +
+                                            "<td></td>" +
+                                            "<td></td>" +
+                                            "<td></td>" +
+                                            "<td></td>" +
+                                        "</tr>"
+                                    );
+                                count++;
+                                console.log(item);
+                            });
+                        } else {
+                            var item_letter = String.fromCharCode(65);
+                            $('#ir_table').find('tr').eq(ind).after("" +
+                                "<tr class='" + job_class + " " + type_class + " item" + job_class_num + type_letter + item_letter + "' id='item" + job_class_num + type_letter + item_letter + "'>" +
+                                    "<td>1</td>" +
+                                    "<td><input type='hidden' class='item_id' id='" + job_class_num + type_letter + item_letter + "' /><label class='item_name'></label></td>" +
+                                    "<td><input class='form-control item_code' onfocus='initial_item_data_row_by_itemcode(this)' id='" + job_class_num + type_letter + item_letter + "'/></td>" +
+                                    "<td><label class='item_unit'></label></td>" +
+                                    "<td><label class='item_qty'>" + Number(0) + "</label></td>" +
+                                    "<td><input type='number' class='form-control ir_qty' value='" + Number(0) + "' onchange='check_ir_qty(this)'/></td>" +
+                                    "<td></td>"+
+                                    "<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='remove_ir_item_row(this)'><span class='glyphicon glyphicon-trash'></span></a></td>" +
+                                    "<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='append_ir_item_row(this,type)'><span class='glyphicon glyphicon-plus'></span></a></td>" +
+                                    "<td></td>" +
+                                    "<td></td>" +
+                                    "<td></td>" +
+                                    "<td></td>" +
+                                "</tr>"
+                            );
+                        }
+                    } else {
+                        alert('Initial BOQ Item Type:' + da.message);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Initial BOQ Item Type:' + textStatus);
+                }
+            });
+        }
+        function check_ir_qty(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var ir_qty = $('#ir_table tr').eq(ind).find('input.ir_qty').val();
+            var boq_qty = $('#ir_table tr').eq(ind).find('label.item_qty').text();
+            var item_class = $('#ir_table tr').eq(ind).attr('class').split(' ');
+            var job_id = item_class[0];
+            var job_category_name = $('#ir_table tr#' + job_id).find('select.job_category_id option:selected').text();
+            if (job_category_name != "Other") {
+                if (Number(ir_qty) > Number(boq_qty)) {
+                    alert('Item Request qty must be smaller than BOQ qty.');
+                    $('#ir_table tr').eq(ind).find('input.ir_qty').focus();
+                    return;
+                }
+            }
+        }
+
+        function initial_item_data_row_by_itemcode(row) {
+            var product_id;
+            var ind = row.parentNode.parentNode.rowIndex;
+            var item_class = $('#ir_table tr').eq(ind).attr('class').split(' ');
+            var job_id = item_class[0];
+            var job_category_id = $('#ir_table tr#'+job_id).find('select.job_category_id').val();
+            var job_category_name = $('#ir_table tr#'+job_id).find('select.job_category_id option:selected').text();
+            var item_code = $('#ir_table tr').eq(ind).find('input.item_code').val();
+            var boq_id = $('#boq_id').val();
+            var row_id = $('#ir_table tr').eq(ind).find('.item_code').attr('id');
+
+            autocompleted(row_id, item_class, boq_id, job_category_id);
+
+            function autocompleted(row_id, item_class, boq_id, job_category_id) {
+                $('#' + row_id).autocomplete({
+                    source: '@Url.Action("GetProductAutoSuggestName", "Product")',
+                    select: function (event, ui) {
+                        AutoCompleteSelectHandler(event, ui, ind, item_class, boq_id, job_category_id);
+                    }
+                })
+
+            }
+
+            function AutoCompleteSelectHandler(event, ui, ind, item_class, boq_id, job_category_id) {
+                var selectedObj = ui.item;
+                var item = (selectedObj.value).split(' ');
+                product_id = selectedObj.id;
+                GetItemDataRow(ind, item_class, boq_id, job_category_id,product_id)
+            }
+
+            function GetItemDataRow(ind, item_class, boq_id, job_category_id, product_id) {
+
+                if (product_id != "") {
+                    $.ajax({
+                        url: '/Product/GetProductDataByCode',
+                        type: "get",
+                        dataType: "json",
+                        async: false,
+                        data: { id: product_id },
+                        success: function (da) {
+                            //$('#ir_table tr').eq(ind).find('select.item-unit').empty().append("<option disabled selected>Select Unit</option>");
+                            $('#ir_table tr').eq(ind).find('select.item-unit').empty();
+                            if (da.data) {
+                                var item = da.data;
+                                console.log(item);
+                                $('#ir_table tr').eq(ind).find('input.item_code').val(item.product_code);
+                                $('#ir_table tr').eq(ind).find('input.item_id').val(item.product_id);
+                                $('#ir_table tr').eq(ind).find('input.item_name').val(item.product_name);
+                                $('#ir_table tr').eq(ind).find('input.ir_qty').val(parseFloat(0).toFixed(2));
+
+                                $('#ir_table tr').eq(ind).find('select.item-unit').append("<option value='" + item.product_unit + "'>" + item.product_unit + "</option>");
+
+                                if (item.uom1_id && item.uom1_qty) {
+                                    $('#ir_table tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom1_id + "'>" + item.uom1_id + "</option>");
+                                }
+                                if (item.uom2_id && item.uom2_qty) {
+                                    $('#ir_table tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom2_id + "'>" + item.uom2_id + "</option>");
+                                }
+                                if (item.uom3_id && item.uom3_qty) {
+                                    $('#ir_table tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom3_id + "'>" + item.uom3_id + "</option>");
+                                }
+                                if (item.uom4_id && item.uom4_qty) {
+                                    $('#ir_table tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom4_id + "'>" + item.uom4_id + "</option>");
+                                }
+                                if (item.uom5_id && item.uom5_qty) {
+                                    $('#ir_table tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom5_id + "'>" + item.uom5_id + "</option>");
+                                }
+
+                            } else {
+                                $('#ir_table tr').eq(ind).find('input.item_id').val(' ');
+                                $('#ir_table tr').eq(ind).find('input.item_name').val(' ');
+                                $('#ir_table tr').eq(ind).find('input.ir_qty').val(parseFloat(0).toFixed(2));
+                            }
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            $('#ir_table tr').eq(ind).find('select.item-unit').empty().append("<option disabled selected>Select Unit</option>");
+                            $('#ir_table tr').eq(ind).find('input.item_id').val(' ');
+                            $('#ir_table tr').eq(ind).find('input.item_name').val(' ');
+                            $('#ir_table tr').eq(ind).find('input.ir_qty').val(parseFloat(0).toFixed(2));
+                            alert(XMLHttpRequest.responseText);
+                        }
+                    });
+                }
+
+                //if (item_class.length == 2) {
+                //    $.ajax({
+                //        url: '/BOQ/GetBOQItemByJobCategoryItemID',
+                //        type: "get",
+                //        dataType: "json",
+                //        data: { boq_id: boq_id, jcat_id: job_category_id, product_id: product_id },
+                //        async: false,
+                //        success: function (da) {
+                //            if (da.result == "success") {
+                //                if (da.data == null) {
+                //                    alert('Item in BOQ not found.');
+                //                    $('#ir_table tr').eq(ind).find('input.item_id').val('');
+                //                    $('#ir_table tr').eq(ind).find('label.item_name').text('');
+                //                    $('#ir_table tr').eq(ind).find('label.item_unit').text('');
+                //                    $('#ir_table tr').eq(ind).find('label.item_qty').text(parseFloat(0).toFixed(2));
+                //                }
+                //                else {
+                //                    var item = da.data;
+                //                    $('#ir_table tr').eq(ind).find('input.item_id').val(item.item_id);
+                //                    $('#ir_table tr').eq(ind).find('label.item_name').text(item.product_name);
+                //                    $('#ir_table tr').eq(ind).find('label.item_unit').text(item.product_unit);
+                //                    $('#ir_table tr').eq(ind).find('label.item_qty').text(parseFloat(item.item_qty).toFixed(2));
+                //                }
+                //            } else {
+                //                alert('Filter Item:' + da.message);
+                //            }
+                //        },
+                //        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                //            alert('Filter Item:' + textStatus);
+                //        }
+                //    });
+                //} else {
+                //    var type_id = item_class[1];
+                //    var category_id = $('#ir_table tr#' + type_id).find('select.item_type_id').val();
+                //    $.ajax({
+                //        url: '/BOQ/GetBOQItemByItemID',
+                //        type: "get",
+                //        dataType: "json",
+                //        data: { item_id: product_id, type_id: category_id },
+                //        async: false,
+                //        success: function (da) {
+                //            if (da.result == "success") {
+                //                console.log(da.data);
+                //                if (da.data == null) {
+                //                    alert('Item not found.');
+                //                    $('#ir_table tr').eq(ind).find('input.item_id').val('');
+                //                    $('#ir_table tr').eq(ind).find('label.item_name').text('');
+                //                    $('#ir_table tr').eq(ind).find('label.item_unit').text('');
+                //                    $('#ir_table tr').eq(ind).find('label.item_qty').text(parseFloat(0).toFixed(2));
+                //                }
+                //                else {
+                //                    var item = da.data;
+                //                    $('#ir_table tr').eq(ind).find('input.item_id').val(item.product_id);
+                //                    $('#ir_table tr').eq(ind).find('label.item_name').text(item.product_name);
+                //                    $('#ir_table tr').eq(ind).find('label.item_unit').text(item.product_unit);
+                //                    $('#ir_table tr').eq(ind).find('label.item_qty').text(parseFloat(0).toFixed(2));
+                //                }
+                //            } else {
+                //                alert('Filter Item:' + da.message);
+                //            }
+                //        },
+                //        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                //            alert('Filter Item:' + textStatus);
+                //        }
+                //    });
+                //}
+            }
+        }
+
+        function initial_item_data_row_by_itemname(row) {
+            var product_id;
+            var ind = row.parentNode.parentNode.rowIndex;
+            var item_class = $('#ir_table tr').eq(ind).attr('class').split(' ');
+            var job_id = item_class[0];
+            var job_category_id = $('#ir_table tr#' + job_id).find('select.job_category_id').val();
+            var job_category_name = $('#ir_table tr#' + job_id).find('select.job_category_id option:selected').text();
+            var item_code = $('#ir_table tr').eq(ind).find('input.item_name').val();
+            var boq_id = $('#boq_id').val();
+            var row_id = $('#ir_table tr').eq(ind).find('.item_name').attr('id');
+
+            autocompleted(row_id, item_class, boq_id, job_category_id);
+
+            function autocompleted(row_id, item_class, boq_id, job_category_id) {
+                $('#' + row_id).autocomplete({
+                    source: '@Url.Action("GetProductAutoSuggestName", "Product")',
+                    select: function (event, ui) {
+                        AutoCompleteSelectHandler(event, ui, ind, item_class, boq_id, job_category_id);
+                    }
+                })
+
+            }
+
+            function AutoCompleteSelectHandler(event, ui, ind, item_class, boq_id, job_category_id) {
+                var selectedObj = ui.item;
+                var item = (selectedObj.value).split(' ');
+                product_id = selectedObj.id;
+                GetItemDataRow(ind, item_class, boq_id, job_category_id, product_id)
+            }
+
+            function GetItemDataRow(ind, item_class, boq_id, job_category_id, product_id) {
+
+                if (product_id != "") {
+                    $.ajax({
+                        url: '/Product/GetProductDataByCode',
+                        type: "get",
+                        dataType: "json",
+                        async: false,
+                        data: { id: product_id },
+                        success: function (da) {
+                            //$('#ir_table tr').eq(ind).find('select.item-unit').empty().append("<option disabled selected>Select Unit</option>");
+                            $('#ir_table tr').eq(ind).find('select.item-unit').empty();
+                            if (da.data) {
+                                var item = da.data;
+                                console.log(item);
+                                $('#ir_table tr').eq(ind).find('input.item_code').val(item.product_code);
+                                $('#ir_table tr').eq(ind).find('input.item_id').val(item.product_id);
+                                $('#ir_table tr').eq(ind).find('input.item_name').val(item.product_name);
+                                $('#ir_table tr').eq(ind).find('input.ir_qty').val(Number(0));
+
+                                $('#ir_table tr').eq(ind).find('select.item-unit').append("<option value='" + item.product_unit + "'>" + item.product_unit + "</option>");
+
+                                if (item.uom1_id && item.uom1_qty) {
+                                    $('#ir_table tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom1_id + "'>" + item.uom1_id + "</option>");
+                                }
+                                if (item.uom2_id && item.uom2_qty) {
+                                    $('#ir_table tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom2_id + "'>" + item.uom2_id + "</option>");
+                                }
+                                if (item.uom3_id && item.uom3_qty) {
+                                    $('#ir_table tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom3_id + "'>" + item.uom3_id + "</option>");
+                                }
+                                if (item.uom4_id && item.uom4_qty) {
+                                    $('#ir_table tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom4_id + "'>" + item.uom4_id + "</option>");
+                                }
+                                if (item.uom5_id && item.uom5_qty) {
+                                    $('#ir_table tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom5_id + "'>" + item.uom5_id + "</option>");
+                                }
+
+                            } else {
+                                $('#ir_table tr').eq(ind).find('input.item_id').val(' ');
+                                $('#ir_table tr').eq(ind).find('input.item_code').val(' ');
+                                $('#ir_table tr').eq(ind).find('input.item_name').val(' ');
+                                $('#ir_table tr').eq(ind).find('input.ir_qty').val(parseFloat(0).toFixed(2));
+                            }
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            $('#ir_table tr').eq(ind).find('select.item-unit').empty().append("<option disabled selected>Select Unit</option>");
+                            $('#ir_table tr').eq(ind).find('input.item_id').val(' ');
+                            $('#ir_table tr').eq(ind).find('input.item_code').val(' ');
+                            $('#ir_table tr').eq(ind).find('input.item_name').val(' ');
+                            $('#ir_table tr').eq(ind).find('input.ir_qty').val(parseFloat(0).toFixed(2));
+                            alert(textStatus);
+                        }
+                    });
+                }
+            }
+
+        }
+
+
+        function changeControl(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var row_id = $('#ir_table tr').eq(ind).attr('id');
+            var row_num = Number(row_id.replace(/[^\d]/g, ''));
+            $('#ir_table tr').eq(ind).find('td:nth-child(2)').html("<input type='text' class='form-control job_category_id' id='j" + row_num + "' placeholder='Job Category'/>");
+        }
+
+        /* Start New Item Section */
+        function itemCheckDuplicate() {
+            $("#Status").html("Checking ...");
+            $.post("@Url.Action("CheckItemCodeAvailable", "Product")",
+                { itemdata: $("#item_code").val() },
+                function (data) {
+                    if (data == 0) {
+                        $("#Status").html('<font color="Blue">Item Code Available.</font>');
+                        $("#item_code").css("border-color", "Blue");
+                        $("#item_name").removeAttr("disabled");
+                        $(".product_unit").removeAttr("disabled");
+                        $(".type_name").removeAttr("disabled");
+                        $("#Remark").removeAttr("disabled");
+                        $(".btnSubmit_item").removeAttr("disabled");
+                    }
+                    else {
+                        $("#Status").html('<font color="Red">Items Code already exists . Try more ...</font>');
+                        $("#item_code").css("border-color", "Red");
+                        $("#item_name").attr("disabled", "disabled");
+                        $(".product_unit").attr("disabled", "disabled");
+                        $(".type_name").attr("disabled", "disabled");
+                        $("#Remark").attr("disabled", "disabled");
+                        $(".btnSubmit_item").attr("disabled", "disabled");
+                    }
+                });
+        }
+        function InitialUnitDropdownList() {
+            $.ajax({
+                url:"@Url.Action("UnitDropDown", "Product")",
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    $('#product_unit').empty();
+                    $('#product_unit').append("" +
+                        "<option selected disabled>--- Select Item Unit ---</option>"
+                    );
+                    $.each(data, function (index, item) {
+                        $.each(item, function (index1, item1) {
+                            $('#product_unit').append("" +
+                                    "<option value='" + item1.Name + "'>" + item1.Name + "</option>"
+                                );
+                            $('#uom1_id').append("" +
+                                  "<option value='" + item1.Name + "'>" + item1.Name + "</option>"
+                              );
+                            $('#uom2_id').append("" +
+                                  "<option value='" + item1.Name + "'>" + item1.Name + "</option>"
+                              );
+                            $('#uom3_id').append("" +
+                                  "<option value='" + item1.Name + "'>" + item1.Name + "</option>"
+                              );
+                            $('#uom4_id').append("" +
+                                  "<option value='" + item1.Name + "'>" + item1.Name + "</option>"
+                              );
+                            $('#uom5_id').append("" +
+                                   "<option value='" + item1.Name + "'>" + item1.Name + "</option>"
+                               );
+                        });
+                    });
+                },
+                error: function (data) {
+                    //alert('fail');
+                }
+            });
+        }
+        function InitialItemTypeDropdownList() {
+            $.ajax({
+                url:"@Url.Action("TypeNameDropdownList", "Product")",
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    $('#type_name').empty();
+                    $('#type_name').append("" +
+                        "<option selected disabled>--- Select Item Type Name ---</option>"
+                    );
+                    $.each(data, function (index, item) {
+                        $.each(item, function (index1, item1) {
+                            $('#type_name').append("" +
+                                    "<option value='" + item1.p_category_id + "'>" + item1.p_category_name + "</option>"
+                                );
+                        });
+                    });
+                },
+                error: function (data) {
+                    alert('fail');
+                }
+            });
+        }
+        function initialUOM1() {
+            var unit = $('#product_unit').val();
+            if (unit != null || unit != "")
+                $('#uom1').text(unit);
+        }
+        function initialUOM2() {
+            var unit = $('#uom1_id').val();
+            if (unit != null || unit != "")
+                $('#uom2').text(unit);
+        }
+        function initialUOM3() {
+            var unit = $('#uom2_id').val();
+            if (unit != null || unit != "")
+                $('#uom3').text(unit);
+        }
+        function initialUOM4() {
+            var unit = $('#uom3_id').val();
+            if (unit != null || unit != "")
+                $('#uom4').text(unit);
+        }
+        function initialUOM5() {
+            var unit = $('#uom4_id').val();
+            if (unit != null || unit != "")
+                $('#uom5').text(unit);
+        }
+        function ClearFields() {
+            $("#item_code").val("");
+            $("#item_name").val("");
+            $("#product_unit").val("--- Select Item Unit ---");
+            $("#unit_price").val("");
+            $("#type_name").val("--- Select Item Type Name ---");
+            $("#Remark").val("");
+            $("#Status").html(' ');
+            $("#item_code").css("border-color", "black");
+            $("#uom1_qty").val(0);
+            $("#uom2_qty").val(0);
+            $("#uom3_qty").val(0);
+            $("#uom4_qty").val(0);
+            $("#uom5_qty").val(0);
+
+            //$("#price_umo1").val("");
+            //$("#price_umo2").val("");
+            //$("#price_umo3").val("");
+            //$("#price_umo4").val("");
+            //$("#price_umo5").val("");
+
+            $("#uom1_id").val("Select Unit");
+            $("#uom2_id").val("Select Unit");
+            $("#uom3_id").val("Select Unit");
+            $("#uom4_id").val("Select Unit");
+            $("#uom5_id").val("Select Unit");
+
+            $("#uom1").text("Unit");
+            $("#uom2").text("Unit");
+            $("#uom3").text("Unit");
+            $("#uom4").text("Unit");
+            $("#uom5").text("Unit");
+
+            //$("#valumo1").val("0");
+            //$("#valumo2").val("0");
+            //$("#valumo3").val("0");
+            //$("#valumo4").val("0");
+            //$("#valumo5").val("0");
+
+        }
+        /* End New Item Section */
+    </script>
+}
+
+
+
+

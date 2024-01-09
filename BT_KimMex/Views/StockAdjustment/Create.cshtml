@@ -1,0 +1,331 @@
+﻿@model BT_KimMex.Models.StockAdjustmentViewModel
+@{
+    ViewBag.Title = "Create";
+    string currentDate =BT_KimMex.Class.CommonClass.ToLocalTime(DateTime.Now).ToString("dd/MM/yyyy");
+}
+@*<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />*@
+<style type="text/css">
+    #stockAdjustmenttable tr td {
+        vertical-align: middle !important;
+    }
+
+        #stockAdjustmenttable tr td:nth-child(5), #stockAdjustmenttable tr td:nth-child(7) {
+            text-align: center !important;
+        }
+</style>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <h3 class="title">Create New Stock Adjustment</h3>
+        <div class="form-group">
+            @Html.Label("Date :", htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.Label(currentDate, new { @class = "col-md-10", id = "current_date" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.stock_adjuctment_code, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.Label(ViewBag.StockAdjustmentCode as string, new { @class = "col-md-10", id = "stockAdjuestmentNo" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.warehouse_id, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("warehouse_id", ViewBag.Warehouses as SelectList, "Select Warehouse", new { @class = "form-control warehouse", @id = "warehouse_id" })
+            </div>
+        </div>
+        <div class="row" style="margin:0 !important;">
+            <table class="table table-bordered" id="stockAdjustmenttable" style="margin-top:0px !important;">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Item Code</th>
+                        <th>Item Name</th>
+                        <th>Item Unit</th>
+                        <th>Stock Balance</th>
+                        <th class="text-center">Count QTY
+                        <input type="number" class="form-control" id="head_count_qty" value="0" step="any" min="0" style="width:100px !important;"/>
+                        </th>
+                        <th>Variance QTY</th>
+                        <th>Reason</th>
+                        <th style="width:50px !important;"></th>
+                        <th style="width:50px !important;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="10">No Item Data</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="button" value="Submit" class="btn btn-default" onclick="submitStockAdjustment()" />
+                @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-default" })
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts{
+@*<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js"></script>*@
+    <script type="text/javascript">
+        $(function () {
+
+            $('#warehouse_id').change(function (e) {
+                e.preventDefault();
+                var warehouse_id = $(this).val();
+                $('#stockAdjustmenttable tbody').empty();
+                if (warehouse_id == "" || warehouse_id == null) {
+                    $('#stockAdjustmenttable tbody').append("" +
+                        "<tr>" +
+                            "<td colspan='9'>No Item Data</td>" +
+                        "</tr>"
+                        );
+                }
+                else {
+                    $.ajax({
+                        url: '@Url.Action("GetAllItemsbyWarehouseJson", "StockAdjustment")',
+                        type: "get",
+                        dataType: "json",
+                        data: { id: warehouse_id },
+                        success: function (da) {
+                            if (da.data.length == 0) {
+                                $('#stockAdjustmenttable tbody').append("" +
+                                    "<tr>" +
+                                        "<td colspan='9'>No Item Data</td>" +
+                                    "</tr>"
+                                );
+                            } else {
+                                $.each(da.data, function (index, item) {
+                                    console.log(item);
+                                    var total_qty = item.total_quantity;
+                                    if (item.inventory_status_id == "9")
+                                    {
+                                        //Issue Block
+                                        total_qty = total_qty + item.out_quantity;
+                                    }
+                                    var btnAdd = "";
+                                    if (index == da.data.length - 1)
+                                        btnAdd = "<a href='javascript:void(0)' class='btn-default btn-sm' onclick='appendItemRow(this)'><span class='glyphicon glyphicon-plus'></span></a>";
+                                    $('#stockAdjustmenttable tbody').append("" +
+                                        "<tr id='i" + Number(index + 1) + "'>" +
+                                            "<td>" + Number(index + 1) + "</td>" +
+                                            "<td><input type='hidden' value='" + item.product_id + "' class='item_id'/><label class='item_code'>" + item.itemCode + "</label></td>" +
+                                            "<td><label class='item_name'>" + item.itemName + "</label></td>" +
+                                            "<td><label class='item_unit'>" + item.itemUnitName + "</label></td>" +
+                                            "<td><label class='stock_balance'>" + total_qty + "</label></td>" +
+                                            "<td><input type='number' class='form-control count_qty' value='" + total_qty + "' onchange='calculateVariance(this)'/></td>" +
+                                            "<td><label class='variance_qty'>0</label></td>" +
+                                            "<td><textarea class='form-control reason'></textarea></td>"+
+                                            "<td><a href='javascript:void(0)' class='btn-default btn-sm' onclick='removeItemRow(this)'><span class='glyphicon glyphicon-trash'></span></a></td>" +
+                                            "<td>" + btnAdd + "</td>" +
+                                        "</tr>"
+                                    );
+                                });
+                            }
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            console.log("Stock Adjustment:: " + textStatus);
+                        }
+                    });
+                }
+            });
+
+            $('#head_count_qty').change(function (e) {
+                var head_count_qty = parseFloat($(this).val());
+                var stock_balances = $('.stock_balance');
+                var count_qtys = $('.count_qty');
+                var variance_qtys = $('.variance_qty');
+            });
+
+        });
+        function initialItemRow(rowNumber, rowIdNumber) {
+            $('#stockAdjustmenttable tbody').append("" +
+                                        "<tr id='i" + rowIdNumber + "'>" +
+                                            "<td>" + rowNumber + "</td>" +
+                                            "<td><input type='hidden' value='' class='item_id'/><input type='text' class='form-control item_code' id='item"+rowIdNumber+"' onfocus='getItemDataRow(this)'/></td>" +
+                                            "<td><label class='item_name'></label></td>" +
+                                            "<td><label class='item_unit'></label></td>" +
+                                            "<td><label class='stock_balance'>0</label></td>" +
+                                            "<td><input type='number' class='form-control count_qty' value='0' onchange='calculateVariance(this)'/></td>" +
+                                            "<td><label class='variance_qty'>0</label></td>" +
+                                            "<td><textarea class='form-control reason'></textarea></td>" +
+                                            "<td><a href='javascript:void(0)' class='btn-default btn-sm' onclick='removeItemRow(this)'><span class='glyphicon glyphicon-trash'></span></a></td>" +
+                                            "<td><a href='javascript:void(0)' class='btn-default btn-sm' onclick='appendItemRow(this)'><span class='glyphicon glyphicon-plus'></span></a></td>" +
+                                        "</tr>"
+                                    );
+        }
+        function appendItemRow(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var rowId = $('#stockAdjustmenttable tr').eq(ind).attr('id').replace(/[^\d]/g, '');
+            var rowNumber = $('#stockAdjustmenttable tr').eq(ind).find('td:first-child').text();
+            var itemId = $('#stockAdjustmenttable tr').eq(ind).find('input.item_id').val();
+            if (!itemId) { //|| Number(stockBalance) < Number(returnQty)
+                return;
+            }
+            initialItemRow(Number(rowNumber) + 1, Number(rowId) + 1);
+            $('#stockAdjustmenttable tr').eq(ind).find('td:nth-child(10)').html('');
+        }
+        function removeItemRow(row) {
+            var arrItemId = [];
+            var ind = row.parentNode.parentNode.rowIndex;
+            var isLastChild = $('#stockAdjustmenttable tr').eq(ind).find('td:nth-child(10) a').length == 0 ? false : true;
+            var itemId = $('#stockAdjustmenttable tr').eq(ind).attr('id');
+            var countTableRow = $('#stockAdjustmenttable tr').length;
+            for (var i = 1; i < countTableRow; i++) {
+                var id = $('#stockAdjustmenttable tr').eq(i).attr('id');
+                if (id != undefined)
+                    arrItemId.push(id);
+            }
+            if (arrItemId.length == 1)
+                return;
+            document.getElementById('stockAdjustmenttable').deleteRow(ind);
+            if (isLastChild)
+                $('#stockAdjustmenttable tr#' + arrItemId[arrItemId.length - 2]).find('td:nth-child(10)').html("<a href='javascript:void(0)' class='btn-default btn-sm' onclick='appendItemRow(this)'><span class='glyphicon glyphicon-plus'></span></a>");
+            else {
+                var deleted_index = arrItemId.indexOf(itemId);
+                arrItemId.splice(deleted_index, 1);
+                for (var i = 0; i < arrItemId.length; i++) {
+                    $('tr#' + arrItemId[i] + ' td:nth-child(1)').html(Number(i) + 1);
+                }
+            }
+        }
+        function calculateVariance(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var stockBalance = $('#stockAdjustmenttable tr').eq(ind).find('label.stock_balance').text();
+            var countQty = $('#stockAdjustmenttable tr').eq(ind).find('input.count_qty').val();
+            var varianceQty = Number(stockBalance) - Number(countQty);
+            $('#stockAdjustmenttable tr').eq(ind).find('label.variance_qty').text(varianceQty);
+        }
+        function getItemDataRow(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var rowId = $('#stockAdjustmenttable tr').eq(ind).find('input.item_code').attr('id');
+            autocompleted(rowId);
+
+            function autocompleted(rowId) {
+                $("#" + rowId).autocomplete({
+                    source: '@Url.Action("GetProductAutoSuggestName", "Product")',
+                    select: function (event, ui) {
+                        AutoCompleteSelectHandler(event, ui, ind);
+                        $(this).val('');
+                    }
+                });
+            }
+
+            function AutoCompleteSelectHandler(event, ui, ind) {
+                var selectedObj = ui.item;
+                var item = (selectedObj.value).split(' ');
+                itemId = selectedObj.id;
+                GetItemDataRow(ind, itemId);
+            }
+
+            function GetItemDataRow(ind, itemId) {
+                if (itemId != "") {
+                    $.ajax({
+                        url: '@Url.Action("GetProductDatawithStockBalance","Product")',
+                        type: "get",
+                        dataType: "json",
+                        async: false,
+                        data: { id: itemId, warehouseID:$('#warehouse_id').val() },
+                        success: function (da) {
+                            $('#stockAdjustmenttable tr').eq(ind).find('input[type="hidden"].item_id').val('');
+                            $('#stockAdjustmenttable tr').eq(ind).find('label.item_name').text('');
+                            $('#stockAdjustmenttable tr').eq(ind).find('label.item_unit').text('');
+                            $('#stockAdjustmenttable tr').eq(ind).find('label.stock_balance').text(0);
+                            $('#stockAdjustmenttable tr').eq(ind).find('input.count_qty').val(0);
+                            $('#stockAdjustmenttable tr').eq(ind).find('label.variance_qty').text(0);
+                            if (da.data) {
+                                var item = da.data;
+                                console.log(item);
+                                $('#stockAdjustmenttable tr').eq(ind).find('input[type="hidden"].item_id').val(item.product_id);
+                                $('#stockAdjustmenttable tr').eq(ind).find('input[type="text"].item_code').val(item.product_code);
+                                $('#stockAdjustmenttable tr').eq(ind).find('label.item_name').text(item.product_name);
+                                $('#stockAdjustmenttable tr').eq(ind).find('label.item_unit').text(item.unit_name);
+                                $('#stockAdjustmenttable tr').eq(ind).find('label.stock_balance').text(item.stock_balance);
+                                $('#stockAdjustmenttable tr').eq(ind).find('input.count_qty').val(item.stock_balance);
+                                $('#stockAdjustmenttable tr').eq(ind).find('label.variance_qty').text(0);
+                            } else {
+                                $('#stockAdjustmenttable tr').eq(ind).find('input[type="hidden"].item_id').val('');
+                                $('#stockAdjustmenttable tr').eq(ind).find('label.item_name').text('');
+                                $('#stockAdjustmenttable tr').eq(ind).find('label.item_unit').text('');
+                                $('#stockAdjustmenttable tr').eq(ind).find('label.stock_balance').text(0);
+                                $('#stockAdjustmenttable tr').eq(ind).find('input.count_qty').val(0);
+                                $('#stockAdjustmenttable tr').eq(ind).find('label.variance_qty').text(0);
+                            }
+                            
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            alert(textStatus);
+                        }
+                    });
+                }
+            }
+        }
+        function submitStockAdjustment() {
+            var inventories = [];
+            var item_element = {};
+            var stockAdjustmentNo = $('#stockAdjuestmentNo').text();
+            var warehouse = $('#warehouse_id').val();
+            var items = $('.item_id');
+            var stock_balance = $('.stock_balance');
+            var count_qty = $('.count_qty');
+            var reasons = $('.reason');
+            var countInvalid = 0;
+            var countZeroQty = 0;
+            if (!warehouse || warehouse == "" || warehouse == null) {
+                alert("Warehouse is required.");
+                return;
+            }
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].value && count_qty[i].value) {
+                    item_element = {};
+                    item_element.product_id = items[i].value;
+                    item_element.total_quantity = stock_balance[i].innerHTML;
+                    item_element.out_quantity = count_qty[i].value;
+                    item_element.remark = reasons[i].value;
+                    inventories.push(item_element);
+                }
+                else
+                    countInvalid++;
+                if (Number(count_qty[i].value) == 0)
+                    countZeroQty++;
+            }
+            if(countInvalid>0)
+            {
+                alert("Please fill all items information.");
+                return;
+            }
+            if (countZeroQty >= items.length) {
+                alert("No item to adjustment.");
+                return;
+            }
+            var model = {
+                stock_adjuctment_code: stockAdjustmentNo,
+                warehouse_id: warehouse,
+                items:inventories
+            };
+            $.ajax({
+                url: "@Url.Action("Create","StockAdjustment")",
+                type: "post",
+                dataType: "json",
+                async: false,
+                data: { model: model },
+                success: function (da) {
+                    if (da.result == "success") {
+                        alert('Your data has been saved successfully.');
+                        window.location.href = '@Url.Action("Index")';
+                    } else if (da.result == "error") {
+                        alert(da.message);
+                    }
+                },
+                error: function (err) {
+                    alert('Your data is error while saving.');
+                }
+            });
+        }
+    </script>
+}
+
+
+

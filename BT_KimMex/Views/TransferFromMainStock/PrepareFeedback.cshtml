@@ -1,0 +1,340 @@
+﻿@model BT_KimMex.Models.TransferFromMainStockViewModel
+@using System.Text.RegularExpressions;
+@{
+    ViewBag.Title = "PrepareFeedback";
+}
+<style type="text/css">
+    #st_table tr td {
+        vertical-align: middle !important;
+    }
+</style>
+<div class="form-horizontal">
+    <h3 class="title">Prepare Feedback Stock Transfer</h3>
+    @Html.HiddenFor(model => model.stock_transfer_id)
+    <div class="form-group">
+        <label class="control-label col-md-2">Date:</label>
+        <label class="col-md-10">@BT_KimMex.Class.CommonClass.ToLocalTime(Convert.ToDateTime(Model.created_date)).ToString("dd/MM/yyyy")</label>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.stock_transfer_no, new { @class = "col-md-2 control-label" })
+        <label class="col-md-10">@Model.stock_transfer_no</label>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.item_request_no, new { @class = "col-md-2 control-label" })
+        <label class="col-md-10">@Model.item_request_no</label>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-bordered" id="st_table">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Item Code</th>
+                    <th>Item Name</th>
+                    <th>Stock Balance</th>
+                    <th>Requested QTY</th>
+                    <th>From Warehouse</th>
+                    <th>Transfer</th>
+                    <th>Return</th>
+                    <th>Transfer QTY</th>
+                    <th>Unit</th>
+                    <th>Invoice No.</th>
+                    <th>Invoice Date</th>
+                    <th>Feedbacked</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    bool isFlage = false;
+                    int count = 1;
+                    foreach (var item in Model.itemTransfers)
+                    {
+                        foreach (var stitem in Model.inventoryDetails)
+                        {
+                            isFlage = false;
+                            if (item.itemID == stitem.product_id && item.warehouseID == stitem.warehouse_id)
+                            {
+                                if (string.Compare(stitem.item_status, "approved") == 0)
+                                {
+                                    <tr>
+                                        <td>@count</td>
+                                        <td>@item.itemCode</td>
+                                        <td>@item.itemName</td>
+                                        <td><label class=''>@string.Format("{0:G29}", Double.Parse(stitem.total_quantity.ToString()))</label> <label class="">@item.itemUnitName</label></td>
+                                        <td><label class=''>@string.Format("{0:G29}", Double.Parse(item.remain_qty.ToString()))</label> <label class="">@item.itemUnitName</label></td>
+                                        <td><input type='hidden' class='' value='@item.warehouseID' />@item.warehouseName</td>
+                                        <td><input type="checkbox" class='' checked disabled /></td>
+                                        <td><input type="checkbox" class='' checked disabled /></td>
+                                        <td><label>@string.Format("{0:G29}", Double.Parse(stitem.out_quantity.ToString()))</label></td>
+                                        <td hidden><label>@stitem.unit</label></td>
+                                        <td><label>@item.itemUnitName</label></td>
+                                        <td><label>@stitem.invoice_number</label></td>
+                                        <td><label>@Convert.ToDateTime(stitem.invoice_date).ToString("dd/MM/yyyy")</label></td>
+                                        <td>@stitem.remark</td>
+                                    </tr>
+
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td>@count</td>
+                                        <td>@item.itemCode <input type='hidden' class='item_id' value='@item.itemID' /> </td>
+                                        <td>@item.itemName</td>
+                                        <td><label class='stock_balance'>@string.Format("{0:G29}", Double.Parse(stitem.total_quantity.ToString()))</label> <label class="stock_balance_unit">@item.itemUnitName</label></td>
+                                        <td><label class='request_qty'>@string.Format("{0:G29}", Double.Parse(item.remain_qty.ToString()))</label> <label class="request_unit">@item.itemUnitName</label></td>
+                                        <td><input type='hidden' class='warehouse_id' value='@item.warehouseID' />@item.warehouseName</td>
+                                        <td><input type="checkbox" class='transfer' checked disabled /></td>
+                                        @if (stitem.status == "True")
+                                        {
+                                            <td><input type="checkbox" class='return' checked /></td>
+                                        }
+                                        @if (stitem.status == "False")
+                                        {
+                                            <td><input type="checkbox" class='return' /></td>
+                                        }
+                                        <td><input type='number' class='form-control transfer_qty' value='@string.Format("{0:G29}",Double.Parse(stitem.out_quantity.ToString()))' /></td>
+                                        <td>
+                                            <select class='form-control transfer-unit' onchange='checkQty(this)'>
+                                                @if (string.Compare(item.itemUnit, stitem.unit) == 0)
+                                                {
+                                                    <option value="@item.itemUnit" selected>@item.itemUnitName</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@item.itemUnit">@item.itemUnit</option>
+                                                }
+                                                @{
+                                                    if (item.uom1_id != null && item.uom1_qty != null)
+                                                    {
+                                                        string uom1 = Regex.Replace(item.uom1_id, @"\t|\n|\r", "");
+                                                        if (string.Compare(uom1, stitem.unit) == 0)
+                                                        {
+                                                            <option value="@uom1,@item.uom1_qty" selected>@uom1</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@uom1,@item.uom1_qty">@uom1</option>
+                                                        }
+                                                    }
+                                                    if (item.uom2_id != null && item.uom2_qty != null)
+                                                    {
+                                                        string uom2 = Regex.Replace(item.uom2_id, @"\t|\n|\r", "");
+                                                        if (string.Compare(uom2, stitem.unit) == 0)
+                                                        {
+                                                            <option value="@uom2,@item.uom2_qty" selected>@uom2</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@uom2,@item.uom2_qty">@uom2</option>
+                                                        }
+                                                    }
+                                                    if (item.uom3_id != null && item.uom3_qty != null)
+                                                    {
+                                                        string uom3 = Regex.Replace(item.uom3_id, @"\t|\n|\r", "");
+                                                        if (string.Compare(uom3, stitem.unit) == 0)
+                                                        {
+                                                            <option value="@uom3,@item.uom3_qty" selected>@uom3</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@uom3,@item.uom3_qty">@uom3</option>
+                                                        }
+                                                    }
+                                                    if (item.uom4_id != null && item.uom4_qty != null)
+                                                    {
+                                                        string uom4 = Regex.Replace(item.uom4_id, @"\t|\n|\r", "");
+                                                        if (string.Compare(uom4, stitem.unit) == 0)
+                                                        {
+                                                            <option value="@uom4,@item.uom4_qty" selected>@uom4</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@uom4,@item.uom4_qty">@uom4</option>
+                                                        }
+                                                    }
+                                                    if (item.uom5_id != null && item.uom5_qty != null)
+                                                    {
+                                                        string uom5 = Regex.Replace(item.uom5_id, @"\t|\n|\r", "");
+                                                        if (string.Compare(uom5, stitem.unit) == 0)
+                                                        {
+                                                            <option value="@uom5,@item.uom5_qty" selected>@uom5</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@uom5,@item.uom5_qty">@uom5</option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </td>
+                                        <td><input type='text' class='form-control invoice_no' value="@stitem.invoice_number" /></td>
+                                        <td>
+                                            <div style="display:inline-block !important;margin-right:5px !important;">
+                                                <div class="input-group date" data-provide="datepicker" data-autoclose="true" style="width:150px !important;">
+                                                    <input type="text" class="form-control invoice_date" style="width:130px !important;" value="@Convert.ToDateTime(stitem.invoice_date).ToString("dd/MM/yyyy") " />
+                                                    <div class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td><textarea class="form-control feedback_comment">@stitem.remark</textarea></td>
+                                    </tr>
+                                                            }
+                                                            isFlage = true;
+                                                            break;
+                                                        }
+                                                    }
+                                                    if (isFlage == false)
+                                                    {
+                                                        <tr>
+                                                            <td>@count</td>
+                                                            <td>@item.itemCode <input type='hidden' class='item_id' value='@item.itemID' /></td>
+                                                            <td>@item.itemName</td>
+                                                            <td><label class='stock_balance'>@string.Format("{0:G29}", Double.Parse(item.stockBalance.ToString()))</label> <label class="stock_balance_unit">@item.itemUnit</label></td>
+                                                            <td><label class='request_qty'>@string.Format("{0:G29}", Double.Parse(item.requestQty.ToString()))</label> <label class="request_unit">@item.itemUnit</label></td>
+                                                            <td><input type='hidden' class='warehouse_id' value='@item.warehouseID' />@item.warehouseName</td>
+                                                            <td><input type="checkbox" class='transfer' /></td>
+                                                            <td><input type="checkbox" class='return' /></td>
+                                                            <td><input type='number' class='form-control transfer_qty' value='0' /></td>
+                                                            <td>
+                                                                <select class='form-control transfer-unit' onchange='checkQty(this)'>
+                                                                    <option value="@item.itemUnit">@item.itemUnit</option>
+                                                                    @{
+                                                                        if (item.uom1_id != null && item.uom1_qty != null)
+                                                                        {
+                                                                            string uom1 = Regex.Replace(item.uom1_id, @"\t|\n|\r", "");
+                                                                            <option value="@uom1,@item.uom1_qty">@uom1</option>
+                                                                        }
+                                                                        if (item.uom2_id != null && item.uom2_qty != null)
+                                                                        {
+                                                                            string uom2 = Regex.Replace(item.uom2_id, @"\t|\n|\r", "");
+                                                                            <option value="@uom2,@item.uom2_qty">@uom2</option>
+                                                                        }
+                                                                        if (item.uom3_id != null && item.uom3_qty != null)
+                                                                        {
+                                                                            string uom3 = Regex.Replace(item.uom3_id, @"\t|\n|\r", "");
+                                                                            <option value="@uom3,@item.uom3_qty">@uom3</option>
+                                                                        }
+                                                                        if (item.uom4_id != null && item.uom4_qty != null)
+                                                                        {
+                                                                            string uom4 = Regex.Replace(item.uom4_id, @"\t|\n|\r", "");
+                                                                            <option value="@uom4,@item.uom4_qty">@uom4</option>
+                                                                        }
+                                                                        if (item.uom5_id != null && item.uom5_qty != null)
+                                                                        {
+                                                                            string uom5 = Regex.Replace(item.uom5_id, @"\t|\n|\r", "");
+                                                                            <option value="@uom5,@item.uom5_qty">@uom5</option>
+                                                                        }
+                                                                    }
+                                                                </select>
+
+                                                            </td>
+                                                            <td><input type='text' class='form-control invoice_no' /></td>
+                                                            <td>
+                                                                <div style="display:inline-block !important;margin-right:5px !important;">
+                                                                    <div class="input-group date" data-provide="datepicker" data-autoclose="true" style="width:150px !important;">
+                                                                        <input type="text" class="form-control invoice_date" style="width:130px !important;" />
+                                                                        <div class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></div>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td><textarea class="form-control feedback_comment"></textarea></td>
+                                                        </tr>
+                                                                            }
+                                                                            count++;
+                                                                        }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="button" value="Submit" class="btn btn-default" onclick="submitPrepreFeedback()" />
+            @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            $(".date").datepicker({ format: 'dd/mm/yyyy' });
+            $('#st_table tbody').on('changeDate', 'td div.date', function () {
+                $(this).datepicker('hide');
+            });
+        });
+        function submitPrepreFeedback() {
+            var arrIndex = [];
+
+            $('.transfer:checkbox:checked').each(function () {
+                var index = $(this)[0].parentNode.parentNode.rowIndex;
+                arrIndex.push(index);
+            });
+            if (arrIndex.length <= 0) {
+                alert('Please choose at lease one item for transfer.');
+                return;
+            } else {
+                var element_item = {};
+                var items = [];
+                var check = true;
+                var false1 = false;
+                var checkornot;
+                for (var i = 0; i < arrIndex.length; i++) {
+                    var itemId = $('#st_table tr').eq(arrIndex[i]).find('input.item_id').val();
+                    var stockBalance = $('#st_table tr').eq(arrIndex[i]).find('label.stock_balance').text();
+                    var requestQty = $('#st_table tr').eq(arrIndex[i]).find('label.request_qty').text();
+                    var warehouse = $('#st_table tr').eq(arrIndex[i]).find('input.warehouse_id').val();
+                    var transferQty = $('#st_table tr').eq(arrIndex[i]).find('input.transfer_qty').val();
+                    var transferUnit = $('#st_table tr').eq(arrIndex[i]).find('select.transfer-unit').val();
+                    var splitUnit = transferUnit.split(',');
+                    var invoiceNumber = $('#st_table tr').eq(arrIndex[i]).find('input.invoice_no').val();
+                    var invoiceDate = $('#st_table tr').eq(arrIndex[i]).find('input.invoice_date').val();
+
+                     $('#st_table tr').eq(arrIndex[i]).find('.return').each(function () {
+                                  if($(this).prop("checked") == true){
+
+                                      checkornot = check;
+                                    }
+                                    else if($(this).prop("checked") == false){
+
+                                      checkornot = false1;
+                                    }
+
+                            });
+                    if (Number(transferQty) <= 0 || Number(transferQty) == '') {
+                        alert('Please fill transfer quantity.');
+                        return;
+                    }
+                    element_item = {};
+                    element_item.product_id = itemId;
+                    element_item.warehouse_id = warehouse;
+                    element_item.out_quantity = transferQty;
+                    element_item.total_quantity = requestQty;
+                    element_item.unit = splitUnit[0].trim();
+                    element_item.invoice_number = invoiceNumber;
+                    element_item.invoice_date = convertDDMMYYYtoMMDDYYYY(invoiceDate);
+                    element_item.status = checkornot;
+                    items.push(element_item);
+                }
+                console.log(checkornot);
+                console.log(items);
+                $.ajax({
+                    url: "@Url.Action("PrepareFeedback", "TransferFromMainStock")",
+                    type: "post",
+                    dataType: "json",
+                    async: false,
+                    data: { id: $('#stock_transfer_id').val(), inventories: items },
+                    success: function (da) {
+                        if (da.result == "success") {
+                            alert('Your data has been submitted successfully.!');
+                            window.location.href = '@Url.Action("Index", "TransferFromMainStock")';
+                        } else if (da.result == "fail") {
+                            alert(da.message);
+                        }
+                    },
+                    error: function (err) {
+                        alert('Your data is error while updating!');
+                    }
+                });
+            }
+        }
+    </script>
+}

@@ -1,0 +1,145 @@
+﻿@using BT_KimMex.Class
+@model IEnumerable<BT_KimMex.Models.MRCutOffViewModel>
+    @using Microsoft.AspNet.Identity;
+@{
+    ViewBag.Title = "Cut-off List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string userid = User.Identity.GetUserId().ToString();
+}
+
+<h3 class="">Material Request Cut-off List</h3>
+<div class="table-responsive">
+    <table class="table table-bordered" id="table">
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Request Number</th>
+                <th>Material Request Ref.</th>
+                <th>Project</th>
+                <th>Requester</th>
+                <th>Requested Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{ 
+                int count = 1;
+                foreach(var item in Model)
+                {
+                    <tr>
+                        <td>@count</td>
+                        <td>@item.mr_cut_off_number</td>
+                        <td>@item.material_request_number</td>
+                        <td>@item.project_name</td>
+                        <td>@BT_KimMex.Class.CommonFunctions.GetUserFullnamebyUserId(item.created_by)</td>
+                        <td>@Convert.ToDateTime(item.created_at).ToString("dd/MM/yyyy")</td>
+                        <td class="text-center">@{
+                            if (string.Compare(item.mr_cut_off_status, Status.Pending) == 0)
+                            {
+                                <label class="label w3-red">@ShowStatus.Created</label>
+                            }
+
+                            else if (string.Compare(item.mr_cut_off_status, Status.Approved) == 0)
+                            {
+                                <label class="label w3-green">@ShowStatus.Completed</label>
+                            }
+                            else
+                            {
+                                <label class="label w3-grey">@item.mr_cut_off_status</label>
+                            }
+                        }</td>
+                        <td class="text-center">
+                            <div class="w3-bar">
+                                <a href="@Url.Action("Details","MRCutOff",new { id = item.mr_cut_off_id })" class="w3-button w3-tiny w3-green"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                                @if ((User.IsInRole(Role.SystemAdmin) || string.Compare(item.created_by, userid) == 0) && string.Compare(item.mr_cut_off_status, Status.Pending) == 0)
+                                {
+                                    <a href="javascript:void(0)" class="w3-button w3-tiny w3-red cancel-promp" id="@item.mr_cut_off_id"><i class="fa fa-ban" aria-hidden="true"></i></a>
+                                }
+                                @if (string.Compare(item.mr_cut_off_status, Status.Pending) == 0 && (User.IsInRole(Role.SystemAdmin) || ClsMRCutOff.IsMRCutOffSiteSupervisor(item.mr_cut_off_id, userid)))
+                                {
+                                    <a href="@Url.Action("Approval","MRCutOff",new { id = item.mr_cut_off_id })" class="w3-button w3-tiny w3-orange"><i class="fa fa-thumbs-up" aria-hidden="true"></i></a>
+                                }
+                                
+                            </div>
+                        </td>
+                    </tr>
+                    count++;
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- cancel request modal popup-->
+<div class="modal fade" id="cancelRequestModal" tabindex="=-1" role="dialog" aria-labelledby="approveModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-warning">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to cancel this request?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" id="btn-cancel-yes">Yes</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            var cut_off_id = '';
+            $('#table').DataTable({});
+            @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser))
+            {
+                <text>
+            $('#table_filter').append('<a href="@Url.Action("Create", "MRCutOff")" class="w3-button w3-tiny w3-teal pull-left" style="margin-right:10px !important;">New Request</a>');
+            </text>
+            }
+
+            $('#table tbody').on('click', 'td a.cancel-promp', function () {
+                cut_off_id = $(this).attr('id');
+                //console.log(mr_cut_id);
+                $('#cancelRequestModal').modal('show');
+            });
+
+            $('#btn-cancel-yes').click(function () {
+                if (cut_off_id != '') {
+                    $.ajax({
+                        url: "/MRCutOff/RequestCancel",
+                        data: {
+                            'id': cut_off_id,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#cancelRequestModal').modal('hide');
+                            if (da.result == "success") {
+                                alert('Your request has been cancelled successfully.');
+                                window.location.href = '@Url.Action("Index", "MRCutOff")';
+                            }
+                            else
+                                alert('Your data has been error while submitting.');
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.approve-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while approving!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

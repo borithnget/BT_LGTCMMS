@@ -1,0 +1,50 @@
+﻿@model BT_KimMex.Models.ProductClassViewModel
+@using BT_KimMex.Class;
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h3 class="title">Edit Product Class</h3>
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.product_class_id)
+
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Class Type <strong stype="color:red;"></strong></label>
+            <div class="col-md-10">
+                @{
+                    var ClassType = (List<SelectListItem>)ViewBag.ClassType;
+                }
+                @Html.DropDownList("class_type_id", new SelectList(CommonFunctions.GetClassTypeListItems(), "class_type_id", "class_type_name", Model.class_type_id), new { id = "class_type_id", @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.class_type_id, "", new { @class = "text-danger", style = "display:block !important;" })
+            </div>
+
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.product_class_name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.product_class_name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.product_class_name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-info" />
+                @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-danger" })
+            </div>
+        </div>
+    </div>
+                    }
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

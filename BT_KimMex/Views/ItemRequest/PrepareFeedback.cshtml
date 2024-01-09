@@ -1,0 +1,127 @@
+﻿@model  BT_KimMex.Models.ItemRequestViewModel
+@using BT_KimMex.Class
+@using Microsoft.AspNet.Identity;
+@{
+    ViewBag.Title = "PrepareFeedback";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "my-form" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.ir_id)
+    <div class="form-horizontal">
+        <h3 class="title">Prepare Feedback Material Request</h3>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.Label("MR Date:", new { @class = "col-md-4" })
+                    <label class="col-md-8" id="date">@Convert.ToDateTime(Model.created_date).ToString("dd/MM/yyyy")</label>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4">MR No.:</label>
+                    @Html.DisplayFor(model => model.ir_no, new { @class = "col-md-8" })
+                </div>
+                <div class="form-group">
+                    @Html.Label("Project Name:", new { @class = "col-md-4" })
+                    @Html.DisplayFor(model => model.project_full_name, new { @class = "col-md-8" })
+                </div>
+                <div class="form-group">
+                    @Html.Label("Purpose of Purchase:", new { @class = "col-md-4" })
+                    @Html.DisplayFor(model => model.purpose_description, new { @class = "col-md-8" })
+                </div>
+            </div>
+            <div class="col-md-6">
+
+            </div>
+        </div>
+
+        <div class="row" style="margin:0 !important;">
+            <table class="table table-bordered" id="ir_table">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Item Code</th>
+                        <th>Item Name</th>
+                        <th>Requested QTY</th>
+                        <th>Requested Unit</th>
+                        <th>Remark</th>
+                        <th>Approved QTY</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int ddCount = 1;
+                        foreach (var ddIr in Model.ir1[0].ir2)
+                        {
+                            string requestQty = string.Format("{0:G29}", decimal.Parse(ddIr.ir_qty.ToString()));
+                            if (string.Compare(ddIr.item_status, Status.Approved) == 0 || string.Compare(ddIr.item_status, Status.Rejected) == 0)
+                            {
+                                <tr>
+                                    <td>@ddCount</td>
+                                    <td style="text-align:center !important;vertical-align:middle !important;">@ddIr.product_code</td>
+                                    <td>@ddIr.product_name</td>
+                                    <td style="text-align:center !important;vertical-align:middle !important;">@requestQty</td>
+                                    <td style="text-align:center !important;vertical-align:middle !important;">@ddIr.requested_unit</td>
+                                    <td>@ddIr.remark</td>
+                                    <td style="text-align:center !important;vertical-align:middle !important;"><strong style="color:green !important;">@ddIr.approved_qty</strong></td>
+                                    <td>@ddIr.reason</td>
+                                    <td>@ddIr.item_status</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td>@ddCount</td>
+                                    <td style="text-align:center !important;vertical-align:middle !important;"><input type="hidden" value="@ddIr.ir_detail2_id" name="ir_detail2_id[]"/> @ddIr.product_code</td>
+                                    <td>@ddIr.product_name</td>
+                                    <td style="text-align:center !important;vertical-align:middle !important;"><input type="number" name="ir_qty[]" class="form-control ir_qty" value="@requestQty" step="any"/></td>
+                                    <td style="text-align:center !important;vertical-align:middle !important;">@ddIr.requested_unit</td>
+                                    <td><textarea class='form-control item_remark' name="remark[]" placeholder='Remark'>@ddIr.remark</textarea></td>
+                                    <td style="text-align:center !important;vertical-align:middle !important;"><strong style="color:green !important;">@ddIr.approved_qty</strong></td>
+                                    <td>@ddIr.reason</td>
+                                    <td>@ddIr.item_status</td>
+                                </tr>
+                            }
+
+                            ddCount++;
+                        }
+
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <button class="w3-button w3-tiny w3-deep-orange" type="button" id="btn-submit">Submit </button>
+                <a class="w3-button w3-tiny w3-red" href="javascript:history.back()">Back</a>
+            </div>
+        </div>
+
+    </div>
+}
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('#btn-submit').on('click', function () {
+                // do validation here
+                var countInvalid=0;
+                var qtys = $('.ir_qty');
+                for (var i = 0; i < qtys.length; i++) {
+                    if (Number(qtys[i].value) <= 0)
+                        countInvalid++;
+                }
+                if (countInvalid > 0) {
+                    alert("Request Quantity must be greater than 0.");
+                    return false;
+                }
+                $('#my-form').submit();
+                //return true;
+            });
+        });
+    </script>
+    }

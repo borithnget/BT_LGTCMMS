@@ -1,0 +1,46 @@
+﻿@model BT_KimMex.Models.SiteViewModel
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h3 class="title">View Site Detail</h3>
+
+<div class="form-horizontal">
+    <div class="form-group">
+        <label class="col-md-2">Site Name:</label>
+        <label class="col-md-10">@Model.site_name</label>
+    </div>
+    @*<div class="form-group">
+        <label class="col-md-2">Site Admin:</label>
+        <label class="col-md-10">@Model.site_admin_id</label>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-2">Site Supervisor:</label>
+        <div class="col-md-10">
+            @foreach(var item in Model.siteSupervisors)
+            {
+                <p>@item.site_supervisor_name</p>
+            }
+        </div>
+    </div>*@
+    <div class="form-group">
+        <label class="col-md-2">Address:</label>
+        <label class="col-md-10">@Model.site_address</label>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            @Html.ActionLink("Edit", "Edit", "Site", new { id = Model.site_id }, new { @class = "btn btn-success" })
+            <a href="@Url.Action("Index","Site")" class="btn btn-danger">Back</a>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('#site_created_date').text(getFormattedDateMMDDYYYY(new Date('@Model.create_dated')));
+        });
+    </script>
+}

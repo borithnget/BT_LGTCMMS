@@ -1,0 +1,505 @@
+﻿@model BT_KimMex.Models.StockTransferViewModel
+@using System.Text.RegularExpressions;
+@using BT_KimMex.Class
+@{
+    ViewBag.Title = "Edit";
+    string date =CommonClass.ToLocalTime(Convert.ToDateTime(Model.created_date)).ToString("dd/MM/yyyy");
+    string stockTransferNo = Model.stock_transfer_no;
+    string xx = Model.item_request_no;
+}
+<style type="text/css">
+    #st_table tr td{
+        vertical-align:middle !important;
+    }
+    #st_table tr td:nth-child(4),#st_table tr td:nth-child(5),#st_table tr td:nth-child(7){
+        text-align:center !important;
+    }
+</style>
+<h3 class="title">Edit Stock Transfer</h3>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+<div class="form-horizontal">
+
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.stock_transfer_id)
+
+    <div class="form-group">
+        @Html.Label("Date:", new { @class = "control-label col-md-2" })
+        @Html.Label(date, new { @class = "col-md-10" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.stock_transfer_no, htmlAttributes: new { @class = "control-label col-md-2" })
+        @Html.Label(stockTransferNo, new { @class = "col-md-10", id = "stock_transfer_no" })
+    </div>
+
+    @*<div class="form-group">
+        <label class="control-label col-md-2">Material Request:<strong style="color:red;">*</strong>:</label>
+        <div class="col-md-10">
+            @Html.DropDownList("item_request_id", new SelectList(ViewBag.IRID, "ir_id", "ir_no", Model.item_request_no), new { @class = "form-control", id = "item_request_id" })
+            @Html.ValidationMessageFor(model => model.item_request_id, "", new { @class = "text-danger" })
+        </div>
+    </div>*@
+    <div class="form-group">
+            @Html.Label("Material Request No:", new { @class = "control-label col-md-2"})
+            @Html.Label(xx, new { @class = "col-md-10" })
+            @Html.TextBoxFor(Model=>Model.item_request_id , new { @class = "control-label col-md-2 hidden", id = "item_request_id" })
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2">Warehouse:</label>
+        <div class="col-md-10">
+            <label id="warehouse">@CommonClass.ConvertWarehouseName(Model.item_request_id)</label>
+        </div>
+    </div>
+
+
+    <div class="row" style="margin:0 !important;">
+        <table class="table table-bordered" id="st_table">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Item Code</th>
+                    <th>Item Name</th>
+                    <th>Stock Balance</th>
+                    <th>Requested QTY</th>
+                    <th>From Warehouse</th>
+                    <th>Transfer</th>
+                    <th>Return</th>
+                    <th>Transfer QTY</th>
+                    <th>Unit</th>
+                    <th>Invoice No.</th>
+                    <th>Invoice Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int count = 1;
+                    bool isFlage = false;
+                    foreach (var item in Model.itemTransfers)
+                    {
+                        <tr>
+                            <td>@count</td>
+                            <td><input type='hidden' class='item_id' value='@item.itemID' />@item.itemCode</td>
+                            <td>@item.itemName</td>
+                            @foreach (var stitem in Model.inventoryDetails)
+                            {
+                                isFlage = false;
+                                if (item.itemID == stitem.product_id && item.warehouseID == stitem.warehouse_id)
+                                {
+                                    <td><label class='stock_balance'>@string.Format("{0:N2}", Double.Parse(stitem.total_quantity.ToString()))</label> <label class="stock_balance_unit">@item.itemUnitName</label></td>
+                                    <td><label class='request_qty'>@string.Format("{0:N2}", Double.Parse(item.requestQty.ToString()))</label> <label class="request_unit">@item.itemUnitName</label></td>
+                                    <td><input type='hidden' class='warehouse_id' value='@item.warehouseID' />@item.warehouseName</td>
+                                    <td><input type="checkbox" class='transfer' checked /></td>
+                                    if (stitem.status == "True")
+                                    {
+                                        <td><input type="checkbox" class='return' checked /></td>
+                                    }
+                                    if (stitem.status == "False")
+                                    {
+                                        <td><input type="checkbox" class='return' /></td>
+                                    }
+                                    <td hidden><input type="text" class="hidcheck" id="hidcheck1" />@stitem.status</td>
+                                    <td><input type='number' class='form-control transfer_qty' value='@string.Format("{0:N2}",Double.Parse(stitem.out_quantity.ToString()))' /></td>
+                                    <td>
+                                        <select class='form-control transfer-unit' onchange='checkQty(this)'>
+                                            @if (string.Compare(item.itemUnit, stitem.unit) == 0)
+                                            {
+                                                <option value="@item.itemUnit" selected>@item.itemUnitName</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.itemUnit">@item.itemUnitName</option>
+                                            }
+                                            @{
+                                                if (item.uom1_id != null && item.uom1_qty != null)
+                                                {
+                                                    string uom1 = Regex.Replace(item.uom1_id, @"\t|\n|\r", "");
+                                                    if (string.Compare(uom1, stitem.unit) == 0)
+                                                    {
+                                                        <option value="@uom1,@item.uom1_qty" selected>@uom1</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@uom1,@item.uom1_qty">@uom1</option>
+                                                    }
+                                                }
+                                                if (item.uom2_id != null && item.uom2_qty != null)
+                                                {
+                                                    string uom2 = Regex.Replace(item.uom2_id, @"\t|\n|\r", "");
+                                                    if (string.Compare(uom2, stitem.unit) == 0)
+                                                    {
+                                                        <option value="@uom2,@item.uom2_qty" selected>@uom2</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@uom2,@item.uom2_qty">@uom2</option>
+                                                    }
+                                                }
+                                                if (item.uom3_id != null && item.uom3_qty != null)
+                                                {
+                                                    string uom3 = Regex.Replace(item.uom3_id, @"\t|\n|\r", "");
+                                                    if (string.Compare(uom3, stitem.unit) == 0)
+                                                    {
+                                                        <option value="@uom3,@item.uom3_qty" selected>@uom3</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@uom3,@item.uom3_qty">@uom3</option>
+                                                    }
+                                                }
+                                                if (item.uom4_id != null && item.uom4_qty != null)
+                                                {
+                                                    string uom4 = Regex.Replace(item.uom4_id, @"\t|\n|\r", "");
+                                                    if (string.Compare(uom4, stitem.unit) == 0)
+                                                    {
+                                                        <option value="@uom4,@item.uom4_qty" selected>@uom4</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@uom4,@item.uom4_qty">@uom4</option>
+                                                    }
+                                                }
+                                                if (item.uom5_id != null && item.uom5_qty != null)
+                                                {
+                                                    string uom5 = Regex.Replace(item.uom5_id, @"\t|\n|\r", "");
+                                                    if (string.Compare(uom5, stitem.unit) == 0)
+                                                    {
+                                                        <option value="@uom5,@item.uom5_qty" selected>@uom5</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@uom5,@item.uom5_qty">@uom5</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </td>
+                                    <td><input type='text' class='form-control invoice_no' value="@stitem.invoice_number" /></td>
+                                    <td>
+                                        <div style="display:inline-block !important;margin-right:5px !important;">
+                                            <div class="input-group date" data-provide="datepicker" data-autoclose="true" style="width:150px !important;">
+                                                <input type="text" class="form-control invoice_date" style="width:130px !important;" value="@Convert.ToDateTime(stitem.invoice_date).ToString("dd/MM/yyyy") " />
+                                                <div class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    isFlage = true;
+                                    break;
+                                }
+                            }
+                            @if (isFlage == false)
+                            {
+                                <td><label class='stock_balance'>@string.Format("{0:N2}", Double.Parse(item.stockBalance.ToString()))</label> <label class="stock_balance_unit">@item.itemUnitName</label></td>
+                                <td><label class='request_qty'>@string.Format("{0:N2}", Double.Parse(item.requestQty.ToString()))</label> <label class="request_unit">@item.itemUnitName</label></td>
+                                <td><input type='hidden' class='warehouse_id' value='@item.warehouseID' />@item.warehouseName</td>
+                                <td><input type="checkbox" class='transfer' /></td>
+                                <td><input type="checkbox" class='return' /></td>
+                                <td hidden><input type="text" class="hidcheck" /></td>
+                                <td><input type='number' class='form-control transfer_qty' value='0' /></td>
+                                <td>
+                                    <select class='form-control transfer-unit' onchange='checkQty(this)'>
+                                        <option value="@item.itemUnit">@item.itemUnitName</option>
+                                        @{
+                                            if (item.uom1_id != null && item.uom1_qty != null)
+                                            {
+                                                string uom1 = Regex.Replace(item.uom1_id, @"\t|\n|\r", "");
+                                                <option value="@uom1,@item.uom1_qty">@uom1</option>
+                                            }
+                                            if (item.uom2_id != null && item.uom2_qty != null)
+                                            {
+                                                string uom2 = Regex.Replace(item.uom2_id, @"\t|\n|\r", "");
+                                                <option value="@uom2,@item.uom2_qty">@uom2</option>
+                                            }
+                                            if (item.uom3_id != null && item.uom3_qty != null)
+                                            {
+                                                string uom3 = Regex.Replace(item.uom3_id, @"\t|\n|\r", "");
+                                                <option value="@uom3,@item.uom3_qty">@uom3</option>
+                                            }
+                                            if (item.uom4_id != null && item.uom4_qty != null)
+                                            {
+                                                string uom4 = Regex.Replace(item.uom4_id, @"\t|\n|\r", "");
+                                                <option value="@uom4,@item.uom4_qty">@uom4</option>
+                                            }
+                                            if (item.uom5_id != null && item.uom5_qty != null)
+                                            {
+                                                string uom5 = Regex.Replace(item.uom5_id, @"\t|\n|\r", "");
+                                                <option value="@uom5,@item.uom5_qty">@uom5</option>
+                                            }
+                                        }
+                                    </select>
+
+                                </td>
+                                <td>
+                                    <input type='text' class='form-control invoice_no' />
+                                </td>
+                                <td>
+                                    <div style="display:inline-block !important;margin-right:5px !important;">
+                                        <div class="input-group date" data-provide="datepicker" data-autoclose="true" style="width:150px !important;">
+                                            <input type="text" class="form-control invoice_date" style="width:130px !important;" />
+                                            <div class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></div>
+                                        </div>
+                                    </div>
+                                </td>
+                            }
+                        </tr>
+                        count++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="button" id="btnSave" value="Submit" class="btn btn-default" />
+            @Html.ActionLink("Cancel", "Index", "StockTransfer", new { @class = "btn btn-default" })
+        </div>
+    </div>
+</div>
+                                                    }
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            $(".date").datepicker({ format: 'dd/mm/yyyy' });
+            $('#st_table tbody').on('changeDate', 'td div.date', function () {
+                $(this).datepicker('hide');
+            });
+            $('#item_request_id').change(function () {
+                var itemRequest = $(this).val();
+                if (itemRequest) {
+                    $.ajax({
+                        url: '@Url.Action("GetItemByIRID", "StockTransfer")',
+                        type: "get",
+                        dataType: "json",
+                        data: { id: itemRequest, stId: $('#stock_transfer_id').val() },
+                        success: function (da) {
+                            console.log(da);
+                            if (da.result == "success") {
+                                $('#st_table tbody').empty();
+                                var count = 1;
+                                $.each(da.data, function (index, item) {
+                                  
+                                    if (item) {
+                                        console.log(item);
+                                        var mou = "<option value='" + item.itemUnit.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "'>" + item.itemUnit.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                                        if (item.uom1_id && item.uom1_qty) {
+                                            mou = mou + "<option value='" + item.uom1_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom1_qty + "'>" + item.uom1_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                                        }
+                                        if (item.uom2_id && item.uom2_qty) {
+                                            mou = mou + "<option value='" + item.uom2_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom2_qty + "'>" + item.uom2_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                                        }
+                                        if (item.uom3_id && item.uom3_qty) {
+                                            mou = mou + "<option value='" + item.uom3_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom3_qty + "'>" + item.uom3_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                                        }
+                                        if (item.uom4_id && item.uom4_qty) {
+                                            mou = mou + "<option value='" + item.uom4_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom4_qty + "'>" + item.uom4_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                                        }
+                                        if (item.uom5_id && item.uom5_qty) {
+                                            mou = mou + "<option value='" + item.uom5_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom5_qty + "'>" + item.uom5_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                                        }
+                                        $('#st_table').append("" +
+                                            "<tr>" +
+                                                "<td>" + count + "</td>" +
+                                                "<td><input type='hidden' class='item_id' value='" + item.itemID + "'/>" + item.itemCode + "</td>" +
+                                                "<td><label>" + item.itemName + "</label></td>" +
+                                                "<td><label class='stock_balance'>" + item.stockBalance + "</label> <label class='stock_balance_unit'>" + item.itemUnit + "</label></td>" +
+                                                "<td><label class='request_qty'>" + item.requestQty + "</label> <label class='request_unit'>" + item.requestUnit + "</label></td>" +
+                                                "<td><input type='hidden' class='warehouse_id' value='" + item.warehouseID + "' />" + item.warehouseName + "</td>" +
+                                                "<td><input type='checkbox' value='' class='transfer'/></td>" +
+                                                "<td hidden><input type='text' id='hidcheck1' class='hidcheck'></td>" +
+                                                "<td><input type='number' class='form-control transfer_qty' value='0' onchange='checkQty(this)'/></td>" +
+                                                //"<td><input type='number' class='form-control transfer_qty' value='0.00' onchange='checkQty(this)'/></td>" +
+                                                "<td><select class='form-control transfer-unit' onchange='checkQty(this)'>" + mou + "</select></td>" +
+                                                "<td><input type='text' class='form-control invoice_no'/></td>" +
+                                                    "<td>" +
+                                                        '<div style="display:inline-block !important;margin-right:5px !important;">' +
+                                                            '<div class="input-group date" data-provide="datepicker" data-autoclose="true" style="width:150px !important;">' +
+                                                                '<input type="text" class="form-control invoice_date" style="width:130px !important;"/>' +
+                                                                '<div class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></div>' +
+                                                            '</div>' +
+                                                        '</div>' +
+                                                    "</td>" +
+                                            "</tr>"
+                                            );
+                                        count++;
+                                    }
+                                });
+                            }
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            console.log(textStatus);
+                        }
+                    });
+                }
+            });
+
+            $('#btnSave').click(function () {
+                var arrIndex = [];
+                var check = true;
+                var false1 = false;
+                var checkornot;
+                $('.transfer:checkbox:checked').each(function () {
+                    var index = $(this)[0].parentNode.parentNode.rowIndex;
+                    arrIndex.push(index);
+                });
+                 
+                if (arrIndex.length <= 0) {
+                    alert('Please choose at lease one item for transfer.');
+                    return;
+                } else {
+                    var element_item = {};
+                    var items = [];
+                    for (var i = 0; i < arrIndex.length; i++) {
+                        var itemId = $('#st_table tr').eq(arrIndex[i]).find('input.item_id').val();
+                        var stockBalance = $('#st_table tr').eq(arrIndex[i]).find('label.stock_balance').text();
+                        var requestQty = $('#st_table tr').eq(arrIndex[i]).find('label.request_qty').text();
+                        var warehouse = $('#st_table tr').eq(arrIndex[i]).find('input.warehouse_id').val();
+                        var transferQty = $('#st_table tr').eq(arrIndex[i]).find('input.transfer_qty').val();
+                        var transferUnit = $('#st_table tr').eq(arrIndex[i]).find('select.transfer-unit').val();
+                        var splitUnit = transferUnit.split(',');
+                        var invoiceNumber = $('#st_table tr').eq(arrIndex[i]).find('input.invoice_no').val();
+                        var invoiceDate = $('#st_table tr').eq(arrIndex[i]).find('input.invoice_date').val();
+                          $('#st_table tr').eq(arrIndex[i]).find('.return').each(function () {
+                                  if($(this).prop("checked") == true){
+                                  
+                                      checkornot = check;
+                                    }
+                                    else if($(this).prop("checked") == false){
+                              
+                                      checkornot = false1;
+                                    }
+                                 
+                            });
+                      
+                        if (Number(transferQty) <= 0 || Number(transferQty) == '') {
+                            alert('Please fill transfer quantity.');
+                            return;
+                        }
+                        element_item = {};
+                        element_item.product_id = itemId;
+                        element_item.status = checkornot;
+                        element_item.warehouse_id = warehouse;
+                        element_item.out_quantity = transferQty;
+                        element_item.total_quantity = requestQty;
+                        element_item.unit = splitUnit[0].trim();
+                        element_item.invoice_number = invoiceNumber;
+                        element_item.invoice_date = convertDDMMYYYtoMMDDYYYY(invoiceDate);
+                        items.push(element_item);
+                    }
+
+                    var model = {
+                        stock_transfer_id: $('#stock_transfer_id').val(),
+                        stock_transfer_no: $('#stock_transfer_no').text(),
+                        item_request_id: $('#item_request_id').val(),
+                    }
+                    console.log(model);
+                    $.ajax({
+                        url: "@Url.Action("EditStockTransfer", "StockTransfer")",
+                        type: "post",
+                        dataType: "json",
+                        async: false,
+                        data: { model: model, inventories: items },
+                        success: function (da) {
+                            if (da.result == "success") {
+                                alert('Your data has been updated successfully.!');
+                                window.location.href = '@Url.Action("Index", "StockTransfer")';
+                            } else if (da.result == "fail") {
+                                alert(da.message);
+                            }
+                        },
+                        error: function (err) {
+                            alert('Your data is error while updating!');
+                        }
+                    });
+
+                }
+            });
+
+        });
+    </script>
+<script type="text/javascript">
+        function checkQty(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var transferQty = $('#st_table tr').eq(ind).find('input.transfer_qty').val();
+            var transferUnit = $('#st_table tr').eq(ind).find('select.transfer-unit').val();
+            var approvedQty = $('#st_table tr').eq(ind).find('label.request_qty').text();
+            var approvedUnit = $('#st_table tr').eq(ind).find('label.request_unit').text();
+            var stockBalance = $('#st_table tr').eq(ind).find('label.stock_balance').text();
+            var stockBalanceUnit = $('#st_table tr').eq(ind).find('label.stock_balance_unit').text();
+
+            //console.log(transferQty + " " + approvedQty + " " + stockBalance);
+            //console.log(transferUnit + " " + approvedUnit + " " + stockBalanceUnit);
+
+            //if (!transferUnit)
+            //    return;
+            if (!transferQty && !transferUnit)
+                return;
+            var splitTransferUnit = transferUnit.split(',');
+            if (stockBalanceUnit == splitTransferUnit[0]) {
+                if (transferQty && Number(transferQty) > Number(approvedQty)) {
+                    alert("Transter quantity must be samller or equal to Requested quantity.");
+                    $('#st_table tr').eq(ind).find('input.transfer_qty').focus();
+                    $('#st_table tr').eq(ind).find('input.transfer_qty').val(0);
+                    return;
+                }
+                if (transferQty && Number(transferQty) > Number(stockBalance)) {
+                    alert("Not enough stock balance to transfer.");
+                    $('#st_table tr').eq(ind).find('input.transfer_qty').focus();
+                    $('#st_table tr').eq(ind).find('input.transfer_qty').val(0);
+                    return;
+                }
+            }
+            else {
+                var quantity = 0;
+                var selectedIndex = $('#st_table tr').eq(ind).find('select.transfer-unit').prop('selectedIndex');
+                if (transferQty) {
+                    if (selectedIndex == 1) {
+                        var splitElement = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(selectedIndex).val().split(',');
+                        quantity = transferQty / splitElement[1];
+                    }
+                    else if (selectedIndex == 2) {
+                        var splitElement = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(2).val().split(',');
+                        quantity = (transferQty / splitElement[1]) / splitElement2[1];
+                    }
+                    else if (selectedIndex == 3) {
+                        var splitElement = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(2).val().split(',');
+                        var splitElement3 = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(3).val().split(',');
+                        quantity = ((transferQty / splitElement[1]) / splitElement3[1]) / splitElement2[1];
+                    }
+                    else if (selectedIndex == 4) {
+                        var splitElement = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(2).val().split(',');
+                        var splitElement3 = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(3).val().split(',');
+                        var splitElement4 = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(4).val().split(',');
+                        quantity = ((((transferQty / splitElement[1]) / splitElement4[1]) / splitElement3[1]) / splitElement2[1]);
+                    } else if (selectedIndex == 5) {
+                        var splitElement = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(2).val().split(',');
+                        var splitElement3 = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(3).val().split(',');
+                        var splitElement4 = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(4).val().split(',');
+                        var splitElement5 = $('#st_table tr').eq(ind).find('select.transfer-unit option').eq(5).val().split(',');
+                        quantity = ((((transferQty / splitElement[1]) / splitElement5[1]) / splitElement4[1]) / splitElement3[1]) / splitElement2;
+                    }
+                    if (Number(quantity) > Number(approvedQty)) {
+                        alert("Transter quantity must be samller or equal to Requested quantity.");
+                        $('#st_table tr').eq(ind).find('input.transfer_qty').focus();
+                        $('#st_table tr').eq(ind).find('input.transfer_qty').val(0);
+                        return;
+                    }
+                    if (Number(quantity) > Number(stockBalance)) {
+                        alert("Not enough stock balance to transfer.");
+                        $('#st_table tr').eq(ind).find('input.transfer_qty').focus();
+                        $('#st_table tr').eq(ind).find('input.transfer_qty').val(0);
+                        return;
+                    }
+                }
+            }
+        }
+</script>
+}
+

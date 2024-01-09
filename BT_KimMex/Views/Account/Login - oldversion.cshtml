@@ -1,0 +1,81 @@
+﻿@using BT_KimMex.Models
+@model LoginViewModel
+@{
+    ViewBag.Title = "Login";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Lotus Green Team - Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link id="favicon" rel="shortcut icon" type="image/jpg" href="~/Assets/images/Lotus.ico" />
+    <link href="https://fonts.googleapis.com/css?family=Gothic+A1" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="~/Assets/Login/vendor/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/Assets/Login/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="~/Assets/Login/fonts/Linearicons-Free-v1.0.0/icon-font.min.css">
+    <link rel="stylesheet" type="text/css" href="~/Assets/Login/vendor/animate/animate.css">
+    <link rel="stylesheet" type="text/css" href="~/Assets/Login/vendor/css-hamburgers/hamburgers.min.css">
+    <link rel="stylesheet" type="text/css" href="~/Assets/Login/vendor/animsition/css/animsition.min.css">
+    <link rel="stylesheet" type="text/css" href="~/Assets/Login/vendor/select2/select2.min.css">
+    <link rel="stylesheet" type="text/css" href="~/Assets/Login/vendor/daterangepicker/daterangepicker.css">
+    <link rel="stylesheet" type="text/css" href="~/Assets/Login/css/util.css">
+    <link rel="stylesheet" type="text/css" href="~/Assets/Login/css/main.css">
+    <style type="text/css">
+        html,body,.login100-form-btn {
+            font-family: 'Gothic A1',sans-serif !important;
+        }
+        .wrap-input100{
+            border:none;
+        }
+    </style>
+</head>
+<body style="background-color: #666666;">
+
+    <div class="limiter">
+        <div class="container-login100">
+            <div class="wrap-login100">
+                @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "login100-form form-horizontal", role = "form" }))
+                {
+                    <div class="form-horizontal" style="text-align:center; background-color:white; padding:20px; border-radius:10px;">
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                        <img class="card-img-top" src="~/Assets/images/lotusgreeenteam.png" alt="Card image cap">
+
+                        <div class="wrap-input100">
+                            @Html.LabelFor(m => m.UserName, new { @class = "label-control" })
+                            @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="wrap-input100">
+                            @Html.LabelFor(m => m.Password, new { @class = "label-control" })
+                            @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="container-login100-form-btn">
+                            <input type="submit" value="Log in" class="login100-form-btn" />
+                        </div>
+                    </div>
+
+                }
+
+                <div class="login100-more" style="background-image: url('../../Assets/images/login_bg.jpeg'); padding:50px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/Assets/Login/vendor/jquery/jquery-3.2.1.min.js"></script>
+    <script src="~/Assets/Login/vendor/animsition/js/animsition.min.js"></script>
+    <script src="~/Assets/Login/vendor/bootstrap/js/popper.js"></script>
+    <script src="~/Assets/Login/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="~/Assets/Login/vendor/select2/select2.min.js"></script>
+    <script src="~/Assets/Login/vendor/daterangepicker/moment.min.js"></script>
+    <script src="~/Assets/Login/vendor/daterangepicker/daterangepicker.js"></script>
+    <script src="~/Assets/Login/vendor/countdowntime/countdowntime.js"></script>
+    <script src="~/Assets/Login/js/main.js"></script>
+
+</body>
+</html>
+

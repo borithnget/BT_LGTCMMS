@@ -1,0 +1,69 @@
+﻿
+@{
+    ViewBag.Title = "GenerateReport";
+}
+
+@if (Request.QueryString["reportType"] != null)
+{
+    <div class="row">
+        <div class="col-md-6">
+            @if (Request.QueryString["reportType"].ToString() == "BOQByProject")
+            {
+                @Html.Partial("ReportController/BOQbyProject")
+            }
+            else if (Request.QueryString["reportType"].ToString() == "ItemRequestbyProject")
+            {
+                @Html.Partial("ReportController/ItemRequestbyProject")
+            }
+            else if (Request.QueryString["reportType"].ToString() == "PurchaseOrder")
+            {
+                @Html.Partial("ReportController/PurchaseOrderReport")
+            }
+            else if (Request.QueryString["reportType"].ToString() == "PurchaseOrderBySupplier")
+            {
+                @Html.Partial("ReportController/PurchaseOrderSupplier")
+            }
+            else if (Request.QueryString["reportType"].ToString() == "StockMovement")
+            {
+                @Html.Partial("ReportController/StockMovement")
+            }
+            else if (Request.QueryString["reportType"].ToString() == "StockBalanceBywarehouse")
+            {
+                @Html.Partial("ReportController/StockBalanceBywarehouse")
+            }
+            else if (Request.QueryString["reportType"].ToString() == "ReturnItemtoSupplier")
+            {
+                @Html.Partial("ReportController/ReturnItemtoSupplier")
+            }
+            else if (Request.QueryString["reportType"].ToString() == "PurchaseOrderVsItemReceived")
+            {
+                @Html.Partial("ReportController/PurchaseOrderVsItemReceived")
+            }
+            else if (Request.QueryString["reportType"].ToString() == "StockUsageBySiteWithRemainBalance")
+            {
+                @Html.Partial("ReportController/StockUsageBySiteWithRemainBalance")
+            }
+            else if (Request.QueryString["reportType"].ToString() == "StockBalanceByDateandWarehouse")
+            {
+                @Html.Partial("ReportController/StockBalanceByDateandWarehouse")
+            }
+            else if (Request.QueryString["reportType"].ToString() == "StockBalanceByDateandWarehouseStockKeeper")
+            {
+                @*@Html.Partial("ReportController/StockBalanceByDateandWarehouseStockKeeper")*@
+                @Html.Partial("ReportController/StockBalanceByDateandWarehouseStockController")
+
+            }
+            else if (Request.QueryString["reportType"].ToString() == "WorkOrderIsuseVSWorkOrderReturn")
+            {
+                @Html.Partial("ReportController/WorkOrderIsuseVSWorkOrderReturn")
+            }
+        </div>
+        @*<div class="col-md-6" style="padding-top:0 !important;">
+            <a href='javascript:void(0)' class='btn btn-sm' onclick="printReport('ReportViewer1')" style="margin-right:-10px !important;"><i class="fa fa-print fa-lg" aria-hidden="true" style="color:blue"></i></a>
+        </div>*@
+    </div>
+   
+}
+@section Scripts{
+    <script type="text/javascript" src="~/Scripts/custom/print-script.js"></script>}
+    

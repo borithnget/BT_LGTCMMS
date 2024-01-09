@@ -1,0 +1,137 @@
+﻿
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3 class="title">Create New Good Receive Note Request</h3>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+
+        <div class="form-group">
+            @Html.Label("Receive Type:", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <select class="form-control" id="receive_type" name="receive_type">
+                    <option>Select Receive Type</option>
+                    <option value="stock tranfer">Stock Transfer</option>
+                    <option value="stock return">Stock Return</option>
+                    <option value="transfer workshop">Transfer from Workshop</option>
+                    <option value="return workshop">Return to Workshop</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label">Receive Ref. <strong class="text-danger">*</strong>:</label>
+            <div class="col-md-10">
+                <select class="form-control" id="receive_ref" name="receive_ref">
+                    <option>Select Receive Ref.</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered" id="table">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>item Description</th>
+                        <th>Total Quantity</th>
+                        <th id="header_history">History</th>
+                        <th>Remain QTY</th>
+                        <th>Receive QTY</th>
+                        <th>Receive Unit</th>
+                        <th>Invoice Number</th>
+                        <th>Invoice Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+}
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+
+            $('#receive_type').change(function (e) {
+                e.preventDefault();
+                var receiveType = $(this).val();
+                $('#receive_ref').empty().append("<option>Select Receive Type</option>");
+                if (receiveType) {
+                    if (receiveType == "transfer workshop") {
+                        $.ajax({
+                            url: '/GoodReceiveNote/GetTransferFromWorkshopListItemsJSON',
+                            type: "get",
+                            dataType: "json",
+                            success: function (da) {
+                                console.log(da);
+                                if (da.data) {
+                                    $.each(da.data, function (index, item) {
+                                        $('#receive_ref').append("" +
+                                           "<option value='" + item.stock_transfer_id + "'>" + item.stock_transfer_no + "</option>"
+                                            );
+                                    });
+                                }
+                            },
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                console.log(textStatus);
+                            }
+                        });
+                    }
+                    else if (receiveType == "transfer workshop") {
+
+                    }
+                }
+
+            });
+
+            $('#receive_ref').change(function (e) {
+                e.preventDefault();
+                var receiveType = $('#receive_type').val();
+                var id = $(this).val();
+                $('#table tbody').empty();
+                if (id) {
+                    if (receiveType == "transfer workshop") {
+                        $.ajax({
+                            url: '/GoodReceiveNote/GetTransferFromWorkshopItemDetailJSON',
+                            type: "get",
+                            dataType: "json",
+                            data:{id:id},
+                            success: function (da) {
+                                console.log(da);
+                                $.each(da.data.inventoryDetails, function (index, item) {
+                                    $('#table').append(""+
+                                        "<tr>"+
+                                            "<td></td>" +
+                                            "<td></td>" +
+                                            "<td></td>" +
+                                            "<td></td>" +
+                                            "<td></td>" +
+                                            "<td></td>" +
+                                            "<td></td>" +
+                                            "<td></td>" +
+                                            "<td></td>" +
+                                        "</tr>"
+                                        );
+                                });
+                            },
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                console.log(textStatus);
+                            }
+                        });
+                    }
+                }
+
+            });
+
+        });
+    </script>
+    }

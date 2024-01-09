@@ -1,0 +1,150 @@
+﻿@model IEnumerable<BT_KimMex.Models.CustomerViewModel>
+@using BT_KimMex.Class
+@{
+    ViewBag.Title = "Index";
+}
+
+<h3 class="title">Customer List</h3>
+
+<table class="table table-bordered" id="customerTable">
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>Customer Name</th>
+            <th>Telephone</th>
+            <th>Email</th>
+            <th>Address</th>
+            <th>Date </th>
+            <th>@Html.DisplayName("Detail")</th>
+            <th>@Html.DisplayName("Edit")</th>
+            <th>@Html.DisplayName("Delete")</th>
+        </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+
+<!-- delete modal popup-->
+<div class="modal fade" id="myModal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to delete this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success delete-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+        $(function () {
+            var message='@TempData["message"]';
+            if ('@TempData["message"]' != null) {
+                $.notify('@TempData["message"]', { className: 'success' });
+            }
+
+            var customer_id;
+
+            InitialDataTable();
+
+            $('#customerTable_filter').append('<a href="@Url.Action("Create", "Customer")" class="btn btn-default pull-left" style="margin-right:10px !important;">Add New</a>');
+
+            $('#customerTable tbody').on('click', 'td a.delete-promp', function () {
+                customer_id = $(this).attr('id');
+                $('#myModal').modal('show');
+            });
+
+            $('.delete-confirm').click(function () {
+                if (customer_id != '') {
+                    $.ajax({
+                        url: "/Customer/Delete",
+                        data: {
+                            'id': customer_id,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#myModal').modal('hide');
+                            if (da.Message == "Success") {
+                                $.notify('Your data has been deleted!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "Customer")';
+                            }
+                            else if (da.Message == "fail")
+                            {
+                                $.notify('Your data has been error while deleting!', { className: 'error' });
+                            }
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while deleting!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+        });
+
+        function InitialDataTable() {
+            var t=$('#customerTable').DataTable({
+                "ajax": {
+                    "url": "@Url.Action("CustomerDataTable", "Customer")",
+                    "type": "GET",
+                    "dataType": "json"
+                },
+                "columns": [
+                    {"data":"customer_id"},
+                    { "data": "customer_name" },
+                    { "data": "customer_phone" },
+                    { "data": "customer_email" },
+                    { "data": "customer_address" },
+                    {
+                        "data": "customer_created_date", render: function (data, type, full, meta) {
+                            return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                        }
+                    },
+                    {
+                        "render": function (data, type, full, meta) {
+                            return '<a href="/Customer/Details/' + full.customer_id + '" class="w3-button w3-tiny w3-green">View Detail</a>';
+                        }
+                    },
+                    {
+                        "render": function (data, type, full, meta) {
+                            return '<a href="/Customer/Edit/' + full.customer_id + '" class="w3-button w3-tiny w3-orange">Edit</a>';
+                        }
+                    },
+                    {
+                        "render": function (data, type, full, meta) {
+                            return '<a href="javascript:void(0)" id="' + full.customer_id + '" class="w3-button w3-tiny w3-red delete-promp">Delete</a>';
+                        }
+                    },
+                ],
+                "order": [[1, "asc"]],
+            });
+            t.on('order.dt search.dt', function () {
+                t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+            $('select[name="customerTable_length"]').addClass('datatable-control');
+            $('input[aria-controls="customerTable"]').addClass('datatable-control');
+        }
+    </script>
+    }

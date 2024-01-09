@@ -1,0 +1,24 @@
+﻿@{
+    ViewBag.Title = "GRNReport";
+}
+
+
+<div class="row" style="padding:10px !important;">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a href='javascript:void(0)' class='btn btn-sm btn-primary' onclick="printReport('ReportViewer1')"><i class="fa fa-print fa-lg" aria-hidden="true"></i> Print</a>
+            @*@using (Html.BeginForm("Export", "ItemRequest", FormMethod.Post))
+                {
+                    <input type="hidden" name="GridHtml" />
+                    <input type="submit" id="btnSubmit" value="Export" />
+                }*@
+        </div>
+        <div class="panel-body">
+            @Html.Partial("ReportController/GRNreport")
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript" src="~/Scripts/custom/print-script.js"></script>
+}

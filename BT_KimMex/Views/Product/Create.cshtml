@@ -1,0 +1,1006 @@
+﻿@model BT_KimMex.Models.ProductViewModel
+@using BT_KimMex.Class;
+@{
+    ViewBag.Title = "Create";
+    //Layout = "~/Views/Shared/_LayoutBackend.cshtml";
+    ViewBag.ProductActive = "active";
+    ViewBag.PageTitle = "Create New Product";
+    ViewBag.Controller = "Product";
+    ViewBag.Action = "Create";
+}
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        @ViewBag.PageTitle
+    </div>
+    <div class="panel-body">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="row col-md-12">
+                <div class="col-md-6">
+
+                    @*<div class="form-group row">
+                        <label class="col-form-label col-md-4">Item Code <span style="color:red;">*</span>:</label>
+                        <label class="col-md-8" id="product_code">@CommonFunctions.GenerateProductCode()</label>
+                    </div>*@
+                    <!--Group-->
+                    <div class="form-group row">
+                        <label class="col-form-label col-md-4">Group <span style="color:red;">*</span>:</label>
+                        <div class="col-md-8">
+                            @Html.DropDownList("class_id", new SelectList(CommonFunctions.GetClassListItems(), "class_id", "class_name"), "Select Class", new { @class = "form-control", id = "class_id" })
+                        </div>
+                    </div>
+
+                    <!-- Sub Group -->
+                    <div class="form-group row">
+                        <label class="control-label col-md-4">Sub Group <span style="color:red;">*</span>:</label>
+                        <div class="col-md-8">
+                            <select class="form-control select2" id="sub_group_id" name="sub_group_id">
+                                <option disabled selected>Select Sub Group</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!--Category-->
+                    <div class="form-group row">
+                        <label class="col-form-label col-md-4">Category <span style="color:red;">*</span>:</label>
+                        <div class="col-md-8">
+                            @Html.DropDownList("p_category_id", ViewBag.Categories as SelectList, "Select Category", new { @class = "form-control", id = "p_category_id", @onchange = "InitialProductDescription()" })
+                        </div>
+                    </div>
+
+                    @*<div class="form-group row">
+                        <label class="col-form-label col-md-2">Category <span style="color:red;">*</span>:</label>
+                        <div class="col-md-10">
+
+                            @Html.DropDownList("p_category_id", ViewBag.Categories as SelectList, "Select Category", new { @class = "form-control", id = "p_category_id" })
+
+                        </div>
+                    </div>*@
+
+                    <!--Type-->
+                    <div class="form-group row">
+                        <label class="col-form-label col-md-4">ProductType <span style="color:red;">*</span>:</label>
+                        <div class="col-md-8">
+                            @*@Html.DropDownList("product_type_id", new SelectList(CommonFunctions.GetProductTypeListItems(), "product_type_id", "product_type_name",
+                            Model.product_type_id), new { id = "product_type_id", @class = "form-control" })*@
+                            @Html.DropDownList("product_type_id", ViewBag.ProductType as SelectList, "Select ProductType", new { @class = "form-control", id = "product_type_id", @onchange = "InitialProductDescription()" })
+
+                        </div>
+                    </div>
+
+                    <!--Class-->
+                    <div class="form-group row">
+                        <label class="col-form-label col-md-4"> Class <strong style="color:red;"></strong> :</label>
+                        <div class="col-md-8">
+                            @Html.DropDownList("product_class_id", ViewBag.ProductClasses as SelectList, "Select Product Class", new { @class = "form-control", id = "product_class_id", onchange = "InitialProductDescription()" })
+                            @Html.ValidationMessageFor(model => model.product_class_id, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <!--Size-->
+                    <div class="form-group row">
+                        <label class="col-form-label col-md-4">Size:</label>
+                        <div class="col-md-8">
+                            @*@Html.EditorFor(model => model.product_type_name, new { htmlAttributes = new { id = "product_type_name", @class = "form-control" } })*@
+
+                            @Html.DropDownList("product_size_id", new SelectList(CommonFunctions.GetProductSizeListItems(), "product_size_id", "product_size_name"), "Select Product Size", new { @class = "form-control", id = "product_size_id", @onchange = "InitialProductDescription()" })
+                            @* @Html.EditorFor(model => model.product_size_id, new { htmlAttributes = new { @class = "form-control" } })*@
+
+                        </div>
+                    </div>
+                    <!--Color-->
+
+                    <div class="form-group row">
+                        <label class="col-form-label col-md-4">Color<span style="color:red;">*</span>:</label>
+                        <div class="col-md-8">
+
+                            @Html.DropDownList("color_id", ViewBag.Color as SelectList, "Select Color", new { @class = "form-control", id = "color_id", @onchange = "InitialProductDescription()" })
+
+                        </div>
+                    </div>
+
+                    <!--Brand-->
+                    <div class="form-group row">
+                        <label class="col-form-label col-md-4">Brand <strong style="color:red;">*</strong>:</label>
+                        <div class="col-md-8">
+                            @Html.DropDownList("brand_id", ViewBag.Brands as SelectList, "Select Brand", new { @class = "form-control", id = "brand_id", @onchange = "InitialProductDescription()" })
+                        </div>
+                    </div>
+
+                    <!--Model/ Factory Code-->
+                    <div class="form-group row">
+                        <label class="col-form-label col-md-4">Model/ Factory Code:</label>
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.model_factory_code, new { htmlAttributes = new { @class = "form-control", @onchange = "InitialProductDescription()" } })
+                        </div>
+                    </div>
+                    <!--Unit-->
+                    <div class="form-group row">
+                        <label class="col-form-label col-md-4">Unit<strong style="color:red;">*</strong>:</label>
+                        <div class="col-md-8">
+                            @Html.DropDownList("product_unit", ViewBag.Unit as SelectList, "Select Unit ", new { @class = "form-control", id = "product_unit", @onchange = "initialUOM1()" })
+                        </div>
+                    </div>
+                    <!--Description-->
+                    <div class="form-group row">
+                        <label class="col-form-label col-md-4">Product Description <span style="color:red;">*</span>:</label>
+                        <div class="col-md-8">
+                            @*@Html.EditorFor(model => model.product_name, new { htmlAttributes = new { @class = "form-control" } })*@
+                            <label id="Remark"></label>
+                        </div>
+                    </div>
+
+                    <div class="form-group row mg-b-0">
+                        <div class="col-sm-4"></div>
+                        <div class="col-sm-8">
+                            <input type="submit" value="Save" class="btn btn-success" id="btnSubmit" />
+                            <a href="@Url.Action("Index","Product")" class="btn btn-danger">Back</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-6 col-md-6 col-md-6 col-sm-6">
+                    <div class="form-group row">
+                        <label class="col-md-4 control-label">Labour Hour:</label>
+                        <div class="col-md-8">
+                            <input type="number" class="form-control" id="labour_hour" name="labour_hour" step="any" value="0" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-4 control-label">Cash Flow:</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" id="cash_flow" name="cash_flow" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-4 control-label">SO Number:</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" id="so_number" name="so_number" />
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Unit of Measurement
+                        </div>
+                        <div class="panel-body">
+                            <table>
+                                <tr>
+                                    <td width="50px"><label>1</label></td>
+                                    <td width="50px"><label id="uom1">Unit</label></td>
+                                    <td width="50px">=></td>
+                                    <td width="150px">@Html.TextBoxFor(model => model.uom1_qty, new { @class = "form-control", type = "Number", Value = "0" })</td>
+                                    <td width="150px">@Html.DropDownList("uom1_id", ViewBag.Unit as SelectList, "Select Unit", new { @class = "form-control", id = "uom1_id", onchange = "initialUOM2()" })</td>
+                                    <td width="150px">@Html.TextBoxFor(model => model.uom1_price, new { @class = "form-control", type = "number", placeholder = "Uom Price", onchange = "validateFloatKeyPress(this);", onKeyPress = "if(this.value.length==8) return false;" })</td>
+                                </tr>
+                                <tr>
+                                    <td width="50px"><label>1</label></td>
+                                    <td width="50px"><label id="uom2">Unit</label></td>
+                                    <td width="50px">=></td>
+                                    <td width="150px">@Html.TextBoxFor(model => model.uom2_qty, new { @class = "form-control", type = "Number", Value = "0" })</td>
+                                    <td width="150px">@Html.DropDownList("uom2_id", ViewBag.Unit as SelectList, "Select Unit", new { @class = "form-control", id = "uom2_id", onchange = "initialUOM3()" })</td>
+                                    <td width="150px">@Html.TextBoxFor(model => model.uom2_price, new { @class = "form-control", type = "number", placeholder = "Uom Price", onchange = "validateFloatKeyPress(this);", onKeyPress = "if(this.value.length==8) return false;" })</td>
+                                </tr>
+                                <tr>
+                                    <td width="50px"><label>1</label></td>
+                                    <td width="50px"><label id="uom3">Unit</label></td>
+                                    <td width="50px">=></td>
+                                    <td width="150px">@Html.TextBoxFor(model => model.uom3_qty, new { @class = "form-control", type = "Number", Value = "0" })</td>
+                                    <td width="150px">@Html.DropDownList("uom3_id", ViewBag.Unit as SelectList, "Select Unit", new { @class = "form-control", id = "uom3_id", onchange = "initialUOM4()" })</td>
+                                    <td width="150px">@Html.TextBoxFor(model => model.uom3_price, new { @class = "form-control", type = "number", placeholder = "Uom Price", onchange = "validateFloatKeyPress(this);", onKeyPress = "if(this.value.length==8) return false;" })</td>
+                                </tr>
+                                <tr>
+                                    <td width="50px"><label>1</label></td>
+                                    <td width="50px"><label id="uom4">Unit</label></td>
+                                    <td width="50px">=></td>
+                                    <td width="150px">@Html.TextBoxFor(model => model.uom4_qty, new { @class = "form-control", type = "Number", Value = "0" })</td>
+                                    <td width="150px">@Html.DropDownList("uom4_id", ViewBag.Unit as SelectList, "Select Unit", new { @class = "form-control", id = "uom4_id", onchange = "initialUOM5()" })</td>
+                                    <td width="150px">@Html.TextBoxFor(model => model.uom4_price, new { @class = "form-control", type = "number", placeholder = "Uom Price", onchange = "validateFloatKeyPress(this);", onKeyPress = "if(this.value.length==8) return false;" })</td>
+                                </tr>
+                                <tr>
+                                    <td width="50px"><label>1</label></td>
+                                    <td width="50px"><label id="uom5">Unit</label></td>
+                                    <td width="50px">=></td>
+                                    <td width="150px">@Html.TextBoxFor(model => model.uom5_qty, new { @class = "form-control", type = "Number", Value = "0" })</td>
+                                    <td width="150px">@Html.DropDownList("uom5_id", ViewBag.Unit as SelectList, "Select Unit", new { @class = "form-control", id = "uom5_id" })</td>
+                                    <td width="150px">@Html.TextBoxFor(model => model.uom5_price, new { @class = "form-control", type = "number", placeholder = "Uom Price", onchange = "validateFloatKeyPress(this);", onKeyPress = "if(this.value.length==8) return false;" })</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        }
+    </div>
+</div>
+
+
+
+@section Scripts{
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
+
+    <script type="text/javascript">
+        
+
+        //$('#product_type_id').change(function () {
+        //    $('#product_type_name').val($('#product_type_id option:selected').text());
+        //});
+
+        //$('#product_type_id').change(function () {
+        //    $('#product_type_name').val($('#product_type_id option:selected').text());
+        //});
+
+        $(function () {
+            //InitialUnitDropdown();
+            //InitialProductCategoryDropdown();
+            $('#current_date').text(getFormattedDateMMDDYYYY(new Date()));
+            @*$('#created_date').text(getFormattedDateMMDDYYYY(new Date('@Model.created_date')));*@
+
+            $('#product_unit').select2();
+
+            @*$('#p_category_id').on('change', function (e) {
+                e.preventDefault();
+                InitialProductDescription();
+                @*var itemTypeId = $(this).val();
+                $('#product_code').val('');
+                if (itemTypeId) {
+                    $.ajax({
+                        url: "@Url.Action("GenerateItemCodebyItemType", "Product")",
+                        type: "get",
+                        dataType: "json",
+                        data: { id: itemTypeId },
+                        success: function (data) {
+                            $('#product_code').val(data.code);
+                        }
+                    });
+                }
+            });*@
+
+            $('#class_id').on('change', function (e) {
+                var classId = $(this).val();
+
+                $('#sub_group_id').empty().append("<option disabled selected>Select Sub Group</option>");
+                $('#p_category_id').empty().append("<option disabled selected>Select Category</option>");
+
+                /*
+                $('#product_type_id').empty().append("<option disabled selected>Select Product Type</option>");
+                //$('#brand_id').empty().append("<option disabled selected>Select Brand</option>");             
+                $('#product_size_id').empty().append("<option disabled selected>Select Product Size</option>");
+                $('#product_class_id').empty().append("<option disabled selected>Select Product Class</option>");
+                */
+                if (classId != "") {
+
+                    //SubGroup
+                    $.ajax({
+                        url: "/SubGroup/GetSubGroupDataTable",
+                        type: "get",
+                        dataType: "json",
+                        data: { group_id: classId },
+                        success: function (data) {
+                            $.each(data.data, function (index, item) {
+                                console.log(item);
+                                $('#sub_group_id').append("" +
+                                    "<option value='" + item.sub_group_id + "'>" + item.sub_group_name + "</option>"
+                                );
+                            });
+                        }
+                    });
+
+                    //category 
+                    $.ajax({
+                        url: "/ProductCategory/GetCategoryDataDropdownlistbyClassId",
+                        type: "get",
+                        dataType: "json",
+                        data: { id: classId },
+                        success: function (data) {
+                            $.each(data.data, function (index, item) {
+                                $('#p_category_id').append("" +
+                                            "<option value='" + item.p_category_id + "'>" + item.p_category_name + "</option>"
+                                        );
+                            });
+                        }
+                    });
+                    //product size
+
+                    //$.ajax({
+                    //  url: "/ProductSize/GetProductDataDropdownlistbyClassId",
+                    //   type: "get",
+                    //    dataType: "json",
+                    //    data: { id: classId },
+                    //    success: function (data) {
+                    //       $.each(data.data, function (index, item) {
+                    //           $('#product_size_id').append("" +
+                    //                       "<option value='" + item.product_size_id + "'>" + item.product_size_name + "</option>"
+                    //                   );
+                    //      });
+                    //  }
+                    //});
+
+                    //product type
+
+                    //$.ajax({
+                    //    url: '/ProductType/GetProductTypeListItemsbyCategoryId',
+                    //    type: "get",
+                    //    dataType: "json",
+                    //    async: false,
+                    //    data: { id: classId },
+                    //    success: function (da) {
+                    //        //console.log(da.data);
+                    //        $.each(da.data, function (ind, item) {
+                    //            $('#product_type_id').append("" +
+                    //                "<option value='" + item.product_type_id + "'>" + item.product_type_name + "</option>"
+                    //            );
+                    //        });
+                    //    },
+                    //    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    //        alert('Initial Product Type:' + textStatus);
+                    //    }
+                    //});
+
+                    //product class
+
+                    //$.ajax({
+                    //    url: '/ProductClass/GetProductclassDropdownList',
+                    //    type: "get",
+                    //    dataType: "json",
+                    //    async: false,
+                    //    data: { group_id: classId },
+                    //    success: function (da) {
+                    //        //console.log(da.data);
+                    //        $.each(da.data, function (ind, item) {
+                    //            $('#product_class_id').append("" +
+                    //                "<option value='" + item.product_class_id + "'>" + item.product_class_name + "</option>"
+                    //            );
+                    //        });
+                    //    },
+                    //    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    //        alert('Initial Product Type:' + textStatus);
+                    //    }
+                    //});
+
+                    //initialBrandControl();
+                }
+                InitialProductDescription();
+
+            });
+
+            //$('#p_category_id').on('change', function (e) {
+            //    var categoryId = $(this).val();
+            //    //$('#brand_id').empty().append("<option disabled selected>Select Brand</option>");
+            //    //$('#product_type_id').empty().append("<option disabled selected>Select Product Type</option>");
+            //    //if (categoryId != "") {
+            //    //    $.ajax({
+            //    //        url: "/ProductType/GetProductTypeDataDropdownlistbyCategoryId",
+            //    //        type: "get",
+            //    //        dataType: "json",
+            //    //        data: { id: categoryId },
+            //    //        success: function (data) {
+            //    //            $.each(data, function (index, item) {
+            //    //                $('#product_type_id').append("" +
+            //    //                            "<option value='" + item.product_type_id + "'>" + item.product_type_name + "</option>"
+            //    //                        );
+            //    //            });
+            //    //        }
+            //    //    });
+            //    //}
+            //    InitialProductDescription()
+            //});
+
+            $('#product_type_id').on('change', function (e) {
+                var Id = $(this).val();
+                $('#brand_id').empty().append("<option disabled selected>Select Brand</option>");
+                if (Id != "") {
+                    $.ajax({
+                        url: "/Brand/GetBrandDataDropdownlistbyCategoryId",
+                        type: "get",
+                        dataType: "json",
+                        data: { id: Id },
+                        success: function (data) {
+                            $.each(data, function (index, item) {
+                                $('#brand_id').append("" +
+                                            "<option value='" + item.brand_id + "'>" + item.brand_name + "</option>"
+                                        );
+                            });
+                        }
+                    });
+
+                }
+                InitialProductDescription();
+            });
+        });
+
+        function itemCheckDuplicate() {
+            $("#Status").html("Checking ...");
+            $.post("@Url.Action("CheckItemCodeAvailable", "Product")", { itemdata: $("#product_code").val() },
+            function (data) {
+                if (data == 0) {
+                    $("#Status").html('<font color="Blue">Item Code Available.</font>');
+                    $("#product_code").css("border-color", "Blue");
+                    $("#product_name").removeAttr("disabled");
+                    $("#product_unit").removeAttr("disabled");
+                    $("#p_category_id").removeAttr("disabled");
+                    $("#Remark").removeAttr("disabled");
+                    $("#btnSubmit").removeAttr("disabled");
+                }
+                else {
+                    $("#Status").html('<font color="Red">Items Code already exists . Try more ...</font>');
+                    $("#product_code").css("border-color", "Red");
+                    $("#product_name").attr("disabled", "disabled");
+                    $("#product_unit").attr("disabled", "disabled");
+                    $("#p_category_id").attr("disabled", "disabled");
+                    $("#Remark").attr("disabled", "disabled");
+                    $("#btnSubmit").attr("disabled", "disabled");
+                }
+            })
+        }
+
+        function initialBrandControl() {
+            var productTypeId = $('#product_type_id').val();
+            var groupId = $('#class_id').val();
+            $('#brand_id').empty().append("<option selected disabled>Select Brand</option>");
+            $.ajax({
+                url: '/Brand/GetBrandListItemsbyCategoryId',
+                type: "get",
+                dataType: "json",
+                async: false,
+                data: { id: productTypeId, group_id: groupId },
+                success: function (da) {
+                    //console.log(da.data);
+                    $.each(da.data, function (ind, item) {
+                        $('#brand_id').append("" +
+                            "<option value='" + item.brand_id + "'>" + item.brand_name + " - " + item.product_type_name + "</option>"
+                        );
+                    });
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Initial Brand:' + textStatus);
+                }
+            });
+        }
+
+        
+        function validateFloatKeyPress(el) {
+            var v = parseFloat(el.value);
+            el.value = (isNaN(v)) ? '' : v.toFixed(2);
+        }
+    </script>
+
+    <script type="text/javascript">
+        function InitialUnitDropdown() {
+            $.ajax({
+                url: "/Product/UnitList",
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    $.each(data, function (index, item) {
+                        $.each(item, function (index1, item1) {
+                            $('#product_unit').append("" +
+                                    "<option value='" + item1.Name + "'>" + item1.Name + "</option>"
+                                );
+                        });
+                    });
+                }
+            })
+        }
+        function InitialProductCategoryDropdown() {
+            $.ajax({
+                url: "@Url.Action("ProductCategory","Product")",
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    $.each(data, function (index, item) {
+                        $.each(item, function (index1, item1) {
+                            $('#p_category_id').append("" +
+                                    "<option value='" + item1.p_category_id + "'>" + item1.p_category_name + "</option>"
+                                );
+                        });
+                    });
+                }
+            })
+        }
+        function InitialProductDescription() {
+            var category = $('#p_category_id').val();
+            var ptype = $('#product_type_id').val();
+            var pclass = $('#product_class_id').val();
+            var psize = $('#product_size_id').val();
+            var pcolor = $('#color').val();
+            var pbrand = $('#brand_id').val();
+            var factorycode = $('#model_factory_code').val();
+            $('#Remark').text('');
+            $.ajax({
+                url: "@Url.Action("GenerateProductDescriptionJson", "Product")",
+                type: "get",
+                dataType: "json",
+                data: {
+                    categroy: category,
+                    type: ptype,
+                    pclass: pclass,
+                    size: psize,
+                    color: pcolor,
+                    brand: pbrand,
+                    model: factorycode,
+                },
+                success: function (data) {
+                    console.log(data);
+                    $('#Remark').html(data.data);
+                }
+            })
+
+        }
+        function initialUOM1() {
+            //var unit = $('#product_unit').val();
+            var unit = $("#product_unit option:selected").text();
+            if (unit != null || unit != "")
+                $('#uom1').text(unit);
+        }
+        function initialUOM2() {
+            //var unit = $('#uom1_id').val();
+            var unit = $("#uom1_id option:selected").text();
+            if (unit != null || unit != "")
+                $('#uom2').text(unit);
+        }
+        function initialUOM3() {
+            //var unit = $('#uom2_id').val();
+            var unit = $("#uom2_id option:selected").text();
+            if (unit != null || unit != "")
+                $('#uom3').text(unit);
+        }
+        function initialUOM4() {
+            //var unit = $('#uom3_id').val();
+            var unit = $("#uom3_id option:selected").text();
+            if (unit != null || unit != "")
+                $('#uom4').text(unit);
+        }
+        function initialUOM5() {
+            //var unit = $('#uom4_id').val();
+            var unit = $("#uom4_id option:selected").text();
+            if (unit != null || unit != "")
+                $('#uom5').text(unit);
+        }
+
+    </script>
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

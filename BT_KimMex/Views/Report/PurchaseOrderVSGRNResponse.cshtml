@@ -1,0 +1,708 @@
+﻿@*@model IEnumerable<BT_KimMex.Models.PurchaseOrderReportViewModel>*@
+@model BT_KimMex.Models.PurchaseOrderVSGRNReportResponseModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>PurchaseOrder VS GRN Response</title>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css" />
+
+    <link rel="stylesheet" type="text/css" href="https://datatables.net/media/css/site-examples.css">
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.6.5/css/buttons.dataTables.min.css" />
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.6.5/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.6.5/js/buttons.html5.min.js"></script>
+
+</head>
+<body>
+    <table style=" border-collapse: collapse;" id="table1" class="display nowrap" width="100%" data-sheetname="Purchase Order vs Good Received Note">
+
+        <thead>
+            <tr>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; padding-top:10px;">No.</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; padding-top: 10px; ">PO#</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; padding-top: 10px; ">PO Date</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; padding-top: 10px; ">Item Code</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; padding-top: 10px; ">Description</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; padding-top: 10px; ">Unit</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; padding-top: 10px; ">Order QTY</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; padding-top: 10px; ">Receive QTY</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; padding-top: 10px; ">Remain QTY</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; padding-top: 10px; ">Unit Price</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; padding-top: 10px; ">Dis %</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; padding-top: 10px; ">Total Amount</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; padding-top: 10px; ">Supplier</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; padding-top: 10px; ">SO #</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; padding-top: 10px; ">Project</td>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model != null)
+            {
+                foreach (var mpo in Model.poGRNs.Select((value, i) => new { i, value }))
+                {
+                    var po = mpo.value;
+                    decimal totalUnitPrice = 0;
+                    decimal totalAmount = 0;
+
+                    foreach (var mitem in po.items.Select((vvalue, ii) => new { ii, vvalue }))
+                    {
+                        var item = mitem.vvalue;
+                        var receivedQTY = item.purd.po_quantity - item.purd.remain_quantity;
+                        var discountAmount = item.purd.original_price * (item.purd.discount_percentage / 100);
+                        var amount = item.purd.po_quantity * (item.purd.original_price - discountAmount);
+                        totalUnitPrice = totalUnitPrice + (decimal)item.purd.unit_price;
+                        totalAmount = totalAmount + (decimal)amount;
+
+                        string number = mitem.ii == 0 ? (mpo.i + 1).ToString() : string.Empty;
+
+                        <tr>
+                            <td style="text-align: center; vertical-align: middle; font-family: 'Kantumruy Pro'; ">@number</td>
+                            <td style="text-align: center; vertical-align: middle; font-family: 'Kantumruy Pro'; ">@po.po_report_number</td>
+                            <td style="text-align: center; vertical-align: middle; font-family: 'Kantumruy Pro'; ">@Convert.ToDateTime(po.quote_entity.created_date).ToString("MM/dd/yyyy")</td>
+                            <td style="text-align: center; vertical-align: middle; font-family: 'Kantumruy Pro'; ">@item.prod.product_code</td>
+                            <td style="text-align: left; vertical-align:middle; font-family: 'Kantumruy Pro'; ">@item.prod.product_name</td>
+                            <td style="text-align: center; vertical-align: middle; font-family: 'Kantumruy Pro'; ">@item.unit.Name</td>
+                            <td style="text-align: center; vertical-align: middle; font-family: 'Kantumruy Pro'; ">@String.Format("{0:.##}", item.purd.po_quantity)</td>
+                            <td style="text-align: center; vertical-align: middle; font-family: 'Kantumruy Pro'; ">@String.Format("{0:.##}", receivedQTY)</td>
+                            <td style="text-align: center; vertical-align: middle; font-family: 'Kantumruy Pro'; ">@String.Format("{0:.##}", item.purd.remain_quantity)</td>
+                            <td style="text-align: center; vertical-align: middle; font-family: 'Kantumruy Pro'; ">@String.Format("$ {0:N3}", item.purd.unit_price)</td>
+                            <td style="text-align: center; vertical-align: middle; font-family: 'Kantumruy Pro'; ">@Convert.ToDecimal(item.purd.discount_percentage).ToString("N2")</td>
+                            <td style="text-align: center; vertical-align: middle; font-family: 'Kantumruy Pro'; ">@String.Format("$ {0:N3}", amount) </td>
+                            <td style="text-align: left; vertical-align: middle; font-family: 'Kantumruy Pro';">@po.supplier_entity.supplier_name</td>
+                            <td style="text-align: left; vertical-align: middle; font-family: 'Kantumruy Pro'; ">@po.project_entity.project_no</td>
+                            <td style="text-align: left; vertical-align:middle; font-family: 'Kantumruy Pro'; ">@po.project_entity.project_full_name</td>
+                        </tr>
+                    }
+                    @*<tr>
+                            <td style="text-align: center; vertical-align:middle; font-family: 'Kantumruy Pro';" colspan="15"><p></p></td>
+                        </tr>*@
+                    var diffDiscount = po.items.GroupBy(s => s.purd.discount_percentage).ToList();
+                    var totalDiscount = diffDiscount.Count() > 1 ? 0 : po.items.Select(s => s.purd.discount_percentage).FirstOrDefault();
+        <tr>
+            @for (var i = 1; i <= 8; i++)
+            {
+                <td><p></p></td>
+            }
+            <td style="text-align: center; vertical-align: middle; font-family: 'Kantumruy Pro'; font-weight: bold;">Sub Total</td>
+            <td style="text-align: center; vertical-align: middle; font-family: 'Kantumruy Pro'; font-weight:bold;">@String.Format("$ {0:N3}", totalUnitPrice)</td>
+            <td style="text-align: center; vertical-align: middle; font-family: 'Kantumruy Pro'; font-weight: bold;">@Convert.ToDecimal(totalDiscount).ToString("N2")</td>
+            <td style="text-align: center; vertical-align: middle; font-family: 'Kantumruy Pro'; font-weight: bold;">@String.Format("$ {0:N3}", totalAmount)</td>
+            <td style="text-align: center; vertical-align: middle; font-family: 'Kantumruy Pro';"></td>
+            <td style="text-align: center; vertical-align: middle; font-family: 'Kantumruy Pro';"></td>
+            <td style="text-align: center; vertical-align: middle; font-family: 'Kantumruy Pro';"></td>
+        </tr>
+                    @*<tr>
+                        <td style="text-align: center; vertical-align:middle; font-family: 'Kantumruy Pro'; border-bottom: 1px dotted black;" colspan="15"><p></p></td>
+                    </tr>*@
+
+                }
+            }
+        </tbody>
+    </table>
+
+    <table style="border-collapse: collapse; width:100%;" id="table2" class="display nowrap" width="100%" data-rowonetitle="My Sheet2" data-sheetname="Detail PO Receiving">
+        <thead>
+            <tr>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align:middle !important;"></td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align:middle !important;">Received Date</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align:middle !important;">PO #</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align:middle !important;">Warehouse</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align:middle !important;">Item Code</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align:middle !important;">Description</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align:middle !important;">Unit</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align:middle !important;"># Item Receive</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align:middle !important;">Order Qty</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align:middle !important;">Received Qty</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align:middle !important;">Remain Qty</td>
+            </tr>
+        </thead>
+
+        <tbody>
+            @{
+                foreach (var obj in Model.poDetails.Select((value, i) => new { i, value }))
+                {
+                    var grn = obj.value;
+                    foreach (var hisObj in grn.receivedHistories.Select((value, i) => new { i, value }))
+                    {
+                        var his = hisObj.value;
+                        var noReceived = string.Format("{0} /IRe", hisObj.i + 1);
+
+                        foreach (var rs in obj.value.poReport.items.Select((value, i) => new { i, value }))
+                        {
+                            var item = rs.value;
+                            var countingNumber = rs.i == 0 && hisObj.i == 0 ? (obj.i + 1).ToString() : string.Empty;
+                            var border = rs.i == obj.value.poReport.items.Count() - 1 && hisObj.i == grn.receivedHistories.Count() - 1 ? "border-bottom:thin dotted black;" : string.Empty;
+
+                            //var receivedQty = item.purd.po_quantity - item.purd.remain_quantity;
+                            var received = his.inventories.Where(s => string.Compare(s.product_id, item.prod.product_id) == 0).FirstOrDefault();
+                            var receivedQty = received == null ? 0 : received.in_quantity;
+
+                            decimal reaminQty = 0;
+                            if (hisObj.i == 0)
+                            {
+                                reaminQty = Convert.ToDecimal(item.purd.po_quantity - Convert.ToDecimal(receivedQty));
+                            }
+                            else if (hisObj.i == grn.receivedHistories.Count() - 1)
+                            {
+                                reaminQty = Convert.ToDecimal(item.purd.remain_quantity);
+                            }
+                            else
+                            {
+                                var receivedLess = grn.receivedHistories.Where(s => s.created_date <= his.created_date).ToList();
+                                decimal totalCurrentReceived = 0;
+                                foreach (var rl in receivedLess)
+                                {
+                                    var re_rl = rl.inventories.Where(s => string.Compare(s.product_id, item.prod.product_id) == 0).FirstOrDefault();
+                                    totalCurrentReceived = totalCurrentReceived + Convert.ToDecimal((re_rl == null ? 0 : re_rl.in_quantity));
+                                }
+                                reaminQty = Convert.ToDecimal(item.purd.po_quantity - totalCurrentReceived);
+                            }
+
+                            string warehouse = his.inventories.FirstOrDefault().warehouseName;
+
+                            <tr>
+                                <td style="@border text-align: center; font-family: 'Kantumruy Pro'; vertical-align:middle !important; ">@countingNumber</td>
+                                <td style="@border text-align: center; font-family: 'Kantumruy Pro'; vertical-align:middle !important;">@BT_KimMex.Class.CommonClass.ToLocalTime(Convert.ToDateTime(his.created_date)).ToString("dd/MM/yyyy")</td>
+                                <td style="@border text-align: center; font-family: 'Kantumruy Pro'; vertical-align:middle !important;">@obj.value.poReport.po_report_number</td>
+                                <td style="@border text-align: left; font-family: 'Kantumruy Pro'; vertical-align:middle !important;">@warehouse</td>
+                                <td style="@border text-align: center; font-family: 'Kantumruy Pro'; vertical-align:middle !important;">@item.prod.product_code</td>
+                                <td style="@border text-align: left; font-family: 'Kantumruy Pro'; vertical-align:middle !important;">@item.prod.product_name</td>
+                                <td style="@border text-align: left; font-family: 'Kantumruy Pro'; vertical-align:middle !important;">@item.unit.Name</td>
+                                <td style="@border text-align: center; font-family: 'Kantumruy Pro'; vertical-align:middle !important;">@noReceived</td>
+                                <td style="@border text-align: center; font-family: 'Kantumruy Pro'; vertical-align:middle !important;">@Convert.ToDecimal(item.purd.po_quantity).ToString("0.####")</td>
+                                <td style="@border text-align: center; font-family: 'Kantumruy Pro'; vertical-align:middle !important;">@Convert.ToDecimal(receivedQty).ToString("0.####")</td>
+                                <td style="@border text-align: center; font-family: 'Kantumruy Pro'; vertical-align:middle !important;">@Convert.ToDecimal(reaminQty).ToString("0.####")</td>
+                            </tr>
+
+
+                        }
+
+                    }
+
+
+                }
+            }
+        </tbody>
+
+    </table>
+
+    @*<script>
+
+        //
+        // Based on example from:
+        // http://live.datatables.net/kuyayeto/9/edit
+        // which in turn is based on example from:
+        // https://datatables.net/forums/discussion/49457
+        // modified by me to process additional tables in a loop.
+        //
+        $(document).ready(function () {
+
+            function getHeaderNames(table) {
+                // Gets header names.
+                //params:
+                //  table: table ID.
+                //Returns:
+                //  Array of column header names.
+
+                var header = $(table).DataTable().columns().header().toArray();
+
+                var names = [];
+                header.forEach(function (th) {
+                    names.push($(th).html());
+                });
+
+                return names;
+            }
+
+            function buildCols(data) {
+                // Builds cols XML.
+                //To do: define widths for each column.
+                //Params:
+                //  data: row data.
+                //Returns:
+                //  String of XML formatted column widths.
+
+                var cols = '<cols>';
+
+                for (i = 0; i < data.length; i++) {
+                    colNum = i + 1;
+                    cols += '<col min="' + colNum + '" max="' + colNum + '" width="20" customWidth="1"/>';
+                }
+
+                cols += '</cols>';
+
+                return cols;
+            }
+
+            function buildRow(data, rowNum, styleNum) {
+                // Builds row XML.
+                //Params:
+                //  data: Row data.
+                //  rowNum: Excel row number.
+                //  styleNum: style number or empty string for no style.
+                //Returns:
+                //  String of XML formatted row.
+
+                var style = styleNum ? ' s="' + styleNum + '"' : '';
+
+                var row = '<row r="' + rowNum + '">';
+
+                for (i = 0; i < data.length; i++) {
+                    colNum = (i + 10).toString(36).toUpperCase();  // Convert to alpha
+
+                    var cr = colNum + rowNum;
+
+                    row += '<c t="inlineStr" r="' + cr + '"' + style + '>' +
+                        '<is>' +
+                        '<t>' + data[i] + '</t>' +
+                        '</is>' +
+                        '</c>';
+                }
+
+                row += '</row>';
+
+                return row;
+            }
+
+            function getTableData(table, title) {
+                // Processes Datatable row data to build sheet.
+                //Params:
+                //  table: table ID.
+                //  title: Title displayed at top of SS or empty str for no title.
+                //Returns:
+                //  String of XML formatted worksheet.
+
+                var header = getHeaderNames(table);
+                var table = $(table).DataTable();
+                var rowNum = 1;
+                var mergeCells = '';
+                var ws = '';
+
+                ws += buildCols(header);
+                ws += '<sheetData>';
+
+                if (title.length > 0) {
+                    ws += buildRow([title], rowNum, 51);
+                    rowNum++;
+
+                    mergeCol = ((header.length - 1) + 10).toString(36).toUpperCase();
+
+                    mergeCells = '<mergeCells count="1">' +
+                        '<mergeCell ref="A1:' + mergeCol + '1"/>' +
+                        '</mergeCells>';
+                }
+
+                ws += buildRow(header, rowNum, 2);
+                rowNum++;
+
+                // Loop through each row to append to sheet.
+                table.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    var data = this.data();
+
+                    // If data is object based, then it needs to be converted
+                    // to an array before sending to buildRow()
+                    ws += buildRow(data, rowNum, '');
+
+                    rowNum++;
+                });
+
+                ws += '</sheetData>' + mergeCells;
+
+                return ws;
+
+            }
+
+            function setSheetName(xlsx, name) {
+                // Changes tab title for sheet.
+                //Params:
+                //  xlsx: xlxs worksheet object.
+                //  name: name for sheet.
+
+                if (name.length > 0) {
+                    var source = xlsx.xl['workbook.xml'].getElementsByTagName('sheet')[0];
+                    source.setAttribute('name', name);
+                }
+            }
+
+            function addSheet(xlsx, table, title, name, sheetId) {
+                //Clones sheet from Sheet1 to build new sheet.
+                //Params:
+                //  xlsx: xlsx object.
+                //  table: table ID.
+                //  title: Title for top row or blank if no title.
+                //  name: Name of new sheet.
+                //  sheetId: string containing sheetId for new sheet.
+                //Returns:
+                //  Updated sheet object.
+
+                //Add sheet2 to [Content_Types].xml => <Types>
+                //============================================
+                var source = xlsx['[Content_Types].xml'].getElementsByTagName('Override')[1];
+                var clone = source.cloneNode(true);
+                clone.setAttribute('PartName', '/xl/worksheets/sheet' + sheetId + '.xml');
+                xlsx['[Content_Types].xml'].getElementsByTagName('Types')[0].appendChild(clone);
+
+                //Add sheet relationship to xl/_rels/workbook.xml.rels => Relationships
+                //=====================================================================
+                var source = xlsx.xl._rels['workbook.xml.rels'].getElementsByTagName('Relationship')[0];
+                var clone = source.cloneNode(true);
+                clone.setAttribute('Id', 'rId' + sheetId + 1);
+                clone.setAttribute('Target', 'worksheets/sheet' + sheetId + '.xml');
+                xlsx.xl._rels['workbook.xml.rels'].getElementsByTagName('Relationships')[0].appendChild(clone);
+
+                //Add second sheet to xl/workbook.xml => <workbook><sheets>
+                //=========================================================
+                var source = xlsx.xl['workbook.xml'].getElementsByTagName('sheet')[0];
+                var clone = source.cloneNode(true);
+                clone.setAttribute('name', name);
+                clone.setAttribute('sheetId', sheetId);
+                clone.setAttribute('r:id', 'rId' + sheetId + 1);
+                xlsx.xl['workbook.xml'].getElementsByTagName('sheets')[0].appendChild(clone);
+
+                //Add sheet2.xml to xl/worksheets
+                //===============================
+                var newSheet = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+                    '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac" mc:Ignorable="x14ac">' +
+                    getTableData(table, title) +
+
+                    '</worksheet>';
+
+                xlsx.xl.worksheets['sheet' + sheetId + '.xml'] = $.parseXML(newSheet);
+
+            }
+
+            var table = $('#table1').DataTable({
+                dom: 'Bftrip',
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        text: 'Excel',
+                        customize: function (xlsx) {
+                            setSheetName(xlsx, 'Employees');
+
+                            // process additional DataTables in the web page:
+                            $('table').each(function (index) {
+                                if (index > 0) {
+                                    var tableID = '#' + $(this).attr('id');
+                                    var rowOneTitle = $(this).attr('data-rowonetitle');
+                                    var sheetName = $(this).attr('data-sheetname');
+                                    var sheetID = index + 1;
+                                    addSheet(xlsx, tableID, rowOneTitle, sheetName, sheetID);
+                                }
+                            });
+
+                        }
+
+                    }
+                ]
+
+            });
+
+            $('#table2').DataTable();
+            //$('#example3').DataTable();
+            //$('#example4').DataTable();
+            //$('#example5').DataTable();
+            //$('#example6').DataTable();
+
+        });
+    </script>*@
+
+    <script type="text/javascript" src="~/Scripts/jquery-1.12.4.min.js"></script>
+        <script type="text/javascript" src="~/Assets/plugins/TableExport/js/xlsx.core.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js" integrity="sha512-csNcFYJniKjJxRWRV1R7fvnXrycHP6qDR21mgz1ZP55xY5d+aHLfo9/FcGDQLfn2IfngbAHd8LdfsagcCqgTcQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.6/shim.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.6/cpexcel.js"></script>
+
+        <script type="text/javascript" src="~/Assets/plugins/TableExport/js/tableexport.min.js"></script>
+        <script type="text/javascript" src="~/Scripts/jQuery.print.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.10.3/xlsx.full.min.js"></script>
+
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/excellentexport@3.4.3/dist/excellentexport.min.js"></script>
+
+        <script type="text/javascript">
+
+
+            function exportTableToExcel(tableId, filename) {
+                let dataType = 'application/vnd.ms-excel';
+                let extension = '.xls';
+
+                let base64 = function (s) {
+                    //return window.btoa(unescape(encodeURIComponent(s)))
+                    //return window.btoa(unescape(escape(s)))
+                    //return window.btoa(escape(s))
+
+                    try {
+                        return window.btoa(unescape(escape(s)));
+                    }
+                    catch (err) {
+                        return window.btoa(unescape(encodeURIComponent(s)));
+                    }
+
+                };
+
+                let template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>';
+                let render = function (template, content) {
+                    return template.replace(/{(\w+)}/g, function (m, p) { return content[p]; });
+                };
+
+                let tableElement = document.getElementById(tableId);
+
+                let tableExcel = render(template, {
+                    worksheet: filename,
+                    table: tableElement.innerHTML.normalize('NFD').replace("–", "-")
+                });
+                //console.log(tableExcel);
+
+                filename = filename + extension;
+
+                if (navigator.msSaveOrOpenBlob) {
+                    let blob = new Blob(
+                        ['\ufeff', tableExcel],
+                        { type: dataType }
+                    );
+
+                    navigator.msSaveOrOpenBlob(blob, filename);
+                } else {
+                    let downloadLink = document.createElement("a");
+
+                    document.body.appendChild(downloadLink);
+
+                    downloadLink.href = 'data:' + dataType + ';base64,' + base64(tableExcel);
+
+                    downloadLink.download = filename;
+
+                    downloadLink.click();
+                }
+            }
+
+            function download_csv(csv, filename) {
+                var csvFile;
+                var downloadLink;
+
+                // CSV FILE
+                csvFile = new Blob([csv], { type: "text/csv" });
+
+                // Download link
+                downloadLink = document.createElement("a");
+
+                // File name
+                downloadLink.download = filename;
+
+                // We have to create a link to the file
+                downloadLink.href = window.URL.createObjectURL(csvFile);
+
+                // Make sure that the link is not displayed
+                downloadLink.style.display = "none";
+
+                // Add the link to your DOM
+                document.body.appendChild(downloadLink);
+
+                // Lanzamos
+                downloadLink.click();
+            }
+
+            function s2ab(s) {
+                var buf = new ArrayBuffer(s.length);
+                var view = new Uint8Array(buf);
+                for (var i = 0; i != s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+                return buf;
+            }
+
+
+            function export_table_to_csv(index) {
+                var csv = [];
+                var rows = document.querySelectorAll("table");
+
+                var rowNew = rows[index].querySelectorAll('tr');
+
+                for (var i = 0; i < rowNew.length; i++) {
+                    var row = [],
+                        cols = rowNew[i].querySelectorAll("td, th");
+
+                    for (var j = 0; j < cols.length; j++)
+                        row.push(cols[j].innerText);
+
+                    csv.push(row.join(","));
+
+                }
+
+
+                return csv.join("\n");
+            }
+
+            function doExcel1(fileName) {
+                var csv = [];
+                var blob,
+                    wb = { SheetNames: [], Sheets: {} };
+
+                for (let i = 0; i < document.querySelectorAll('table').length; i++) {
+
+                    var sheetd = 'Sheet' + i;
+                    if (i == 0) {
+                        sheetd = "PO vs GRN";
+                    } else if (i == 1) {
+                        sheetd = "Detail PO Receiving";
+                    }
+
+                    var ws1 = XLSX.read(export_table_to_csv(i), { type: "binary" }).Sheets.Sheet1;
+                    wb.SheetNames.push(sheetd);
+                    wb.Sheets[sheetd] = ws1;
+
+                }
+
+                blob = new Blob([s2ab(XLSX.write(wb, { bookType: 'xlsx', type: 'binary' }))], {
+                    type: "application/octet-stream"
+                });
+
+                download_csv(blob, fileName);
+            }
+
+                    var tablesToExcel1 = (function ($) {
+            var uri = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,'
+                //uri = 'data:application/vnd.ms-excel;base64,'
+                //, html_start = `<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">`
+                , html_start = `<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><meta http-equiv="content-type" content="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8">`
+                , template_ExcelWorksheet = `<x:ExcelWorksheet><x:Name>{SheetName}</x:Name><x:WorksheetSource HRef="sheet{SheetIndex}.htm"/></x:ExcelWorksheet>`
+                , template_ListWorksheet = `<o:File HRef="sheet{SheetIndex}.htm"/>`
+                , template_HTMLWorksheet = `
+------=_NextPart_dummy
+Content-Location: sheet{SheetIndex}.htm
+Content-Type: text/html; charset=windows-1252
+
+` + html_start + `
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <link id="Main-File" rel="Main-File" href="../WorkBook.htm">
+  <link rel="File-List" href="filelist.xml">
+</head>
+<body><table>{SheetContent}</table></body>
+</html>`
+                , template_WorkBook = `MIME-Version: 1.0
+X-Document-Type: Workbook
+Content-Type: multipart/related; boundary="----=_NextPart_dummy"
+
+------=_NextPart_dummy
+Content-Location: WorkBook.htm
+Content-Type: text/html; charset=windows-1252
+
+` + html_start + `
+<head>
+<meta name="Excel Workbook Frameset">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<link rel="File-List" href="filelist.xml">
+<!--[if gte mso 9]><xml>
+ <x:ExcelWorkbook>
+  <x:ExcelWorksheets>{ExcelWorksheets}</x:ExcelWorksheets>
+  <x:ActiveSheet>0</x:ActiveSheet>
+ </x:ExcelWorkbook>
+</xml><![endif]-->
+</head>
+<frameset>
+  <frame src="sheet0.htm" name="frSheet">
+  <noframes><body><p>This page uses frames, but your browser does not support them.</p></body></noframes>
+</frameset>
+</html>
+{HTMLWorksheets}
+Content-Location: filelist.xml
+Content-Type: text/xml; charset="utf-8"
+
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+  <o:MainFile HRef="../WorkBook.htm"/>
+  {ListWorksheets}
+  <o:File HRef="filelist.xml"/>
+</xml>
+------=_NextPart_dummy--
+`
+                , base64 = function (s) {
+                    //return window.btoa(unescape(encodeURIComponent(s)))
+                    try {
+                        return window.btoa(unescape(escape(s)));
+                    }
+                    catch (err) {
+                        return window.btoa(unescape(encodeURIComponent(s)));
+                    }
+
+
+                }
+                , format = function (s, c) {
+                    return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; })
+                }
+            return function (tables, filename) {
+                var context_WorkBook = {
+                    ExcelWorksheets: ''
+                    , HTMLWorksheets: ''
+                    , ListWorksheets: ''
+                };
+                var tables = jQuery(tables);
+                $.each(tables, function (SheetIndex) {
+                    var $table = $(this);
+                    var SheetName = $table.attr('data-SheetName');
+                    if ($.trim(SheetName) === '') {
+                        SheetName = 'Sheet' + SheetIndex;
+                    }
+                    context_WorkBook.ExcelWorksheets += format(template_ExcelWorksheet, {
+                        SheetIndex: SheetIndex
+                        , SheetName: SheetName
+                    });
+                    context_WorkBook.HTMLWorksheets += format(template_HTMLWorksheet, {
+                        SheetIndex: SheetIndex
+                        , SheetContent: $table.html()
+                    });
+                    context_WorkBook.ListWorksheets += format(template_ListWorksheet, {
+                        SheetIndex: SheetIndex
+                    });
+                });
+
+                var blob = new Blob([s2ab(atob(base64(format(template_WorkBook, context_WorkBook))))], {
+                    type: ''
+                });
+
+                var link = document.createElement("A");
+                //link.href = uri + base64(format(template_WorkBook, context_WorkBook));
+                link.href = URL.createObjectURL(blob);
+                link.download = filename || 'Workbook.xlsx';
+                link.target = '_blank';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+                })(jQuery);
+
+
+
+            $(function () {
+                $("input[name='GridHtml']").val($("#myform").html());
+                //$("#my-form").submit();
+
+                //var html = document.querySelector("table").outerHTML;
+                //doExcel1('POvsGRN.xlsx');
+
+                //exportTableToExcel('table1', 'Purchase Order VS Good Received Note Report');
+                tablesToExcel1('#table1,#table2', 'Purchase Order VS Good Received Note Report' + '.xls');
+
+                if (navigator.userAgent.indexOf("Firefox") > 0) {
+                    window.setTimeout(function () { window.history.back(); }, 1000);
+                } else {
+                    //window.top.close();
+                    window.history.back();
+                }
+
+                //export_excel();
+
+            });
+        </script>
+
+</body>
+</html>

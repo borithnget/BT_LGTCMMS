@@ -1,0 +1,141 @@
+﻿@model BT_KimMex.Models.SupplierViewModel
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<div class="w3-container">
+    <h3>Edit Supplier</h3>
+</div>
+
+<div class="w3-container">
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.supplier_id)
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="col-md-4">Date:</label>
+                        <label class="col-md-8" id="created_date"></label>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-4">Supplier Name <span style="color:red;">*</span>:</label>
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.supplier_name, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.supplier_name, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.discount, htmlAttributes: new { @class = "col-md-4" })
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.discount, new { htmlAttributes = new { @class = "form-control", type = "Number" } })
+                            @Html.ValidationMessageFor(model => model.supplier_name, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.supplier_phone, htmlAttributes: new { @class = "col-md-4" })
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.supplier_phone, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.supplier_phone, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.supplier_email, htmlAttributes: new { @class = "col-md-4" })
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.supplier_email, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.supplier_email, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.supplier_address, htmlAttributes: new { @class = "col-md-4" })
+                        <div class="col-md-8">
+                            @Html.TextAreaFor(model => model.supplier_address, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.supplier_address, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-4">Supplier Type:</label>
+                        <div class="col-md-8">
+                            <select class="form-control" id="supplier_type" name="supplier_type">
+                                <option value="local">Local</option>
+                                <option value="oversea">Oversea </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-4 col-md-8">
+                            <input type="submit" value="Save" class="btn btn-success" />
+                            <a href="@Url.Action("Index","Supplier")" class="btn btn-danger">Back</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <h4>TERMS & CONDITIONS</h4>
+                            <div class="form-group">
+                                <label class="col-md-4">Incoterms:</label>
+                                <div class="col-md-8">
+                                    @Html.EditorFor(model => model.incoterm, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4">Payment:</label>
+                                <div class="col-md-8">
+                                    @Html.EditorFor(model => model.payment, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4">Delivery:</label>
+                                <div class="col-md-8">
+                                    @Html.EditorFor(model => model.delivery, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4">Shipment:</label>
+                                <div class="col-md-8">
+                                    @Html.EditorFor(model => model.shipment, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4">Warranty:</label>
+                                <div class="col-md-8">
+                                    @Html.EditorFor(model => model.warranty, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4">Vendor Ref:</label>
+                                <div class="col-md-8">
+                                    @Html.EditorFor(model => model.vendor_ref, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            var date = '@Model.created_date';
+            $('#created_date').text(getFormattedDateMMDDYYYY(new Date(date)));
+            if ('@TempData["message"]' != null) {
+                $.notify('@TempData["message"]', { className: 'error' });
+            }
+            $('#supplier_type').val('@Model.supplier_type');
+        });
+    </script>
+}

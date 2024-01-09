@@ -1,0 +1,1297 @@
+﻿@model IEnumerable<BT_KimMex.Models.StockTransferViewModel>
+@using BT_KimMex.Class
+@{
+    ViewBag.Title = "Index";
+    string status = string.Empty;
+    if (string.IsNullOrWhiteSpace(Request.QueryString["status"]))
+    {
+        status = string.Empty;
+    }
+    else
+    {
+        status = Request.QueryString["status"].ToString();
+    }
+}
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+<style type="text/css">
+    #stockTransferTable tr td {
+        vertical-align: middle !important;
+    }
+
+        #stockTransferTable tr td:nth-child(9), #stockTransferTable tr td:nth-child(10), #stockTransferTable tr td:nth-child(11), #stockTransferTable tr td:nth-child(12) {
+            text-align: center !important;
+        }
+</style>
+
+<h3 class="title">Stock Transfer List</h3>
+
+<div class="well" style="padding:8px !important; padding-bottom:30px !important;">
+    <div class="form-group">
+        <label class="control-label col-md-2">Requested Date:</label>
+        <div class="col-md-3">
+            <div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
+                <i class="fa fa-calendar"></i>&nbsp;
+                <span></span> <i class="fa fa-caret-down"></i>
+            </div>
+        </div>
+        <label class="control-label col-md-2">Status:</label>
+        <div class="col-md-3">
+            <select class="form-control" id="ddr_status" name="ddr_status" style="width:100% !important;">
+                <option value="0">All</option>
+                <option value="@Status.Pending">@ShowStatus.STCreated</option>
+                <option value="@Status.PendingFeedback">@ShowStatus.PendingFeedback</option>
+                <option value="@Status.Feedbacked">@ShowStatus.PendingFeedback</option>
+                <option value="@Status.Completed">@ShowStatus.STApproved</option>
+                <option value="@Status.Approved">@ShowStatus.STChecked</option>
+                <option value="@Status.Rejected">@ShowStatus.Rejected</option>
+                <option value="@Status.cancelled">Cancelled</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="w3-button w3-tiny w3-blue" onclick="initialDataTable()">Filter</button>
+        </div>
+    </div>
+</div>
+
+<table class="table table-bordered" id="stockTransferTable">
+    <thead>
+        <tr>
+            <th rowspan="2">ID</th>
+            <th rowspan="2">Date</th>
+            <th rowspan="2">Transfer No.</th>
+            <th rowspan="2">PR Ref.</th>
+            <th rowspan="2">Project</th>
+            <th rowspan="2">To Warehouse</th>
+            <th rowspan="2">From Warehouse</th>
+            <th rowspan="2">Requester</th>
+            <th colspan="4">Status</th>
+            <th rowspan="2">Action</th>
+            @*<th>Approve/ Feedback</th>
+            <th>View</th>
+            <th>Edit</th>
+            <th>Delete</th>*@
+        </tr>
+        <tr>
+            <th>Action</th>
+            <th>SR</th>
+            <th>MR</th>
+            <th>GRN</th>
+        </tr>
+    </thead>
+    <tbody>
+        @*@{ 
+            int count = 1;
+            foreach(var item in Model)
+            {
+                <tr>
+                    <td>@count</td>
+                    <td>@CommonClass.ToLocalTime(Convert.ToDateTime(item.created_date)).ToString("dd/MM/yyyy")</td>
+                    <td><a href="@Url.Action("Detail","StockTransfer",new { id = item.stock_transfer_id })">@item.stock_transfer_no</a></td>
+                    <td>@item.item_request_no</td>
+                    <td>@item.project_fullname</td>
+                    <td>@item.warehouse_name</td>
+                    <td>@item.from_warehouse_name</td>
+                    <td>@BT_KimMex.Class.CommonFunctions.GetUserFullnamebyUserId(item.create_by)</td>
+                    <td class="text-center">
+                        @{
+                            if (item.stock_transfer_status == Status.Pending)
+                            {
+                                <label class="label w3-red">@ShowStatus.STCreated</label>
+                            }
+                            else if (string.Compare(item.stock_transfer_status, Status.PendingFeedback) ==0)
+                            {
+                                <label class="label w3-red">@item.stock_transfer_status</label>
+                            }
+                            else if (string.Compare(item.stock_transfer_status, Status.Feedbacked) == 0)
+                            {
+                                <label style="color:green !important;">@item.stock_transfer_status</label>
+                            }
+                            else if (string.Compare(item.stock_transfer_status, Status.Completed) == 0)
+                            {
+                                <label class="label w3-blue">@ShowStatus.STApproved</label>
+                            }
+                            else if (string.Compare(item.stock_transfer_status, Status.Approved) == 0)
+                            {
+                                <label class="label w3-yellow">@ShowStatus.STChecked</label>
+                            }
+                            else if (string.Compare(item.stock_transfer_status, Status.Rejected) == 0|| string.Compare(item.stock_transfer_status, Status.cancelled) == 0)
+                            {
+                                <label class="label w3-grey">@item.stock_transfer_status</label>
+                            }                       
+                        }
+                    </td>
+                    <td><label class="label w3-red">@item.sr_status</label></td>
+                    <td><label class="label w3-blue">@item.mr_status</label></td>
+                    <td><label class="label w3-green">@item.received_status</label></td>
+                    <td><a href="@Url.Action("Detail","StockTransfer",new { id = item.stock_transfer_id })" class="w3-button w3-tiny w3-green">View Detail</a></td>
+                </tr>
+                                count++;
+                            }
+        }*@
+    </tbody>
+</table>
+
+<!-- delete project modal popup-->
+<div class="modal fade" id="myModal" tabindex="=-1" role="dialog" aria-labelledby="deleteModalLabel">
+    <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header alert alert-danger">
+                    <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+                </div>
+                <div class="modal-body">
+                    <p class="success-message">Are you sure to delete this item?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default delete-confirm">Yes</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        No
+                    </button>
+                </div>
+            </div>
+      </div>
+  </div>
+
+    <!-- approve project modal popup-->
+    <div class="modal fade" id="approveModal" tabindex="=-1" role="dialog" aria-labelledby="approveModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header alert alert-warning">
+                    <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+                </div>
+                <div class="modal-body">
+                    <p class="s uccess-message">Are you sure to <strong>Approve</strong> this item?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default approve-confirm">Yes</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- reject project modal popup-->
+    <div class="modal fade" id="rejectModal" tabindex="=-1" role="dialog" aria-labelledby="rejectModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header alert alert-danger">
+                    <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <p class="success-message col-md-12">Are you sure to <strong>Reject</strong> this item?</p>
+                        <label class="col-md-2">Comment:</label>
+                        <div class="col-md-10">
+                            <textarea class="form-control" rows="5" id="reject-comment"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default reject-confirm">Yes</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts{
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.3/moment.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+        <script type="text/javascript">
+            $(function () {
+
+                var start = moment().subtract(29, 'days');
+                var end = moment();
+
+                function cb(start, end) {
+                    $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+                }
+
+                $('#reportrange').daterangepicker({
+                    startDate: start,
+                    endDate: end,
+                    ranges: {
+                        'Today': [moment(), moment()],
+                        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                        'This Month': [moment().startOf('month'), moment().endOf('month')],
+                        'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                    }
+                }, cb);
+
+                cb(start, end);
+                $('#ddr_status').select2();
+                initialDataTable();
+
+            var stockTransferId;
+            var isMSC = false;
+            var isCFO = false;
+            var isAdmin = false;
+            var isPCH = false;
+            var isQA = false;
+            @{
+                if (User.IsInRole("Admin"))
+                {
+                    <text>isAdmin = true;</text>
+                }
+                if(User.IsInRole("Procurement Manager"))
+                {
+                    <text>isMSC = true;</text>
+                }
+                if(User.IsInRole("Site Manager"))
+                {
+                    <text>isCFO = true;</text>
+                }
+                if(User.IsInRole("Purchaser"))
+                {
+                    <text>isPCH = true;</text>
+                }
+                if(User.IsInRole("QA/QC Officer"))
+                {
+                    <text>isQA = true;</text>
+                }
+
+            }
+            if (isAdmin || (isAdmin && string.Compare(status, "All") == 0)) {
+                status = "All";
+                $("#allsp").hide();
+
+
+                $("#allqc").hide();
+                $("#allqa").hide();
+                $("#allcfo").hide();
+                $("#allpq").hide();
+                $("#allsp").hide();
+            }
+            if (isPCH) {
+                status = "Pending";
+                $("div.id_100 select").val("Pending");
+               // $("#pending").closest('option').addClass('selected');
+                $("#feedback").hide();
+                $("#pf").hide();
+                $("#all").hide();
+                $("#allqc").hide();
+                $("#allqa").hide();
+                $("#allcfo").hide();
+                $("#allpq").hide();
+                $("#allsp").hide();
+                $("#complete").hide();
+                $("#completed").hide();
+            }
+            if (isQA) {
+                status = "AllQA";
+                $("div.id_100 select").val("AllQA");
+                $("#all").hide();
+                $("#allqc").hide();
+                $("#allcfo").hide();
+                $("#allsp").hide();
+                $("#allpq").hide();
+                $("#completed").hide();
+                //$("#complete").hide();
+            }
+            if (isCFO) {
+                status = "AllCFO";
+                $("div.id_100 select").val("AllCFO");
+                $("#all").hide();
+                $("#allqa").hide();
+                $("#allqc").hide();
+                $("#allpq").hide();
+                $("#allsp").hide();
+                $("#feedback").hide();
+                //$("#pf").hide();
+                $("#pending").hide();
+            }
+            if (isCFO && isQA) {
+                status = "AllCQ";
+                $("div.id_100 select").val("AllCQ");
+                $("#all").hide();
+                $("#allqa").hide();
+                $("#allcfo").hide();
+                $("#allqc").show();
+                $("#allpq").hide();
+                $("#feedback").show();
+                $("#pending").show();
+                $("#pf").show();
+                $("#completed").show();
+                $("#complete").show();
+            }
+            if (isQA && isPCH) {
+                status = "AllPQ";
+                $("div.id_100 select").val("AllPQ");
+                $("#all").hide();
+                $("#allcfo").hide();
+                $("#allqa").hide();
+                $("#allqc").hide();
+                $("#allpq").show();
+                $("#feedback").show();
+                $("#pending").show();
+                $("#pf").show();
+                $("#complete").show();
+            }
+            if (isCFO && isPCH) {
+                status = "AllSP";
+                $("div.id_100 select").val("AllSP");
+                $("#all").hide();
+                $("#allqc").hide();
+                $("#allcfo").hide();
+                $("#allqa").hide();
+                $("#allpq").hide();
+                $("#allsp").show();
+
+                $("#completed").show();
+                $("#complete").show();
+                $("#pending").show();
+                //$("#feedback").show();
+                //$("#pf").show();
+            }
+            //if (isCFO) {
+            //    $("#tab_pending").closest('li').addClass('active');
+            //    $("#table_pending").addClass('active');
+            //    $("#tab_approve").hide();
+            //}
+            //if (isDir || (isDir && string.Compare(status, "Approved") == 0)){
+            //    $("#tab_approve").closest('li').addClass('active');
+            //    $("#table_approve").addClass('active');
+            //    $("#tab_pending").hide();
+            //}
+
+
+
+            @*@if (!string.IsNullOrEmpty(status))
+            {
+                <text>
+            initialStockTransferDatatable('@status', isAdmin, isMSC, isCFO, isPCH, isQA);
+            $('#st_status').val('@status');
+            </text>
+            }
+            else
+            {
+                <text>initialStockTransferDatatable(status, isAdmin, isMSC, isCFO,isPCH, isQA); </text>
+            }*@
+
+            //$('#stockTransferTable').DataTable({});
+
+            @*@if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser))
+            {
+                <text>
+            $('#stockTransferTable_filter').append('<a href="@Url.Action("Create", "StockTransfer")" class="w3-button w3-tiny w3-teal pull-left" style="margin-right:10px !important;">New Request</a>');
+            </text>
+            }*@
+
+            $('#st_status').change(function () {
+    var status = $(this).val();
+    if (status != null || status != "")
+        initialStockTransferDatatable(status, isAdmin, isMSC, isCFO, isPCH, isQA);
+});
+
+            $('#stockTransferTable tbody').on('click', 'td a.delete-promp', function () {
+                stockTransferId = $(this).attr('id');
+                $('#myModal').modal('show');
+            });
+
+            $('.delete-confirm').click(function () {
+                if (stockTransferId != '') {
+                    $.ajax({
+                        url: "/StockTransfer/Delete",
+                        data: {
+                            'id': stockTransferId,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#myModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been deleted!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "StockTransfer")';
+                            }
+                            else if (da.result == "fail")
+                                $.notify('Your data has been error while deleting!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while deleting!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+            $('#stockTransferTable tbody').on('click', 'td a.approve-promp', function () {
+                stockTransferId = $(this).attr('id');
+                $('#approveModal').modal('show');
+            });
+
+            $('.approve-confirm').click(function () {
+                if (stockTransferId != '') {
+                    $.ajax({
+                        url: "/StockTransfer/Approve",
+                        data: {
+                            'id': stockTransferId,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#approveModal').modal('hide');
+                            if (da.result == "success") {
+                                alert('Your data has been approved!');
+                                window.location.href = '@Url.Action("Index", "StockTransfer")';
+                            }
+                            else if (da.result == "fail")
+                                alert(da.message);
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            alert('Your data has been error while approving!');
+                        }
+                    });
+                }
+            });
+
+            $('#stockTransferTable tbody').on('click', 'td a.reject-promp', function () {
+                stockTransferId = $(this).attr('id');
+                $('#rejectModal').modal('show');
+            });
+
+            $('.reject-confirm').click(function () {
+                if (stockTransferId != '') {
+                    var comment = $("#reject-comment").val();
+                    $.ajax({
+                        url: "/StockTransfer/Reject",
+                        data: {
+                            'id': stockTransferId,
+                            'comment': comment
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.reject-confirm').css('display', 'none');
+                            }
+                            $('#rejectModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been rejected!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "StockTransfer")';
+                            }
+                            else if (da.result == "fail")
+                                $.notify('Your data has been error while rejecting!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while rejecting!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+            });
+
+            function initialDataTable() {
+                var t = $('#stockTransferTable').DataTable({
+                    "bDestroy": true,
+                    "ajax": {
+                        "url": "/StockTransfer/GetStockTransferByDaterangeAndStatusListItemsAJAX",
+                        "type": "GET",
+                        "dataType": "json",
+                        "data": {
+                            dateRange: $('#reportrange span').html(),
+                            status: $('#ddr_status').val(),
+                        }
+                    },
+                    "columns": [
+                        { "data": "stock_transfer_id" },
+                        { "data": "created_at_text" },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return '<a href="/StockTransfer/Detail/' + full.stock_transfer_id + '">' + full.stock_transfer_no + '</a>';
+                            }
+                        },
+                        { "data": "item_request_no" },
+                        { "data": "project_fullname" },
+                        { "data": "warehouse_name" },
+                        { "data": "from_warehouse_name" },
+                        { "data": "created_by_text" },
+                        { "data": "show_status" },
+                        { "data": "sr_status" },
+                        { "data": "mr_status" },
+                        { "data": "received_status" },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return '<a href="/StockTransfer/Detail/' + full.stock_transfer_id + '" class="w3-button w3-tiny w3-green">View Detail</a>';
+                            }
+                        },
+                    ],
+                    "order": [[2, "desc"]],
+                });
+                t.on('order.dt search.dt', function () {
+                    t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                        cell.innerHTML = i + 1;
+                    });
+                }).draw();
+
+                @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser))
+                {
+                    <text>
+                $('#stockTransferTable_filter').append('<a href="@Url.Action("Create", "StockTransfer")" class="w3-button w3-tiny w3-teal pull-left" style="margin-right:10px !important;">New Request</a>');
+                    </text>
+                }
+
+            }
+        </script>
+
+        <script type="text/javascript">
+
+        function initialStockTransferDatatable(status, isAdmin, isMSC, isCFO, isPCH, isQA) {
+            var t;
+
+            if (isAdmin ) {
+                t = $('#stockTransferTable').DataTable({
+                    "bDestroy": true,
+                    "ajax": {
+                        "url": "@Url.Action("GetStockTransferDataTable", "StockTransfer")",
+                        "type": "GET",
+                        "dataType": "json",
+                        "data": { status: status }
+                    },
+                    "columns": [
+                        { "data": "stock_transfer_id" },
+                        {
+                            "data": "created_date", render: function (data, type, full, meta) {
+                                //return new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)).toISOString().slice(0, 10);
+                                return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                            }
+                        },
+                        { "data": "stock_transfer_no" },
+                        { "data": "item_request_no" },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strWarehouse;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strInvoiceNo;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strInvoiceDate;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.stock_transfer_status == "pending")
+                                    return '<label style="color:orange !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "Pending Feedback")
+                                    return '<label style="color:blue !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "Feedbacked")
+                                    return '<label style="color:green !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "completed")
+                                    return '<label style="color:green !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "approved")
+                                    return '<label style="color:red !important;">' + full.stock_transfer_status + '</label>';
+                                    else if (full.stock_transfer_status == "Rejected")
+                                        return '<label style="color:gray !important;">' + full.stock_transfer_status + '</label>';
+                                else
+                                    return '';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.stock_transfer_status == "pending"  )
+                                    //return '<a href="javascript:void(0)" id="' + full.stock_transfer_id + '" class="approve-promp">Approve/ Feedback</a>';
+                                    return '<a href="/StockTransfer/ApproveFeedback/' + full.stock_transfer_id + '">Approve/ Feedback</a>';
+                                else if (full.stock_transfer_status == "Approved" || full.stock_transfer_status == "Feedbacked")
+                                    return '<a href="/StockTransfer/ApproveFeedback/' + full.stock_transfer_id + '">Completed</a>';
+                                return '';
+                            }
+                        },
+                        //{
+                        //    "render": function (data, type, full, meta) {
+                        //        if (full.stock_transfer_status == "Pending")
+                        //            return '<a href="javascript:void(0)" id="' + full.stock_transfer_id + '" class="reject-promp">Reject</a>';
+                        //        return '';
+                        //    }
+                        //},
+                        {
+                            "render": function (data, type, full, meta) {
+                                return '<a href="/StockTransfer/Detail/' + full.stock_transfer_id + '">View Detail</a>';
+                            }
+                        },
+
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.stock_transfer_status == "Pending" || full.stock_transfer_status == "Rejected" )
+                                    return '<a href="/StockTransfer/Edit/' + full.stock_transfer_id + '">Edit</a>';
+                                else if (full.stock_transfer_status == "Pending Feedback")
+                                    return '<a href="/StockTransfer/PrepareFeedback/' + full.stock_transfer_id + '">Prepare Feedback</a>';
+                                return '';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.stock_transfer_status == "Pending" || full.stock_transfer_status == "Rejected" )
+                                    return '<a href="javascript:void(0)" id="' + full.stock_transfer_id + '" class="delete-promp">Delete</a>';
+                                return '';
+                            }
+                        }
+                    ],
+                    "order": [[2, "desc"]],
+                });
+                $('#stockTransferTable_filter').append('<a href="@Url.Action("Create", "StockTransfer")" class="btn btn-default pull-left" style="margin-right:10px !important;">Add New</a>');
+            } else if (isQA && isPCH) {
+                 t = $('#stockTransferTable').DataTable({
+                    "bDestroy": true,
+                    "ajax": {
+                        "url": "@Url.Action("GetStockTransferDataTable", "StockTransfer")",
+                        "type": "GET",
+                        "dataType": "json",
+                        "data": { status: status }
+                    },
+                    "columns": [
+                        { "data": "stock_transfer_id" },
+                        {
+                            "data": "created_date", render: function (data, type, full, meta) {
+                                //return new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)).toISOString().slice(0, 10);
+                                return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                            }
+                        },
+                        { "data": "stock_transfer_no" },
+                        { "data": "item_request_no" },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strWarehouse;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strInvoiceNo;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strInvoiceDate;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.stock_transfer_status == "Pending")
+                                    return '<label style="color:orange !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "Pending Feedback")
+                                    return '<label style="color:blue !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "Feedbacked")
+                                    return '<label style="color:green !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "completed")
+                                    return '<label style="color:green !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "approved")
+                                    return '<label style="color:red !important;">' + full.stock_transfer_status + '</label>';
+                                    //else if (full.stock_transfer_status == "Rejected")
+                                    //    return '<label style="color:gray !important;">' + full.stock_transfer_status + '</label>';
+                                else
+                                    return '';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.stock_transfer_status == "Pending"  )
+                                    //return '<a href="javascript:void(0)" id="' + full.stock_transfer_id + '" class="approve-promp">Approve/ Feedback</a>';
+                                    return '<a href="/StockTransfer/ApproveFeedback/' + full.stock_transfer_id + '">Approve/ Feedback</a>';
+                                else if (full.stock_transfer_status == "Approved" || full.stock_transfer_status == "Feedbacked")
+                                    //return '<a href="/StockTransfer/ApproveFeedback/' + full.stock_transfer_id + '">Completed</a>';
+                                    return '<p>Approved</p>'
+                                return '';
+                            }
+                        },
+                        //{
+                        //    "render": function (data, type, full, meta) {
+                        //        if (full.stock_transfer_status == "Pending")
+                        //            return '<a href="javascript:void(0)" id="' + full.stock_transfer_id + '" class="reject-promp">Reject</a>';
+                        //        return '';
+                        //    }
+                        //},
+                        {
+                            "render": function (data, type, full, meta) {
+                                return '<a href="/StockTransfer/Detail/' + full.stock_transfer_id + '">View Detail</a>';
+                            }
+                        },
+
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.stock_transfer_status == "Pending" || full.stock_transfer_status == "Rejected" )
+                                    return '<a href="/StockTransfer/Edit/' + full.stock_transfer_id + '">Edit</a>';
+                                else if (full.stock_transfer_status == "Pending Feedback")
+                                    return '<a href="/StockTransfer/PrepareFeedback/' + full.stock_transfer_id + '">Prepare Feedback</a>';
+                                return '';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.stock_transfer_status == "Pending" || full.stock_transfer_status == "Rejected" )
+                                    return '<a href="javascript:void(0)" id="' + full.stock_transfer_id + '" class="delete-promp">Delete</a>';
+                                return '';
+                            }
+                        }
+                    ],
+                     "order": [[2, "desc"]],
+
+                });
+                $('#stockTransferTable_filter').append('<a href="@Url.Action("Create", "StockTransfer")" class="btn btn-default pull-left" style="margin-right:10px !important;">Add New</a>');
+            }
+              else if (isQA && isCFO) {
+
+                 t = $('#stockTransferTable').DataTable({
+                    "bDestroy": true,
+                    "ajax": {
+                        "url": "@Url.Action("GetStockTransferDataTable", "StockTransfer")",
+                        "type": "GET",
+                        "dataType": "json",
+                        "data": { status: status }
+                    },
+                    "columns": [
+                        { "data": "stock_transfer_id" },
+                        {
+                            "data": "created_date", render: function (data, type, full, meta) {
+                                //return new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)).toISOString().slice(0, 10);
+                                return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                            }
+                        },
+                        { "data": "stock_transfer_no" },
+                        { "data": "item_request_no" },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strWarehouse;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strInvoiceNo;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strInvoiceDate;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.stock_transfer_status == "Pending")
+                                    return '<label style="color:orange !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "Pending Feedback")
+                                    return '<label style="color:blue !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "Feedbacked")
+                                    return '<label style="color:green !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "completed")
+                                    return '<label style="color:green !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "approved")
+                                    return '<label style="color:red !important;">' + full.stock_transfer_status + '</label>';
+                                    //else if (full.stock_transfer_status == "Rejected")
+                                    //    return '<label style="color:gray !important;">' + full.stock_transfer_status + '</label>';
+                                else
+                                    return '';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.stock_transfer_status == "Pending" || full.stock_transfer_status == "Feedbacked" )
+                                    //return '<a href="javascript:void(0)" id="' + full.stock_transfer_id + '" class="approve-promp">Approve/ Feedback</a>';
+                                    return '<a href="/StockTransfer/ApproveFeedback/' + full.stock_transfer_id + '">Approve/ Feedback</a>';
+                                else if (full.stock_transfer_status == "Approved")
+                                     return '<a href="/StockTransfer/ApproveFeedback/' + full.stock_transfer_id + '">Completed</a>';
+                                return '';
+                            }
+                        },
+                        //{
+                        //    "render": function (data, type, full, meta) {
+                        //        if (full.stock_transfer_status == "Pending")
+                        //            return '<a href="javascript:void(0)" id="' + full.stock_transfer_id + '" class="reject-promp">Reject</a>';
+                        //        return '';
+                        //    }
+                        //},
+                        {
+                            "render": function (data, type, full, meta) {
+                                return '<a href="/StockTransfer/Detail/' + full.stock_transfer_id + '">View Detail</a>';
+                            }
+                        },
+
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.stock_transfer_status == "Pending Feedback")
+                                    return '<a href="/StockTransfer/PrepareFeedback/' + full.stock_transfer_id + '">Prepare Feedback</a>';
+                                return '';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                //if (full.stock_transfer_status == "Pending" || full.stock_transfer_status == "Rejected" || full.stock_transfer_status == "Approved")
+                                    //return '<a href="javascript:void(0)" id="' + full.stock_transfer_id + '" class="delete-promp">Delete</a>';
+                                return '';
+                            }
+                        }
+                    ],
+                     "order": [[2, "desc"]],
+                     "columnDefs": [
+                         {
+                             "targets": [11],
+                             "visible": false,
+                         },
+
+                     ]
+                });
+
+            }
+            else if (isCFO && isPCH) {
+
+                 t = $('#stockTransferTable').DataTable({
+                    "bDestroy": true,
+                    "ajax": {
+                        "url": "@Url.Action("GetStockTransferDataTable", "StockTransfer")",
+                        "type": "GET",
+                        "dataType": "json",
+                        "data": { status: status }
+                    },
+                    "columns": [
+                        { "data": "stock_transfer_id" },
+                        {
+                            "data": "created_date", render: function (data, type, full, meta) {
+                                //return new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)).toISOString().slice(0, 10);
+                                return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                            }
+                        },
+                        { "data": "stock_transfer_no" },
+                        { "data": "item_request_no" },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strWarehouse;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strInvoiceNo;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strInvoiceDate;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.stock_transfer_status == "Pending")
+                                    return '<label style="color:orange !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "Pending Feedback")
+                                    return '<label style="color:blue !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "Feedbacked")
+                                    return '<label style="color:green !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "completed")
+                                    return '<label style="color:green !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "approved")
+                                    return '<label style="color:red !important;">' + full.stock_transfer_status + '</label>';
+                                    //else if (full.stock_transfer_status == "Rejected")
+                                    //    return '<label style="color:gray !important;">' + full.stock_transfer_status + '</label>';
+                                else
+                                    return '';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                //if (full.stock_transfer_status == "Pending"  )
+                                //    //return '<a href="javascript:void(0)" id="' + full.stock_transfer_id + '" class="approve-promp">Approve/ Feedback</a>';
+                                //    return '<a href="/StockTransfer/ApproveFeedback/' + full.stock_transfer_id + '">Approve/ Feedback</a>';
+                                //else
+                                if (full.stock_transfer_status == "Approved" || full.stock_transfer_status == "Feedbacked")
+                                    return '<a href="/StockTransfer/ApproveFeedback/' + full.stock_transfer_id + '">Completed</a>';
+                                    //return '<p>Approved</p>'
+                                return '';
+                            }
+                        },
+                        //{
+                        //    "render": function (data, type, full, meta) {
+                        //        if (full.stock_transfer_status == "Pending")
+                        //            return '<a href="javascript:void(0)" id="' + full.stock_transfer_id + '" class="reject-promp">Reject</a>';
+                        //        return '';
+                        //    }
+                        //},
+                        {
+                            "render": function (data, type, full, meta) {
+                                return '<a href="/StockTransfer/Detail/' + full.stock_transfer_id + '">View Detail</a>';
+                            }
+                        },
+
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.stock_transfer_status == "Pending" || full.stock_transfer_status == "Rejected")
+                                    return '<a href="/StockTransfer/Edit/' + full.stock_transfer_id + '">Edit</a>';
+                                else if (full.stock_transfer_status == "Pending Feedback")
+                                    return '<a href="/StockTransfer/PrepareFeedback/' + full.stock_transfer_id + '">Prepare Feedback</a>';
+                                return '';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.stock_transfer_status == "Pending" || full.stock_transfer_status == "Rejected")
+                                    return '<a href="javascript:void(0)" id="' + full.stock_transfer_id + '" class="delete-promp">Delete</a>';
+                                return '';
+                            }
+                        }
+                    ],
+                     "order": [[2, "desc"]],
+
+                });
+                $('#stockTransferTable_filter').append('<a href="@Url.Action("Create", "StockTransfer")" class="btn btn-default pull-left" style="margin-right:10px !important;">Add New</a>');
+            }
+            else if (isPCH) {
+
+                t = $('#stockTransferTable').DataTable({
+                    "bDestroy": true,
+                    "ajax": {
+                        "url": "@Url.Action("GetStockTransferDataTable", "StockTransfer")",
+                        "type": "GET",
+                        "dataType": "json",
+                        "data": { status: status },
+                    },
+                    "columns": [
+                        { "data": "stock_transfer_id" },
+                        {
+                            "data": "created_date", render: function (data, type, full, meta) {
+                                //return new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)).toISOString().slice(0, 10);
+                                return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                            }
+                        },
+                        { "data": "stock_transfer_no" },
+                        { "data": "item_request_no" },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strWarehouse;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strInvoiceNo;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strInvoiceDate;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.stock_transfer_status == "Pending")
+                                    return '<label style="color:orange !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "Pending Feedback")
+                                    return '<label style="color:blue !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "Feedbacked")
+                                    return '<label style="color:green !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "completed")
+                                    return '<label style="color:green !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "approved")
+                                    return '<label style="color:red !important;">' + full.stock_transfer_status + '</label>';
+                                    //else if (full.stock_transfer_status == "Rejected")
+                                    //    return '<label style="color:gray !important;">' + full.stock_transfer_status + '</label>';
+                                else
+                                    return full.stock_transfer_status;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                //if (full.stock_transfer_status == "Pending")
+                                //    //return '<a href="javascript:void(0)" id="' + full.stock_transfer_id + '" class="approve-promp">Approve/ Feedback</a>';
+                                //    return '<a href="/StockTransfer/ApproveFeedback/' + full.stock_transfer_id + '">Approve/ Feedback</a>';
+                                //else
+                                if (full.stock_transfer_status == "Approved" || full.stock_transfer_status == "Feedbacked")
+                                    return '<a href="/StockTransfer/ApproveFeedback/' + full.stock_transfer_id + '">Completed</a>';
+                                return '';
+                            }
+                        },
+                        //{
+                        //    "render": function (data, type, full, meta) {
+                        //        if (full.stock_transfer_status == "Pending")
+                        //            return '<a href="javascript:void(0)" id="' + full.stock_transfer_id + '" class="reject-promp">Reject</a>';
+                        //        return '';
+                        //    }
+                        //},
+                        {
+                            "render": function (data, type, full, meta) {
+                                return '<a href="/StockTransfer/Detail/' + full.stock_transfer_id + '">View Detail</a>';
+                            }
+                        },
+
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.stock_transfer_status == "Pending" || full.stock_transfer_status == "Rejected")
+                                    return '<a href="/StockTransfer/Edit/' + full.stock_transfer_id + '">Edit</a>';
+                                else if (full.stock_transfer_status == "Pending Feedback")
+                                    return '<a href="/StockTransfer/PrepareFeedback/' + full.stock_transfer_id + '">Prepare Feedback</a>';
+                                return '';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.stock_transfer_status == "Pending" || full.stock_transfer_status == "Rejected")
+                                    return '<a href="javascript:void(0)" id="' + full.stock_transfer_id + '" class="delete-promp">Delete</a>';
+                                return '';
+                            }
+                        }
+                    ],
+                    "order": [[1, "desc"]],
+                    "columnDefs": [
+                        {
+                            "targets": [8],
+                            "visible": false,
+                        },
+
+                    ]
+                });
+                $('#stockTransferTable_filter').append('<a href="@Url.Action("Create", "StockTransfer")" class="btn btn-default pull-left" style="margin-right:10px !important;">Add New</a>');
+            } else if (isQA) {
+
+                 t = $('#stockTransferTable').DataTable({
+                    "bDestroy": true,
+                    "ajax": {
+                        "url": "@Url.Action("GetStockTransferDataTable", "StockTransfer")",
+                        "type": "GET",
+                        "dataType": "json",
+                        "data": { status: status }
+                    },
+                    "columns": [
+                        { "data": "stock_transfer_id" },
+                        {
+                            "data": "created_date", render: function (data, type, full, meta) {
+                                //return new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)).toISOString().slice(0, 10);
+                                return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                            }
+                        },
+                        { "data": "stock_transfer_no" },
+                        { "data": "item_request_no" },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strWarehouse;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strInvoiceNo;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strInvoiceDate;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.stock_transfer_status == "Pending")
+                                    return '<label style="color:orange !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "Pending Feedback")
+                                    return '<label style="color:blue !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "Feedbacked")
+                                    return '<label style="color:green !important;">' + full.stock_transfer_status + '</label>';
+                                //else if (full.stock_transfer_status == "Completed")
+                                //    return '<label style="color:green !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "approved")
+                                    return '<label style="color:red !important;">' + full.stock_transfer_status + '</label>';
+                                    //else if (full.stock_transfer_status == "Rejected")
+                                    //    return '<label style="color:gray !important;">' + full.stock_transfer_status + '</label>';
+                                else
+                                    return '';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.stock_transfer_status == "Pending" || full.stock_transfer_status == "Feedbacked" )
+                                    //return '<a href="javascript:void(0)" id="' + full.stock_transfer_id + '" class="approve-promp">Approve/ Feedback</a>';
+                                    return '<a href="/StockTransfer/ApproveFeedback/' + full.stock_transfer_id + '">Approve/ Feedback</a>';
+                                else if (full.stock_transfer_status == "Approved")
+                                    return '<p>Success Approved</p>';
+                                return '';
+                            }
+                        },
+                        //{
+                        //    "render": function (data, type, full, meta) {
+                        //        if (full.stock_transfer_status == "Pending")
+                        //            return '<a href="javascript:void(0)" id="' + full.stock_transfer_id + '" class="reject-promp">Reject</a>';
+                        //        return '';
+                        //    }
+                        //},
+                        {
+                            "render": function (data, type, full, meta) {
+                                return '<a href="/StockTransfer/Detail/' + full.stock_transfer_id + '">View Detail</a>';
+                            }
+                        },
+
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.stock_transfer_status == "Pending Feedback")
+                                    return '<a href="/StockTransfer/PrepareFeedback/' + full.stock_transfer_id + '">Prepare Feedback</a>';
+                                return '';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                //if (full.stock_transfer_status == "Pending" || full.stock_transfer_status == "Rejected" || full.stock_transfer_status == "Approved")
+                                    //return '<a href="javascript:void(0)" id="' + full.stock_transfer_id + '" class="delete-promp">Delete</a>';
+                                return '';
+                            }
+                        }
+                    ],
+                     "order": [[2, "desc"]],
+                    "columnDefs": [
+                        //{
+                        //    "targets": [8],
+                        //    "visible": false,
+                        //},
+                        //{
+                        //    "targets": [10],
+                        //    "visible": false,
+                        //},
+                        {
+                            "targets": [11],
+                            "visible": false,
+                        },
+                    ]
+                });
+                //$('#stockTransferTable_filter').append('<a href="@Url.Action("Create", "StockTransfer")" class="btn btn-default pull-left" style="margin-right:10px !important;">Add New</a>');
+            }
+
+
+
+            else {
+
+                t = $('#stockTransferTable').DataTable({
+                    "bDestroy": true,
+                    "ajax": {
+                        "url": "@Url.Action("GetStockTransferDataTable", "StockTransfer")",
+                        "type": "GET",
+                        "dataType": "json",
+                        "data": { status: status },
+                    },
+                    "columns": [
+                        { "data": "stock_transfer_id" },
+                        {
+                            "data": "created_date", render: function (data, type, full, meta) {
+                                //return new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)).toISOString().slice(0, 10);
+                                return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                            }
+                        },
+                        { "data": "stock_transfer_no" },
+                        { "data": "item_request_no" },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strWarehouse;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strInvoiceNo;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                return full.strInvoiceDate;
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.stock_transfer_status == "Pending")
+                                    return '<label style="color:orange !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "Pending Feedback")
+                                    return '<label style="color:blue !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "Feedbacked")
+                                    return '<label style="color:green !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "completed")
+                                    return '<label style="color:green !important;">' + full.stock_transfer_status + '</label>';
+                                else if (full.stock_transfer_status == "approved")
+                                    return '<label style="color:red !important;">' + full.stock_transfer_status + '</label>';
+                                    //else if (full.stock_transfer_status == "Rejected")
+                                    //    return '<label style="color:gray !important;">' + full.stock_transfer_status + '</label>';
+                                else
+                                    return '';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.stock_transfer_status == "Pending" || full.stock_transfer_status == "Feedbacked")
+                                    //return '<a href="javascript:void(0)" id="' + full.stock_transfer_id + '" class="approve-promp">Approve/ Feedback</a>';
+                                    return '<a href="/StockTransfer/ApproveFeedback/' + full.stock_transfer_id + '">Approve/ Feedback</a>';
+                                else if (full.stock_transfer_status == "Approved" || full.stock_transfer_status == "Feedbacked")
+                                    return '<a href="/StockTransfer/ApproveFeedback/' + full.stock_transfer_id + '">Completed</a>';
+                                //if (full.stock_transfer_status == "Pending Feedback")
+                                //    return '<a href="/StockTransfer/PrepareFeedback/' + full.stock_transfer_id + '">Prepare Feedback</a>';
+
+                                return '';
+                            }
+                        },
+                        //{
+                        //    "render": function (data, type, full, meta) {
+                        //        if (full.stock_transfer_status == "Pending")
+                        //            return '<a href="javascript:void(0)" id="' + full.stock_transfer_id + '" class="reject-promp">Reject</a>';
+                        //        return '';
+                        //    }
+                        //},
+                        {
+                            "render": function (data, type, full, meta) {
+                                return '<a href="/StockTransfer/Detail/' + full.stock_transfer_id + '">View Detail</a>';
+                            }
+                        },
+
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.stock_transfer_status == "Pending" || full.stock_transfer_status == "Rejected")
+                                    return '<a href="/StockTransfer/Edit/' + full.stock_transfer_id + '">Edit</a>';
+                                else if (full.stock_transfer_status == "Pending Feedback")
+                                    return '<a href="/StockTransfer/PrepareFeedback/' + full.stock_transfer_id + '">Prepare Feedback</a>';
+                                return '';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full, meta) {
+                                if (full.stock_transfer_status == "Pending" || full.stock_transfer_status == "Rejected")
+                                    return '<a href="javascript:void(0)" id="' + full.stock_transfer_id + '" class="delete-promp">Delete</a>';
+                                return '';
+                            }
+                        }
+                    ],
+                    "order": [[1, "desc"]],
+                    "columnDefs": [
+                        {
+                            "targets": [10],
+                            "visible": false,
+                        },
+                        {
+                            "targets": [11],
+                            "visible": false,
+                        }
+                    ]
+                });
+            }
+
+            t.on('order.dt search.dt', function () {
+                t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+            $('select[name="stockTransferTable_length"]').addClass('datatable-control');
+            $('input[aria-controls="stockTransferTable"]').addClass('datatable-control');
+
+        }
+        </script>
+    }

@@ -1,0 +1,353 @@
+﻿@using BT_KimMex.Class
+@{
+    ViewBag.Title = "MyRequest";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+<h3 class="title">Quote Requested List</h3>
+
+<ul class="nav nav-tabs">
+    <li class="active"><a data-toggle="tab" href="#home">Pending Request</a></li>
+    <li><a data-toggle="tab" href="#menu1">Requested History</a></li>
+</ul>
+<div class="tab-content" style="margin-top:10px !important;">
+    <div id="home" class="tab-pane fade in active">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="pending">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Quote No</th>
+                        <th>PR No</th>
+                        <th>Project Name</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                        @*<th>Edit</th>*@
+                        @*<th>Delete</th>*@
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        
+    </div>
+    <div id="menu1" class="tab-pane fade">
+        <div class="well" style="padding:8px !important; padding-bottom:30px !important;">
+            <div class="form-group">
+                <label class="control-label col-md-2">Requested Date:</label>
+                <div class="col-md-3">
+                    <div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
+                        <i class="fa fa-calendar"></i>&nbsp;
+                        <span></span> <i class="fa fa-caret-down"></i>
+                    </div>
+                </div>
+                <label class="control-label col-md-2">Status:</label>
+                <div class="col-md-3">
+                    <select class="form-control" id="ddr_status" name="ddr_status" style="width:100% !important;">
+                        <option value="0">All</option>
+                        @*<option value="Pending">@ShowStatus.QuoteCreated</option>*@
+                        <option value="Approved">@ShowStatus.QuoteApproved</option>
+                        <option value="Completed">@ShowStatus.QuoteCompleted</option>
+                        <option value="@Status.RequestCancelled">@ShowStatus.QuoteRequestCancelled</option>
+                        <option value="@Status.Rejected">@ShowStatus.QuoteRejected</option>
+                        <option value="@Status.cancelled">@ShowStatus.MRCancelled</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="w3-button w3-tiny w3-blue" onclick="initialRequestedHistoryDataTable()">Filter</button>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered" id="history">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Quote</th>
+                        <th>PR No</th>
+                        <th>Project Name</th>
+                        <th>Status</th>
+                        <th>PO with VAT</th>
+                        <th>PO with Non VAT</th>
+                        <th>View</th>
+                        @*<th>Generate</th>*@
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        
+    </div>
+</div>
+
+<!-- delete project modal popup-->
+<div class="modal fade" id="myModal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to delete this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default delete-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.3/moment.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script type="text/javascript">
+
+        $(function () {
+
+            var start = moment().subtract(29, 'days');
+            var end = moment();
+
+            function cb(start, end) {
+                $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            }
+
+            $('#reportrange').daterangepicker({
+                startDate: start,
+                endDate: end,
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                }
+            }, cb);
+
+            cb(start, end);
+            $('#ddr_status').select2();
+
+            initialPendingRequestDataTable();
+            initialRequestedHistoryDataTable();
+
+            $('#pending tbody').on('click', 'td a.delete-promp', function () {
+                po_id = $(this).attr('id');
+                $('#myModal').modal('show');
+            });
+            $('.delete-confirm').click(function () {
+                if (po_id != '') {
+                    $.ajax({
+                        url: "/PurchaseOrder/Delete",
+                        data: {
+                            'id': po_id,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#myModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been deleted!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "PurchaseOrder")';
+                            }
+                            else if (da.Message == "fail")
+                                $.notify('Your data has been error while deleting!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while deleting!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+        });
+
+        function initialPendingRequestDataTable() {
+            var t = $('#pending').DataTable({
+                "bDestroy": true,
+                "ajax": {
+                    "url": "/PurchaseOrder/GetMyPendingRequestbyUser",
+                    "type": "GET",
+                    "dataType": "json",
+                },
+                "columns": [
+                    { "data": "purchase_order_id" },
+                    //{
+                    //    "data": "created_date", render: function (data, type, full, meta) {
+                    //        return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+
+                    //    }
+                    //},
+                    { "data": "created_at_text" },
+                    { "data": "purchase_oder_number" },
+                    { "data": "ir_no" },
+                    { "data": "project_full_name" },
+                    {
+                        "render": function (data, type, full, meta) {
+                            if (full.purchase_order_status == "Pending")
+                                return '<label class="label w3-orange">Quote Created</label>';
+                            else if (full.purchase_order_status == "Approved")
+                                return '<label class="label w3-blue">Quote Approved</label>';
+                            else if (full.purchase_order_status == "Completed")
+                                return '<label class="label w3-green">Quote Completed</label>';
+                            else if (full.purchase_order_status == "Rejected")
+                                return '<label class="label w3-grey">Quote Rejected</label>';
+                            else if (full.purchase_order_status == "Cancelled")
+                                return '<label class="label w3-gray">Quote Cancelled</label>';
+                            else if (full.purchase_order_status == '@Status.RequestCancelled') {
+                                return '<label class="label w3-gray">@ShowStatus.GetQuoteShowStatus(Status.RequestCancelled)</label>';
+                            }
+                            else if (full.purchase_order_status == '@Status.MREditted') {
+                                return '<label class="label w3-gray">@ShowStatus.GetQuoteShowStatus(Status.MREditted)</label>';
+                            }
+                            else
+                                return '<label class="label w3-gray">'+full.purchase_order_status+'</label>';
+                            }
+
+                        
+                    },
+
+                    {
+                        "render": function (data, type, full, meta) {
+                            return '<a href="/PurchaseOrder/Detail/' + full.purchase_order_id + '" class="w3-button w3-tiny w3-green">View Detail</a>';// <a href="javascript:void(0)" id="' + full.purchase_order_id + '" class="w3-button w3-tiny w3-red delete-promp">Delete</a>';
+                        }
+                    },
+                    //{
+                    //    "render": function (data, type, full, meta) {
+                    //        return '<a href="/PurchaseOrder/Edit/' + full.purchase_order_id + '">Edit</a>';
+                    //        //return '';
+                    //    }
+                    //},
+                    //{
+                    //    "render": function (data, type, full, meta) {
+                    //        return '<a href="javascript:void(0)" id="' + full.purchase_order_id + '" class="w3-button w3-tiny w3-red delete-promp">Delete</a>';
+                    //    }
+                    //},
+
+                ],
+                "order": [[2, "desc"]],
+            });
+            t.on('order.dt search.dt', function () {
+                t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+        }
+        function initialRequestedHistoryDataTable() {
+            $("#history").width('100%');
+            var t = $('#history').DataTable({
+                "bDestroy": true,
+                "ajax": {
+                    "url": "/PurchaseOrder/GetMyRequestedHistorybyUser",
+                    "type": "GET",
+                    "dataType": "json",
+                    "data": {
+                        dateRange: $('#reportrange span').html(),
+                        status: $('#ddr_status').val(),
+                    }
+                },
+                "columns": [
+                    { "data": "purchase_order_id" },
+                    {
+                        "data": "created_date", render: function (data, type, full, meta) {
+                            return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                        }
+                    },
+                    { "data": "purchase_oder_number" },
+                    { "data": "ir_no" },
+                    { "data": "project_full_name" },
+                    {
+                        "render": function (data, type, full, meta) {
+                            //if (full.purchase_order_status == "Pending")
+                            //    return '<label style="color:orange !important;">' + full.purchase_order_status + '</label>';
+                            //else if (full.purchase_order_status == "Approved")
+                            //    return '<label style="color:blue !important;">Checked by Technical Department</label>';
+                            //else if (full.purchase_order_status == "Completed")
+                            //    return '<label style="color:green !important;">Approved by Finance</label>';
+                            //else if (full.purchase_order_status == "Rejected")
+                            //    return '<label style="color:gray !important;">' + full.purchase_order_status + '</label>';
+                            //else if (full.purchase_order_status == "Cancelled")
+                            //    return '<label style="color:gray !important;">' + full.purchase_order_status + '</label>';
+
+                            if (full.purchase_order_status == "Pending")
+                                return '<label class="label w3-orange">Quote Created</label>';
+                            else if (full.purchase_order_status == "Approved")
+                                return '<label class="label w3-blue">Quote Approved</label>';
+                            else if (full.purchase_order_status == "Completed")
+                                return '<label class="label w3-green">Quote Completed</label>';
+                            else if (full.purchase_order_status == "Rejected"||full.purchase_order_status == "rejected")
+                                return '<label class="label w3-grey">Quote Rejected</label>';
+                            else if (full.purchase_order_status == "Cancelled" || full.purchase_order_status == "cancelled")
+                                return '<label class="label w3-gray">@ShowStatus.MRCancelled</label>';
+                            else if (full.purchase_order_status == '@Status.RequestCancelled') {
+                                return '<label class="label w3-gray">@ShowStatus.QuoteRequestCancelled</label>';
+                            }
+                            else if (full.purchase_order_status == '@Status.MREditted') {
+                                return '<label class="label w3-gray">@ShowStatus.MREditted</label>';
+                            } else {
+                                return '<label class="label w3-grey">' + full.purchase_order_status + '</label>';
+                            }
+
+                        }
+                    },
+                    {
+                        "render": function (data, type, full, meta) {
+                            var VATNumber = '';
+                            for (var i = 0; i < full.ReportNumberVAT.length; i++) {
+                                VATNumber = VATNumber + full.ReportNumberVAT[i] + ", ";
+                            }
+                            return VATNumber;
+
+                        }
+                    },
+                    {
+                        "render": function (data, type, full, meta) {
+                            var VATNumber = '';
+                            for (var i = 0; i < full.ReportNumberNonVAT.length; i++) {
+                                VATNumber = VATNumber + full.ReportNumberNonVAT[i] + ", ";
+                            }
+                            return VATNumber;
+                        }
+                    },
+                    {
+                        "render": function (data, type, full, meta) {
+                            return '<a href="/PurchaseOrder/Detail/' + full.purchase_order_id + '" class="w3-button w3-tiny w3-green">View Detail</a>';
+                        }
+                    },
+
+                    //{
+                    //    "render": function (data, type, full, meta) {
+
+                    //        if (full.purchase_order_status == "Completed" || full.purchase_order_status == "Approved")
+                    //            return '<a href="/PurchaseOrder/GenerateReport/' + full.purchase_order_id + '">Generate</a>';
+                    //        else
+                    //            return '';
+
+                    //    }
+                    //}
+
+                ],
+                "order": [[2, "desc"]],
+            });
+            t.on('order.dt search.dt', function () {
+                t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+        }
+    </script>
+    }

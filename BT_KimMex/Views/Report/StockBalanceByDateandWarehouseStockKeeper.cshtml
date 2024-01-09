@@ -1,0 +1,135 @@
+﻿
+@model BT_KimMex.Models.StockBalanceBydateAndwarehouseReport
+@{
+    ViewBag.Title = "StockBalanceByDateandWarehouseStockKeeper";
+}
+<style>
+    /*.dow{
+        display: normal !important;
+    }
+    .datepicker-switch{
+        display:normal !important;
+    }*/
+    /*.datepicker {
+        display:none !important;
+    }*/
+    /*.datepicker-dropdown {
+        display:none !important;
+    }*/
+    /*.dropdown-menu {
+        display:none !important;
+    }*/
+    /*.datepicker-orient-left {
+        display:none !important;
+    }*/
+    /*.datepicker-orient-top{
+        display:none !important;
+    }*/
+
+    .ui-datepicker-calendar {
+        display: none;
+    }
+
+    .ui-datepicker-current:disabled {
+        display: none;
+    }
+</style>
+
+<h3 class="title">Stock Balance By warehouse</h3>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="form-group">
+            <div class="col-md-4">
+                <label class="col-md-4 control-label">Date From <strong style="color:red !important">*</strong>:</label>
+                <div class="col-md-8">
+                    <div class="input-group date " style="width:280px !important;">
+                        @*<input name="startDate" id="startDate" class="date-picker form-control" placeholder="MM/YYYY" />*@
+                        @Html.EditorFor(model => model.date, new { htmlAttributes = new { @class = "date-picker form-control", placeholder = "MM/YYYY" } })
+                        <div class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar" id="startDate"></span>
+                        </div>
+                    </div>
+                    @Html.ValidationMessageFor(model => model.date, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="col-md-4 control-label">Warehouse:</label>
+                <div class="col-md-8">
+                    @Html.DropDownList("warehouse_id", ViewBag.StockBalance as SelectList, "All", new { @id = "warehouses_id", @class = "form-control warehoustclass", onchange = "Check()" })
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="col-md-4 control-label">Project Name:</label>
+                <div class="col-md-8">
+
+                    @*@Html.DropDownList("project_id", new SelectList(""), "All", new { @id = "projectsIdwhenChange", @class = " form-control stateclassbywarehouse", onchange = "Check()" })*@
+                    @Html.DropDownList("project_id", ViewBag.Projects as SelectList, "All", new { @id = "projectsIdwhenChange", @class = " form-control stateclassbywarehouse", onchange = "Check()" })
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Generate" class="w3-button w3-tiny w3-teal" />
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts{
+    <script type="text/javascript">
+        window.onload = function () {
+           // $("#warehouses_id").window.onload();
+
+            //$.get("/Report/getprojectbywarehouse", { UnId: $('#warehouses_id').val().trim() }, function (data) {
+            //    $("#projectsIdwhenChange").empty();
+            //    $("#projectsIdwhenChange").append("<option>" + "All" + "</option>");
+            //    $.each(data, function (index, row) {
+            //        $("#projectsIdwhenChange").append("<option value='" + row.id + "'>" + row.name + "</option>");
+
+            //    });
+            //});
+        }
+        jQuery.browser = {};
+        (function () {
+           // $('#projectsIdwhenChange').hide();
+            jQuery.browser.msie = false;
+            jQuery.browser.version = 0;
+            if (navigator.userAgent.match(/MSIE ([0-9]+)\./)) {
+                jQuery.browser.msie = true;
+                jQuery.browser.version = RegExp.$1;
+            }
+        })();
+        $(function () {
+            $('.date-picker').datepicker({
+                changeMonth: true,
+                changeYear: true,
+                showButtonPanel: true,
+                dateFormat: 'MM yy',
+                onClose: function (dateText, inst) {
+                    $(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, 1));
+                    $(this).addClass("form-control");
+                }
+            });
+        });
+
+        $(".warehoustclass").change(function (e) {
+            //alert($('#warehouses_id').val().trim());
+            var isAllValid = true;
+            $.get("/Report/getprojectbywarehouse", { UnId: $('#warehouses_id').val().trim() }, function (data) {
+                $("#projectsIdwhenChange").empty();
+                $("#projectsIdwhenChange").append("<option>" + "All" + "</option>");
+                $.each(data, function (index, row) {
+                    // $("#StateId").val("-- please select -- ")
+                    $("#projectsIdwhenChange").append("<option value='" + row.id + "'>" + row.name + "</option>");
+
+                });
+            });
+        });
+
+
+    </script>
+}

@@ -1,0 +1,197 @@
+﻿@model BT_KimMex.Models.RegisterViewModel
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h3>Create New User</h3>
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Date:</label>
+            <label class="col-md-10" id="user_current_date"></label>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-2 control-label">First Name:</label>
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="user_first_name" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-2 control-label">Last Name:</label>
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="user_last_name" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-2 control-label">Login Name <strong style="color:red;">*</strong>:</label>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.UserName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-2 control-label">Password <strong style="color:red;">*</strong>:</label>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-2 control-label">Confirm Password <strong style="color:red;">*</strong>:</label>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.ConfirmPassword, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-2 control-label">Position:</label>
+            <div class="col-md-10">
+                <select class="form-control" id="postion">
+                    <option selected disabled>Select Position</option>
+                    </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-2 control-label">User Group <strong style="color:red;">*</strong>:</label>
+            <div class="col-md-10">
+                <select class="form-control" id="UserRoles">
+                    <option selected disabled>Select User Group</option>
+                </select>
+                @Html.ValidationMessageFor(model => model.Role, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-2 control-label">Telephone:</label>
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="user_telephone" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="button" id="btnCreate" value="Create" class="btn btn-default" />
+                <a href="@Url.Action("Index","User")" class="btn btn-default">Cancel</a>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+
+            $('#user_current_date').text(getFormattedDateMMDDYYYY(new Date()));
+            initial_position_dropdownlist();
+            initial_user_group_dropdownlist();
+
+            $('#btnCreate').click(function () {
+                var userFirstName = $('#user_first_name').val();
+                var userLastName = $('#user_last_name').val();
+                var userLoginName = $('#UserName').val();
+                var userPassword = $('#Password').val();
+                var userConfirmPassword = $('#ConfirmPassword').val();
+                var userPosition = $('#postion').val();
+                var userGroup = $('#UserRoles').val();
+                var userTelephone = $('#user_telephone').val();
+                var userEmail = $('#Email').val();
+                var model = {
+                    Email: userEmail,
+                    Password: userPassword,
+                    ConfirmPassword: userConfirmPassword,
+                    UserName: userLoginName,
+                    UserRoles: userGroup
+                }
+                $.ajax({
+                    url: "@Url.Action("RegisterUser", "Account")",
+                    type: "post",
+                    dataType: "json",
+                    async: false,
+                    data: { model: model, user_first_name: userFirstName, user_last_name: userLastName, position_id: userPosition, user_telephone: userTelephone },
+                    success: function (da) {
+                        if (da.result == "success") {
+                            $.notify('Your data has been saved!', { className: 'success' });
+                            window.location.href = '@Url.Action("Index","User")';
+                        } else {
+                            $.notify('Your data is error while saving!', { className: 'error' });
+                        }
+                    },
+                    error: function (err) {
+                        $.notify('Your data is error while saving!', { className: 'error' });
+                    }
+                });
+            });
+        });
+    </script>
+    <script type="text/javascript">
+        function initial_position_dropdownlist() {
+            $.ajax({
+                url:"@Url.Action("GetPositionDropdownList", "User")",
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    $('#postion').empty();
+                    $('#postion').append("" +
+                        "<option selected disabled>Select Position</option>"
+                    );
+                    $.each(data, function (index, item) {
+                        $.each(item, function (index1, item1) {
+                            $('#postion').append("" +
+                                    "<option value='" + item1.position_id + "'>" + item1.position_name + "</option>"
+                                );
+                        });
+                    });
+                },
+                error: function (err) {
+                    alert("Position:" + err.statusText);
+                }
+            });
+        }
+
+        function initial_user_group_dropdownlist() {
+            $.ajax({
+                url:"@Url.Action("GetUserGroupDropdownList", "User")",
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    $('#UserRoles').empty();
+                    $('#UserRoles').append("" +
+                        "<option selected disabled>Select User Group</option>"
+                    );
+                    $.each(data, function (index, item) {
+                        $.each(item, function (index1, item1) {
+                            $('#UserRoles').append("" +
+                                    "<option value='" + item1.Role + "'>" + item1.Role + "</option>"
+                                );
+                        });
+                    });
+                },
+                error: function (err) {
+                    alert("User Group:"+err.statusText);
+                }
+            });
+        }
+    </script>
+    }

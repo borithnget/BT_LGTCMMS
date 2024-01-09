@@ -1,0 +1,972 @@
+﻿@model BT_KimMex.Models.PurchaseOrderViewModel
+@using BT_KimMex.Class
+@using Microsoft.AspNet.Identity;
+@using MoreLinq;
+@using BT_KimMex.Models;
+@using System.IO;
+@{
+    ViewBag.Title = "Detail";
+    ViewBag.LayoutStyle = "big";
+    decimal totalAmount = 0;
+    bool isPur = false, isAdmin = false, isCFO = false, isDir = false;
+    if (User.IsInRole(Role.SystemAdmin))
+    {
+        isAdmin = true;
+    }
+    else if (User.IsInRole(Role.Purchaser))
+    {
+        isPur = true;
+    }
+    else if (User.IsInRole(Role.ProjectManager))
+    {
+        isCFO = true;
+    }
+    else if (User.IsInRole(Role.TechnicalDirector))
+    {
+        isDir = true;
+
+    }
+
+
+    int maxSupplier = 0;
+    //foreach (var item in Model.poDetails)
+    //{
+    //    if (item.poSuppliers.Count() > maxSupplier)
+    //    {
+    //        maxSupplier = item.poSuppliers.Count();
+    //    }
+    //}
+
+    maxSupplier = Model.supplierQuotes.Count();
+
+
+    BT_KimMex.Entities.kim_mexEntities db = new BT_KimMex.Entities.kim_mexEntities();
+    string userid = User.Identity.GetUserId().ToString();
+    decimal totalAmountPerRequest = 0;
+    int colspanfoot = maxSupplier * 5;
+    Model.supplierQuotes = Model.supplierQuotes.OrderBy(s => s.supplier_name).ToList();
+    List<BT_KimMex.Entities.tb_purchase_order> quoteHistories = PurchaseOrderViewModel.GetQuoteHistoriesbyIdAndPR(Model.purchase_order_id, Model.item_request_id);
+}
+
+<style type="text/css">
+    #po_table thead th, tr td, tfoot tr th {
+        text-align: center !important;
+        vertical-align: middle !important;
+        font-size: 10px !important;
+    }
+
+    #po_table td:nth-child(3) {
+        text-align: left !important;
+    }
+</style>
+
+<div class="w3-panel w3-card-4">
+    <div class="w3-container w3-display-container">
+        <h3 class="title">View Quote Detail</h3>
+        <button class="w3-button w3-tiny w3-display-topright w3-white w3-border w3-border-blue" style="margin-top:20px !important;" id="btn_show_history"><i class="fa fa-history" aria-hidden="true"></i> View History</button>
+    </div>
+
+    <div class="form-horizontal" id="myform">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.Label("Date:", new { @class = "control-label col-md-4" })
+                    <label class="col-md-8" id="date">@Convert.ToDateTime(Model.created_date).ToString("dd/MM/yyyy")</label>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-4">Quote List No.:</label>
+                    @*@Html.DisplayFor(model => model.purchase_oder_number, new { @class = "col-md-8" })*@
+                    <label class="col-md-8">@Model.purchase_oder_number</label>
+                </div>
+
+                <div class="form-group">
+                    @Html.Label("Project Name:", new { @class = "control-label col-md-4" })
+                    @*@Html.DisplayFor(model => model.project_full_name, new { @class = "col-md-8" })*@
+                    <label class="col-md-8">@Model.project_full_name</label>
+                </div>
+                <!--Rathana Add 10.04.2019-->
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.ShippingTo, new { @class = "control-label col-md-4" })
+                    <label class="col-md-8">@CommonClass.ConvertUserDetailIDToName(Model.ShippingTo)</label>
+                </div>
+                <!--End Rathana Add-->
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="control-label col-md-4">Requester:</label>
+                    <label class="col-md-8">@CommonClass.GetUserFullnameByUserId(Model.created_by)</label>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-4">PR Ref.:</label>
+                    @*@Html.DisplayFor(model => model.ir_no, new { @class = "col-md-8" })*@
+                    <label class="col-md-8">@Model.ir_no</label>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.POLNumber, new { @class = "control-label col-md-4" })
+                    @*@Html.DisplayFor(model => model.POLNumber, new { @class = "col-md-8" })*@
+                    <label class="col-md-8">@Model.POLNumber</label>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-4">Status:</label>
+                    <label class="col-md-8">@ShowStatus.GetQuoteShowStatus(Model.purchase_order_status)</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                @if (quoteHistories.Count() > 0)
+                {
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Requested Date</th>
+                                    <th>Quote No.</th>
+                                    <th>Requested By</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var his in quoteHistories)
+                                {
+                                    <tr>
+                                        <td><a href="@Url.Action("Detail","PurchaseOrder",new { id = his.purchase_order_id })" target="_blank">@Convert.ToDateTime(his.created_date).ToString("dd/MM/yyyy HH:mm")</a></td>
+                                        <td>@his.purchase_oder_number</td>
+                                        <td>@CommonFunctions.GetUserFullnamebyUserId(his.created_by)</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="row" style="margin:0 !important;">
+            <table class="table table-responsive table-bordered" id="po_table">
+                <thead>
+                    <tr>
+                        <th rowspan="2">No.</th>
+                        <th rowspan="2">Item Code</th>
+                        <th rowspan="2">Item Name</th>
+                        <th rowspan="2">Req. QTY</th>
+                        <th rowspan="2">Req. Unit</th>
+                        @*@for (int i = 1; i <= maxSupplier; i++)
+                            {
+                                <th colspan="6">Supplier @i</th>
+                            }*@
+                        @foreach (var gs in Model.supplierQuotes)
+                        {
+                            <th colspan="5">@gs.supplier_name</th>
+                        }
+                        @if (!isPur && string.Compare(Model.purchase_order_status, "Pending") != 0 && string.Compare(Model.purchase_order_status, Status.Rejected) != 0 && string.Compare(Model.purchase_order_status, Status.RequestCancelled) != 0 && string.Compare(Model.purchase_order_status, Status.cancelled) != 0)
+                        {
+                            <th colspan="6">Selected Supplier</th>
+                            <th rowspan="2">Total</th>
+                            <th rowspan="2">Remark</th>
+                        }
+                        <th rowspan="2">Status</th>
+                    </tr>
+                    <tr>
+                        @*@for (int i = 1; i <= maxSupplier; i++)
+                            {
+                                <th>VAT</th>
+                                <th></th>
+                                <th>Name</th>
+                                <th>Dis.(%)</th>
+                                <th>Unit Price</th>
+                                <th>T&C</th>
+                            }*@
+                        @foreach (var gs in Model.supplierQuotes)
+                        {
+                            <th>VAT @Convert.ToDecimal(gs.discount).ToString("G2") %</th>
+                            <th></th>
+                            @*<th>Name</th>*@
+                            <th>Dis.(%)</th>
+                            <th>Unit Price</th>
+                            <th>T&C</th>
+                        }
+                        @if (!isPur && string.Compare(Model.purchase_order_status, "Pending") != 0 && string.Compare(Model.purchase_order_status, Status.Rejected) != 0 && string.Compare(Model.purchase_order_status, Status.RequestCancelled) != 0 && string.Compare(Model.purchase_order_status, Status.cancelled) != 0)
+                        {
+                            <th>VAT</th>
+                            <th>Name</th>
+                            <th>Dis.(%)</th>
+                            <th>Unit Price</th>
+                            <th>PO QTY</th>
+                            <th>PO Unit</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int count = 1;
+                        foreach (var item in Model.poDetails)
+                        {
+                            string requestQty = string.Format("{0:G29}", decimal.Parse(item.quantity.ToString()));
+                            <tr>
+                                <td>@count</td>
+                                <td>@item.product_code</td>
+                                <td>@item.product_name</td>
+                                <td>@requestQty</td>
+                                <td>@item.item_unit</td>
+                                @{
+                                    var sups = item.poSuppliers.OrderBy(s => s.supplier_name).ToList();
+                                    for (int i = 0; i < sups.Count(); i++)
+                                    {
+                                        string tnc = "<ul style='margin:0px !important;padding:0px !important;margin-left:7px !important;'​>";
+
+                                        if (!string.IsNullOrEmpty(sups[i].incoterm))
+                                        {
+                                            tnc = string.Format("{0}<li>Incoterms: {1}</li>", tnc, sups[i].incoterm);
+                                        }
+                                        if (!string.IsNullOrEmpty(sups[i].payment))
+                                        {
+                                            tnc = string.Format("{0}<li>Payment: {1}</li>", tnc, sups[i].payment);
+                                        }
+                                        if (!string.IsNullOrEmpty(sups[i].delivery))
+                                        {
+                                            tnc = string.Format("{0}<li>Delivery: {1}</li>", tnc, sups[i].delivery);
+                                        }
+                                        if (!string.IsNullOrEmpty(sups[i].shipment))
+                                        {
+                                            tnc = string.Format("{0}<li>Shipment: {1}</li>", tnc, sups[i].shipment);
+                                        }
+                                        if (!string.IsNullOrEmpty(sups[i].warranty))
+                                        {
+                                            tnc = string.Format("{0}<li>Wanrranty: {1}</li>", tnc, sups[i].warranty);
+                                        }
+                                        if (!string.IsNullOrEmpty(sups[i].vendor_ref))
+                                        {
+                                            tnc = string.Format("{0}<li>Vendor Ref.: {1}</li>", tnc, sups[i].vendor_ref);
+                                        }
+                                        tnc = string.Format("{0}{1}", tnc, "</ul>");
+
+                                        <td>
+                                            @if (Convert.ToBoolean(sups[i].vat))
+                                            {
+                                                <input type="checkbox" checked disabled />
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" disabled />
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (Convert.ToBoolean(sups[i].is_check))
+                                            {
+                                                <input type="checkbox" checked disabled />
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" disabled />
+                                            }
+                                        </td>
+                                        @*<td>@sups[i].supplier_name</td>*@
+                                        <td>@Convert.ToDecimal(sups[i].discount_percentage).ToString("G2")</td>
+                                        @*<td>@sups[i].unit_price</td>*@
+                                        <td>@Convert.ToDecimal(sups[i].original_price).ToString("N4")</td>
+                                        <td style="text-align:left !important;">@Html.Raw(tnc)</td>
+                                    }
+
+                                    for (var i = 1; i <= (maxSupplier - sups.Count()); i++)
+                                    {
+                                        @*<td></td>*@
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    }
+
+                                    if (!isPur && string.Compare(Model.purchase_order_status, "Pending") != 0 && string.Compare(Model.purchase_order_status, Status.Rejected) != 0 && string.Compare(Model.purchase_order_status, Status.RequestCancelled) != 0 && string.Compare(Model.purchase_order_status, Status.cancelled) != 0)
+                                    {
+                                        for (int i = 0; i < sups.Count(); i++)
+                                        {
+                                            if (sups[i].is_selected == true)
+                                            {
+                                                string poQty = string.Format("{0:G29}", decimal.Parse(item.po_quantity.ToString()));
+                                                <td style="background-color:yellow !important;">
+                                                    @if (Convert.ToBoolean(sups[i].vat))
+                                                    {
+                                                        <input type="checkbox" checked disabled />
+                                                    }
+                                                    else
+                                                    {
+                                                        <input type="checkbox" disabled />
+                                                    }
+                                                </td>
+                                                <td style="background-color:yellow !important;">@sups[i].supplier_name</td>
+                                                <td style="background-color:yellow !important;">@sups[i].discount_percentage</td>
+                                                @*<td style="background-color:yellow !important;">@sups[i].unit_price</td>*@
+                                                <td style="background-color:yellow !important;">@sups[i].original_price</td>
+                                                <td style="background-color:yellow !important;">@poQty</td>
+                                                <td style="background-color:yellow !important;">
+                                                    @if (!string.IsNullOrEmpty(item.po_unit))
+                                                    {
+                                                        <span>@db.tb_unit.Find(item.po_unit).Name</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @{
+                                                        decimal total = Convert.ToDecimal(sups[i].unit_price * item.po_quantity);
+                                                        @*<b>@total.ToString("C")</b>*@
+                                                        <b>@string.Format("{0:N4}", decimal.Parse(total.ToString()))</b>
+
+                                                    }
+                                                </td>
+                                                <td>@sups[i].Reason</td>
+                                                if (Convert.ToBoolean(sups[i].vat))
+                                                {
+                                                    var vatamount = Convert.ToDecimal(sups[i].discount / 100);
+                                                    totalAmount = totalAmount + Convert.ToDecimal(sups[i].unit_price * item.po_quantity) + (Convert.ToDecimal(sups[i].unit_price * item.po_quantity) * vatamount);
+                                                }
+                                                else
+                                                {
+                                                    totalAmount = totalAmount + Convert.ToDecimal(sups[i].unit_price * item.po_quantity);
+                                                }
+
+
+                                            }
+
+                                        }
+
+
+
+                                    }
+                                }
+
+                                <td>
+                                    @{ if (string.Compare(item.item_status, "Pending") == 0)
+                                        {
+                                            <label style="color:green !important">@item.item_status</label>
+                                        }
+                                        else if (string.Compare(item.item_status, "approved") == 0)
+                                        {
+                                            <label style="color:blue !important">@item.item_status</label>
+                                        }
+                                        else if (string.Compare(item.item_status, "rejected") == 0)
+                                        {
+                                            <label style="color:gray !important">@item.item_status</label>
+                                        }
+                                        else if (string.Compare(item.item_status, "cancelled") == 0 || string.Compare(item.item_status, Status.RequestCancelled) == 0)
+                                        {
+                                            <label style="color:gray !important">@item.item_status</label>
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                            count++;
+
+                        }
+                    }
+                </tbody>
+                <tfoot>
+                    <!-- Sub Total VAT/Non VAT by supplier -->
+                    <tr>
+                        <th colspan="5" style="text-align:right !important;">Sub Total VAT/NON VAT (USD):</th>
+                        @foreach (var sup in Model.supplierQuotes)
+                        {
+                            QuoteBySupplierAmountModel obj = PurchaseOrderViewModel.QuoteAmountBySupplier(Model.purchase_order_id, sup, Model.purchase_order_status);
+
+                            <th colspan="3">@string.Format("{0:N4}", decimal.Parse(obj.VATAmount.ToString()))</th>
+                            <th colspan="2">@string.Format("{0:N4}", decimal.Parse(obj.NONVATAmount.ToString()))</th>
+                        }
+
+                        @if (!isPur && string.Compare(Model.purchase_order_status, "Pending") != 0 && string.Compare(Model.purchase_order_status, Status.Rejected) != 0 && string.Compare(Model.purchase_order_status, Status.RequestCancelled) != 0 && string.Compare(Model.purchase_order_status, Status.cancelled) != 0)
+                        {
+                            <th colspan="6" style="background-color:yellow !important;"></th>
+                        }
+                        <th colspan="3"></th>
+                    </tr>
+                    <!-- Total Amount Per supplier -->
+                    <tr>
+                        <th colspan="5" style="text-align:right !important;">Total Amount per Supplier (USD):</th>
+                        @foreach (var sup in Model.supplierQuotes)
+                        {
+                            decimal totalAmountPerSupplier = PurchaseOrderViewModel.QuoteAmountBySupplier(Model.purchase_order_id, sup, Model.purchase_order_status).TotalAmount;
+                            //totalAmountPerRequest = totalAmountPerRequest + totalAmountPerSupplier;
+                            totalAmountPerRequest = totalAmountPerRequest + (totalAmountPerSupplier - (decimal)sup.lump_sum_discount_amount);
+                            <th colspan="5">@string.Format("{0:N4}", decimal.Parse(totalAmountPerSupplier.ToString()))</th>
+                        }
+                        @if (!isPur && string.Compare(Model.purchase_order_status, "Pending") != 0 && string.Compare(Model.purchase_order_status, Status.Rejected) != 0 && string.Compare(Model.purchase_order_status, Status.RequestCancelled) != 0 && string.Compare(Model.purchase_order_status, Status.cancelled) != 0)
+                        {
+                            <th colspan="6" style="background-color:yellow !important;"></th>
+                        }
+                        <th colspan="3"></th>
+                    </tr>
+                    <!-- Lump sum discount -->
+                    <tr>
+                        <th colspan="5" style="text-align:right !important;">Discount per Supplier (USD):</th>
+                        @foreach (var sup in Model.supplierQuotes)
+                        {
+                            var lumpsumDiscountAmount = sup.lump_sum_discount_amount;
+                            <th colspan="5">@string.Format("{0:N4}", decimal.Parse(lumpsumDiscountAmount.ToString()))</th>
+                        }
+                        @if (!isPur && string.Compare(Model.purchase_order_status, "Pending") != 0 && string.Compare(Model.purchase_order_status, Status.Rejected) != 0 && string.Compare(Model.purchase_order_status, Status.RequestCancelled) != 0 && string.Compare(Model.purchase_order_status, Status.cancelled) != 0)
+                        {
+                            <th colspan="6" style="background-color:yellow !important;"></th>
+                        }
+                        <th colspan="3"></th>
+                    </tr>
+
+                    <!-- Total After Discount -->
+                    <tr>
+                        <th colspan="5" style="text-align:right !important;">Total Amount per Supplier after Discount (USD):</th>
+                        @foreach (var sup in Model.supplierQuotes)
+                        {
+                            decimal totalAmountPerSupplier = PurchaseOrderViewModel.QuoteAmountBySupplier(Model.purchase_order_id, sup, Model.purchase_order_status).TotalAmount;
+                            //totalAmountPerRequest = totalAmountPerRequest + totalAmountPerSupplier;
+                            decimal totalAmountAfterDiscount = (totalAmountPerSupplier - (decimal)sup.lump_sum_discount_amount);
+                            <th colspan="5">@string.Format("{0:N4}", decimal.Parse(totalAmountAfterDiscount.ToString()))</th>
+                        }
+                        @if (!isPur && string.Compare(Model.purchase_order_status, "Pending") != 0 && string.Compare(Model.purchase_order_status, Status.Rejected) != 0 && string.Compare(Model.purchase_order_status, Status.RequestCancelled) != 0 && string.Compare(Model.purchase_order_status, Status.cancelled) != 0)
+                        {
+                            <th colspan="6" style="background-color:yellow !important;"></th>
+                        }
+                        <th colspan="3"></th>
+                    </tr>
+
+                    <!-- Total Amount per Request-->
+                    <tr>
+                        <th colspan="5" style="text-align:right !important;">Grand Total Amount Per Request (USD):</th>
+                        <th colspan="@colspanfoot">@string.Format("{0:N4}", decimal.Parse(totalAmountPerRequest.ToString()))</th>
+                        @if (!isPur && string.Compare(Model.purchase_order_status, "Pending") != 0 && string.Compare(Model.purchase_order_status, Status.Rejected) != 0 && string.Compare(Model.purchase_order_status, Status.RequestCancelled) != 0 && string.Compare(Model.purchase_order_status, Status.cancelled) != 0)
+                        {
+                            <th colspan="6" style="background-color:yellow !important;"></th>
+                        }
+                        <th colspan="3"></th>
+                    </tr>
+
+                    @if (!isPur && string.Compare(Model.purchase_order_status, "Pending") != 0 && string.Compare(Model.purchase_order_status, Status.Rejected) != 0 && string.Compare(Model.purchase_order_status, Status.RequestCancelled) != 0 && string.Compare(Model.purchase_order_status, Status.cancelled) != 0)
+                    {
+                        int cspan = 11 + (maxSupplier * 5);
+
+                        var grouplumpsums = Model.poDetails.GroupBy(s => s.lump_sum_discount_amount).ToList();
+                        foreach (var gls in grouplumpsums)
+                        {
+                            totalAmount = totalAmount - Convert.ToDecimal(gls.Key);
+                        }
+
+                        <tr>
+                            <td colspan="@cspan" style="text-align:right !important;"><label style="font-weight:bold !important;">Grand Total Approved Amount (USD):</label></td>
+                            @*<td style="text-align:center !important;"><label style="font-weight:bold !important;"><b>@totalAmount.ToString("C")</b></label></td>*@
+                            <td style="text-align:center !important;"><label style="font-weight:bold !important;"><b>@string.Format("{0:N4}", decimal.Parse(totalAmount.ToString()))</b></label></td>
+                            <td colspan="2"></td>
+                        </tr>
+
+                    }
+                </tfoot>
+
+            </table>
+        </div>
+        <div class="form-group">
+            @Html.Label("Attachments Reference:", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @{
+                    var atts = Model.poAttachments;
+                    for (int i = 0; i < atts.Count(); i++)
+                    {
+                        <a class="title" href="/PurchaseOrder/Download/?p=@(atts[i].po_attachment_id + atts[i].po_attachment_extension)&d=@atts[i].po_attachment_name">@atts[i].po_attachment_name</a><br />
+                    }
+                }
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label">Supplier Quote Attachment:</label>
+            <div class="col-md-8">
+                @foreach (var sup in Model.supplierQuotes)
+                {
+                    var quoteAttachments = QuoteViewModel.GetSupplierQuoteByPRAndSupplier(Model.item_request_id, sup.supplier_id).attachments;
+                    foreach (var quoteAtt in quoteAttachments)
+                    {
+                        if (CommonClass.isFileIsImageByExtenstion(quoteAtt.attachment_extension))
+                        {
+                            var file_path = Path.Combine(Server.MapPath("~/Documents/Attachment/"), quoteAtt.attachment_id+"_watermark" + quoteAtt.attachment_extension);
+                            if (File.Exists(file_path))
+                            {
+                                <a class="title" href="/PurchaseOrder/DownloadSupplierQuote/?p=@(quoteAtt.attachment_id + "_watermark" + quoteAtt.attachment_extension)&d=@quoteAtt.attachment_name">@string.Format("{0}:{1}", sup.supplier_name, quoteAtt.attachment_name)</a><br />
+                            }
+                            else
+                            {
+                                <a class="title" href="/PurchaseOrder/DownloadSupplierQuote/?p=@(quoteAtt.attachment_id +  quoteAtt.attachment_extension)&d=@quoteAtt.attachment_name">@string.Format("{0}:{1}", sup.supplier_name, quoteAtt.attachment_name)</a><br />
+                            }
+
+                        }
+                        else
+                        {
+                            <a class="title" href="/PurchaseOrder/DownloadSupplierQuote/?p=@(quoteAtt.attachment_id + quoteAtt.attachment_extension)&d=@quoteAtt.attachment_name">@string.Format("{0}:{1}", sup.supplier_name, quoteAtt.attachment_name)</a><br />
+                        }
+
+                    }
+
+                }
+            </div>
+        </div>
+
+        @if (Model.rejects.Count() > 0)
+        {
+            <div class="form-group">
+                <label class="control-label col-md-2">Reject Reason:</label>
+                <div class="col-md-10">
+                    <ul>
+                        @foreach (var reject in Model.rejects)
+                        {
+                            <li>@reject.comment <b>By @reject.rejected_by</b></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+        @{
+            var requestcancels = Model.processFlows.Where(s => string.Compare(s.status, Status.RequestCancelled) == 0).ToList();
+            if (requestcancels.Count() > 0)
+            {
+                <div class="form-group">
+                    <label class="control-label col-md-2">Cancel Reason:</label>
+                    <div class="col-md-10">
+                        <ul>
+                            @foreach (var item in requestcancels)
+                            {
+                                <li>@item.remark <b>By @CommonFunctions.GetUserFullnamebyUserId(item.created_by)</b></li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            }
+        }
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                @{
+                    if ((isAdmin || isPur) && (string.Compare(Model.purchase_order_status.ToLower(), Status.RequestCancelled) != 0 && string.Compare(Model.purchase_order_status.ToLower(), Status.cancelled) != 0 && string.Compare(Model.purchase_order_status.ToLower(), Status.Rejected) != 0) && !(bool)Model.is_po_checked)
+                    {
+                        @*<a href="@Url.Action("Edit","PurchaseOrder",new { id = Model.purchase_order_id })" class="btn btn-success"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>*@
+                        <a href="javascript:void(0)" class="btn btn-success" id="btnRequestCancel">Request Cancel</a>
+                    }
+                    if ((isAdmin || (User.IsInRole(Role.ProjectManager) && CommonFunctions.isProjectManagerinQuote(Model.purchase_order_id, userid))) && Model.purchase_order_status == "Pending")
+                    {
+                        <a href="@Url.Action("Approve","PurchaseOrder",new { id=Model.purchase_order_id})" class="btn btn-warning"> Approve</a>
+                        <a href="javascript:void(0)" id="cancel-mr-promp" class="btn btn-danger cancel-mr-promp"> Reject</a>
+                        <a href="javascript:void(0)" id="reject-promp" class="btn btn-danger reject-promp"> Cancel MR</a>
+
+                        @*<a href="@Url.Action("Edit","PurchaseOrder",new { id = Model.purchase_order_id })" class="btn btn-default">Edit</a>*@
+                    }
+                    if ((isAdmin || isDir) && Model.purchase_order_status == "Approved")
+                    {
+                        <a href="@Url.Action("DirectorApprove","PurchaseOrder",new { id=Model.purchase_order_id})" class="btn btn-warning"> Approve</a>
+                        <a href="javascript:void(0)" id="cancel-mr-promp" class="btn btn-danger cancel-mr-promp"> Reject</a>
+                        <a href="javascript:void(0)" id="reject-promp" class="btn btn-danger reject-promp"> Cancel MR</a>
+                    }
+                    if ((isAdmin || User.IsInRole(Role.OperationDirector)) && string.Compare(Model.purchase_order_status, Status.Checked) == 0)
+                    {
+                        <a href="javascript:void(0)" id="btn-od-approve" class="btn btn-warning"> Approve</a>
+                        <a href="javascript:void(0)" id="cancel-mr-promp" class="btn btn-danger cancel-mr-promp"> Reject</a>
+                        <a href="javascript:void(0)" id="reject-promp" class="btn btn-danger reject-promp"> Cancel MR</a>
+                    }
+                    if ((isAdmin || isCFO) && Model.purchase_order_status == "Completed")
+                    {
+                        <a href="@Url.Action("Cancel","PurchaseOrder",new { id=Model.purchase_order_id})" class="btn btn-primary">Cancel Quote</a>
+                    }
+                    @*if (Model.purchase_order_status == "Completed")
+                        {
+                            <a href="@Url.Action("GenerateReport","PurchaseOrder",new { id=Model.purchase_order_id})" class="btn btn-default">Generate Report</a>
+                        }*@
+
+                    @*if((isAdmin ||isCFO ||isDir)&& (string.Compare(Model.purchase_order_status,"Approved")==0 || string.Compare(Model.purchase_order_status, "Completed") == 0))
+                        {
+                            <a href="@Url.Action("Print","PurchaseOrder",new { id = Model.purchase_order_id })" class="btn btn-info" target="_blank"><i class="fa fa-print" aria-hidden="true"></i> Print</a>
+                        }*@
+
+                }
+
+                @*@using (Html.BeginForm("Export", "PurchaseOrder", FormMethod.Post))
+                    {
+                        <input type="hidden" name="GridHtml" />
+                        <input type="submit" id="btnSubmit" value="Export" />
+                    }*@
+
+                <a href="javascript:history.back()" class="btn btn-danger"> Back</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- approve project modal popup-->
+<div class="modal fade" id="approveModal" tabindex="=-1" role="dialog" aria-labelledby="approveModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-warning">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to <strong>Approve</strong> this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default approve-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- OD approve project modal popup-->
+<div class="modal fade" id="approveODModal" tabindex="=-1" role="dialog" aria-labelledby="approveModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-warning">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to <strong>Approve</strong> this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" id="btn-odapprove-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- reject project modal popup-->
+<div class="modal fade" id="rejectModal" tabindex="=-1" role="dialog" aria-labelledby="rejectModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="canceltype" />
+                <p class="success-message">Are you sure to <strong id="str-type">Reject</strong> this item?</p>
+                <div class="form-group row">
+                    <label class="col-md-2">Comment:</label>
+                    <div class="col-md-10">
+                        <textarea class="form-control" rows="5" id="reject-comment"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default reject-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- cancel project modal popup-->
+<div class="modal fade" id="cancelModal" tabindex="=-1" role="dialog" aria-labelledby="cancelModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to <strong>Cancel</strong> this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default cancel-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Show History modal popup-->
+<div class="modal fade" id="showHistoryModal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-primary">
+                <h4 class="modal-title" id="myModalLabel">View Process History</h4>
+            </div>
+
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>User</th>
+                                <th>Status</th>
+                                <th>Remark</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                foreach (var history in Model.processWorkFlows)
+                                {
+                                    <tr>
+                                        <td>@Convert.ToDateTime(history.created_at).ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>@history.crated_by_name</td>
+                                        <td>@Html.Raw(ShowStatus.GetQuoteShowStatusFull(history.status))</td>
+                                        <td>@history.remark</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                @*<button class="btn btn-default approve-confirm">Yes</button>*@
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            var po_id = GetURLParameter();
+            var role;
+            @*$('#date').text(getFormattedDateMMDDYYYY(new Date('@Model.created_date')));*@
+
+            $("#btnSubmit").click(function () {
+                $("input[name='GridHtml']").val($("#myform").html());
+            });
+
+            $('#btn_show_history').click(function (e) {
+                $('#showHistoryModal').modal('show');
+            });
+
+            $('#btnRequestCancel').click(function (e) {
+                e.preventDefault();
+                //ShowDialogFunction.ShowDialogWithInput('@Model.purchase_order_id', "quote", "request_cancel");
+                $('#canceltype').val('@Status.RequestCancelled');
+                $('#str-type').html("Cancel");
+                $('#rejectModal').modal('show');
+
+            });
+
+            $('#cancel-mr-promp').click(function (e) {
+                e.preventDefault();
+                //ShowDialogFunction.ShowDialogWithInput('@Model.purchase_order_id', "quote", "reject");
+                $('#canceltype').val('@Status.Rejected');
+                $('#str-type').html("Reject");
+                $('#rejectModal').modal('show');
+            });
+
+            $('.approve-promp').click(function () {
+                $('#approveModal').modal('show');
+            });
+
+            $('.approve-confirm').click(function () {
+                if (po_id != '') {
+                    $.ajax({
+                        url: "/PurchaseOrder/ApprovedByCFO",
+                        data: {
+                            'id': po_id,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#approveModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been approved!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index","PurchaseOrder")';
+                            }
+                            else
+                                $.notify('Your data has been error while approving!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.approve-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while approving!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+            $('.cancel-promp').click(function () {
+                $('#cancelModal').modal('show');
+            });
+            $('.cancel-confirm').click(function () {
+                if (po_id != '') {
+                    $.ajax({
+                        url: "/PurchaseOrder/Cancel",
+                        data: {
+                            'id': po_id,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#rejectModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been cancelled!', { className: 'success' });
+                                //window.location.href = '@Url.Action("Index", "PurchaseOrder")';
+                                window.location.reload();
+                            }
+                            else
+                                $.notify('Your data has been error while cancelling!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.approve-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while cancelling!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+
+            $('#reject-promp').click(function () {
+                @{
+                    if (isCFO)
+                    {
+                        <text>
+                role = "Chief of Finance Officer";
+                </text>
+                    }
+                    else if (isDir)
+                    {
+                        <text>
+                role = "Director";
+                </text>
+                    }
+
+                }
+                $('#canceltype').val('@Status.CancelledMR');
+                $('#str-type').html("Cancel");
+                $('#rejectModal').modal('show');
+            });
+
+            $('.reject-confirm').click(function () {
+                var canceltype = $('#canceltype').val();
+                if (po_id != '') {
+                    var rejectComment = $('#reject-comment').val();
+
+                    if (canceltype == '@Status.RequestCancelled') {
+
+                        $.ajax({
+                            url: "/PurchaseOrder/RequestCancel",
+                            data: {
+                                'id': po_id,
+                                'comment': rejectComment,
+                            },
+                            type: 'GET',
+                            success: function (da) {
+                                $.notify('Your request has been cancelled.', { className: 'success' });
+                                window.location.href = '/PurchaseOrder/MyRequest';
+                            },
+                            error: function (err) {
+                                Swal.showValidationMessage(`Request failed: ${err}`)
+                            }
+                        });
+
+
+                    } else if (canceltype == '@Status.Rejected') {
+                        $.ajax({
+                            url: "/PurchaseOrder/RejectResubmit",
+                            data: {
+                                'id': po_id,
+                                'comment': rejectComment,
+                            },
+                            type: 'GET',
+                            success: function (da) {
+                                console.log(da);
+                                //swal.fire({ title: 'Sucess' });
+                                $.notify('Your data has been rejected.', { className: 'success' });
+                                window.location.href = '/PurchaseOrder/MyApproval';
+                            },
+                            error: function (err) {
+                                //Swal.showValidationMessage(`Request failed: ${err}`)
+                                if (!$('.modal-header').hasClass('alert-danger')) {
+                                    $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                    $('.approve-confirm').css('display', 'none');
+                                }
+                                $('.success-message').html(err.statusText);
+                                $.notify('Your data has been error while canceling.', { className: 'error' });
+                            }
+                        });
+
+                    } else if (canceltype == '@Status.CancelledMR') {
+                        $.ajax({
+                            url: "/PurchaseOrder/RejectedByCFO",
+                            data: {
+                                'id': po_id,
+                                'role': role,
+                                'comment': rejectComment,
+                            },
+                            type: 'GET',
+                            success: function (da) {
+                                if ($('.modal-header').hasClass('alert-danger')) {
+                                    $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                    $('.delete-confirm').css('display', 'none');
+                                }
+                                $('#rejectModal').modal('hide');
+                                if (da.result == "success") {
+                                    $.notify('Your data has been cancelled.', { className: 'success' });
+                                    window.location.href = '@Url.Action("MyApproval", "PurchaseOrder")';
+                                }
+                                else
+                                    $.notify('Your data has been error while canceling.', { className: 'error' });
+                            },
+                            error: function (err) {
+                                if (!$('.modal-header').hasClass('alert-danger')) {
+                                    $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                    $('.approve-confirm').css('display', 'none');
+                                }
+                                $('.success-message').html(err.statusText);
+                                $.notify('Your data has been error while canceling.', { className: 'error' });
+                            }
+                        });
+                    }
+
+
+                }
+            });
+
+            $('#btn-od-approve').click(function () {
+                $('#approveODModal').modal('show');
+            });
+            $("#btn-odapprove-confirm").click(function (e) {
+                if (po_id != '') {
+                    $.ajax({
+                        url: "/PurchaseOrder/ODApprovedAJAX",
+                        data: {
+                            'quoteId': po_id,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            console.log(da);
+                            var result = da.result;
+                            $('#approveODModal').modal('hide');
+                            if (result.isSuccess) {
+                                alert('Your data has been approved.');
+                                ////window.location.href = '@Url.Action("Index", "PurchaseOrder")';
+                                window.location.reload();
+                            }
+                            else
+                                $.notify('Your data has been error while cancelling!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.approve-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while approving.', { className: 'error' });
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}
+

@@ -1,0 +1,797 @@
+﻿@model BT_KimMex.Models.PurchaseOrderViewModel
+@using System.Text.RegularExpressions;
+@using BT_KimMex.Class;
+@using BT_KimMex.Models;
+
+@{
+    ViewBag.Title = "Approve";
+    ViewBag.LayoutStyle = "big";
+    int maxSupplier = 0;
+    //foreach (var item in Model.poDetails)
+    //{
+    //    if (item.poSuppliers.Count() > maxSupplier)
+    //    {
+    //        maxSupplier = item.poSuppliers.Count();
+    //    }
+    //}
+    maxSupplier = Model.supplierQuotes.Count();
+    decimal totalAmountPerRequest = 0;
+    decimal colspanfooter = maxSupplier * 6;
+    Model.supplierQuotes = Model.supplierQuotes.OrderBy(s => s.supplier_name).ToList();
+}
+<style type="text/css">
+     /*{
+        text-align: center !important;
+        vertical-align: middle !important;
+    }*/
+    input[type="radio"] {
+      -webkit-appearance: checkbox; /* Chrome, Safari, Opera */
+      -moz-appearance: checkbox;    /* Firefox */
+      /*-ms-appearance: checkbox;     /* not currently supported */*/
+    }
+    #po_table thead th,#po_table tr td,tfoot tr th{
+        text-align: center !important;
+        vertical-align: middle !important;
+        font-size:10px !important;
+    }
+    #po_table .form-control{
+        /*width:auto !important;*/
+        padding:0px !important;
+        font-size:10px !important;
+    }
+    #po_table .po-qty{
+        padding:0px !important;
+        text-align: center !important;
+        vertical-align: middle !important;
+        width:60%;
+    }
+    #po_table tr td:nth-child(3) {
+        text-align: left !important;
+    }
+    tfoot tr th:first-child{
+        text-align: right !important;
+    }
+</style>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <h3 class="title">Approve Quote</h3>
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.purchase_order_id)
+        @Html.HiddenFor(model => model.purchase_order_status)
+
+        <div class="form-group">
+            @Html.Label("PO Date :", htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.Label("Date", new { @class = "col-md-10", id = "current_date" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.purchase_oder_number, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.Label(" ", new { @class = "col-md-10", id = "purchase_oder_number" })
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">PR Ref. :</label>
+            @Html.Label(Model.ir_no, new { @class = "col-md-10" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ir_project_id, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.Label(" ", new { @class = "col-md-10", id = "ir_project_id" })
+        </div>
+        <!--Rathana Add 10.04.2019-->
+        <div class="form-group">
+            @Html.LabelFor(m => m.POLNumber, new { @class = "control-label col-md-2" })
+            <label class="col-md-10">@Model.POLNumber</label>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.ShippingTo, new { @class = "control-label col-md-2" })
+            <label class="col-md-10">@BT_KimMex.Class.CommonClass.ConvertUserDetailIDToName(Model.ShippingTo)</label>
+        </div>
+        <!--End Rathana Add-->
+        <div class="row" style="margin:0 !important;">
+            <table class="table table-responsive table-bordered" id="po_table">
+                <thead>
+                    <tr>
+                        <th rowspan="2">No.</th>
+                        <th rowspan="2">Item Code</th>
+                        <th rowspan="2">Item Name</th>
+                        <th rowspan="2">Req. QTY</th>
+                        <th rowspan="2">Req. Unit</th>
+                        @*@for (int i = 1; i <= maxSupplier; i++)
+                        {
+                            <th colspan="7">Supplier @i</th>
+                        }*@
+                        @foreach (var gs in Model.supplierQuotes)
+                        {
+                            <th colspan="6">@gs.supplier_name</th>
+                        }
+                        <th rowspan="2" style="width:80px !important;">PO QTY</th>
+                        <th rowspan="2">PO Unit</th>
+                        <th rowspan="2">Reason</th>
+                    </tr>
+                    <tr>
+                        @{
+                            int j = 1;
+
+                            foreach (var gs in Model.supplierQuotes)
+                            {
+                                string supcls = string.Format("supplier{0}", j);
+                                    <th><input type="radio" class="" name="sup_head" value="@gs.supplier_id" data-supcls="@supcls"></th>
+                                    <th></th>
+                                    <th>VAT</th>
+                                    @*<th>Name</th>*@
+                                    <th>Dis.(%)</th>
+                                    <th>Unit Price</th>
+                                    <th>T&C</th>
+                                    j++;
+                                }
+                            }
+                        @*<th></th>                        
+                            <th>Name</th>
+                        <th>Unit Price</th>
+                        <th>VAT</th>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Unit Price</th>
+                        <th>VAT</th>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Unit Price</th>*@
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int count = 1;
+                        foreach (var item in Model.poDetails)
+                        {
+                            string poQuantity = string.Format("{0:G29}", decimal.Parse(item.quantity.ToString()));
+                            <tr>
+                                <td>@count</td>
+                                <td>@item.product_code</td>
+                                <td>@item.product_name</td>
+                                <td><label class="request-qty">@poQuantity</label> </td>
+                                <td><label class="request-unit">@item.item_unit</label></td>
+                                @{
+                                    var sups = item.poSuppliers.OrderBy(s=>s.supplier_name).ToList();
+                                    for (int i = 0; i < sups.Count(); i++)
+                                    {
+                                        if (i < sups.Count())
+                                        {
+                                            string tnc = "<ul style='margin:0px !important;padding:0px !important;margin-left:7px !important;'​>";
+
+                                            if (!string.IsNullOrEmpty(sups[i].incoterm))
+                                            {
+                                                tnc = string.Format("{0}<li>Incoterms: {1}</li>",tnc,sups[i].incoterm);
+                                            }
+                                            if(!string.IsNullOrEmpty(sups[i].payment))
+                                            {
+                                                tnc = string.Format("{0}<li>Payment: {1}</li>", tnc, sups[i].payment);
+                                            }
+                                            if (!string.IsNullOrEmpty(sups[i].delivery))
+                                            {
+                                                tnc = string.Format("{0}<li>Delivery: {1}</li>", tnc, sups[i].delivery);
+                                            }
+                                            if (!string.IsNullOrEmpty(sups[i].shipment))
+                                            {
+                                                tnc = string.Format("{0}<li>Shipment: {1}</li>", tnc, sups[i].shipment);
+                                            }
+                                            if (!string.IsNullOrEmpty(sups[i].warranty))
+                                            {
+                                                tnc = string.Format("{0}<li>Wanrranty: {1}</li>", tnc, sups[i].warranty);
+                                            }
+                                            if (!string.IsNullOrEmpty(sups[i].vendor_ref))
+                                            {
+                                                tnc = string.Format("{0}<li>Vendor Ref.: {1}</li>", tnc, sups[i].vendor_ref);
+                                            }
+                                            tnc = string.Format("{0}{1}", tnc, "</ul>");
+
+                                            var name = "item" + count.ToString();
+                                            string item_sup_cls = string.Format("supplier{0}", i + 1);
+                                            if (Convert.ToBoolean(sups[i].is_check))
+                                            {
+                                                <td>
+                                                    @*<input type="checkbox" value="@sups[i].po_supplier_id">*@
+                                                    <input type="radio" class="suppliers" name="@name" value="@sups[i].po_supplier_id" data-isupcls="@item_sup_cls" data-price="@sups[i].unit_price" data-vat="@Convert.ToBoolean(sups[i].vat)" data-vatnumber="@sups[i].discount">
+                                                </td>
+                                                <td><input type="checkbox" checked disabled/></td>
+                                            }
+                                            else
+                                            {
+                                                <td>
+                                                    @*<input type="checkbox" value="@sups[i].po_supplier_id">*@
+                                                    <input type="radio" class="suppliers" name="@name" value="@sups[i].po_supplier_id" data-price="0" data-vat="@Convert.ToBoolean(sups[i].vat)" data-vatnumber="@sups[i].discount" disabled>
+                                                </td>
+                                                <td><input type="checkbox" disabled /></td>
+                                            }
+                                            <td>
+                                                @if (Convert.ToBoolean(sups[i].vat))
+                                                {
+                                                    <input type="checkbox" checked disabled />
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" disabled />
+                                                }
+                                            </td>
+                                            @*<td>@sups[i].supplier_name</td>*@
+                                            <td>@sups[i].discount_percentage</td>
+                                            @*<td>@sups[i].unit_price</td>*@
+                                            <td>@sups[i].original_price</td>
+                                            <td style="text-align:left !important;" >@Html.Raw(tnc)</td>                                    
+                                        }
+                                        else
+                                        {
+                                            @*<td></td>*@
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td> 
+                                            <td></td>
+                                        }
+                                    }
+                                    for (var i = 1; i <= (maxSupplier - sups.Count()); i++)
+                                    {
+                                        @*<td></td>*@
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    }
+                                }
+                                <td><input type="number" class="form-control po-qty" value="@poQuantity" onchange="calculateTotalAmountByQTY(this)"/></td>
+                                <td>
+                                    <select class="form-control po_unit" onchange="checkQty(this)">
+                                        @{ 
+                                            string product_unit= Regex.Replace(item.product_unit, @"\t|\n|\r", "");
+                                            string requested_unit= Regex.Replace(item.item_unit, @"\t|\n|\r", "");
+                                            if (string.Compare(requested_unit, product_unit) == 0)
+                                            {
+                                                <option value="@product_unit" selected>@item.product_unit_name</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@product_unit">@item.product_unit_name</option>
+                                            }
+                                            if (item.uom != null)
+                                            {
+                                                if (item.uom.uom1_id != null && item.uom.uom1_qty != null)
+                                                {
+                                                    string uom1_unit = Regex.Replace(item.uom.uom1_id, @"\t|\n|\r", "");
+                                                    if (string.Compare(requested_unit, uom1_unit) == 0)
+                                                    {
+                                                        <option value="@uom1_unit,@item.uom.uom1_qty" selected>@uom1_unit</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@uom1_unit,@item.uom.uom1_qty">@uom1_unit</option>
+                                                    }
+                                                }
+                                                if (item.uom.uom2_id != null && item.uom.uom2_qty != null)
+                                                {
+                                                    string uom2_unit = Regex.Replace(item.uom.uom2_id, @"\t|\n|\r", "");
+                                                    if (string.Compare(requested_unit, uom2_unit) == 0)
+                                                    {
+                                                        <option value="@uom2_unit,@item.uom.uom2_qty" selected>@uom2_unit</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@uom2_unit,@item.uom.uom2_qty">@uom2_unit</option>
+                                                    }
+                                                }
+                                                if (item.uom.uom3_id != null && item.uom.uom3_qty != null)
+                                                {
+                                                    string uom3_unit = Regex.Replace(item.uom.uom3_id, @"\t|\n|\r", "");
+                                                    if (string.Compare(requested_unit, uom3_unit) == 0)
+                                                    {
+                                                        <option value="@uom3_unit,@item.uom.uom3_qty" selected>@uom3_unit</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@uom3_unit,@item.uom.uom2_qty">@uom3_unit</option>
+                                                    }
+                                                }
+                                                if (item.uom.uom4_id != null && item.uom.uom4_qty != null)
+                                                {
+                                                    string uom4_unit = Regex.Replace(item.uom.uom4_id, @"\t|\n|\r", "");
+                                                    if (string.Compare(requested_unit, uom4_unit) == 0)
+                                                    {
+                                                        <option value="@uom4_unit,@item.uom.uom2_qty" selected>@uom4_unit</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@uom4_unit,@item.uom.uom2_qty">@uom4_unit</option>
+                                                    }
+                                                }
+                                                if (item.uom.uom5_id != null && item.uom.uom5_qty != null)
+                                                {
+                                                    string uom5_unit = Regex.Replace(item.uom.uom5_id, @"\t|\n|\r", "");
+                                                    if (string.Compare(requested_unit, uom5_unit) == 0)
+                                                    {
+                                                        <option value="@uom5_unit,@item.uom.uom2_qty" selected>@uom5_unit</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@uom5_unit,@item.uom.uom2_qty">@uom5_unit</option>
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    </select>
+                                </td>
+                                <td><textarea class="form-control reason" ></textarea></td>
+                            </tr>
+                                                count++;
+                                            }
+                    }
+                </tbody>
+                <tfoot>
+                    <tr style="background-color:lightgray !important;">
+                        <th colspan="5" class="text-right">Sub Total VAT/NON VAT (USD):</th>
+                        @foreach(var sup in Model.supplierQuotes)
+                        {
+                            QuoteBySupplierAmountModel obj = PurchaseOrderViewModel.QuoteAmountBySupplier(Model.purchase_order_id,sup , Model.purchase_order_status);
+                            <th colspan="3" class="text-center">@string.Format("{0:N4}", decimal.Parse(obj.VATAmount.ToString()))</th>
+                            <th colspan="3" class="text-center">@string.Format("{0:N4}", decimal.Parse(obj.NONVATAmount.ToString()))</th>
+                        }
+                        <th colspan="3"></th>
+                    </tr>
+                    <tr style="background-color:lightgray !important;">
+                        <th colspan="5" class="text-right">Total Amount per Supplier (USD):</th>
+                        @foreach(var sup in Model.supplierQuotes)
+                        {
+                            decimal totalAmountPerSupplier = PurchaseOrderViewModel.QuoteAmountBySupplier(Model.purchase_order_id, sup, Model.purchase_order_status).TotalAmount;
+                            totalAmountPerRequest = totalAmountPerRequest + (totalAmountPerSupplier-(decimal)sup.lump_sum_discount_amount);
+                            <th colspan="6" class="text-center">@string.Format("{0:N4}", decimal.Parse(totalAmountPerSupplier.ToString()))</th>
+                        }
+                        <th colspan="3"></th>
+                    </tr>
+
+                    <!-- Lump sum discount -->
+                    <tr style="background-color:lightgray !important;">
+                        <th colspan="5" style="text-align:right !important;">Discount per Supplier (USD):</th>
+                        @foreach (var sup in Model.supplierQuotes)
+                        {
+                            var lumpsumDiscountAmount = sup.lump_sum_discount_amount;
+                            <th colspan="6">@string.Format("{0:N4}", decimal.Parse(lumpsumDiscountAmount.ToString()))</th>
+                        }
+                        <th colspan="3"></th>
+                    </tr>
+
+                    <!-- Total After Discount -->
+                    <tr style="background-color:lightgray !important;">
+                        <th colspan="5" style="text-align:right !important;">Total Amount per Supplier after Discount (USD):</th>
+                        @foreach (var sup in Model.supplierQuotes)
+                        {
+                            decimal totalAmountPerSupplier = PurchaseOrderViewModel.QuoteAmountBySupplier(Model.purchase_order_id, sup, Model.purchase_order_status).TotalAmount;
+                            //totalAmountPerRequest = totalAmountPerRequest + totalAmountPerSupplier;
+                            decimal totalAmountAfterDiscount = (totalAmountPerSupplier - (decimal)sup.lump_sum_discount_amount);
+                            <th colspan="6">@string.Format("{0:N4}", decimal.Parse(totalAmountAfterDiscount.ToString()))</th>
+                        }
+                        <th colspan="3"></th>
+                    </tr>
+
+                    <tr style="background-color:lightgray !important;">
+                        <th colspan="5" class="text-right">Grand Total Amount Per Request (USD):</th>
+                        <th colspan="@colspanfooter" class="text-center">@string.Format("{0:N4}", decimal.Parse(totalAmountPerRequest.ToString()))</th>
+                        <th colspan="3"></th>
+                    </tr>
+                    <!-- Approved Amount -->
+                    <tr>
+                        <th colspan="5" class="text-right">Approved Sub Total VAT/NON VAT (USD):</th>
+                        @{
+                            int scount = 1;
+
+                            foreach (var sup in Model.supplierQuotes)
+                            {
+                                string suppliervatid = string.Format("supplier{0}_vatamount", scount);
+                                string suppliernonvatid = string.Format("supplier{0}_nonvatamount", scount);
+                                <th colspan="3" class="text-center"><label class="sub_total_amount" id="@suppliervatid">@string.Format("{0:N4}", decimal.Parse("0"))</label></th>
+                                <th colspan="3" class="text-center"><label class="sub_total_amount"  id="@suppliernonvatid">@string.Format("{0:N4}", decimal.Parse("0"))</label></th>
+                                scount++;
+                        }
+
+
+                        }
+                        <th colspan="3"></th>
+                    </tr>
+                    <tr>
+                        <th colspan="5" class="text-right">Approved Total Amount per Supplier (USD):</th>
+                        @{
+                            int sscount = 1;
+                            foreach (var sup in Model.supplierQuotes)
+                            {
+                                string suppliersubtotal_id = string.Format("supplier{0}_subtotal", sscount);
+                                <th colspan="6" class="text-center"><label class="sub_total_amount supplier_sub_total" id="@suppliersubtotal_id" data-lumpsumdiscount="@sup.lump_sum_discount_amount">@string.Format("{0:N4}", decimal.Parse("0"))</label></th>
+
+                                sscount++;
+                            }
+
+                        }
+                        <th colspan="3"></th>
+                    </tr>
+                    
+
+                    <tr>
+                        <th colspan="5" class="text-right">Approved Grand Total Amount Per Request (USD):</th>
+                        <th colspan="@colspanfooter" class="text-center"><label id="total_approved_amount_per_request">@string.Format("{0:N4}", decimal.Parse("0"))</label></th>
+                        <th colspan="3"></th>
+                    </tr>
+
+                </tfoot>
+            </table>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                @*<input type="button" id="btn-submit" value="Submit" class="btn btn-success" onclick="submitRequest(false)"/>*@
+                <a href="javascript:void(0)" onclick="submitRequest(false)" id="btn-submit" class="btn btn-warning">Submit</a>
+
+                <!-- Block new enhancement -->
+                <a href="javascript:void(0)" onclick="submitRequest(true)" id="btn-submit-td" class="btn btn-warning request-td-promp">Submit & Request TD Approve</a>
+
+                <a href="javascript:history.back()" class="btn btn-default">Back</a>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('#current_date').text(getFormattedDateMMDDYYYY(new Date('@Model.created_date')));
+            $('#purchase_oder_number').text('@Model.purchase_oder_number');
+            $("#ir_project_id").text('@Model.project_full_name');
+
+            $('input[type=radio][name=sup_head]').on('change click', function () {
+
+                var sub_total_vat_amount = 0, sub_total_nonvat_amount = 0,sub_total_supplier=0;
+
+                var sup_cls = $(this).attr('data-supcls');
+                var sup_child = $('input[type=radio][data-isupcls="' + sup_cls + '"]');
+                var po_qtys = $('.po-qty');
+
+                //console.log(sup_child);
+                var suppliers = $('.suppliers');
+                for (var i = 0; i < suppliers.length; i++) {
+                    $(suppliers[i]).prop("checked", false);
+                }
+                $(this).prop("checked", true);
+
+                for (var i = 0; i < sup_child.length; i++) {
+                    $(sup_child[i]).prop("checked", true);
+                    var price =parseFloat($(sup_child[i]).attr('data-price'));
+                    var qty = parseFloat($(po_qtys[i]).val());
+                    var vat = $(sup_child[i]).attr('data-vat');
+                    var vatnumber =parseFloat($(sup_child[i]).attr('data-vatnumber'))/100;
+                    //console.log(price + " " + qty + " " + vat);
+                    if (vat == "True") {
+                        sub_total_vat_amount = sub_total_vat_amount + (qty * price) + ((qty * price)*vatnumber);
+                    } else if (vat == "False") {
+                        sub_total_nonvat_amount = sub_total_nonvat_amount + (qty * price);
+                    }
+                }
+                sub_total_supplier = sub_total_vat_amount + sub_total_nonvat_amount;
+                //console.log(sup_cls);
+
+                for (var i = 0; i < $('.sub_total_amount').length; i++) {
+                    $($('.sub_total_amount')[i]).text(parseFloat(0).toFixed(4));
+                }
+
+                var lumpsumdiscount = $('#' + sup_cls + "_subtotal").attr('data-lumpsumdiscount');
+                //alert(lumpsumdiscount);
+
+                $('#' + sup_cls + "_vatamount").text(ReplaceNumberWithCommas(parseFloat(sub_total_vat_amount).toFixed(4)));
+                $('#' + sup_cls + "_nonvatamount").text(ReplaceNumberWithCommas(parseFloat(sub_total_nonvat_amount).toFixed(4)));
+                $('#' + sup_cls + "_subtotal").text(ReplaceNumberWithCommas(parseFloat(sub_total_supplier - lumpsumdiscount).toFixed(4)));
+
+                var total_approved_amount_per_request = 0;
+                $.each($('.supplier_sub_total'), function (index, item) {
+                    
+                    total_approved_amount_per_request = total_approved_amount_per_request +parseFloat(RemoveCommaFromNumber($(item).text()));
+                });
+               
+
+                $("#total_approved_amount_per_request").text(ReplaceNumberWithCommas(parseFloat(total_approved_amount_per_request).toFixed(4)));
+                //alert(total_approved_amount_per_request);
+
+            });
+
+            $('input[type=radio][class=suppliers]').on('click change', function () {
+                //console.log(this.value);
+                calculateTotalAmount();
+
+            });
+
+            //$('input[type=radio][name=sup_head]').click(function () {
+            //    var sup_cls = $(this).attr('data-supcls');
+            //    var sup_child = $('input[type=radio][data-isupcls="' + sup_cls + '"]');
+            //    //console.log(sup_child);
+            //    var suppliers = $('.suppliers');
+            //    for (var i = 0; i < suppliers.length; i++) {
+            //        $(suppliers[i]).prop("checked", false);
+            //    }
+            //    $(this).prop("checked", true);
+            //    for (var i = 0; i < sup_child.length; i++) {
+            //        $(sup_child[i]).prop("checked", true);
+            //    }
+            //});
+
+            @*$('#btnSave').click(function () {
+                var arr_supplier_id = new Array();
+                var count_row = $('#po_table tbody tr').length;
+                var reason = $('.reason');
+                var supplier_element = {};
+                var suppliers = [];
+                var purchase_order_id = $('#purchase_order_id').val();
+                var requestQtys = $('.request-qty');
+                var poQtys = $('.po-qty');
+                var poUnits = $('.po_unit');
+                for (var i = 1; i <= count_row; i++) {
+                    var po_supplier = $('input[name=item' + i + ']:checked').val();
+                    if (!po_supplier) {
+                        alert("Please choose one supplier in each item.");
+                        return;
+                    }
+                    arr_supplier_id.push(po_supplier);
+                }
+                for (var i = 0; i < arr_supplier_id.length; i++) {
+                    //if (Number(requestQtys[i].innerHTML) < Number(poQtys[i].value)) {
+                    //    alert("All Request item quantity must be smaller than PO Qty.");
+                    //    return;
+                    //}
+                    var splitPOUnit = (poUnits[i].value).split(',');
+                    supplier_element = {};
+                    supplier_element.po_supplier_id = arr_supplier_id[i];
+                    supplier_element.Reason = reason[i].value;
+                    supplier_element.po_quantity = poQtys[i].value;
+                    supplier_element.po_unit =splitPOUnit[0] ;
+                    suppliers.push(supplier_element);
+                }
+                $.ajax({
+                    url: "@Url.Action("Approved", "PurchaseOrder")",
+                    type: "post",
+                    dataType: "json",
+                    async: false,
+                    data: {id:purchase_order_id, poSuppliers: suppliers },
+                    success: function (da) {
+                        if (da.result == "success") {
+                            $.notify('Your data has been saved!', { className: 'success' });
+                            window.location.href = '@Url.Action("MyApproval", "PurchaseOrder")';
+                        } else {
+                            console.log(da.message);
+                            $.notify('Your data is error while saving!', { className: 'error' });
+                        }
+                    },
+                    error: function (err) {
+                        $.notify('Your data is error while saving!', { className: 'error' });
+                    }
+                });
+            });*@
+        });
+
+        function calculateTotalAmountByQTY(row) {
+            checkQty(row);
+            calculateTotalAmount();
+        }
+
+        function checkQty(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var requestQty = $('#po_table tr').eq(ind).find('label.request-qty').text();
+            var requestUnit = $('#po_table tr').eq(ind).find('label.requestf-unit').text().replace(/(\r\n\t|\n|\r\t)/gm, "");;
+            var poQty = $('#po_table tr').eq(ind).find('input.po-qty').val();
+            var poUnit = $('#po_table tr').eq(ind).find('select.po_unit').val();
+            //if (Number(requestQty) < Number(poQty)) {
+            //    alert("Request item quantity must be smaller than PO Qty.");
+            //    return;
+            //}
+            //console.log(requestQty + " " + requestUnit);
+            //console.log(poQty + " " + poUnit);
+            var splitPOUnit = poUnit.split(',');
+            if (requestUnit == splitPOUnit[0].replace(/(\r\n\t|\n|\r\t)/gm, "")) {
+                if(poQty&&(Number(poQty)>Number(requestQty))){
+                    $.notify('PO Qty must be smaller than Request Qty.', { className: 'error' });
+                    $('#po_table tr').eq(ind).find('input.po-qty').focus();
+                    $('#po_table tr').eq(ind).find('input.po-qty').val(requestQty);
+                    return;
+                }
+            } else {
+                var quantity = 0;
+                var selectedIndex = $('#po_table tr').eq(ind).find('select.po_unit').prop('selectedIndex');
+                if (poQty) {
+                    if (selectedIndex == 1) {
+                        var splitElement = $('#po_table tr').eq(ind).find('select.po_unit option').eq(selectedIndex).val().split(',');
+                        quantity = Number(poQty) / Number(splitElement[1]);
+                        //console.log(quantity);
+                        if (quantity > requestQty) {
+                            $.notify('PO Qty must be smaller than Request Qty.', { className: 'error' });
+                            $('#po_table tr').eq(ind).find('input.po-qty').focus();
+                            $('#po_table tr').eq(ind).find('input.po-qty').val(Number(requestQty*splitElement[1]));
+                            return;
+                        }
+                    } else if (selectedIndex == 2) {
+                        var splitElement = $('#po_table tr').eq(ind).find('select.po_unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#po_table tr').eq(ind).find('select.po_unit option').eq(1).val().split(',');
+                        quantity = (poQty / splitElement[1]) / splitElement2[1];
+                        if (quantity > requestQty) {
+                            $.notify('PO Qty must be smaller than Request Qty.', { className: 'error' });
+                            $('#po_table tr').eq(ind).find('input.po-qty').focus();
+                            $('#po_table tr').eq(ind).find('input.po-qty').val(Number(requestQty * splitElement[1]*splitElement2[1]));
+                            return;
+                        }
+                    }
+                    else if (selectedIndex == 3) {
+                        var splitElement = $('#po_table tr').eq(ind).find('select.po_unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#po_table tr').eq(ind).find('select.po_unit option').eq(1).val().split(',');
+                        var splitElement3 = $('#po_table tr').eq(ind).find('select.po_unit option').eq(2).val().split(',');
+                        quantity = quantity = ((poQty / splitElement[1]) / splitElement3[1]) / splitElement2[1];
+                        if (quantity > requestQty) {
+                            $.notify('PO Qty must be smaller than Request Qty.', { className: 'error' });
+                            $('#po_table tr').eq(ind).find('input.po-qty').focus();
+                            $('#po_table tr').eq(ind).find('input.po-qty').val(Number(requestQty * splitElement[1] * splitElement2[1]*splitElement3[1]));
+                            return;
+                        }
+                    }
+                    else if (selectedIndex == 4) {
+                        var splitElement = $('#po_table tr').eq(ind).find('select.po_unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#po_table tr').eq(ind).find('select.po_unit option').eq(1).val().split(',');
+                        var splitElement3 = $('#po_table tr').eq(ind).find('select.po_unit option').eq(2).val().split(',');
+                        var splitElement4 = $('#po_table tr').eq(ind).find('select.po_unit option').eq(3).val().split(',');
+                        quantity = ((((poQty/ splitElement[1]) / splitElement4[1]) / splitElement3[1]) / splitElement2[1]);
+                        if (quantity > requestQty) {
+                            $.notify('PO Qty must be smaller than Request Qty.', { className: 'error' });
+                            $('#po_table tr').eq(ind).find('input.po-qty').focus();
+                            $('#po_table tr').eq(ind).find('input.po-qty').val(Number(requestQty * splitElement[1] * splitElement2[1] * splitElement3[1]*splitElement4[1]));
+                            return;
+                        }
+                    }
+                    else if (selectedIndex == 5) {
+                        var splitElement = $('#po_table tr').eq(ind).find('select.po_unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#po_table tr').eq(ind).find('select.po_unit option').eq(1).val().split(',');
+                        var splitElement3 = $('#po_table tr').eq(ind).find('select.po_unit option').eq(2).val().split(',');
+                        var splitElement4 = $('#po_table tr').eq(ind).find('select.po_unit option').eq(3).val().split(',');
+                        var splitElement5 = $('#po_table tr').eq(ind).find('select.po_unit option').eq(4).val().split(',');
+                        quantity = ((((poQty / splitElement[1]) / splitElement5[1]) / splitElement4[1]) / splitElement3[1]) / splitElement2;
+                        if (quantity > requestQty) {
+                            $.notify('PO Qty must be smaller than Request Qty.', { className: 'error' });
+                            $('#po_table tr').eq(ind).find('input.po-qty').focus();
+                            $('#po_table tr').eq(ind).find('input.po-qty').val(Number(requestQty * splitElement[1] * splitElement2[1] * splitElement3[1]*splitElement4[1]*splitElement5[1]));
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        function submitRequest(isRequestTD) {
+            
+            enable_submit_button(true);
+
+            var arr_supplier_id = new Array();
+            var count_row = $('#po_table tbody tr').length;
+            var reason = $('.reason');
+            var supplier_element = {};
+            var suppliers = [];
+            var purchase_order_id = $('#purchase_order_id').val();
+            var requestQtys = $('.request-qty');
+            var poQtys = $('.po-qty');
+            var poUnits = $('.po_unit');
+            for (var i = 1; i <= count_row; i++) {
+                var po_supplier = $('input[name=item' + i + ']:checked').val();
+                if (!po_supplier) {
+                    alert("Please choose one supplier in each item.");
+                    enable_submit_button(false);
+                    return;
+                }
+                arr_supplier_id.push(po_supplier);
+            }
+            for (var i = 0; i < arr_supplier_id.length; i++) {
+                //if (Number(requestQtys[i].innerHTML) < Number(poQtys[i].value)) {
+                //    alert("All Request item quantity must be smaller than PO Qty.");
+                //    return;
+                //}
+                var splitPOUnit = (poUnits[i].value).split(',');
+                supplier_element = {};
+                supplier_element.po_supplier_id = arr_supplier_id[i];
+                supplier_element.Reason = reason[i].value;
+                supplier_element.po_quantity = poQtys[i].value;
+                supplier_element.po_unit =splitPOUnit[0] ;
+                suppliers.push(supplier_element);
+            }
+            //alert(RemoveCommaFromNumber($('#total_approved_amount_per_request').text()));
+            $.ajax({
+                url: "@Url.Action("Approved", "PurchaseOrder")",
+                type: "post",
+                dataType: "json",
+                //async: false,
+                data: {
+                    id: purchase_order_id,
+                    poSuppliers: suppliers,
+                    isRequestTD: isRequestTD,
+                    totalAmountPerRequest: RemoveCommaFromNumber($('#total_approved_amount_per_request').text()),
+                },
+                success: function (da) {
+                    if (da.result == "success") {
+                        $.notify('Your data has been saved!', { className: 'success' });
+                        window.location.href = '@Url.Action("MyApproval", "PurchaseOrder")';
+                    } else {
+                        console.log(da.message);
+                        $.notify('Your data is error while saving!', { className: 'error' });
+                        enable_submit_button(false);
+                    }
+                },
+                error: function (err) {
+                    $.notify('Your data is error while saving.', { className: 'error' });
+                    enable_submit_button(false);
+                }
+            });
+        }
+
+        function calculateTotalAmount() {
+            $.each($('input[type=radio][name=sup_head]'), function (index, item) {
+
+                var sub_total_vat_amount = 0, sub_total_nonvat_amount = 0, sub_total_supplier = 0;
+                var sup_cls = $(item).attr('data-supcls');
+                var sup_child = $('input[type=radio][data-isupcls="' + sup_cls + '"]');
+                var po_qtys = $('.po-qty');
+
+                $.each(sup_child, function (index1, item1) {
+                    if ($(item1).is(':checked')) {
+                        var price = parseFloat($(item1).attr('data-price'));
+                        var qty = parseFloat($(po_qtys[index1]).val());
+                        var vat = $(item1).attr('data-vat');
+                        var vatnumber = parseFloat($(item1).attr('data-vatnumber')) / 100;
+
+                        //console.log(price + " " + qty + " " + vat);
+                        if (vat == "True") {
+                            sub_total_vat_amount = sub_total_vat_amount + (qty * price) + ((qty * price)*vatnumber);
+                        } else if (vat == "False") {
+                            sub_total_nonvat_amount = sub_total_nonvat_amount + (qty * price);
+                        }
+                    }
+                });
+
+                var lumpsumdiscount = $('#' + sup_cls + "_subtotal").attr('data-lumpsumdiscount');
+
+                sub_total_supplier = sub_total_vat_amount + sub_total_nonvat_amount;
+
+                $('#' + sup_cls + "_vatamount").text(ReplaceNumberWithCommas(parseFloat(sub_total_vat_amount).toFixed(4)));
+                $('#' + sup_cls + "_nonvatamount").text(ReplaceNumberWithCommas(parseFloat(sub_total_nonvat_amount).toFixed(4)));
+                $('#' + sup_cls + "_subtotal").text(ReplaceNumberWithCommas(parseFloat(sub_total_supplier - lumpsumdiscount).toFixed(4)));
+
+            });
+
+            var total_approved_amount_per_request = 0;
+            $.each($('.supplier_sub_total'), function (index, item) {
+                total_approved_amount_per_request = total_approved_amount_per_request + parseFloat(RemoveCommaFromNumber($(item).text()));
+            });
+            $("#total_approved_amount_per_request").text(ReplaceNumberWithCommas(parseFloat(total_approved_amount_per_request).toFixed(4)));
+
+            //alert(total_approved_amount_per_request);
+        }
+
+        function enable_submit_button(is_submit) {
+            if (is_submit) {
+                $('#btn-submit').text("Submitting...");
+                $('#btn-submit').attr('disabled', true);
+                $('#btn-submit-td').text("Submitting...");
+                $('#btn-submit-td').attr('disabled', true);
+            } else {
+                $('#btn-submit').text("Submit");
+                $('#btn-submit').attr('disabled', false);
+                $('#btn-submit-td').text("Submitting...");
+                $('#btn-submit-td').attr('disabled', false);
+            }
+        }
+
+        function visible_submit_button(total_amount_per_request) {
+            if (total_amount_per_request > 3000) {
+
+            }
+        }
+    </script>
+    
+    }

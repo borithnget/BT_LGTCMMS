@@ -1,0 +1,277 @@
+﻿@model IEnumerable<BT_KimMex.Models.ProjectViewModel>
+@using BT_KimMex.Class
+@{
+    ViewBag.Title = "Index";
+}
+<style type="text/css">
+    table tr td{
+        vertical-align:middle !important;
+    }
+</style>
+<h3 class="title">Project List</h3>
+<div class="row">
+    <div class="form-group">
+        <label class="control-label col-md-2">Project Status:</label> 
+        <div class="col-md-10">
+            <select class="form-control" id="p_status">
+                <option value="All" selected>All</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+                <option value="Completed">Completed</option>
+            </select>
+        </div>
+    </div>
+</div>
+<h1></h1>
+@*<a href="~/Reports/ReportController/Project.aspx">Report</a>*@
+<table class="table table-bordered" id="ProjectTable">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Project Short Name</th>
+            <th>Project Full Name</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Project Engineer</th>
+            <th>Site Name</th>
+            <th>Warehouse</th>
+            <th>Customer</th>
+            <th>Status</th>
+            @*<th>View</th>*@
+            <th>Edit</th>
+            <th>Delete</th>
+            @*<th>Link to BOQ</th>*@
+        </tr>
+    </thead>
+    <tbody>
+        
+    </tbody>
+</table>
+
+<!-- delete project modal popup-->
+<div class="modal fade" id="myModal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to delete this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default delete-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- update project status popup-->
+<div class="modal fade" id="status_modal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-warning">
+                <h4 class="modal-title" id="myModalLabel">Update Project Status</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="control-label col-md-5">Project Status:</label>
+                    <div class="col-md-7">
+                        <select class="form-control" id="p_status_updated" style="width:280px !important;">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default status-confirm">Save</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            var project_id,p_status_id;
+            var p_status;
+            InitialDataTable("All");
+
+            if ('@TempData["message"]' != null) {
+                $.notify('@TempData["message"]', { className: 'success' });
+            }
+
+            $('#ProjectTable tbody').on('click', 'td a.delete-promp', function () {
+                project_id = $(this).attr('id');
+                $('#myModal').modal('show');
+            });
+
+            $('#ProjectTable tbody').on('click', 'td a.status-promp', function () {
+                p_status_id = $(this).attr('id');
+                $('#status_modal').modal('show');
+            });
+
+            $('.delete-confirm').click(function () {
+                if (project_id != '') {
+                    $.ajax({
+                        url: "/Project/Delete",
+                        data: {
+                            'id': project_id,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#myModal').modal('hide');
+                            if (da.Message == "Success")
+                            {
+                                $.notify('Your data has been saved!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "Project")';
+                            }
+                            else if (da.Message == "fail")
+                                $.notify('Your data has been error while deleting!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while deleting!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+            $('.status-confirm').click(function () {
+                if (p_status_id != '') {
+                    var p_status=$('#p_status_updated').val();
+                    $.ajax({
+                        url: "/Project/UpdateProjectStatus",
+                        data: {
+                            'id': p_status_id,
+                            'p_status': p_status,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.status-confirm').css('display', 'none');
+                            }
+                            $('#status_modal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your Project Status has been updated!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "Project")';
+                            }
+                            else if (da.result == "fail")
+                                $.notify('Your Project Status has been error while updating!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.status-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your Project Status has been error while updating!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+            $('#p_status').change(function () {
+                var p_status = $(this).val();
+                if (p_status != null || p_status != "") {
+                    InitialDataTable(p_status)
+                }
+            });
+
+            function InitialDataTable(status) {
+                var t=$('#ProjectTable').DataTable({
+                    "ajax": {
+                        "url": "@Url.Action("ProjectDataTable", "Project")",
+                        "type": "GET",
+                        "dataType": "json",
+                        "data": { p_status: status },
+                    },
+                    "columns": [
+                            {"data":"project_id"},
+                            //{ "data": "project_short_name" },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    return '<a href="/Project/Details/' + full.project_id + '">' + full.project_short_name + '</a>';
+                                }
+                            },
+                            { "data": "project_full_name" },
+                            {
+                                "data": "project_start_date", render: function (data, type, full, meta) {
+                                    if (data == "" | data == null)
+                                        return "";
+                                    else
+                                        return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                                }
+                            },
+                            {
+                                "data": "project_end_date", render: function (data, type, full, meta) {
+                                    if (data == null || data == "")
+                                        return "";
+                                    else
+                                        return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                                }
+                            },
+                            { "data": "project_manager" },
+                            { "data": "site_name" },
+                            { "data": "warehouse_project_name" },
+                            { "data": "customer_name" },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    return '<a href="javascript:void(0)" id="' + full.project_id + '" class="status-promp w3-button w3-small w3-teal text-center">'+full.p_status+'</a>';
+                                }
+                            },
+                            //{
+                            //    "render": function (data, type, full, meta) {
+                            //        return '<a href="/Project/Details/' + full.project_id + '">View Detail</a>';
+                            //    }
+                            //},
+                            {
+                                "render": function (data, type, full, meta) {
+                                    return '<a href="/Project/Edit/' + full.project_id + '" class="w3-button w3-small w3-green">Edit</a>';
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    return '<a href="javascript:void(0)" id="' + full.project_id + '" class="delete-promp w3-button w3-small w3-red">Delete</a>';
+                                }
+                            },
+                            //{
+                            //    "render": function (data, type, full, meta) {
+                            //        if (full.isBOQ == true)
+                            //            return '<a href="/BOQ/Details/' + full.boq_id + '">View BOQ Detail</a>';
+                            //        return '<a href="/BOQ/Create/' + full.project_id + '">Link to BOQ</a>';
+                            //    }
+                            //}
+                    ],
+                    "bDestroy": true,
+                    "order": [[1, "asc"]]
+                });
+                t.on('order.dt search.dt', function () {
+                    t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                        cell.innerHTML = i + 1;
+                    });
+                }).draw();
+                $('select[name="ProjectTable_length"]').addClass('datatable-control');
+                $('input[aria-controls="ProjectTable"]').addClass('datatable-control');
+                $('#ProjectTable_filter').append('<a href="@Url.Action("Create","Project")" class="btn btn-default pull-left" style="margin-right:10px !important;">Add New</a>');
+            }
+
+        });
+    </script>
+}

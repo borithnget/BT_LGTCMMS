@@ -1,0 +1,131 @@
+﻿@model BT_KimMex.Models.SiteViewModel
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h3>Create New Site</h3>
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Date:</label>
+            <label class="col-md-10" id="current_date"></label>
+        </div>
+
+        <div class="form-group">
+            <label class = "control-label col-md-2">Site Name <span style="color:red !important;">*</span>:</label>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.site_name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.site_name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        @*<div class="form-group">
+            <label class="control-label col-md-2">Site Admin <span style="color:red !important;">*</span>:</label>
+            <div class="col-md-10">
+                @Html.DropDownList("site_admin_id", new SelectList(BT_KimMex.Class.GlobalMethod.GetUserListItemsbyRole(BT_KimMex.Class.Role.SiteAdmin), "UserId", "user_first_name"), "Selete Admin", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.site_name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Site Supervisor <span style="color:red !important;">*</span>:</label>
+            <div class="col-md-4">
+                <table style="width:100% !important;" id="table"></table>
+                @Html.ValidationMessageFor(model => model.site_name, "", new { @class = "text-danger" })
+            </div>
+        </div>*@
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.site_address, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextAreaFor(model => model.site_address,  new { @class = "form-control" } )
+                @Html.ValidationMessageFor(model => model.site_address, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-success" />
+                <a href="@Url.Action("Index","Site")" class="btn btn-danger">Back</a>
+            </div>
+        </div>
+    </div>
+}
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+            $(function () {
+                $('#current_date').text(getFormattedDateMMDDYYYY(new Date()));
+                if ('@TempData["message"]' != null) {
+                    $.notify('@TempData["message"]', { className: 'error' });
+                }
+                initialSiteSupervisorTable();
+            });
+        function initialSiteSupervisorTable() {
+            $('#table').append("" +
+                    "<tr>" +
+                        "<td width='280px'>" +
+                            "<select class='form-control sitesupervisors' name='sitesupervisors'>" +
+                                "<option selected disabled value=''>Select Site Supervisor</option>" +
+                            "</select>" +
+                        "</td>" +
+                        "<td style='width:40px !important;'>" +
+                            "<button type='button' class='btn btn-default btn-sm' onclick='RemoveSiteManagerRow(this)'><span class='glyphicon glyphicon-trash'></span></button>" +
+                        "</td>" +
+                        "<td style='width:40px !important;'>" +
+                            "<button type='button' class='btn btn-default btn-sm' onclick='AddSiteManagerRow(this)'><span class='glyphicon glyphicon-plus'></span></button>" +
+                        "</td>" +
+                    "</tr>"
+                );
+            InitialSiteSupervisor();
+        }
+        function InitialSiteSupervisor() {
+            $.ajax({
+                url:"@Url.Action("SiteSupervisorDropDownJSON", "Site")",
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    $('#table tr:last-child select.sitesupervisors').empty();
+                    $('#StockkeeperTable tr:last-child select.sitesupervisors').append("" +
+                        "<option selected disabled> Select Site Supervisor</option>"
+                    );
+                    $.each(data, function (index, item) {
+                        $.each(item, function (index1, item1) {
+                            var full_name = item1.Username;
+                            $('#table tr:last-child select.sitesupervisors').append("" +
+                                    "<option value='" + item1.UserId + "'>" + full_name + "</option>"
+                                );
+                        });
+                    });
+                },
+                error: function (data) {
+                    alert('fail');
+                }
+            });
+        }
+        function AddSiteManagerRow(Row) {
+            var index = Row.parentNode.parentNode.rowIndex;
+            initialSiteSupervisorTable();
+            $('#table tbody tr td:nth-child(3)').eq(index).html('');
+        }
+        function RemoveSiteManagerRow(Row) {
+            var index = Row.parentNode.parentNode.rowIndex;
+            var numberOfRow = $('#table tbody tr').length;
+            if (numberOfRow > 1) {
+                document.getElementById('table').deleteRow(index);
+                if (Number(index + 1) == numberOfRow)
+                    $('#table tbody tr td:nth-child(3)').eq(index - 1).html("<button type='button' class='btn btn-default btn-sm' onclick='AddSiteManagerRow(this)'><span class='glyphicon glyphicon-plus'></span></button>");
+            }
+        }
+    </script>
+}

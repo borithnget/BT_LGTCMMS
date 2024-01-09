@@ -1,0 +1,21 @@
+﻿@model BT_KimMex.Models.PositionViewModel
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h3 class="title">View Position Detail</h3>
+
+<div class="form-horizontal">
+    <div class="form-group row">
+        <label class="col-md-2 control-label">Position:</label>
+        <label class="col-md-10">@Model.position_name</label>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            @Html.ActionLink("Edit", "Edit", new { id = Model.position_id }, new { @class = "w3-button w3-tiny w3-teal" })
+            @Html.ActionLink("Back", "Index", null, new { @class = "w3-button w3-tiny w3-red" })
+        </div>
+    </div>
+</div>
+

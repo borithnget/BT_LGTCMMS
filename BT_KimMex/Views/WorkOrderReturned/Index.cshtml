@@ -1,0 +1,88 @@
+﻿@model IEnumerable<BT_KimMex.Models.WorkorderReturnedViewModel>
+    @using BT_KimMex.Class;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="w3-container">
+    <h3 class="">Work Order Returned List</h3>
+</div>
+<div class="w3-container">
+    <table class="table table-bordered" id="table">
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Date</th>
+                <th>Work Order Returned No.</th>
+                <th>Work Order Issued Ref.</th>
+                <th>Requester</th>
+                <th>Project</th>
+                <th>Warehouse</th>
+                <th>Status</th>
+                <th>Detail</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int count = 1;
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@count</td>
+                        <td>@CommonClass.ToLocalTime(Convert.ToDateTime(item.created_date)).ToString("dd/MM/yyyy")</td>
+                        <td><a href="@Url.Action("Details","WorkOrderReturned",new { id = item.workorder_returned_id })">@item.workorder_returned_number</a></td>
+                        <td>@item.workorder_issued_number</td>
+                        <td>@BT_KimMex.Class.CommonFunctions.GetUserFullnamebyUserId(item.created_by)</td>
+                        <td>@item.project_fullname</td>
+                        <td>@item.warehouse_name</td>
+                        <td class="text-center">
+                            @{
+                                if (string.Compare(item.workorder_returned_status, Status.Pending) == 0)
+                                {
+                                    <span class="label label-danger">@ShowStatus.WORCreated</span>
+                                }
+                                else if (string.Compare(item.workorder_returned_status, Status.Approved) == 0)
+                                {
+                                    <span class="label w3-yellow">@ShowStatus.WORChecked</span>
+                                }
+                                else if (string.Compare(item.workorder_returned_status, Status.Checked) == 0)
+                                {
+                                    <span class="label w3-blue">@ShowStatus.WORApproved</span>
+                                }
+                                else if (string.Compare(item.workorder_returned_status, Status.Completed) == 0)
+                                {
+                                    <span class="label w3-green">@ShowStatus.WORCompleted</span>
+                                }
+                                else
+                                {
+                                    <span class="label w3-gray">@item.workorder_returned_status</span>
+                                }
+                            }
+                        </td>
+                        <td class="text-center"><a href="@Url.Action("Details","WorkOrderReturned",new { id = item.workorder_returned_id })" class="w3-button w3-tiny w3-green">View Detail</a></td>
+                    </tr>
+                    count++;
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('#table').DataTable({});
+            @{
+                if (User.IsInRole(BT_KimMex.Class.Role.SystemAdmin) || User.IsInRole(BT_KimMex.Class.Role.SiteSupervisor))
+                {
+                    <text>
+            $('#table_filter').append('<a href="@Url.Action("Create", "WorkOrderReturned")" class="w3-button w3-tiny w3-teal pull-left" style="margin-right:10px !important;">New Request</a>');
+            </text>
+                }
+            }
+        });
+    </script>
+    }

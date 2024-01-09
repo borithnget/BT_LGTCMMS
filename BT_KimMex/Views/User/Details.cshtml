@@ -1,0 +1,69 @@
+﻿@model BT_KimMex.Models.UserRolesViewModel
+
+@{
+    ViewBag.Title = "View User Detail";
+}
+<div class="panel panel-default">
+    <div class="panel-heading" style="font-size:20px !important;font-weight:bold !important;">
+        @ViewBag.Title
+    </div>
+    <div class="panel-body">
+        <div class="form-horizontal">
+            <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+                    @*<div class="form-group">
+                        @Html.Label("Date:", new { @class = "col-md-2 control-label" })
+                        @Html.DisplayFor(model => model.created_date)
+                    </div>*@
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.user_first_name, new { @class = "col-md-2 control-label" })
+                        @Html.DisplayFor(model => model.user_first_name)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.user_last_name, new { @class = "col-md-2 control-label" })
+                        @Html.DisplayFor(model => model.user_last_name)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Username, new { @class = "col-md-2 control-label" })
+                        @Html.DisplayFor(model => model.Username)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.position_name, new { @class = "col-md-2 control-label" })
+                        @Html.DisplayFor(model => model.position_name)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Role, new { @class = "col-md-2 control-label" })
+                        @Html.DisplayFor(model => model.Role)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.user_telephone, new { @class = "col-md-2 control-label" })
+                        @Html.DisplayFor(model => model.user_telephone)
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <a href="@Url.Action("EditUser","Account", new { id = Model.UserId })" class="btn btn-success">Edit</a>
+                            <a href="@Url.Action("Index","User")" class="btn btn-danger">Back</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                    <div class="form-group row">
+                        <div id="imgPreview" class="thumbnail">
+                            @if (string.IsNullOrEmpty(Model.user_signature))
+                            {
+                                <img src="@Url.Content("~/Assets/img/profile-picture.jpg")" style="object-fit:cover; background-color:white; width: 100px;height: 100px;" class="img-responsive" id="targetImg" />
+                            }
+                            else
+                            {
+                                <img src="@Model.user_signature" style="object-fit: fill; background-color: white; width: 100px; height: 100px; " class="img-responsive" id="targetImg" />
+                            }
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    </div>
+    

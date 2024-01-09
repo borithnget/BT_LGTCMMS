@@ -1,0 +1,1541 @@
+﻿@model BT_KimMex.Models.ItemReceiveViewModel
+@{
+    ViewBag.Title = "Create New Good Receive Note";
+    string ireDate =BT_KimMex.Class.CommonClass.ToLocalTime(DateTime.Now).ToString("dd/MM/yyyy");
+    string ireNo = ViewBag.IReID;
+    string currentDate = DateTime.Now.ToString("MM/dd/yyyy");
+}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+<style type="text/css">
+    #itemReceiveTable tr td:nth-child(5){
+        text-align:left !important;
+    }
+   #itemReceivedTable thead th,#po_table tr td {
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+</style>
+<div class="w3-panel w3-card-4">
+    <div class="w3-container w3-display-container">
+        <h3 class="title">@ViewBag.Title</h3>
+    </div>
+    <div class="w3-container w3-display-container">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="row">
+                <div class="col-md-6">
+
+                    <div class="form-group">
+                        @Html.Label("Receive Type:", new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            <select class="form-control" id="receive_type" name="receive_type">
+                                <option>Select Receive Type</option>
+                                <option value="Purchase Order">Purchase Order</option>
+                                <option value="Stock Transfer">Stock Transfer</option>
+                                <option value="Stock Return">Stock Return</option>
+                                <option value="Transfer Workshop">Transfer from Workshop</option>
+                                @*<option value="Return Workshop">Return to Workshop</option>*@
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="poSupplierPanel">
+                        @Html.Label("PR Supplier:", new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            <select class="form-control" id="poSupplier"></select>
+
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-4" id="ref_label" style="text-align:right;"></div>
+                        <div class="col-md-8" id="receiveTypeBlock">
+
+                        </div>
+                        <input type="hidden" id="poVATStatus" />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.received_number, new { @class = "control-label col-md-4" })
+                        <label class="col-md-8" id="received_number">@BT_KimMex.Class.CommonClass.GenerateProcessNumber("IRe")</label>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-4">MR Ref. No:</label>
+                        <label class="col-md-8" id="lblMrRefNo"></label>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-4">Project Fullname:</label>
+                        <label class="col-md-8" id="lblProjectName"></label>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-4">To Warehouse:</label>
+                        <input type="hidden" id="warehouse_id" />
+                        <label class="col-md-8" id="warehouse_name"></label>
+                    </div>
+                </div>
+            </div>
+
+            @*<div class="form-group">
+            @Html.Label("Date:", new { @class = "control-label col-md-2" })
+            @Html.Label(ireDate, new { @class = "col-md-10" })
+        </div>*@
+            @*<div class="form-group">
+            @Html.LabelFor(model => model.created_date, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-7">
+                <div class="input-group date" data-provide="datepicker" style="width:280px !important;">
+                    @Html.EditorFor(model => model.created_date, new { htmlAttributes = new { @class = "form-control", id ="created_date" } })
+                    <div class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </div>
+                </div>
+            </div>
+        </div>*@
+
+
+
+            @*<div class="form-group">
+            @Html.Label("Receive Type:", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <label class="radio-inline">
+                    <input type="radio" name="receiveType" value="Stock Transfer">Stock Transfer
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="receiveType" value="Purchase Order">Purchase Order
+                </label>
+            </div>
+        </div>*@
+
+
+            <!--ST Ref-->
+            @*<div class="form-group row">
+            <label class="control-label col-md-2">Sending Date:</label>
+            <div class="col-md-10">
+                <div class="input-group date" data-provide="datepicker" style="width:280px !important;">
+
+                    <input type="text" class="form-control" id="sending_date" name="sending_date" placeholder="MM/DD/YYYY" />
+                    <div class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="control-label col-md-2">Returning Date:</label>
+            <div class="col-md-10">
+                <div class="input-group date" data-provide="datepicker" style="width:280px !important;">
+
+                    <input type="text" class="form-control" id="returning_date" name="returning_date" placeholder="MM/DD/YYYY" />
+                    <div class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </div>
+                </div>
+            </div>
+        </div>*@
+
+            <div class="row" style="margin:0 !important;">
+                <table class="table table-bordered" id="itemReceiveTable">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Item Code</th>
+                            <th>Item Name</th>
+                            <th>Quantity</th>
+                            <th>From Supplier/ Warehouse</th>
+                            @*<th rowspan="2" id="historyHeader">History</th>*@
+                            <th>Remain</th>
+                            <th class="receiveQty">Receive QTY</th>
+                            <th>Receive Unit</th>
+                            <th>Invoice No.</th>
+                            <th>Invoice Date</th>
+                            <th>To Warehouse</th>
+                        </tr>
+                        <tr id="secondheader"></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="12">No data available in table</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-2 control-label">Supporting Document :</label>
+                <div class="col-md-10">
+                    <input type="file" class="form-control" name="attachment_reference" id="attachment_reference" multiple />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-2 control-label">Delivery Order (DO) :</label>
+                <div class="col-md-10">
+                    <input type="file" class="form-control" name="delivery_order" id="delivery_order" accept="image/*"/>
+                    <span class="text-danger"><b>Accept only (.Image/*)</b></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <button type="button" id="btnCreate" class="btn btn-success">Submit</button>
+                    <a href="javascript:history.back()" class="btn btn-danger">Back</a>
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+</div>
+
+
+
+@section Scripts{
+    <script type="text/javascript" src="~/Scripts/custom/itemReceiveScript.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+    <script type="text/html" src="~/Scripts/custom/itemReceiveScript.js">
+    </script>
+    <script type="text/javascript">
+        $(this).load(function () {
+            $('#poSupplierPanel').hide();
+        });
+
+        $(function () {
+            $('#ref_id').select2();
+            $('#poSupplierPanel').hide();
+
+            $('#sending_date').val('@currentDate');
+            $('#returning_date').val('@currentDate');
+
+            //var $rdReceiveTypes = $('input:radio[name=receiveType]');
+            //if ($rdReceiveTypes.is(':checked') == false) {
+            //    $rdReceiveTypes.filter('[value="Stock Transfer"]').prop('checked', true);
+            //    $('#ref_label').empty();
+            //    $('#ref_label').append("<label class='control-label'>ST Ref. <strong style='color:red;'>*</strong>:</label>");
+            //    $('#receiveTypeBlock').empty();
+            //    $('#receiveTypeBlock').append("" +
+            //            "<select class='form-control' id='ref_id' onchange='initialReceivedItem(true,$(this).val())'>" +
+            //                "<option value>Select Stock Transfer Reference</option>" +
+            //            "</select>"
+            //        );
+            //    $('#poSupplierPanel').show();
+            //    InitialStockTransferDropdownList();
+            //}
+
+            //$('input[type=radio][name=receiveType]').change(function () {
+            //    $('#itemReceiveTable tbody').empty();
+            //    $('#lblMrRefNo').text('');
+            //    $('#lblProjectName').text('');
+            //    $('#warehouse_name').text('');
+            //    $('#warehouse_id').val('');
+            //    if (this.value == "Stock Transfer") {
+            //        $('#ref_label').empty();
+            //        $('#ref_label').append("<label class='control-label'>ST Ref. <strong style='color:red;'>*</strong>:</label>");
+            //        $('#receiveTypeBlock').empty();
+            //        $('#receiveTypeBlock').append("" +
+            //                "<select class='form-control' id='ref_id' onchange='initialReceivedItem(true,$(this).val())'>" +
+            //                    "<option value>Select Stock Transfer Reference</option>" +
+            //                "</select>"
+            //            );
+            //        InitialStockTransferDropdownList();
+            //        $('#poSupplierPanel').hide();
+            //    }
+
+            //    else if (this.value == "Purchase Order") {
+            //        $('#ref_label').empty();
+            //        $('#ref_label').append("<label class='control-label'>PO Ref. <strong style='color:red;'>*</strong>:</label>");
+            //        $('#receiveTypeBlock').empty();
+            //        $('#receiveTypeBlock').append("" +
+            //                "<select class='form-control' id='ref_id' onchange='initialReceivedItem(false,$(this).val())'>" +
+            //                    "<option value>Select Purchase Order Reference</option>" +
+            //                "</select>"
+            //           );
+            //        $('#poSupplierPanel').show();
+            //        initialPOSupplierDropdownList();
+            //        $('#itemReceiveTable tbody').empty().append("<tr><td colspan='10'>No data available in table</td></tr>");
+            //        //InitialPurchaseOrderDropdownList();
+
+            //    }
+            //});
+
+            $('#receive_type').change(function (e) {
+                e.preventDefault();
+                var receiveType = $(this).val();
+                $('#itemReceiveTable tbody').empty();
+                $('#lblMrRefNo').text('');
+                $('#lblProjectName').text('');
+                $('#warehouse_name').text('');
+                $('#warehouse_id').val('');
+
+                $('#receive_ref').empty().append("<option>Select Receive Type</option>");
+                if (receiveType) {
+                    if (this.value == "Stock Transfer") {
+                        $('#ref_label').empty();
+                        $('#ref_label').append("<label class='control-label'>ST Ref. <strong style='color:red;'>*</strong>:</label>");
+                        $('#receiveTypeBlock').empty();
+                        $('#receiveTypeBlock').append("" +
+                                "<select class='form-control' id='ref_id' onchange='initialReceivedItem(true,$(this).val())'>" +
+                                    "<option value>Select Stock Transfer Reference</option>" +
+                                "</select>"
+                            );
+                        InitialStockTransferDropdownList();
+                        $('#poSupplierPanel').hide();
+                    }
+                    else if (receiveType == "Transfer Workshop") {
+
+                        $('#ref_label').empty();
+                        $('#ref_label').append("<label class='control-label'>ST Ref. <strong style='color:red;'>*</strong>:</label>");
+                        $('#receiveTypeBlock').empty();
+                        $('#receiveTypeBlock').append("" +
+                                "<select class='form-control' id='ref_id' onchange='initialReceivedItem(true,$(this).val())'>" +
+                                    "<option value>Select Transfer Reference</option>" +
+                                "</select>"
+                            );
+
+                        $.ajax({
+                            url: '/GoodReceiveNote/GetTransferFromWorkshopListItemsJSON',
+                            type: "get",
+                            dataType: "json",
+                            success: function (da) {
+                                console.log(da);
+                                if (da.data) {
+                                    $.each(da.data, function (index, item) {
+                                        $('#ref_id').append("" +
+                                           "<option value='" + item.stock_transfer_id + "'>" + item.stock_transfer_no + "</option>"
+                                            );
+                                    });
+                                }
+                            },
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                console.log(textStatus);
+                            }
+                        });
+                        $('#poSupplierPanel').hide();
+                    }
+                    else if (receiveType == "Stock Return") {
+                        $('#ref_label').empty();
+                        $('#ref_label').append("<label class='control-label'>Return Ref. <strong style='color:red;'>*</strong>:</label>");
+                        $('#receiveTypeBlock').empty();
+                        $('#receiveTypeBlock').append("" +
+                                "<select class='form-control' id='ref_id' onchange='initialReceivedItem(true,$(this).val())'>" +
+                                    "<option value>Select Return Reference</option>" +
+                                "</select>"
+                            );
+                        $.ajax({
+                            url: '/GoodReceiveNote/GetStockReturnListItemsJSON',
+                            type: "get",
+                            dataType: "json",
+                            success: function (da) {
+                                console.log(da);
+                                if (da.data) {
+                                    $.each(da.data, function (index, item) {
+                                        $('#ref_id').append("" +
+                                           "<option value='" + item.receive_item_voucher_id + "'>" + item.received_number + "</option>"
+                                            );
+                                    });
+                                }
+                            },
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                console.log(textStatus);
+                            }
+                        });
+                        $('#poSupplierPanel').hide();
+                    }
+                    else if (receiveType == "Return Workshop") {
+                        $('#ref_label').empty();
+                        $('#ref_label').append("<label class='control-label'>Return Ref. <strong style='color:red;'>*</strong>:</label>");
+                        $('#receiveTypeBlock').empty();
+                        $('#receiveTypeBlock').append("" +
+                                "<select class='form-control' id='ref_id' onchange='initialReceivedItem(true,$(this).val())'>" +
+                                    "<option value>Select Return Reference</option>" +
+                                "</select>"
+                            );
+                        $.ajax({
+                            url: '/GoodReceiveNote/GetReturnWorkshopListItemsJSON',
+                            type: "get",
+                            dataType: "json",
+                            success: function (da) {
+                                console.log(da);
+                                if (da.data) {
+                                    $.each(da.data, function (index, item) {
+                                        $('#ref_id').append("" +
+                                           "<option value='" + item.return_main_stock_id + "'>" + item.return_main_stock_no + "</option>"
+                                            );
+                                    });
+                                }
+                            },
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                console.log(textStatus);
+                            }
+                        });
+                        $('#poSupplierPanel').hide();
+                    }
+                    else if (receiveType == "Purchase Order") {
+                        $('#ref_label').empty();
+                        $('#ref_label').append("<label class='control-label'>PO Ref. <strong style='color:red;'>*</strong>:</label>");
+                        $('#receiveTypeBlock').empty();
+                        $('#receiveTypeBlock').append("" +
+                                "<select class='form-control' id='ref_id' onchange='initialReceivedItem(false,$(this).val())'>" +
+                                    "<option value>Select Purchase Order Reference</option>" +
+                                "</select>"
+                           );
+                        $('#poSupplierPanel').show();
+                        initialPOSupplierDropdownList();
+                        $('#itemReceiveTable tbody').empty().append("<tr><td colspan='10'>No data available in table</td></tr>");
+                    }
+                }
+
+            });
+
+            $('#itemReceiveTable tbody').on('changeDate', 'td div.date', function () {
+                $(this).datepicker('hide');
+            });
+
+            $('#poSupplier').on('change', function (e) {
+                e.preventDefault();
+                var id = $(this).val();
+                initialPurchaseOrderRefbySupplier(id);
+                $('#warehouse_id').val('');
+                $('#warehouse_name').text('');
+                $('#lblProjectName').text('');
+                $('#lblMrRefNo').text('');
+                $('#itemReceiveTable tbody').empty().append("<tr><td colspan='10'>No data available in table</td></tr>");
+            });
+
+            $('#btnCreate').click(function () {
+                enable_submit_button(true);
+                var ireNumber = $('#received_number').text();
+                var created_date = $('#ceated_date').val();
+                //var ireType = $('input[type=radio][name=receiveType]:checked').val();
+                var ireType=$('#receive_type').val();
+                var ireRef = $('#ref_id').val();
+                var items = $('.item_id');
+                var receivedQtys = $('.received_qty');
+                var receivedUnits = $('.received-unit');
+                var warehouses = $('.warehouse');
+                var suppliers = $('.supplier_id');
+                var history_id = $('.history_id');
+                var history_name = $('.history_name');
+                var invoiceNumbers = $('.invoice_number');
+                var invoiceDate = $('.invoice_date');
+                var supplierId = $('#poSupplier').val();
+                var poReportNumber = $('#ref_id option:selected').text();
+                var ireDetails = [];
+                var arrAttachment = [];
+                var warehouse = $('#warehouse_id').val();
+                var sendingDate = $('#sending_date').val();
+                var returningDate = $('#returning_date').val();
+
+                if (!ireRef) {
+                    $.notify('Receive Type Reference is required.', { className: 'error' });
+                    enable_submit_button(false);
+                    return;
+                }
+
+                if (warehouse == null || warehouse == undefined || warehouse == '') {
+                    alert("Project is no warehouse. please go to create warehouse for this project.");
+                    enable_submit_button(false);
+                    return;
+                }
+
+                for (var i = 0; i < items.length; i++) {
+                    var itemID = items[i].value;
+                    //var history_id = history_id[i].value;
+                    //var warehouse = warehouses[i].value;
+
+                    var receivedQty = receivedQtys[i].value;
+                    var receivedUnit = (receivedUnits[i].value).split(',');
+                    if (warehouse && receivedQty && Number(receivedQty) > 0) {
+                        var element_item = {};
+                        element_item.product_id = itemID;
+                        element_item.warehouse_id = warehouse;
+                        //element_item.history_id = history_id[i].value;
+                        element_item.in_quantity = receivedQty;
+                        element_item.unit = receivedUnit[0];
+                        element_item.supplier_id = suppliers[i].value;
+                        element_item.invoice_number = invoiceNumbers[i].value;
+                        element_item.invoice_date = convertDDMMYYYtoMMDDYYYY(invoiceDate[i].value);
+                        ireDetails.push(element_item);
+                    } else if (receivedQty && Number(receivedQty) > 0 && !warehouse) {
+                        alert('Please select warehouse to receive item.');
+                        enable_submit_button(false);
+                        return;
+                    }
+                    //else if (warehouse &&( !receivedQty || Number(receivedQty) <= 0)) {
+                    //    alert('Please fill received qty to warehouse.');
+                    //    return;
+                    //}
+                    //else if (!receivedUnit[0]) {
+                    //    $.notify('Please fill received unit.', { className: 'error' });
+                    //    return;
+                    //}
+                }
+                if (ireDetails.length == 0) {
+                    alert('Received item required.');
+                    enable_submit_button(false);
+                    return;
+                }
+
+                /* START ATTACHMENT */
+                var form_data = new FormData();
+                var file_input = document.getElementById('attachment_reference');
+                //if (file_input.files.length > 0) {
+                    for (var i = 0; i < file_input.files.length; i++) {
+                        form_data = new FormData();
+                        form_data.append(file_input.files[i].name, file_input.files[i]);
+                        $.ajax({
+                            url: '@Url.Action("UploadAttachment", "ItemReceive")',
+                            type: "POST",
+                            data: form_data,
+                            async: false,
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            success: function (da) {
+                                if (da.result == "success")
+                                    arrAttachment.push(da.attachment_id);
+                            },
+                            error: function (xhr, error, status) {
+                                console.log(error, status);
+                            }
+                        });
+                    }
+                //} else {
+                //    alert('Supporting Document is required.');
+                //    return;
+                //}
+
+                /** START DELIVERY ORDER ATTACHMENT */
+                var arrDOAttachment = [];
+                var do_file_input = document.getElementById('delivery_order');
+                if (do_file_input.files.length > 0) {
+
+                    for (var i = 0; i < do_file_input.files.length; i++) {
+                        form_data = new FormData();
+                        form_data.append(do_file_input.files[i].name, do_file_input.files[i]);
+                        $.ajax({
+                            url: '@Url.Action("UploadDOAttachment", "ItemReceive")',
+                            type: "POST",
+                            data: form_data,
+                            async: false,
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            success: function (da) {
+                                if (da.result == "success")
+                                    arrDOAttachment.push(da.attachment_id);
+                            },
+                            error: function (xhr, error, status) {
+                                console.log(error, status);
+                            }
+                        });
+                    }
+                }
+
+
+                var model = {
+                    received_number: ireNumber,
+                    received_type: ireType,
+                    ref_id: ireRef,
+                    supplier_id: supplierId,
+                    po_report_number: poReportNumber,
+                    created_date: created_date,
+                    sending_date: sendingDate,
+                    returning_date:returningDate
+                };
+
+                $.ajax({
+                    url: "@Url.Action("CreateItemReceived", "ItemReceive")",
+                    type: "post",
+                    dataType: "json",
+                    //async: false,
+                    data: { model: model, inventories: ireDetails, Attachment: arrAttachment, DOAttachment: arrDOAttachment },
+                    success: function (da) {
+                        if (da.result == "success") {
+                            alert('Your data has been saved.');
+                            window.location.href = '@Url.Action("MyRequest", "ItemReceive")';
+                        } else if (da.result == "fail") {
+                            alert(da.message);
+                            enable_submit_button(false);
+                        }
+                    },
+                    error: function (err) {
+                        alert('Your data is error while saving.');
+                    }
+                });
+
+            });
+
+        });
+    </script>
+    <script type="text/javascript">
+
+        function InitialStockTransferDropdownList() {
+            $.ajax({
+                url: '/ItemReceive/GetStockTransferNumberDropdownlist',
+                type: "get",
+                dataType: "json",
+                success: function (da) {
+                    console.log(da);
+                    if (da.data) {
+                        $.each(da.data, function (index, item) {
+                            $('#ref_id').append("" +
+                               "<option value='" + item.stock_transfer_id + "'>" + item.stock_transfer_no + "</option>"
+                                );
+                        });
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(textStatus);
+                }
+            });
+            $('#ref_id').select2();
+        }
+
+        function InitialPurchaseOrderDropdownList() {
+            $.ajax({
+                url: '/ItemReceive/GetPurchaseOrderNumberDropdownlist',
+                type: "get",
+                dataType: "json",
+                success: function (da) {
+                    if (da.data) {
+                        $.each(da.data, function (index, item) {
+                            $('#ref_id').append("" +
+                               "<option value='" + item.purchase_order_id + "'>" + item.purchase_oder_number + "</option>"
+                                );
+                        });
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(textStatus);
+                }
+            });
+            $('#ref_id').select2();
+        }
+
+        function initialReceivedItem(isST, stID) {
+            clearHistoryHeader();
+            //var receivedType = $('input[type=radio][name=receiveType]:checked').val();
+            var receivedType = $('#receive_type').val();
+            $('#itemReceiveTable').empty();
+            $('#warehouse_id').val('');
+            $('#warehouse_name').text('');
+            $('#lblProjectName').text('');
+            if (stID == null || stID == "" || stID == undefined) {
+                $('#itemReceiveTable tbody').empty().append("<tr><td colspan='10'>No data available in table</td></tr>");
+            }
+            else if (receivedType == "Stock Transfer" && isST && stID) {
+                var purchaserderId = $('#ref_id option:selected').val();
+                $('#lblMrRefNo').text('');
+                $.ajax({
+                    url: '/ItemRequest/GetMaterialRequestNumberbyStockTransferJson',
+                    type: "get",
+                    dataType: "json",
+                    data: { id: purchaserderId },
+                    success: function (da) {
+                        if (da.result == "success") {
+                            //console.log(da.data);
+                            $('#lblMrRefNo').text(da.data.mr_number);
+                            $('#lblProjectName').text(da.data.project_fullanme);
+                            if (da.data.warehouse_id == null) {
+                                $('#warehouse_name').text("No Warehouse");
+                            } else {
+                                $('#warehouse_id').val(da.data.warehouse_id);
+                                $('#warehouse_name').text(da.data.warehouse_name);
+                            }
+                            
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        console.log(textStatus);
+                    }
+                });
+               
+                $.ajax({
+                    url: '/ItemReceive/GetStockTransferItem',
+                    type: "get",
+                    dataType: "json",
+                    data: { id: stID },
+                    success: function (da) {
+                        if (da.result == "success") {
+                           
+                            $('#itemReceiveTable').empty();
+                            var rowHeader = "";
+
+                            if (da.data[0].histories.length>0)
+                            rowHeader = rowHeader + "<th colspan='" + da.data[0].totalReceived + "'>Received History</th>";
+
+                            $('#itemReceiveTable').append(""+
+                                "<thead>"+
+                                    "<tr>"+
+                                        "<th>No.</th>"+
+                                        "<th>Item Code</th>"+
+                                        "<th>Item Name</th>"+
+                                        "<th>Quantity</th>"+
+                                        "<th>From Supplier/ Warehouse</th>"+
+                                        rowHeader+
+                                        "<th>Remain</th>" +         
+                                        "<th>Receive QTY</th>"+
+                                        "<th>Receive Unit</th>"+
+                                        "<th>Invoice No.</th>"+
+                                        "<th>Invoice Date</th>"+
+                                        //"<th>To Warehouse</th>"+
+                                    "</tr>"
+                                );
+
+                            $.each(da.data, function (index, item) {
+                                console.log(item);
+                                var mou = "";
+                                mou = mou + "<option value='" + item.itemUnit.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "'>" + item.itemUnitName.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                                if (item.uom != null) {
+                                    if (item.uom.uom1_id != null && item.uom.uom1_qty != null) {
+                                        var uom = (item.uom.uom1_id).replace(/(\r\n\t|\n|\r\t)/gm, "").trim();
+                                        mou = mou + "<option value='" + uom + "," + item.uom.uom1_qty + "'>" + uom + "</option>";
+                                    }
+                                    if (item.uom.uom2_id != null && item.uom.uom2_qty != null) {
+                                        var uom = (item.uom.uom2_id).replace(/(\r\n\t|\n|\r\t)/gm, "").trim();
+                                        mou = mou + "<option value='" + uom + "," + item.uom.uom2_qty + "'>" + uom + "</option>";
+                                    }
+                                    if (item.uom.uom3_id != null && item.uom.uom3_qty != null) {
+                                        var uom = (item.uom.uom3_id).replace(/(\r\n\t|\n|\r\t)/gm, "").trim();
+                                        mou = mou + "<option value='" + uom + "," + item.uom.uom3_qty + "'>" + uom + "</option>";
+                                    }
+                                    if (item.uom.uom4_id != null && item.uom.uom4_qty != null) {
+                                        var uom = (item.uom.uom4_id).replace(/(\r\n\t|\n|\r\t)/gm, "").trim();
+                                        mou = mou + "<option value='" + uom + "," + item.uom.uom4_qty + "'>" + uom + "</option>";
+                                    }
+                                    if (item.uom.uom5_id != null && item.uom.uom5_qty != null) {
+                                        var uom = (item.uom.uom5_id).replace(/(\r\n\t|\n|\r\t)/gm, "").trim();
+                                        mou = mou + "<option value='" + uom + "," + item.uom.uom5_qty + "'>" + uom + "</option>";
+                                    }
+                                }
+
+                                var strReceivedHistory = "";
+                                for (var i = 0; i < item.histories.length; i++) {
+                                    strReceivedHistory = strReceivedHistory + "<td>" + item.histories[i].total_quantity + "</td>";
+                                }
+                                var remaincol=item.totalReceived-item.histories.length;
+                                for (var i = 0; i < remaincol; i++) {
+                                    strReceivedHistory = strReceivedHistory + "<td>0</td>";
+                                }
+
+                                if (item.out_quantity == 0) {
+                                    $('#itemReceiveTable').append("" +
+                                        "<tr>" +
+                                            "<td>" + Number(index + 1) + "</td>" +
+                                            "<td>" + item.itemCode + "</td>" +
+                                            "<td>" + item.itemName + "</td>" +
+                                            "<td>" + item.total_quantity + " " + item.unitName + "</td>" + //item.itemUnit
+                                            "<td>" + item.warehouseName + "</td>" +
+                                            strReceivedHistory +
+                                            "<td>" + item.out_quantity + "</td>" +
+                                            "<td></td>" +
+                                            "<td></td>" +
+                                            "<td></td>" +
+                                                "<td>" +
+                                                    
+                                                "</td>" +
+                                            //"<td><select class='form-control warehouse'></select></td>" +
+                                        "</tr>"
+                                    );
+                                } else {
+                                    $('#itemReceiveTable').append("" +
+                                        "<tr>" +
+                                            "<td>" + Number(index + 1) + "</td>" +
+                                            "<td><input type='hidden' class='item_id' value='" + item.product_id + "'/>" + item.itemCode + "</td>" +
+                                            "<td>" + item.itemName + "</td>" +
+                                            "<td><label class='request_qty'>" + item.total_quantity + "</label> <input type='hidden' class='request_unit' value='" + item.unit + "'/> <label class=''>" + item.unitName + "</label></td>" + //item.itemUnit
+                                            "<td><input type='hidden' class='supplier_id' value='" + item.warehouse_id + "'/>" + item.warehouseName + "</td>" +
+                                            strReceivedHistory +
+                                            "<td><label class='remain_qty'>" + item.out_quantity + "</label></td>" +
+                                            "<td><input type='number' class='form-control received_qty' value='0' onchange='checkQty(this)' /> </td>" +
+                                            "<td><select class='form-control received-unit' onchange='checkQty(this)'>" + mou + "</select></td>" +
+                                            "<td><input type='text' class='form-control invoice_number'/></td>" +
+                                                "<td>" +
+                                                    '<div style="r:inline-block !important;margin-right:5px !important;">' +
+                                                            '<div class="input-group date" data-provide="datepicker" data-autoclose="true" style="width:150px !important;">' +
+                                                                '<input type="text" class="form-control invoice_date" style="width:130px !important;"/>' +
+                                                                '<div class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></div>' +
+                                                            '</div>' +
+                                                        '</div>' +
+                                                "</td>" +
+                                            //"<td><select class='form-control warehouse'></select></td>" +
+                                        "</tr>"
+                                    );
+                                }
+                                
+
+                                //InitialWarehouseDropdownList(isST, stID, Number(index + 2));
+                                $(".date").datepicker({ format: 'dd/mm/yyyy' });
+                            });
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        console.log(textStatus);
+                    }
+                });
+
+            // Purchase Order
+            } else if (receivedType == "Purchase Order" && isST == false && stID) {
+
+                var supplierId = $('#poSupplier').val();
+                var purchaseOrderNumber = $('#ref_id option:selected').text();
+                var purchaserderId = $('#ref_id option:selected').val();
+                var purchaseOrderSupplierId = $('#ref_id option:selected').attr('data-supplierid');
+                //$('#poSupplier').val(purchaseOrderSupplierId).trigger('change');
+                //$('#ref_id').val(purchaserderId).trigger('change');
+                var supplierId = $('#poSupplier').val();
+                //alert(purchaseOrderSupplierId);
+                //console.log("PO ID:" + purchaserderId);
+                //initial MR Number
+                $('#lblMrRefNo').text('');
+                $.ajax({
+                    url: '/ItemRequest/GetMaterialRequestNumberbyPOJson',
+                    type: "get",
+                    dataType: "json",
+                    data: { id: purchaserderId },
+                    success: function (da) {
+                        if (da.result == "success") {
+                            $('#lblMrRefNo').text(da.data.mr_number);
+                            $('#lblProjectName').text(da.data.project_fullanme);
+                            if (da.data.warehouse_id == null) {
+                                $('#warehouse_id').val("No Warehouse");
+                            } else {
+                                $('#warehouse_id').val(da.data.warehouse_id);
+                                $('#warehouse_name').text(da.data.warehouse_name);
+                            }
+                            
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        console.log(textStatus);
+                    }
+                });
+
+                $.ajax({
+                    url: '/ItemReceive/GetItemReceivedByRefId',
+                    type: "get",
+                    dataType: "json",
+                    data: { id: purchaserderId },
+                    success: function (da) {
+                        if (da.result == "success") {
+                            $.each(da.data, function (i, value) {
+                                receivedItems.push(value);
+                            });
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        console.log(textStatus);
+                    }
+                });
+
+                $.ajax({
+                    url: '/ItemReceive/GetPurchaseOrderItem',
+                    type: "get",
+                    dataType: "json",
+                    data: { id: stID, supplierid: supplierId, purchaseOrderNumber: purchaseOrderNumber },
+                    success: function (da) {
+                        if (da.result == "success") {
+                            if (da.data.length == 0) {
+                                $('#itemReceiveTable tbody').empty().append("<tr><td colspan='12'>No data available in table</td></tr>");
+                            } else {
+
+                                var rowHeader = "";
+                                //rowHeader = rowHeader + "<th colspan='" + da.data[0].totalReceived + "'>Received History</th>";
+                                $('#itemReceiveTable').append("" +
+                                    "<thead>" +
+                                        "<tr>" +
+                                            "<th>No.</th>" +
+                                            "<th>Item Code</th>" +
+                                            "<th>Item Name</th>" +
+                                            "<th>Quantity</th>" +
+                                            "<th>From Supplier/ Warehouse</th>" +
+                                            rowHeader +
+                                            "<th>Remain</th>" +
+                                            "<th>Receive QTY</th>" +
+                                            "<th>Receive Unit</th>" +
+                                            "<th>Invoice No.</th>" +
+                                            "<th>Invoice Date</th>" +
+                                            //"<th>To Warehouse</th>"+
+                                        "</tr>"
+                                    );
+
+                                $.each(da.data, function (index, item) {
+                                    console.log(item);
+                                    var mou;
+                                    mou = mou + "<option value='" + item.product_unit.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "'>" + item.product_unit_name.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                                    if (item.uom != null) {
+                                        if (item.uom.uom1_id != null && item.uom.uom1_qty != null ) {
+                                            var uom = (item.uom.uom1_id).replace(/(\r\n\t|\n|\r\t)/gm, "").trim();
+                                            mou = mou + "<option value='" + uom + "," + item.uom.uom1_qty + "'>" + uom + "</option>";
+                                        }
+                                        if (item.uom.uom2_id != null && item.uom.uom2_qty != null) {
+                                            var uom = (item.uom.uom2_id).replace(/(\r\n\t|\n|\r\t)/gm, "").trim();
+                                            mou = mou + "<option value='" + uom + "," + item.uom.uom2_qty + "'>" + uom + "</option>";
+                                        }
+                                        if (item.uom.uom3_id != null && item.uom.uom3_qty != null) {
+                                            var uom = (item.uom.uom3_id).replace(/(\r\n\t|\n|\r\t)/gm, "").trim();
+                                            mou = mou + "<option value='" + uom + "," + item.uom.uom3_qty + "'>" + uom + "</option>";
+                                        }
+                                        if (item.uom.uom4_id != null && item.uom.uom4_qty != null) {
+                                            var uom = (item.uom.uom4_id).replace(/(\r\n\t|\n|\r\t)/gm, "").trim();
+                                            mou = mou + "<option value='" + uom + "," + item.uom.uom4_qty + "'>" + uom + "</option>";
+                                        }
+                                        if (item.uom.uom5_id != null && item.uom.uom5_qty != null) {
+                                            var uom = (item.uom.uom5_id).replace(/(\r\n\t|\n|\r\t)/gm, "").trim();
+                                            mou = mou + "<option value='" + uom + "," + item.uom.uom5_qty + "'>" + uom + "</option>";
+                                        }
+                                    }
+
+                                    /*
+                                    var po_unit = item.po_unit.replace(/(\r\n\t|\n|\r\t)/gm, "").trim();
+                                    if (item.po_unit == item.product_unit.replace(/(\r\n\t|\n|\r\t)/gm, ""))
+                                        mou = "<option value='" + item.product_unit + "' selected>" + item.product_unit + "</option>";
+                                    else
+                                        mou = "<option value='" + item.product_unit + "'>" + item.product_unit + "</option>";
+                                    if (item.uom1_id && item.uom1_qty) {
+                                        var uom1 = item.uom1_id.replace(/(\r\n\t|\n|\r\t)/gm, "");
+                                        var check = po_unit.localeCompare(po_unit);
+                                        if (uom1 == item.po_unit)
+                                            mou = mou + "<option value='" + uom1 + "," + item.uom1_qty + "' selected>" + uom1 + "</option>";
+                                        else
+                                            mou = mou + "<option value='" + uom1 + "," + item.uom1_qty + "'>" + uom1 + "</option>";
+                                    }
+                                    if (item.uom2_id && item.uom2_qty) {
+                                        mou = mou + "<option value='" + item.uom2_id +"," + item.uom2_qty+ "'>" + item.uom2_id + "</option>";
+                                    }
+                                    if (item.uom3_id && item.uom3_qty) {
+                                        mou = mou + "<option value='" + item.uom3_id + "," + item.uom3_qty + "'>" + item.uom3_id + "</option>";
+                                    }
+                                    if (item.uom4_id && item.uom4_qty) {
+                                        mou = mou + "<option value='" + item.uom4_id + "," + item.uom4_qty + "'>" + item.uom4_id + "</option>";
+                                    }
+                                    if (item.uom5_id && item.uom5_qty) {
+                                        mou = mou + "<option value='" + item.uom5_id + "," + item.uom5_qty + "'>" + item.uom5_id + "</option>";
+                                    }
+                                    */
+                                    
+                                    $('#itemReceiveTable').append("" +
+                                            "<tr>" +
+                                                "<td>" + Number(index + 1) + "</td>" +
+                                                "<td><input type='hidden' class='item_id' value='" + item.item_id + "'/>" + item.product_code + "</td>" +
+                                                "<td>" + item.product_name + "</td>" +
+                                                "<td><label class='po_qty'>" + item.po_quantity + "</label> <input type='hidden' class='request_unit' value='" + item.item_unit + "'/> <label class=''>" + item.item_unit_name + "</label> <input type='hidden' class='unit_level' value='" + item.unitLevel + "'/> </td>" +// item.product_unit
+                                                "<td><input type='hidden' class='supplier_id' value='" + item.supplier_id + "'/>" + item.supplier_name + "</td>" +
+                                                "<td><label class='request_qty'>" + item.quantity + "</label></td>" +
+                                                "<td><input type='number' class='form-control received_qty' value='0' onchange='checkQty(this)' /> </td>" +
+                                                "<td><select class='form-control received-unit' onchange='checkQty(this)'>" + mou + "</select></td>" +
+                                                "<td><input type='text' class='form-control invoice_number'/></td>" +
+                                                "<td>" +
+                                                    '<div style="display:inline-block !important;margin-right:5px !important;">' +
+                                                            '<div class="input-group date" data-provide="datepicker" data-autoclose="true" style="width:150px !important;">' +
+                                                                '<input type="text" class="form-control invoice_date" style="width:130px !important;" value="'+getFormattedDateMMDDYYYY(new Date())+'"/>' +
+                                                                '<div class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></div>' +
+                                                            '</div>' +
+                                                        '</div>' +
+                                                "</td>" +
+                                                //"<td><select class='form-control warehouse'></select></td>" +
+                                            "</tr>"
+                                        );
+
+                                    //InitialWarehouseDropdownList(isST, stID, Number(index + 2));
+                                    $(".date").datepicker({ format: 'dd/mm/yyyy' });
+                                });
+                            }
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        console.log(textStatus);
+                    }
+                });
+            }
+            else if (receivedType == 'Transfer Workshop') {
+                $.ajax({
+                    url: '/GoodReceiveNote/GetTransferFromWorkshopItemDetailJSON',
+                    type: "get",
+                    dataType: "json",
+                    data: { id: stID },
+                    success: function (da) {
+                        console.log(da.data);
+                        $('#lblMrRefNo').text(da.data.item_request_no);
+                        $('#lblProjectName').text(da.data.project_fullname);
+                        $('#warehouse_id').val(da.data.warehouse_id);
+                        $('#warehouse_name').text(da.data.warehouse_name);
+                        $('#itemReceiveTable').empty();
+                        var rowHeader = "";
+
+                        if (da.data.inventoryDetails[0].histories.length > 0)
+                            rowHeader = rowHeader + "<th colspan='" + da.data[0].totalReceived + "'>Received History</th>";
+
+                        $('#itemReceiveTable').append("" +
+                            "<thead>" +
+                                "<tr>" +
+                                    "<th>No.</th>" +
+                                    "<th>Item Code</th>" +
+                                    "<th>Item Name</th>" +
+                                    "<th>Quantity</th>" +
+                                    "<th>From Supplier/ Warehouse</th>" +
+                                    rowHeader +
+                                    "<th>Remain</th>" +
+                                    "<th>Receive QTY</th>" +
+                                    "<th>Receive Unit</th>" +
+                                    "<th>Invoice No.</th>" +
+                                    "<th>Invoice Date</th>" +
+                                    //"<th>To Warehouse</th>"+
+                                "</tr>"
+                            );
+
+                        $.each(da.data.inventoryDetails, function (index, item) {
+
+                            var mou = mou + "<option value='" + item.itemUnit.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "'>" + item.itemUnitName.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                            var strReceivedHistory = "";
+                            for (var i = 0; i < item.histories.length; i++) {
+                                strReceivedHistory = strReceivedHistory + "<td>" + item.histories[i].total_quantity + "</td>";
+                            }
+                            var remaincol = item.totalReceived - item.histories.length;
+                            for (var i = 0; i < remaincol; i++) {
+                                strReceivedHistory = strReceivedHistory + "<td>0</td>";
+                            }
+                            
+                            $('#itemReceiveTable').append("" +
+                                        "<tr>" +
+                                            "<td>" + Number(index + 1) + "</td>" +
+                                            "<td><input type='hidden' class='item_id' value='" + item.product_id + "'/>" + item.itemCode + "</td>" +
+                                            "<td>" + item.itemName + "</td>" +
+                                            "<td><label class='request_qty'>" + item.total_quantity + "</label> <input type='hidden' class='request_unit' value='" + item.unit + "'/> <label class=''>" + item.unitName + "</label></td>" + //item.itemUnit
+                                            "<td><input type='hidden' class='supplier_id' value='" + item.from_warehouse_id + "'/>" + item.from_warehouse_name + "</td>" +
+                                            strReceivedHistory +
+                                            "<td class='text-center'><label class='remain_qty'>" + item.remain_quantity + "</label></td>" +
+                                            "<td><input type='number' class='form-control received_qty' value='0' onchange='checkQty(this)' /> </td>" +
+                                            "<td><select class='form-control received-unit' onchange='checkQty(this)'>" + mou + "</select></td>" +
+                                            "<td><input type='text' class='form-control invoice_number'/></td>" +
+                                                "<td>" +
+                                                    '<div style="r:inline-block !important;margin-right:5px !important;">' +
+                                                            '<div class="input-group date" data-provide="datepicker" data-autoclose="true" style="width:150px !important;">' +
+                                                                '<input type="text" class="form-control invoice_date" style="width:130px !important;"/>' +
+                                                                '<div class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></div>' +
+                                                            '</div>' +
+                                                        '</div>' +
+                                                "</td>" +
+                                            //"<td><select class='form-control warehouse'></select></td>" +
+                                        "</tr>"
+                                    );
+                            $(".date").datepicker({ format: 'dd/mm/yyyy' });
+                        });
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        console.log(textStatus);
+                    }
+                });
+            }
+            else if (receivedType == 'Stock Return') {
+                $.ajax({
+                    url: '/GoodReceiveNote/GetStockReturnItemDetailJSON',
+                    type: "get",
+                    dataType: "json",
+                    data: { id: stID },
+                    success: function (da) {
+                        console.log(da.data);
+                        $('#lblMrRefNo').text(da.data.stock_issue_ref);
+                        $('#lblProjectName').text(da.data.project_fullname);
+                        $('#warehouse_id').val(da.data.warehouse_id);
+                        $('#warehouse_name').text(da.data.warehouse_name);
+                        $('#itemReceiveTable').empty();
+                        var rowHeader = "";
+
+                        if (da.data.inventories[0].histories.length > 0)
+                            rowHeader = rowHeader + "<th colspan='" + da.data[0].totalReceived + "'>Received History</th>";
+
+                        $('#itemReceiveTable').append("" +
+                            "<thead>" +
+                                "<tr>" +
+                                    "<th>No.</th>" +
+                                    "<th>Item Code</th>" +
+                                    "<th>Item Name</th>" +
+                                    "<th>Quantity</th>" +
+                                    "<th>To Warehouse</th>" +
+                                    rowHeader +
+                                    "<th>Remain</th>" +
+                                    "<th>Receive QTY</th>" +
+                                    "<th>Receive Unit</th>" +
+                                    "<th>Invoice No.</th>" +
+                                    "<th>Invoice Date</th>" +
+                                    //"<th>To Warehouse</th>"+
+                                "</tr>"
+                            );
+
+                        $.each(da.data.inventories, function (index, item) {
+                            console.log(item);
+                            var mou = mou + "<option value='" + item.itemUnit.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "'>" + item.itemUnitName.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                            var strReceivedHistory = "";
+                            for (var i = 0; i < item.histories.length; i++) {
+                                strReceivedHistory = strReceivedHistory + "<td>" + item.histories[i].total_quantity + "</td>";
+                            }
+                            var remaincol = item.totalReceived - item.histories.length;
+                            for (var i = 0; i < remaincol; i++) {
+                                strReceivedHistory = strReceivedHistory + "<td>0</td>";
+                            }
+
+                            $('#itemReceiveTable').append("" +
+                                        "<tr>" +
+                                            "<td>" + Number(index + 1) + "</td>" +
+                                            "<td><input type='hidden' class='item_id' value='" + item.product_id + "'/>" + item.itemCode + "</td>" +
+                                            "<td>" + item.itemName + "</td>" +
+                                            "<td><label class='request_qty'>" + item.total_quantity + "</label> <input type='hidden' class='request_unit' value='" + item.unit + "'/> <label class=''>" + item.unitName + "</label></td>" + //item.itemUnit
+                                            "<td><input type='hidden' class='supplier_id' value='" + item.warehouse_id + "'/>" + item.warehouseName + "</td>" +
+                                            strReceivedHistory +
+                                            "<td class='text-center'><label class='remain_qty'>" + item.remain_quantity + "</label></td>" +
+                                            "<td><input type='number' class='form-control received_qty' value='0' onchange='checkQty(this)' /> </td>" +
+                                            "<td><select class='form-control received-unit' onchange='checkQty(this)'>" + mou + "</select></td>" +
+                                            "<td><input type='text' class='form-control invoice_number'/></td>" +
+                                                "<td>" +
+                                                    '<div style="r:inline-block !important;margin-right:5px !important;">' +
+                                                            '<div class="input-group date" data-provide="datepicker" data-autoclose="true" style="width:150px !important;">' +
+                                                                '<input type="text" class="form-control invoice_date" style="width:130px !important;"/>' +
+                                                                '<div class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></div>' +
+                                                            '</div>' +
+                                                        '</div>' +
+                                                "</td>" +
+                                            //"<td><select class='form-control warehouse'></select></td>" +
+                                        "</tr>"
+                                    );
+                            $(".date").datepicker({ format: 'dd/mm/yyyy' });
+                        });
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        console.log(textStatus);
+                    }
+                });
+            }
+            else if (receivedType == "Return Workshop") {
+                $.ajax({
+                    url: '/GoodReceiveNote/GetReturnWorkshopItemJSON',
+                    type: "get",
+                    dataType: "json",
+                    data: { id: stID },
+                    success: function (da) {
+                        console.log(da.data);
+                        $('#lblMrRefNo').text(da.data.mr_number);
+                        $('#lblProjectName').text(da.data.project_fullname);
+                        $('#warehouse_id').val(da.data.warehouse_id);
+                        $('#warehouse_name').text(da.data.warehouse_name);
+                        $('#itemReceiveTable').empty();
+                        var rowHeader = "";
+
+                        if (da.data.inventoryDetails[0].histories.length > 0)
+                            rowHeader = rowHeader + "<th colspan='" + da.data[0].totalReceived + "'>Received History</th>";
+
+                        $('#itemReceiveTable').append("" +
+                            "<thead>" +
+                                "<tr>" +
+                                    "<th>No.</th>" +
+                                    "<th>Item Code</th>" +
+                                    "<th>Item Name</th>" +
+                                    "<th>Quantity</th>" +
+                                    "<th>From Supplier/ Warehouse</th>" +
+                                    rowHeader +
+                                    "<th>Remain</th>" +
+                                    "<th>Receive QTY</th>" +
+                                    "<th>Receive Unit</th>" +
+                                    "<th>Invoice No.</th>" +
+                                    "<th>Invoice Date</th>" +
+                                    //"<th>To Warehouse</th>"+
+                                "</tr>"
+                            );
+
+                        $.each(da.data.inventoryDetails, function (index, item) {
+
+                            var mou = mou + "<option value='" + item.itemUnit.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "'>" + item.itemUnitName.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>";
+                            var strReceivedHistory = "";
+                            for (var i = 0; i < item.histories.length; i++) {
+                                strReceivedHistory = strReceivedHistory + "<td>" + item.histories[i].total_quantity + "</td>";
+                            }
+                            var remaincol = item.totalReceived - item.histories.length;
+                            for (var i = 0; i < remaincol; i++) {
+                                strReceivedHistory = strReceivedHistory + "<td>0</td>";
+                            }
+
+                            $('#itemReceiveTable').append("" +
+                                        "<tr>" +
+                                            "<td>" + Number(index + 1) + "</td>" +
+                                            "<td><input type='hidden' class='item_id' value='" + item.product_id + "'/>" + item.itemCode + "</td>" +
+                                            "<td>" + item.itemName + "</td>" +
+                                            "<td><label class='request_qty'>" + item.total_quantity + "</label> <input type='hidden' class='request_unit' value='" + item.unit + "'/> <label class=''>" + item.unitName + "</label></td>" + //item.itemUnit
+                                            "<td><input type='hidden' class='supplier_id' value='" + item.from_warehouse_id + "'/>" + item.from_warehouse_name + "</td>" +
+                                            strReceivedHistory +
+                                            "<td class='text-center'><label class='remain_qty'>" + item.remain_quantity + "</label></td>" +
+                                            "<td><input type='number' class='form-control received_qty' value='0' onchange='checkQty(this)' /> </td>" +
+                                            "<td><select class='form-control received-unit' onchange='checkQty(this)'>" + mou + "</select></td>" +
+                                            "<td><input type='text' class='form-control invoice_number'/></td>" +
+                                                "<td>" +
+                                                    '<div style="r:inline-block !important;margin-right:5px !important;">' +
+                                                            '<div class="input-group date" data-provide="datepicker" data-autoclose="true" style="width:150px !important;">' +
+                                                                '<input type="text" class="form-control invoice_date" style="width:130px !important;"/>' +
+                                                                '<div class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></div>' +
+                                                            '</div>' +
+                                                        '</div>' +
+                                                "</td>" +
+                                            //"<td><select class='form-control warehouse'></select></td>" +
+                                        "</tr>"
+                                    );
+                            $(".date").datepicker({ format: 'dd/mm/yyyy' });
+                        });
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        console.log(textStatus);
+                    }
+                });
+            }
+        }
+
+        function InitialWarehouseDropdownList(isST, ID, ind) {
+            if (isST) {
+                $.ajax({
+                    url: '/ItemReceive/GetWarehouseByStockTransfer',
+                    type: "get",
+                    dataType: "json",
+                    data: { id: ID },
+                    success: function (da) {
+                        if (da.result == "success") {
+                            $.each(da.data, function (index, item) {
+                                $('#itemReceiveTable tr').eq(ind).find('select.warehouse').append("<option value='" + item.warehouse_id + "'>" + item.warehouse_name + "</option>");
+                            });
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        console.log(textStatus);
+                    }
+                });
+            } else {
+                $.ajax({
+                    url: '/ItemReceive/GetWarehouseByPurchaseOrder',
+                    type: "get",
+                    dataType: "json",
+                    data: { id: ID },
+                    success: function (da) {
+                        if (da.result == "success") {
+                            $.each(da.data, function (index, item) {
+                                $('#itemReceiveTable tr').eq(ind).find('select.warehouse').append("<option value='" + item.warehouse_id + "'>" + item.warehouse_name + "</option>");
+                            });
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        console.log(textStatus);
+                    }
+                });
+            }
+        }
+
+        function initialPOSupplierDropdownList() {
+            $('#poSupplier').empty().append("<option value='0'>Select Supplier</option>");
+            $.ajax({
+                url: '@Url.Action("SupplierDropdownList", "Supplier")',
+                type: "get",
+                dataType: "json",
+                success: function (da) {
+                    if (da.result="success" && da.data) {
+                        $.each(da.data, function (index, item) {
+                            //console.log(item)
+
+                            $('#poSupplier').append("" +
+                               "<option value='" + item.supplier_id + "'>" + item.supplier_name + "</option>"
+                                );
+
+                        });
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(textStatus);
+                }
+            });
+            $('#poSupplier').select2();
+            //initialPurchaseOrderRefbySupplier('0');
+        }
+
+        function initialPurchaseOrderRefbySupplier(id) {
+            $('#ref_id').empty().append("<option value='0'>Select Purchase Order Reference</option>");
+            $('#poVATStatus').val('');
+            $.ajax({
+                url: '@Url.Action("GetPurchaseOrderbySupplier", "ItemReceive")',
+                type: "get",
+                dataType: "json",
+                data:{id:id},
+                success: function (da) {
+                    if (da.result = "success" && da.data) {
+                        $.each(da.data, function (index, item) {
+                            //console.log(item)
+
+                            $('#ref_id').append("" +
+                                "<option value='" + item.purchaseOrderId + "' data-supplierid='" + item.poSupplierId+"'>" + item.purchaseOrderNumber + "</option>"
+                                );
+
+                        });
+                        $('#ref_id').select2();
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(textStatus);
+                }
+            });
+        }
+        /*
+        function checkQty(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var requestQty = $('#itemReceiveTable tr').eq(ind).find('label.request_qty').text();
+            var receiveQty = $('#itemReceiveTable tr').eq(ind).find('input.received_qty').val();
+            if (receiveQty && (Number(receiveQty) > Number(requestQty))) {
+                $.notify('Receive Qty must be smaller than Request Qty.', { className: 'error' });
+                $('#itemReceiveTable tr').eq(ind).find('input.received_qty').focus();
+                return;
+            }
+        }
+        */
+        var receivedItems = [];
+        var colHisHeader = 'H';
+        function qtyChange(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var historyHeader = $('#historyHeader');
+            var table = $('#itemReceiveTable');
+            var currentRow = table.find('tr').eq(ind);
+            if (historyHeader.attr('rowspan') == 2) {
+                historyHeader.attr('rowspan', 1);
+                var second = $('#secondheader');
+                var current = 0;
+                var item_id = currentRow.find('.item_id').val();
+                var items = $.grep(receivedItems, function (e) { return e.ItemId == item_id });
+                $.each(items, function (arrayindex, value) {
+                    current = arrayindex + 1;
+                    var cls = '.se_' + current;
+                    var existCell = second.find(cls);
+                    if (existCell != null && existCell.text() == '') {
+                        historyHeader.attr('colspan', current);
+                        existCell = document.createElement("th");
+                        existCell.innerHTML = colHisHeader + current;
+                        existCell.className = 'se_' + current;
+                        second.append(existCell);
+                    }
+
+                    //var rowCell = currentRow.find(cls);
+                    //if (rowCell != null && rowCell.val() == 0) {
+                    //    rowCell.val(value.Quantity);
+                    //    rowCell.text(value.Quantity);
+                    //    rowCell.removeClass('hidden');
+                    //}
+
+                    var rows = table.find('tr');
+                    $.each(rows, function (rowIndex, rowVal) {
+                        rowVal = table.find('tr').eq(rowIndex);
+                        if (rowIndex > 1 && rowVal.find('.item_id') != item_id) {
+                            var otherCell = rowVal.find(cls);
+                            if (otherCell != null && otherCell.val() == 0) {
+                                otherCell.val('0');
+                                otherCell.text('');
+                                otherCell.removeClass('hidden');
+                            }
+                        }
+                    });
+                });
+                if (historyHeader.attr('rowspan') == 1) {
+                    historyHeader.attr('colspan', current + 1);
+                    existCell = document.createElement("th");
+                    existCell.innerHTML = colHisHeader + (current + 0);
+                    existCell.className = 'se_' + (current + 1);
+                    second.append(existCell);
+                }
+            }
+            updateAllQtyByRow(currentRow);
+            //checkQty(currentRow);
+        }
+
+        function updateAllQtyByRow(row) {
+            var current_qty = row.find('.current_qty');
+            var received_qty = row.find('.received_qty');
+            var item_id = row.find('.item_id').val();
+            var qty = +(row.find('.request_qty').text());
+            var items = $.grep(receivedItems, function (e) { return e.ItemId == item_id });
+            $.each(items, function (i, value) {
+                var cell = row.find('.se_' + (i + 1));
+                if (cell != null && cell.val() == 0) {
+                    cell.val(value.Quantity);
+                    cell.text(value.Quantity);
+                }
+                qty -= value.Quantity;
+            });
+            qty -= received_qty.val();
+            current_qty.val(received_qty.val());
+            current_qty.text(received_qty.val());
+            row.find('.remain_qty').val(qty);
+            row.find('.remain_qty').text(qty);
+        }
+
+        function clearHistoryHeader() {
+            $('#secondheader').find('th').remove();
+            $('#historyHeader').attr('rowspan', 2);
+            $('#historyHeader').attr('colspan', 1);           
+        }
+
+        function checkQty(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var requestQty = $('#itemReceiveTable tr').eq(ind).find('label.request_qty').text();
+            var receiveQty = $('#itemReceiveTable tr').eq(ind).find('input.received_qty').val();
+            var requestedUnit = $('#itemReceiveTable tr').eq(ind).find('input.request_unit').val();
+            var receivedUnit = $('#itemReceiveTable tr').eq(ind).find('select.received-unit').val();
+            var unitLevel = $('#itemReceiveTable tr').eq(ind).find('input.unit_level').val();
+            if (!receivedUnit)
+                return;
+            var spitReceiveUnit = receivedUnit.split(',');
+            if (requestedUnit == spitReceiveUnit[0]) {
+                console.log(requestedUnit);
+                if (receiveQty && (Number(receiveQty) > Number(requestQty))) {
+                    alert('Receive Qty must be smaller or equal to quantity.');
+                    $('#itemReceiveTable tr').eq(ind).find('input.received_qty').focus();
+                    $('#itemReceiveTable tr').eq(ind).find('input.received_qty').val(0);
+                    return;
+                }
+            }
+            else if (unitLevel == 0) {
+                console.log(unitLevel);
+                var quantity = 0;
+                var selectedIndex = $('#itemReceiveTable tr').eq(ind).find('select.received-unit').prop('selectedIndex')
+                if (receiveQty) {
+                    if (selectedIndex == 0) {
+
+                    }
+                    if (selectedIndex == 1) {
+                        var splitElement = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(selectedIndex).val().split(',');
+                        quantity = receiveQty / splitElement[1];
+
+                    }
+                    else if (selectedIndex == 2) {
+                        var splitElement = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(2).val().split(',');
+                        quantity = (receiveQty / splitElement[1]) / splitElement2[1];
+
+                    }
+                    else if (selectedIndex == 3) {
+                        var splitElement = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(2).val().split(',');
+                        var splitElement3 = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(3).val().split(',');
+                        quantity = ((receiveQty / splitElement[1]) / splitElement3[1]) / splitElement2[1];
+                    }
+                    else if (selectedIndex == 4) {
+                        var splitElement = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(2).val().split(',');
+                        var splitElement3 = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(3).val().split(',');
+                        var splitElement4 = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(4).val().split(',');
+                        quantity = ((((receiveQty / splitElement[1]) / splitElement4[1]) / splitElement3[1]) / splitElement2[1]);
+                    }
+                    else if (selectedIndex == 5) {
+                        var splitElement = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(2).val().split(',');
+                        var splitElement3 = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(3).val().split(',');
+                        var splitElement4 = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(4).val().split(',');
+                        var splitElement5 = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(5).val().split(',');
+                        quantity = ((((receiveQty / splitElement[1]) / splitElement5[1]) / splitElement4[1]) / splitElement3[1]) / splitElement2;
+                    }
+
+                    if (quantity > Number(requestQty)) {
+                        alert('Receive quantity must be smaller or equal to quantity.', { className: 'error' });
+                        $('#itemReceiveTable tr').eq(ind).find('input.received_qty').focus();
+                        $('#itemReceiveTable tr').eq(ind).find('input.received_qty').val(0);
+                        return;
+                    }
+                }
+
+            }
+
+
+            else {
+                var quantity = 0;
+                var selectedIndex = $('#itemReceiveTable tr').eq(ind).find('select.received-unit').prop('selectedIndex');
+                if (receiveQty) {
+                    if (selectedIndex == 0) {
+                        alert("small unit");
+                    }
+                }
+            }
+
+
+        }
+
+        function enable_submit_button(is_submit) {
+            if (is_submit) {
+                $('#btnCreate').text("Submitting...");
+                $('#btnCreate').attr('disabled', true);
+            } else {
+                $('#btnCreate').text("Submit");
+                $('#btnCreate').attr('disabled', false);
+            }
+        }
+
+</script>
+}
+
+            @*/*
+//************************************************************
+            // new add
+            if (!receivedUnit)
+                return;
+            var spitReceiveUnit = receivedUnit.split(',');
+            if (requestedUnit != spitReceiveUnit[0]) {
+               //console.log(requestedUnit);
+                if (receiveQty && (Number(receiveQty) < Number(requestQty))) {            
+                    alert('Receive Qty not equal to quantity.');
+                    $('#itemReceiveTable tr').eq(ind).find('input.received_qty').focus();
+                    $('#itemReceiveTable tr').eq(ind).find('input.received_qty').val(0);
+                    return;
+                }
+            } else {
+                var quantity = 0;
+                var selectedIndex = $('#itemReceiveTable tr').eq(ind).find('select.received-unit').prop('selectedIndex');
+               
+                if (receiveQty) {
+                    if (selectedIndex == 0) {
+
+                    }
+                    if (selectedIndex == 1) {
+                        var splitElement = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(selectedIndex).val().split(',');
+                        quantity = receiveQty / splitElement[1];
+
+                    }
+                    else if (selectedIndex == 2) {
+                        var splitElement = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(2).val().split(',');
+                        quantity = (receiveQty / splitElement[1]) / splitElement2[1];
+
+                    }
+                    else if (selectedIndex == 3) {
+                        var splitElement = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(2).val().split(',');
+                        var splitElement3 = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(3).val().split(',');
+                        quantity = ((receiveQty / splitElement[1]) / splitElement3[1]) / splitElement2[1];
+                    }
+                    else if (selectedIndex == 4) {
+                        var splitElement = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(2).val().split(',');
+                        var splitElement3 = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(3).val().split(',');
+                        var splitElement4 = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(4).val().split(',');
+                        quantity = ((((receiveQty / splitElement[1]) / splitElement4[1]) / splitElement3[1]) / splitElement2[1]);
+                    } else if (selectedIndex == 5) {
+                        var splitElement = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(2).val().split(',');
+                        var splitElement3 = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(3).val().split(',');
+                        var splitElement4 = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(4).val().split(',');
+                        var splitElement5 = $('#itemReceiveTable tr').eq(ind).find('select.received-unit option').eq(5).val().split(',');
+                        quantity = ((((receiveQty / splitElement[1]) / splitElement5[1]) / splitElement4[1]) / splitElement3[1]) / splitElement2;
+                    }
+
+                    if (quantity > Number(requestQty)) {
+                        alert('Receive quantity must be smaller or equal to quantity.', { className: 'error' });
+                        $('#itemReceiveTable tr').eq(ind).find('input.received_qty').focus();
+                        $('#itemReceiveTable tr').eq(ind).find('input.received_qty').val(0);
+                        return;
+                    }
+                }
+
+            }
+         */
+
+            //new add*@
+     

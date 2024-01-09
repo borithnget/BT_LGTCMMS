@@ -1,0 +1,191 @@
+﻿@model BT_KimMex.Models.PurchaseRequisitionViewModel
+
+@{
+    ViewBag.Title = "Create";
+}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.min.css" rel="stylesheet" />
+<style type="text/css">
+    .jumbotron {
+        padding: 10px !important;
+        font-size: 14px !important;
+    }
+
+    tr th {
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+</style>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <h3 class="title">Create Purchase Requisition Request</h3>
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="col-md-4">Request Date:</label>
+                    <label class="col-md-8">@Convert.ToDateTime(DateTime.Now).ToString("dd/MM/yyyy")</label>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4">Purchase Requisition Number:</label>
+                    <label class="col-md-8">@ViewBag.PRNumber</label>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4">Project <span class="text-danger">*</span>:</label>
+                    <div class="col-md-8">
+                        @Html.DropDownList("project_id", new SelectList(BT_KimMex.Class.CommonClass.GetAllProject(), "project_id", "project_full_name"), "Select Project", new { @class = "form-control select2" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4">Material Request Ref. <span class="text-danger">*</span>:</label>
+                    <div class="col-md-8">
+                        @if (string.IsNullOrEmpty(Model.material_request_id))
+                        {
+                            <select class="form-control select2" id="material_request_id" name="material_request_id">
+                                <option>Select Material Request Reference</option>
+                            </select>
+                        }
+                        else
+                        {
+                            @Html.DropDownList("material_request_id", new SelectList(Model.materialRequests, "ir_id", "ir_no",Model.material_request_id), new { @class = "form-control select2" })
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6"> 
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="table">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Item Code</th>
+                            <th>Item Name</th>
+                            <th>Requested Qty</th>
+                            <th>Requested Unit</th>
+                            <th>Remain</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.materialRequestItems.Count() == 0)
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center">No Data Available</td>
+                            </tr>
+                        }else
+                        {
+                            int count = 1;
+                            foreach(var item in Model.materialRequestItems)
+                            {
+                                string rowId = "i" + count;
+                                string itemId = "item" + count;
+                                <tr id='@rowId'>
+                                            <td>@count</td>
+                                            <td><input type='hidden' name='item_id' class='item-id' value='@item.ir_item_id'/><label class='item-code' id='@itemId'>@item.product_code</label></td>
+                                            <td><label class='item-name'>@item.product_name</label></td>
+                                            <td class='text-center'>@item.ir_qty<input type='hidden' name='item_qty' value='@item.remain_qty'/></td>
+                                            <td>@item.requested_unit <input type='hidden' name='item_unit' value='@item.ir_item_unit'/></td>
+                                            <td class='text-center'>@item.remain_qty</td>
+                                        </tr>
+                                count++;
+                            }
+                        }
+
+
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+
+        <div class="row">
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Submit" id="btnCreate" class="btn btn-success" />
+                    <a href="javascript:history.back();" class="btn btn-danger">Back</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+
+            $('.select2').select2();
+
+            $('#project_id').on('change', function (e) {
+                e.preventDefault();
+                var projectId = $(this).val();
+                $('#material_request_id').empty().append("<option>Select Material Request Reference</option>");;
+                $('#table tbody').empty().append("<tr><td colspan='5' class='text-center'>No Item Data</td></tr>");
+                if (projectId) {
+                    $.ajax({
+                        url: '@Url.Action("GetItemRequestsbyProject", "PurchaseRequisition")',
+                        type: "get",
+                        dataType: "json",
+                        data: { id: projectId },
+                        success: function (da) {
+                            //console.log(da);
+                            $.each(da, function (index, item) {
+                                $('#material_request_id').append("<option value='" + item.ir_id + "'>" + item.ir_no + "</option>");
+                            });
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            console.log(XMLHttpRequest);
+                        }
+                    });
+                }
+
+            });
+
+            $('#material_request_id').change(function () {
+                var irID = $(this).val();
+                $('#table tbody').empty();
+                if (irID) {
+                    $.ajax({
+                        url: '@Url.Action("GetMaterialRequestListItemsJson", "ItemRequest")',
+                        type: "get",
+                        dataType: "json",
+                        data: { id: irID },
+                        success: function (da) {
+                            console.log(da);
+
+                            if (da.data.length > 0) {
+                                $.each(da.data, function (index, item) {
+                                    var rowNumber = index;
+                                    $('#table tbody').append("" +
+                                        "<tr id='i" + Number(Number(rowNumber) + 1) + "'>" +
+                                            "<td>" + Number(Number(rowNumber) + 1) + "</td>" +
+                                            "<td><input type='hidden' name='item_id' class='item-id' value='" + item.ir_item_id + "'/><label class='item-code' id='item" + Number(Number(rowNumber) + 1) + "'>" + item.product_code + "</label></td>" +
+                                            "<td><label class='item-name'>" + item.product_name + "</label></td>" +
+                                            "<td class='text-center'>" + item.remain_qty + "<input type='hidden' name='item_qty' value='" + item.remain_qty + "'/></td>" +
+                                            "<td>" + item.requested_unit + "<input type='hidden' name='item_unit' value='" + item.ir_item_unit + "'/></td>" +
+                                            "<td class='text-center'>" + item.remain_qty + "</td>" +
+                                            //"<td><input type='number' class='form-control unit-price' value='0' onchange='validateFloatKeyPress(this);' onKeyPress='if(this.value.length==8) return false;'/></td>" +
+                                            //"<td><input type='number' class='form-control discount' value='0'/></td>" +
+
+                                        "</tr>"
+                                        );
+                                });
+                            }
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            $('#quoteTable tbody ').empty();
+                        }
+                    });
+                }
+
+            });
+
+        });
+    </script>
+
+}

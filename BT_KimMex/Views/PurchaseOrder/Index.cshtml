@@ -1,0 +1,1329 @@
+﻿@using BT_KimMex.Class;
+@{
+    ViewBag.Title = "Index";
+    string status = string.Empty;
+    if (string.IsNullOrWhiteSpace(Request.QueryString["status"]))
+    {
+        status = string.Empty;
+    }
+    else
+    {
+        status = Request.QueryString["status"].ToString();
+    }
+}
+<style type="text/css">
+    #pending td:nth-child(6),#pending td:nth-child(7),#pending td:nth-child(8),#pending td:nth-child(9),#pending td:nth-child(10),#pending td:nth-child(11){
+        text-align:center;
+        vertical-align:middle;
+    }
+    #reject td:nth-child(6),#reject td:nth-child(7),#reject td:nth-child(8),#reject td:nth-child(9){
+        text-align:center;
+        vertical-align:middle;
+    }
+</style>
+<h3 class="title">Purchase Order List</h3>
+@*<div class="row">
+    <div class="form-group">
+        <label class="control-label col-md-2">Purchase Order Status:</label>
+        <div class="col-md-10">
+            <select class="form-control" id="p_status">
+                <option value="All" selected>All</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Checked by CFO</option>
+                <option value="Completed">Approved by Director</option>
+                <option value="Rejected">Rejected</option>
+               
+            </select>
+        </div>
+    </div>
+</div>
+<h1></h1>*@
+    <ul class="nav nav-tabs" id="Mytab">
+        <li class="nav-link"><a data-toggle="tab" href="#table_pending" id="tab_pending">Pending</a></li>
+        <li class=""><a data-toggle="tab" href="#table_approve" id="tab_approve">Approved</a></li>
+        <li class=""><a data-toggle="tab" href="#table_complete" id="tab_complete">Completed</a></li>
+        <li class=""><a data-toggle="tab" href="#table_reject" id="tab_reject">Rejected</a></li>
+    </ul>
+<div class="tab-content">  
+    <div id="table_pending" class="tab-pane fade in" style="margin-top:10px;">
+        <table class="table table-bordered" id="pending" >
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>PO List No</th>
+                    <th>PR No</th>
+                    <th>Project Name</th>
+                    <th>Status</th>
+                    <th>Approve</th>
+                    <th>Reject</th>
+                    <th>View</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                    @*<th>Cancel</th>
+                    <th>Generate</th>*@
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <div id="table_approve" class="tab-pane fade in" style="margin-top:10px;">
+        <table class="table table-bordered" id="approve">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>PO List No</th>
+                    <th>PR No</th>
+                    <th>Project Name</th>
+                    <th>Status</th>
+                    <th>PO with VAT</th>
+                    <th>PO with Non VAT</th>
+                    <th>Approve</th>
+                    <th>Reject</th>
+                    <th>View</th>
+                    @*<th>Cancel</th>*@
+                    <th>Generate</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <div id="table_complete" class="tab-pane fade in " style="margin-top:10px;">
+        <table class="table table-bordered" id="complete">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>PO List No</th>
+                    <th>PR No</th>
+                    <th>Project Name</th>
+                    <th>Status</th>
+                    <th>PO with VAT</th>
+                    <th>PO with Non VAT</th>
+                    <th>View</th>
+                    @*<th>Edit</th>
+                    <th>Delete</th>*@
+                    <th>Cancel</th>
+                    <th>Generate</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <div id="table_reject" class="tab-pane fade in" style="margin-top:10px;">
+        <table class="table table-bordered" id="reject">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>PO List No</th>
+                    <th>PR No</th>
+                    <th>Project Name</th>
+                    <th>Status</th>
+                    @*<th>Approve</th>
+                    <th>Reject</th>*@
+                    <th>View</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                    @*<th>Cancel</th>
+                    <th>Generate</th>*@
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+<!-- delete project modal popup-->
+<div class="modal fade" id="myModal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to delete this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default delete-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- approve project modal popup-->
+<div class="modal fade" id="approveModal" tabindex="=-1" role="dialog" aria-labelledby="approveModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-warning">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to <strong>Approve</strong> this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default approve-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                
+            </div>
+        </div>
+    </div>
+</div>
+<!-- reject project modal popup-->
+<div class="modal fade" id="rejectModal" tabindex="=-1" role="dialog" aria-labelledby="rejectModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to <strong>Reject</strong> this item?</p>
+                <label class="col-md-2">Comment:</label>
+                <div class="col-md-10">
+                    <textarea class="form-control" rows="5" id="reject-comment"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default reject-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- cancel project modal popup-->
+<div class="modal fade" id="cancelModal" tabindex="=-1" role="dialog" aria-labelledby="cancelModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to <strong>Cancel</strong> this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default cancel-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript" src="~/Scripts/custom/purchase_order.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            var isp;
+            var isPMSC = false;
+            var isDir = false;
+            var isAdmin = false;
+            var isCFO = false;
+            var po_id;
+            var role;
+
+            @if (User.IsInRole("Admin"))
+            {
+                <text>isAdmin = true;</text>
+            }
+            @if (User.IsInRole("Purchaser")|| User.IsInRole("Main Stock Controller"))
+            {
+                <text>isPMSC=true;</text>
+            }
+            @if (User.IsInRole("Chief of Finance Officer"))
+            {
+                <text>isCFO=true;</text>
+            }
+            @if (User.IsInRole("Site Manager"))
+            {
+                <text>isDir = true;</text>
+            }
+
+            PurchaseOrder.InitialPurchaseOrderDataTable("Pending", isAdmin, isPMSC, isCFO, isDir);
+            PurchaseOrder.InitialPurchaseOrderDataTable("Approved", isAdmin, isPMSC, isCFO, isDir);
+            PurchaseOrder.InitialPurchaseOrderDataTable("Completed", isAdmin, isPMSC, isCFO, isDir);
+            PurchaseOrder.InitialPurchaseOrderDataTable("Rejected", isAdmin, isPMSC, isCFO, isDir);
+
+            if (isAdmin || (isAdmin && string.Compare(status, "Approved") == 0)) {
+                $("#tab_pending").closest('li').addClass('active');
+                $("#table_pending").addClass('active');
+            }
+            if (isPMSC) {
+                $("#tab_pending").closest('li').addClass('active');
+                $("#table_pending").addClass('active');
+                $("#tab_approve").hide();
+            }
+            if (isCFO) {
+                $("#tab_pending").closest('li').addClass('active');
+                $("#table_pending").addClass('active');
+                $("#tab_approve").hide();
+            }
+            if (isDir || (isDir && string.Compare(status, "Approved") == 0)){
+                $("#tab_approve").closest('li').addClass('active');
+                $("#table_approve").addClass('active');
+                $("#tab_pending").hide();
+            }
+            
+
+
+            @*@if (User.IsInRole("Admin"))
+            {
+                <text>isAdmin = true;
+                    $("tab_pending").closest('li').addClass('active');
+                    $("#table_pending").addClass('active');
+                    $("#approve").width('100%');
+                    $("#reject").width('100%');
+                    $("#complete").width('100%');
+                </text>
+            }
+            @if (!string.IsNullOrEmpty(status))
+            {
+                <text>
+                    initial_datatable('@status', isAdmin, true);
+                    $('#p_status').val('@status');
+                </text>
+            }
+            else
+            {
+                if (User.IsInRole("Purchaser")||User.IsInRole("Main Stock Controller"))
+                {
+                        <text>
+                            isp = true;
+                            $("#pending").width('100%');
+                            $("#complete").width('100%');
+                            $("#reject").width('100%');
+                            $("#tab_approve").hide();
+                            $("#table_pending").addClass('active');
+                            $("#tab_pending").closest('li').addClass('active');
+                            initial_datatable("All", isAdmin, false);
+                            // $('#reject_filter').append('<a href="@Url.Action("Create","PurchaseOrder")" class="btn btn-default pull-left" style="margin-right:10px float:right !important;">Add New</a>');
+                            //   $('#complete_filter').append('<a href="@Url.Action("Create","PurchaseOrder")" class="btn btn-default pull-left" style="margin-right:10px float:right !important;">Add New</a>');
+                        </text>
+                }
+                else
+                {
+                    <text>
+                        isp = false;
+                        initial_datatable("All",isAdmin,true);
+                    </text>
+                }
+            }
+
+            @if (User.IsInRole("Director"))
+            {
+                <text>
+                    $("#tab_pending").hide();
+                    $("#approve").width('100%');
+                    $("#complete").width('100%');
+                    $("#reject").width('100%');
+                    $("#table_approve").addClass('active');
+                    $("#tab_approve").closest('li').addClass('active');
+                    isDir = true;
+                </text>
+            }
+            @if (User.IsInRole("Chief of Finance Officer"))
+            {
+                <text>
+                    $("#tab_approve").hide();
+                    $("#pending").width('100%');
+                    $("#complete").width('100%');
+                    $("#reject").width('100%');
+                    $("#table_pending").addClass('active');
+                    $("#tab_pending").closest('li').addClass('active');
+                    isCFO = true;
+                </text>
+            }
+            if (isAdmin || isp) {
+                $('#pending_filter').append('<a href="@Url.Action("Create","PurchaseOrder")" class="btn btn-default pull-left" style="margin-right:10px float:right !important;">Add New</a>');
+                $('#approve_filter').append('<a href="@Url.Action("Create","PurchaseOrder")" class="btn btn-default pull-left" style="margin-right:10px float:right !important;">Add New</a>');
+                $('#complete_filter').append('<a href="@Url.Action("Create","PurchaseOrder")" class="btn btn-default pull-left" style="margin-right:10px float:right !important;">Add New</a>');
+                $('#reject_filter').append('<a href="@Url.Action("Create","PurchaseOrder")" class="btn btn-default pull-left" style="margin-right:10px float:right !important;">Add New</a>');
+
+            }*@
+            $('#pending tbody').on('click', 'td a.delete-promp', function () {
+                po_id = $(this).attr('id');
+                $('#myModal').modal('show');
+            });
+            $('#reject tbody').on('click', 'td a.delete-promp', function () {
+                po_id = $(this).attr('id');
+                $('#myModal').modal('show');
+            });
+            $('.delete-confirm').click(function () {
+                if (po_id != '') {
+                    $.ajax({
+                        url: "/PurchaseOrder/Delete",
+                        data: {
+                            'id': po_id,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#myModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been deleted!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "PurchaseOrder")';
+                            }
+                            else if (da.Message == "fail")
+                                $.notify('Your data has been error while deleting!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while deleting!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+            $('#pending tbody').on('click', 'td a.approve-promp', function () {
+                po_id = $(this).attr('id');
+                $('#approveModal').modal('show');
+            });
+            $('.approve-confirm').click(function () {
+                if (po_id != '') {
+                    $.ajax({
+                        url: "/PurchaseOrder/ApprovedByCFO",
+                        data: {
+                            'id': po_id,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#approveModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been approved!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index","PurchaseOrder")';
+                            }
+                            else
+                                $.notify('Your data has been error while approving!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.approve-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while approving!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+            //new add
+
+            $('#approve tbody').on('click', 'td a.reject-promp', function () {
+                po_id = $(this).attr('id');
+                if (isCFO)
+                    role = "Chief of Finance Officer";
+                else if (isDir)
+                    role = "Director";
+                $('#rejectModal').modal('show');
+            });
+            //new add
+
+            $('#pending tbody').on('click', 'td a.reject-promp', function () {
+                po_id = $(this).attr('id');
+                if (isCFO)
+                    role = "Chief of Finance Officer";
+                else if (isDir)
+                    role = "Director";
+                $('#rejectModal').modal('show');
+            });
+            $('.reject-confirm').click(function () {
+                if (po_id != '') {
+                    var rejectComment = $('#reject-comment').val();
+                    $.ajax({
+                        url: "/PurchaseOrder/RejectedByCFO",
+                        data: {
+                            'id': po_id,
+                            'role': role,
+                            'comment': rejectComment,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#rejectModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been rejected!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "PurchaseOrder")';
+                            }
+                            else
+                                $.notify('Your data has been error while rejecting!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.approve-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while rejecting!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+            $('#pending tbody').on('click', 'td a.cancel-promp', function () {
+                po_id = $(this).attr('id');
+                if (isCFO)
+                    role = "Chief of Finance Officer";
+                $('#cancelModal').modal('show');
+            });
+            $('.cancel-confirm').click(function () {
+                if (po_id != '') {
+                    $.ajax({
+                        url: "/PurchaseOrder/Cancel",
+                        data: {
+                            'id': po_id,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#rejectModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been cancelled!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "PurchaseOrder")';
+                            }
+                            else
+                                $.notify('Your data has been error while cancelling!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.approve-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while cancelling!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+            $('#p_status').change(function () {
+                var boq_status = $(this).val();
+                if (boq_status != null || boq_status != "")
+                    if (isp)
+                        initial_datatable(boq_status, isAdmin, false);
+                    else
+                        initial_datatable(boq_status, isAdmin, true);
+            });
+        });
+        var PurchaseOrder = {
+            InitialPurchaseOrderDataTable: function (status, isAdmin, isPurchaser, isCFO, isDirector) {
+                if (status == "Pending") {
+                    //alert(isAdmin+" "+isPurchaser+" "+isCFO+" "+isDirector)
+                    $("#pending").width('100%');
+                    var t;
+                    if (isAdmin || (isPurchaser && isCFO)) {
+                        t = $('#pending').DataTable({
+                            "bDestroy": true,
+                            "ajax": {
+                                //"url": "@Url.Action("GetPurchasseOrderDataTable", "PurchaseOrder")",
+                                "url": "/PurchaseOrder/GetPurchasseOrderDataTable",
+                                "type": "GET",
+                                "dataType": "json",
+                                "data": { po_status: status },
+                            },
+                            "columns": [
+                                { "data": "purchase_order_id" },
+                                {
+                                    "data": "created_date", render: function (data, type, full, meta) {
+                                        return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                                    }
+                                },
+                                { "data": "purchase_oder_number" },
+                                { "data": "ir_no" },
+                                { "data": "project_full_name" },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Pending")
+                                            return '<label style="color:orange !important;">' + full.purchase_order_status + '</label>';
+                                        else if (full.purchase_order_status == "Approved")
+                                            return '<label style="color:blue !important;">Checked by CFO</label>';
+                                        else if (full.purchase_order_status == "Completed")
+                                            return '<label style="color:green !important;">Approved by Director</label>';
+                                        else if (full.purchase_order_status == "Rejected")
+                                            return '<label style="color:gray !important;">' + full.purchase_order_status + '</label>';
+                                        else if (full.purchase_order_status == "Cancelled")
+                                            return '<label style="color:gray !important;">' + full.purchase_order_status + '</label>';
+
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Completed" || full.purchase_order_status == "Rejected" || full.purchase_order_status == "Cancelled") {
+                                            return "";
+                                        } else {
+                                            if (!isDirector && (full.purchase_order_status != "Approved")) {
+                                                return '<a href="/PurchaseOrder/Approve/' + full.purchase_order_id + '">Approve</a>';
+                                            }
+                                            else if (isDirector && full.purchase_order_status == "Approved") {
+                                                return '<a href="/PurchaseOrder/DirectorApprove/' + full.purchase_order_id + '">Approve</a>';
+                                            }
+                                            else {
+                                                return '';
+                                            }
+                                        }
+
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Completed" || full.purchase_order_status == "Rejected" || full.purchase_order_status == "Cancelled") {
+                                            return "";
+                                        } else {
+                                            if (!isDirector && (full.purchase_order_status != "Approved"))
+                                                return '<a href="javascript:void(0)" id="' + full.purchase_order_id + '" class="reject-promp">Reject</a>';
+                                            else if (isDirector && full.purchase_order_status == "Approved") {
+                                                return '<a href="javascript:void(0)" id="' + full.purchase_order_id + '" class="reject-promp">Reject</a>';
+                                            }
+                                            else
+                                                return '';
+                                        }
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        return '<a href="/PurchaseOrder/Detail/' + full.purchase_order_id + '">View Detail</a>';
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Completed" || full.purchase_order_status == "Rejected")
+                                            return "";
+                                        if (isDirector && full.purchase_order_status == "Pending")
+                                            return "";
+                                        if (isCFO && (full.purchase_order_status == "Approved" || full.purchase_order_status == "Rejected"))
+                                            return "";
+                                        return '<a href="/PurchaseOrder/Edit/' + full.purchase_order_id + '">Edit</a>';
+                                        //return '';
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Completed" || full.purchase_order_status == "Rejected")
+                                            return "";
+                                        if (isDirector && full.purchase_order_status == "Pending")
+                                            return "";
+                                        if (isCFO && (full.purchase_order_status == "Approved" || full.purchase_order_status == "Rejected"))
+                                            return "";
+                                        return '<a href="javascript:void(0)" id="' + full.purchase_order_id + '" class="delete-promp">Delete</a>';
+                                    }
+                                },
+
+                            ],
+                            "order": [[2, "desc"]],
+                            //"columnDefs": [
+                            //    {
+                            //        "targets": [9],
+                            //        "visible": false,
+                            //    },
+                            //    {
+                            //        "targets": [10],
+                            //        "visible": false,
+                            //    }
+                            //]
+                        });
+                        $('#pending_filter').append('<a href="@Url.Action("Create", "PurchaseOrder")" class="btn btn-default pull-left" style="margin-right:10px; float:left !important;">Add New</a>');
+                    }
+                    else if (isPurchaser) {
+                        t = $('#pending').DataTable({
+                            "bDestroy": true,
+                            "ajax": {
+                                //"url": "@Url.Action("GetPurchasseOrderDataTable", "PurchaseOrder")",
+                                "url": "/PurchaseOrder/GetPurchasseOrderDataTable",
+                                "type": "GET",
+                                "dataType": "json",
+                                "data": { po_status: status },
+                            },
+                            "columns": [
+                                { "data": "purchase_order_id" },
+                                {
+                                    "data": "created_date", render: function (data, type, full, meta) {
+                                        return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                                    }
+                                },
+                                { "data": "purchase_oder_number" },
+                                { "data": "ir_no" },
+                                { "data": "project_full_name" },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Pending")
+                                            return '<label style="color:orange !important;">' + full.purchase_order_status + '</label>';
+                                        else if (full.purchase_order_status == "Approved")
+                                            return '<label style="color:blue !important;">Checked by CFO</label>';
+                                        else if (full.purchase_order_status == "Completed")
+                                            return '<label style="color:green !important;">Approved by Director</label>';
+                                        else if (full.purchase_order_status == "Rejected")
+                                            return '<label style="color:gray !important;">' + full.purchase_order_status + '</label>';
+                                        else if (full.purchase_order_status == "Cancelled")
+                                            return '<label style="color:gray !important;">' + full.purchase_order_status + '</label>';
+
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Completed" || full.purchase_order_status == "Rejected" || full.purchase_order_status == "Cancelled") {
+                                            return "";
+                                        } else {
+                                            if (!isDirector && (full.purchase_order_status != "Approved")) {
+                                                return '<a href="/PurchaseOrder/Approve/' + full.purchase_order_id + '">Approve</a>';
+                                            }
+                                            else if (isDirector && full.purchase_order_status == "Approved") {
+                                                return '<a href="/PurchaseOrder/DirectorApprove/' + full.purchase_order_id + '">Approve</a>';
+                                            }
+                                            else {
+                                                return '';
+                                            }
+                                        }
+
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Completed" || full.purchase_order_status == "Rejected" || full.purchase_order_status == "Cancelled") {
+                                            return "";
+                                        } else {
+                                            if (!isDirector && (full.purchase_order_status != "Approved"))
+                                                return '<a href="javascript:void(0)" id="' + full.purchase_order_id + '" class="reject-promp">Reject</a>';
+                                            else if (isDirector && full.purchase_order_status == "Approved") {
+                                                return '<a href="javascript:void(0)" id="' + full.purchase_order_id + '" class="reject-promp">Reject</a>';
+                                            }
+                                            else
+                                                return '';
+                                        }
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        return '<a href="/PurchaseOrder/Detail/' + full.purchase_order_id + '">View Detail</a>';
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Completed" || full.purchase_order_status == "Rejected")
+                                            return "";
+                                        if (isDirector && full.purchase_order_status == "Pending")
+                                            return "";
+                                        if (isCFO && (full.purchase_order_status == "Approved" || full.purchase_order_status == "Rejected"))
+                                            return "";
+                                        return '<a href="/PurchaseOrder/Edit/' + full.purchase_order_id + '">Edit</a>';
+                                        //return '';
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Completed" || full.purchase_order_status == "Rejected")
+                                            return "";
+                                        if (isDirector && full.purchase_order_status == "Pending")
+                                            return "";
+                                        if (isCFO && (full.purchase_order_status == "Approved" || full.purchase_order_status == "Rejected"))
+                                            return "";
+                                        return '<a href="javascript:void(0)" id="' + full.purchase_order_id + '" class="delete-promp">Delete</a>';
+                                    }
+                                },
+
+                            ],
+                            "order": [[2, "desc"]],
+                            "columnDefs": [
+                                {
+                                    "targets": [6],
+                                    "visible": false,
+                                },
+                                {
+                                    "targets": [7],
+                                    "visible": false,
+                                }
+                            ]
+                        });
+                        $('#pending_filter').append('<a href="@Url.Action("Create", "PurchaseOrder")" class="btn btn-default pull-left" style="margin-right:10px; float:left !important;">Add New</a>');
+                    } else {
+                        t = $('#pending').DataTable({
+                            "bDestroy": true,
+                            "ajax": {
+                                //"url": "@Url.Action("GetPurchasseOrderDataTable", "PurchaseOrder")",
+                                "url": "/PurchaseOrder/GetPurchasseOrderDataTable",
+                                "type": "GET",
+                                "dataType": "json",
+                                "data": { po_status: status },
+                            },
+                            "columns": [
+                                { "data": "purchase_order_id" },
+                                {
+                                    "data": "created_date", render: function (data, type, full, meta) {
+                                        return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                                    }
+                                },
+                                { "data": "purchase_oder_number" },
+                                { "data": "ir_no" },
+                                { "data": "project_full_name" },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Pending")
+                                            return '<label style="color:orange !important;">' + full.purchase_order_status + '</label>';
+                                        else if (full.purchase_order_status == "Approved")
+                                            return '<label style="color:blue !important;">Checked by CFO</label>';
+                                        else if (full.purchase_order_status == "Completed")
+                                            return '<label style="color:green !important;">Approved by Director</label>';
+                                        else if (full.purchase_order_status == "Rejected")
+                                            return '<label style="color:gray !important;">' + full.purchase_order_status + '</label>';
+                                        else if (full.purchase_order_status == "Cancelled")
+                                            return '<label style="color:gray !important;">' + full.purchase_order_status + '</label>';
+
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Completed" || full.purchase_order_status == "Rejected" || full.purchase_order_status == "Cancelled") {
+                                            return "";
+                                        } else {
+                                            if (!isDirector && (full.purchase_order_status != "Approved")) {
+                                                return '<a href="/PurchaseOrder/Approve/' + full.purchase_order_id + '">Approve</a>';
+                                            }
+                                            else if (isDirector && full.purchase_order_status == "Approved") {
+                                                return '<a href="/PurchaseOrder/DirectorApprove/' + full.purchase_order_id + '">Approve</a>';
+                                            }
+                                            else {
+                                                return '';
+                                            }
+                                        }
+
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Completed" || full.purchase_order_status == "Rejected" || full.purchase_order_status == "Cancelled") {
+                                            return "";
+                                        } else {
+                                            if (!isDirector && (full.purchase_order_status != "Approved"))
+                                                return '<a href="javascript:void(0)" id="' + full.purchase_order_id + '" class="reject-promp">Reject</a>';
+                                            else if (isDirector && full.purchase_order_status == "Approved") {
+                                                return '<a href="javascript:void(0)" id="' + full.purchase_order_id + '" class="reject-promp">Reject</a>';
+                                            }
+                                            else
+                                                return '';
+                                        }
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        return '<a href="/PurchaseOrder/Detail/' + full.purchase_order_id + '">View Detail</a>';
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Completed" || full.purchase_order_status == "Rejected")
+                                            return "";
+                                        if (isDirector && full.purchase_order_status == "Pending")
+                                            return "";
+                                        if (isCFO && (full.purchase_order_status == "Approved" || full.purchase_order_status == "Rejected"))
+                                            return "";
+                                        return '<a href="/PurchaseOrder/Edit/' + full.purchase_order_id + '">Edit</a>';
+                                        //return '';
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Completed" || full.purchase_order_status == "Rejected")
+                                            return "";
+                                        if (isDirector && full.purchase_order_status == "Pending")
+                                            return "";
+                                        if (isCFO && (full.purchase_order_status == "Approved" || full.purchase_order_status == "Rejected"))
+                                            return "";
+                                        return '<a href="javascript:void(0)" id="' + full.purchase_order_id + '" class="delete-promp">Delete</a>';
+                                    }
+                                },
+
+                            ],
+                            "order": [[2, "desc"]],
+                            "columnDefs": [
+                                {
+                                    "targets": [9],
+                                    "visible": false,
+                                },
+                                {
+                                    "targets": [10],
+                                    "visible": false,
+                                }
+                            ]
+                        });
+                    }
+                    if (t) {
+                        t.on('order.dt search.dt', function () {
+                            t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                                cell.innerHTML = i + 1;
+                            });
+                        }).draw();
+                        $('select[name="pending_length"]').addClass('datatable-control');
+                        $('input[aria-controls="pending"]').addClass('datatable-control');
+                    }
+                } else if (status == "Approved") {
+                    var t;
+                    $("#approve").width('100%');
+                    t = $('#approve').DataTable({
+                        "bDestroy": true,
+                        "ajax": {
+                            //"url": "@Url.Action("GetPurchasseOrderDataTable", "PurchaseOrder")",
+                            "url": "/PurchaseOrder/GetPurchasseOrderDataTable",
+                            "type": "GET",
+                            "dataType": "json",
+                            "data": { po_status: status },
+                        },
+                        "columns": [
+                            { "data": "purchase_order_id" },
+                            {
+                                "data": "created_date", render: function (data, type, full, meta) {
+                                    return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                                }
+                            },
+                            { "data": "purchase_oder_number" },
+                            { "data": "ir_no" },
+                            { "data": "project_full_name" },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    if (full.purchase_order_status == "Pending")
+                                        return '<label style="color:orange !important;">' + full.purchase_order_status + '</label>';
+                                    else if (full.purchase_order_status == "Approved")
+                                        return '<label style="color:blue !important;">Checked by CFO</label>';
+                                    else if (full.purchase_order_status == "Completed")
+                                        return '<label style="color:green !important;">Approved by Director</label>';
+                                    else if (full.purchase_order_status == "Rejected")
+                                        return '<label style="color:gray !important;">' + full.purchase_order_status + '</label>';
+                                    else if (full.purchase_order_status == "Cancelled")
+                                        return '<label style="color:gray !important;">' + full.purchase_order_status + '</label>';
+
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    var VATNumber = '';
+                                    for (var i = 0; i < full.ReportNumberVAT.length; i++) {
+                                        VATNumber = VATNumber + full.ReportNumberVAT[i] + ", ";
+                                    }
+                                    return VATNumber;
+
+                                }
+                            },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        var VATNumber = '';
+                                        for (var i = 0; i < full.ReportNumberNonVAT.length; i++) {
+                                            VATNumber = VATNumber + full.ReportNumberNonVAT[i] + ", ";
+                                        }
+                                        return VATNumber;
+                                    }
+                                },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    if (full.purchase_order_status == "Completed" || full.purchase_order_status == "Rejected" || full.purchase_order_status == "Cancelled") {
+                                        return "";
+                                    } else {
+                                        if (!isDirector && (full.purchase_order_status != "Approved")) {
+                                            return '<a href="/PurchaseOrder/Approve/' + full.purchase_order_id + '">Approve</a>';
+                                        }
+                                        else if (full.purchase_order_status == "Approved") {
+                                            return '<a href="/PurchaseOrder/DirectorApprove/' + full.purchase_order_id + '">Approve</a>';
+                                        }
+                                        else {
+                                            return '';
+                                        }
+                                    }
+
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    if (full.purchase_order_status == "Completed" || full.purchase_order_status == "Rejected" || full.purchase_order_status == "Cancelled") {
+                                        return "";
+                                    } else {
+                                        if (!isDirector && (full.purchase_order_status != "Approved"))
+                                            return '<a href="javascript:void(0)" id="' + full.purchase_order_id + '" class="reject-promp">Reject</a>';
+                                        else if (full.purchase_order_status == "Approved") {
+                                            return '<a href="javascript:void(0)" id="' + full.purchase_order_id + '" class="reject-promp">Reject</a>';
+                                        }
+                                        else
+                                            return '';
+                                    }
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    return '<a href="/PurchaseOrder/Detail/' + full.purchase_order_id + '">View Detail</a>';
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+
+                                    if (full.purchase_order_status == "Completed" || full.purchase_order_status == "Approved")
+                                        return '<a href="/PurchaseOrder/GenerateReport/' + full.purchase_order_id + '">Generate</a>';
+                                    else
+                                        return '';
+
+                                }
+                            }
+
+                        ],
+                        "order": [[2, "desc"]],
+                    });
+                    if (t) {
+                        t.on('order.dt search.dt', function () {
+                            t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                                cell.innerHTML = i + 1;
+                            });
+                        }).draw();
+                        $('select[name="approve_length"]').addClass('datatable-control');
+                        $('input[aria-controls="approve"]').addClass('datatable-control');
+                    }
+                } else if (status == "Completed") {
+                    var t;
+                    $("#complete").width('100%');
+                    if (isAdmin || isCFO) {
+                        t = $('#complete').DataTable({
+                            "bDestroy": true,
+                            "ajax": {
+                                //"url": "@Url.Action("GetPurchasseOrderDataTable", "PurchaseOrder")",
+                                "url": "/PurchaseOrder/GetPurchasseOrderDataTable",
+                                "type": "GET",
+                                "dataType": "json",
+                                "data": { po_status: status },
+                            },
+                            "columns": [
+                                { "data": "purchase_order_id" },
+                                {
+                                    "data": "created_date", render: function (data, type, full, meta) {
+                                        return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                                    }
+                                },
+                                { "data": "purchase_oder_number" },
+                                { "data": "ir_no" },
+                                { "data": "project_full_name" },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Pending")
+                                            return '<label style="color:orange !important;">' + full.purchase_order_status + '</label>';
+                                        else if (full.purchase_order_status == "Approved")
+                                            return '<label style="color:blue !important;">Checked by CFO</label>';
+                                        else if (full.purchase_order_status == "Completed")
+                                            return '<label style="color:green !important;">Approved by Director</label>';
+                                        else if (full.purchase_order_status == "Rejected")
+                                            return '<label style="color:gray !important;">' + full.purchase_order_status + '</label>';
+                                        else if (full.purchase_order_status == "Cancelled")
+                                            return '<label style="color:gray !important;">' + full.purchase_order_status + '</label>';
+
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        var VATNumber = '';
+                                        for (var i = 0; i < full.ReportNumberVAT.length; i++) {
+                                            VATNumber = VATNumber + full.ReportNumberVAT[i] + ", ";
+                                        }
+                                        return VATNumber;
+
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        var VATNumber = '';
+                                        for (var i = 0; i < full.ReportNumberNonVAT.length; i++) {
+                                            VATNumber = VATNumber + full.ReportNumberNonVAT[i] + ", ";
+                                        }
+                                        return VATNumber;
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        return '<a href="/PurchaseOrder/Detail/' + full.purchase_order_id + '">View Detail</a>';
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Completed")
+                                            return '<a href="/PurchaseOrder/Cancel/' + full.purchase_order_id + '">Cancel</a>';
+                                        else
+                                            return '';
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+
+                                        if (full.purchase_order_status == "Completed" || full.purchase_order_status == "Approved")
+                                            return '<a href="/PurchaseOrder/GenerateReport/' + full.purchase_order_id + '">Generate</a>';
+                                        else
+                                            return '';
+
+                                    }
+                                }
+
+                            ],
+                            "order": [[2, "desc"]],
+                            //"columnDefs": [
+                            //    {
+                            //        "targets": [9],
+                            //        "visible": false,
+                            //    },
+                            //    {
+                            //        "targets": [10],
+                            //        "visible": false,
+                            //    }
+                            //]
+                        });
+                    } else {
+                        t = $('#complete').DataTable({
+                            "bDestroy": true,
+                            "ajax": {
+                                //"url": "@Url.Action("GetPurchasseOrderDataTable", "PurchaseOrder")",
+                                "url": "/PurchaseOrder/GetPurchasseOrderDataTable",
+                                "type": "GET",
+                                "dataType": "json",
+                                "data": { po_status: status },
+                            },
+                            "columns": [
+                                { "data": "purchase_order_id" },
+                                {
+                                    "data": "created_date", render: function (data, type, full, meta) {
+                                        return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                                    }
+                                },
+                                { "data": "purchase_oder_number" },
+                                { "data": "ir_no" },
+                                { "data": "project_full_name" },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Pending")
+                                            return '<label style="color:orange !important;">' + full.purchase_order_status + '</label>';
+                                        else if (full.purchase_order_status == "Approved")
+                                            return '<label style="color:blue !important;">Checked by CFO</label>';
+                                        else if (full.purchase_order_status == "Completed")
+                                            return '<label style="color:green !important;">Approved by Director</label>';
+                                        else if (full.purchase_order_status == "Rejected")
+                                            return '<label style="color:gray !important;">' + full.purchase_order_status + '</label>';
+                                        else if (full.purchase_order_status == "Cancelled")
+                                            return '<label style="color:gray !important;">' + full.purchase_order_status + '</label>';
+
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        var VATNumber = '';
+                                        for (var i = 0; i < full.ReportNumberVAT.length; i++) {
+                                            VATNumber = VATNumber + full.ReportNumberVAT[i] + ", ";
+                                        }
+                                        return VATNumber;
+
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        var VATNumber = '';
+                                        for (var i = 0; i < full.ReportNumberNonVAT.length; i++) {
+                                            VATNumber = VATNumber + full.ReportNumberNonVAT[i] + ", ";
+                                        }
+                                        return VATNumber;
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        return '<a href="/PurchaseOrder/Detail/' + full.purchase_order_id + '">View Detail</a>';
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Completed")
+                                            return '<a href="/PurchaseOrder/Cancel/' + full.purchase_order_id + '">Cancel</a>';
+                                        else
+                                            return '';
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+
+                                        if (full.purchase_order_status == "Completed" || full.purchase_order_status == "Approved")
+                                            return '<a href="/PurchaseOrder/GenerateReport/' + full.purchase_order_id + '">Generate</a>';
+                                        else
+                                            return '';
+
+                                    }
+                                }
+
+                            ],
+                            "order": [[2, "desc"]],
+                            "columnDefs": [
+                                {
+                                    "targets": [9],
+                                    "visible": false,
+                                },
+                            ]
+                        });
+                    }
+                    if (t) {
+                        t.on('order.dt search.dt', function () {
+                            t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                                cell.innerHTML = i + 1;
+                            });
+                        }).draw();
+                        $('select[name="complete_length"]').addClass('datatable-control');
+                        $('input[aria-controls="complete"]').addClass('datatable-control');
+                    }
+                } else if (status == "Rejected") {
+                    var t;
+                    $("#reject").width('100%');
+                    if (isAdmin || isPurchaser) {
+                        t = $('#reject').DataTable({
+                            "bDestroy": true,
+                            "ajax": {
+                                //"url": '@Url.Action("GetPurchasseOrderDataTable", "PurchaseOrder")',
+                                "url": "/PurchaseOrder/GetPurchasseOrderDataTable",
+                                "type": "GET",
+                                "dataType": "json",
+                                "data": { po_status: status },
+                            },
+                            "columns": [
+                                { "data": "purchase_order_id" },
+                                {
+                                    "data": "created_date", render: function (data, type, full, meta) {
+                                        return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                                    }
+                                },
+                                { "data": "purchase_oder_number" },
+                                { "data": "ir_no" },
+                                { "data": "project_full_name" },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Pending")
+                                            return '<label style="color:orange !important;">' + full.purchase_order_status + '</label>';
+                                        else if (full.purchase_order_status == "Approved")
+                                            return '<label style="color:blue !important;">Checked by CFO</label>';
+                                        else if (full.purchase_order_status == "Completed")
+                                            return '<label style="color:green !important;">Approved by Director</label>';
+                                        else if (full.purchase_order_status == "Rejected")
+                                            return '<label style="color:gray !important;">' + full.purchase_order_status + '</label>';
+                                        else if (full.purchase_order_status == "Cancelled")
+                                            return '<label style="color:gray !important;">' + full.purchase_order_status + '</label>';
+
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        return '<a href="/PurchaseOrder/Detail/' + full.purchase_order_id + '">View Detail</a>';
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Pending" || full.purchase_order_status == "Rejected")
+                                            return '<a href="/PurchaseOrder/Edit/' + full.purchase_order_id + '">Edit</a>';
+                                        return '';
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Pending" || full.purchase_order_status == "Rejected")
+                                            return '<a href="javascript:void(0)" id="' + full.purchase_order_id + '" class="delete-promp">Delete</a>';
+                                        return "";
+
+                                    }
+                                }
+                            ],
+                            "order": [[2, "desc"]],
+                        });
+                    }
+                    else if (isAdmin || isCFO || isDirector) {
+                        t = $('#reject').DataTable({
+                            "bDestroy": true,
+                            "ajax": {
+                                //"url": '@Url.Action("GetPurchasseOrderDataTable", "PurchaseOrder")',
+                                "url": "/PurchaseOrder/GetPurchasseOrderDataTable",
+                                "type": "GET",
+                                "dataType": "json",
+                                "data": { po_status: status },
+                            },
+                            "columns": [
+                                { "data": "purchase_order_id" },
+                                {
+                                    "data": "created_date", render: function (data, type, full, meta) {
+                                        return getFormattedDateMMDDYYYY(new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)));
+                                    }
+                                },
+                                { "data": "purchase_oder_number" },
+                                { "data": "ir_no" },
+                                { "data": "project_full_name" },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Pending")
+                                            return '<label style="color:orange !important;">' + full.purchase_order_status + '</label>';
+                                        else if (full.purchase_order_status == "Approved")
+                                            return '<label style="color:blue !important;">Checked by CFO</label>';
+                                        else if (full.purchase_order_status == "Completed")
+                                            return '<label style="color:green !important;">Approved by Director</label>';
+                                        else if (full.purchase_order_status == "Rejected")
+                                            return '<label style="color:gray !important;">' + full.purchase_order_status + '</label>';
+                                        else if (full.purchase_order_status == "Cancelled")
+                                            return '<label style="color:gray !important;">' + full.purchase_order_status + '</label>';
+
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        return '<a href="/PurchaseOrder/Detail/' + full.purchase_order_id + '">View Detail</a>';
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Pending" || full.purchase_order_status == "Rejected")
+                                            return '<a href="/PurchaseOrder/Edit/' + full.purchase_order_id + '">Edit</a>';
+                                        return '';
+                                    }
+                                },
+                                {
+                                    "render": function (data, type, full, meta) {
+                                        if (full.purchase_order_status == "Pending" || full.purchase_order_status == "Rejected")
+                                            return '<a href="javascript:void(0)" id="' + full.purchase_order_id + '" class="delete-promp">Delete</a>';
+                                        return "";
+
+                                    }
+                                }
+                            ],
+                            "order": [[2, "desc"]],
+                            "columnDefs": [
+                                    {
+                                        "targets": [7],
+                                        "visible": false,
+                                    },
+                                    {
+                                        "targets": [8],
+                                        "visible": false,
+                                    },
+
+                            ]
+                        });
+                    }
+                    if (t) {
+                        t.on('order.dt search.dt', function () {
+                            t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                                cell.innerHTML = i + 1;
+                            });
+                        }).draw();
+                        $('select[name="reject_length"]').addClass('datatable-control');
+                        $('input[aria-controls="reject"]').addClass('datatable-control');
+                    }
+                }
+            },
+        };
+    </script>
+    
+    }
+

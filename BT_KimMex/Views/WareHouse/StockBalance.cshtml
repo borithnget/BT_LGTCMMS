@@ -1,0 +1,99 @@
+﻿@model IEnumerable<BT_KimMex.Models.InventoryDetailViewModel>
+@{
+    ViewBag.Title = "StockBalance";
+}
+
+<h3 class="title">View Stock Balance</h3>
+<div class="row">
+    <div class="form-group" style="margin-bottom:5px !important;">
+        <label class="control-label col-md-2">Filter by Warehouse :</label>
+        <div class="col-md-10">
+            @Html.DropDownList("warehouse_id", ViewBag.Warehouse as SelectList, "All", new { @class="form-control"})
+        </div>
+    </div>
+</div>
+<table class="table table-bordered" id="stockBalanceTable" style="margin-top:0px !important;">
+    <thead>
+        <tr>
+            <th>No.</th>
+            @*<th>Item Type Name</th>*@
+            <th>Item Code</th>
+            <th>Item Name</th>
+            <th>Item Unit</th>
+            <th>Stock Balance</th>
+            @*<th>Amount</th>*@
+        </tr>
+    </thead>
+    <tbody>
+        
+        @*@{ 
+            int count = 1;
+            foreach(var item in Model)
+            {
+                <tr>
+                    <td>@count</td>
+                    <td>@item.itemTypeName</td>
+                    <td>@item.itemCode</td>
+                    <td>@item.itemName</td>
+                    <td>@item.itemUnit</td>
+                    <td>@item.quantity</td>
+                </tr>
+                count++;
+            }
+        }*@
+    </tbody>
+</table>
+
+@section Scripts{
+
+    <script>
+
+    </script>
+
+
+    <script type="text/javascript">
+        $(function () {
+            //initialStockBalanceDataTable("All");
+            $("#stockBalanceTable").DataTable({});
+            $('#warehouse_id').change(function () {
+                var warehouse_id = $(this).val();
+                if (warehouse_id == null || warehouse_id == "")
+                    initialStockBalanceDataTable("All");
+                else
+                    initialStockBalanceDataTable(warehouse_id);
+            });
+
+            function initialStockBalanceDataTable(warehouser_id) {
+                var t=$("#stockBalanceTable").DataTable({
+                    "bDestroy": true,
+                    "ajax": {
+                        "url": "@Url.Action("StockBalananceDataTable", "WareHouse")",
+                        "type": "GET",
+                        "dataType": "json",
+                        "data": { warehouse_id: warehouser_id },
+                    },
+                    "columns": [
+                        { "data": "itemTypeId" },
+                        //{ "data": "itemTypeName" },
+                        { "data": "itemCode" },
+                        { "data": "itemName" },
+                        { "data": "unitName" },
+                        { "data": "quantity" },
+                        //{"data":"unit_price"},
+                    ],
+                    "order": [[2, "asc"]],
+                });
+                t.on('order.dt search.dt', function () {
+                    t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                        cell.innerHTML = i + 1;
+                    });
+                }).draw();
+                $('select[name="stockBalanceTable_length"]').addClass('datatable-control');
+                $('input[aria-controls="stockBalanceTable"]').addClass('datatable-control');
+            }
+
+            $('.dataTables_filter').append('<a href="@Url.Action("ImportStockBalance", "WareHouse")" class="btn btn-default pull-left" style="margin-right:5px; margin-bottom:5px !important;">Import StockBalance</a>');
+        });
+    </script>
+    }
+

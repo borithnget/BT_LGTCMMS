@@ -1,0 +1,86 @@
+﻿@model BT_KimMex.Models.PurchaseOrderReport
+@{
+    ViewBag.Title = "Purchase Order Report";
+    string currentDate = DateTime.Now.ToString("MM/dd/yyyy");
+    int isFinance = ViewBag.Id;
+}
+
+<div class="w3-panel w3-card-4">
+    <div class="w3-container w3-display-container">
+        <h3 class="title">@ViewBag.Title</h3>
+    </div>
+    <div class="w3-container w3-display-container">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <input type="hidden" name="isFinance" value="@isFinance" id="isFinance"/>
+                <div class="form-group">
+                    <label class="col-md-2">From Date <strong style="color:red !important">*</strong>:</label>
+                    <div class="col-md-4">
+                        <div class="input-group date" data-provide="datepicker" style="width:280px !important;">
+                            @Html.EditorFor(model => model.dateFrom, new { htmlAttributes = new { @class = "form-control", placeholder = "MM/DD/YYYY" } })
+                            <div class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </div>
+                        </div>
+                        @Html.ValidationMessageFor(model => model.dateFrom, "", new { @class = "text-danger" })
+                    </div>
+                    <label class="col-md-2">To Date <strong style="color:red !important">*</strong>:</label>
+                    <div class="col-md-4">
+                        <div class="input-group date" data-provide="datepicker" style="width:280px !important;">
+                            @Html.EditorFor(model => model.dateTo, new { htmlAttributes = new { @class = "form-control", placeholder = "MM/DD/YYYY" } })
+                            <div class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </div>
+                        </div>
+                        @Html.ValidationMessageFor(model => model.dateTo, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.project_id, new { @class = "col-md-2" })
+                    <div class="col-md-4">
+                        @Html.DropDownList("project_id", ViewBag.Projects as SelectList, "All", new { @class = "form-control select2" })
+                    </div>
+                    @Html.LabelFor(model => model.poSuppplier, new { @class = "col-md-2" })
+                    <div class="col-md-4">
+                        @Html.DropDownList("poSuppplier", ViewBag.Suppliers as SelectList, "All", new { @class = "form-control select2" })
+                    </div>
+                </div>
+
+                @*<div class="form-group">
+                    @Html.LabelFor(model => model.poStatus, new { @class = "col-md-2" })
+                    <div class="col-md-4">
+                        <select class="form-control" name="poStatus">
+                            <option value="All" selected>All</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                </div>*@
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Generate to Excel" class="btn btn-success" />
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('#dateFrom').val('@currentDate');
+            $('#dateTo').val('@currentDate');
+            $('.select2').select2();
+
+        });
+    </script>
+    }
+
+

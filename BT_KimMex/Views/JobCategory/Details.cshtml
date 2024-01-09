@@ -1,0 +1,49 @@
+﻿@model BT_KimMex.Models.JobCategoryViewModel
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h3>View Job Category Detail</h3>
+
+<div>
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayName("Date:")
+        </dt>
+
+        <dd>
+            <label id="date"></label>
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.j_category_name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.j_category_name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.j_description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.j_description)
+        </dd>
+        <dt>
+
+        </dt>
+        <dd>
+            @Html.ActionLink("Edit", "Edit", "JobCategory", new { id = Model.j_category_id }, new { @class="btn btn-default"})
+            <a href="@Url.Action("Index","JobCategory")" class="btn btn-default">Back</a>
+        </dd>
+    </dl>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('#date').text(getFormattedDateMMDDYYYY(new Date('@Model.created_date')));
+        });
+    </script>
+    }
+

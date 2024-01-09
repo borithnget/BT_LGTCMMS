@@ -1,0 +1,1122 @@
+﻿@model BT_KimMex.Models.PurchaseOrderReportGenerateModel
+    @using BT_KimMex.Models;
+@using MoreLinq;
+@{
+    Layout = null;
+    string OPONONTITLE = Model.is_local ? string.Empty : Model.is_vat ? string.Empty : "ORDER FROM";
+    string TITLE = Model.is_local ? "LOCAL PURCHASE ORDER" : Model.is_vat ? "PURCHASE ORDER" : string.Empty;
+    string vatNumber = Model.is_vat ? Model.vat_number : "0";
+
+    //MR Part
+    string expectedDeliveryDate = string.Empty;
+    if (Model.materialRequest.expected_delivery_date.HasValue)
+    {
+        expectedDeliveryDate = Convert.ToDateTime(Model.materialRequest.expected_delivery_date).ToString("dd-MMM-yy");
+    }
+
+    //Quote
+    decimal totalAmountPerRequest = 0;
+    decimal totalAmount = 0;
+    int colspanfoot = Model.quote.supplierQuotes.Count() * 4;
+    string quoteApprovedDate = string.IsNullOrEmpty(Model.quote.approved_by) ? string.Empty : @Convert.ToDateTime(Model.quote.approved_date).ToString("dd-MM-yyyy");
+
+
+    BT_KimMex.Entities.kim_mexEntities db = new BT_KimMex.Entities.kim_mexEntities();
+    string host = HttpContext.Current.Request.Url.Authority;
+    string domainName = HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Authority);
+
+    string prefixDomainName = string.Compare(domainName, "lgtss.com") == 0? "https://" : string.Compare(domainName, "training.lgtss.com") == 0 ? "http://":string.Empty;
+
+        }    
+
+
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>ExportExcel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/TableExport/5.2.0/css/tableexport.min.css" integrity="sha512-QNApdXD0OM7mWwz9n+xCNgjfkYe7Usw17xroPYOtsnVQqTQfardTXrrUWyvkcpkmYaeVn3KS0ps0BLbV59KCQg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+
+
+    <!-- PO Report-->
+    @if (Model.isPO)
+    {
+        <table width="100%" style="border-collapse: collapse; " id="table" border="1" cellspacing="5" cellpadding="5" data-SheetName="Purchase Order">
+            @if (Model.is_vat)
+            {
+                <tr>
+                    <td colspan="3"><img src="https://lgtss.com/Assets/images/lotusgreeenteam.png" style="height:100px; width:300px; margin-top:10px; " /></td>
+                    <td colspan="7"></td>
+                </tr>
+                <tr>
+                    <td colspan="10"><h3></h3></td>
+                </tr>
+                <tr>
+                    <td colspan="10"><h3></h3></td>
+                </tr>
+            }
+            <tr>
+                <td colspan="6"><h3 style="font-family:Century Gothic;color:green;font-style:italic; font-size:35px;">@OPONONTITLE</h3></td>
+                <td colspan="3"></td>
+                <td colspan="4"><h3 style="font-family:Century Gothic;color:green;font-style:italic; font-size:35px;">@TITLE</h3></td>
+            </tr>
+            <!-- Start Header Information -->
+            <tr>
+                <td colspan="11"></td>
+            </tr>
+            <tr>
+                <td colspan="6" style="font-size:30px !important; font-family:Century Gothic;font-size:12px;text-align:left;">VENDOR</td>
+                <td colspan="3"></td>
+                <td colspan="4" style="font-size:30px !important; font-family:Century Gothic;font-size:12px;text-align:left;">REFERENCE</td>
+            </tr>
+            <tr>
+                <td colspan="4" style="border-top: 1px solid #000000;border-left: 1px solid #000000;border-right: 1px solid #000000;border-collapse: collapse; font-family:Century Gothic;font-size:27px !important;text-align:left">@Model.SupplierName</td>
+                <td colspan="5"></td>
+                <td colspan="2" style="border-top:1px solid #000000; border-left: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left;">P. Order No.</td>
+                <td colspan="2" style="border-top:1px solid #000000; border-right: 1px solid #000000; border-collapse: collapse; font-family:Century Gothic;font-size:27px;text-align:left">:@Model.purchaseOrderNumber</td>
+            </tr>
+            <tr>
+                <td colspan="4" style="border-left: 1px solid #000000;border-right: 1px solid #000000;border-collapse: collapse; font-family:Century Gothic;font-size:27px;text-align:left">@Model.SupplierAddress</td>
+                <td colspan="5"></td>
+                <td colspan="2" style="border-left: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left">Date</td>
+                <td colspan="2" style="border-right: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left">:@Model.CreatedAt</td>
+            </tr>
+            <tr>
+                <td colspan="4" style="border-left: 1px solid #000000;border-right: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left">Attn.:</td>
+                <td colspan="5"></td>
+                <td colspan="2" style="border-left: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left">Project</td>
+                <td colspan="2" style="border-right: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left">:@Model.projectshortname</td>
+            </tr>
+            <tr>
+                <td colspan="4" style="border-left: 1px solid #000000;border-right: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left">H/P:@Model.SupplierTelephone</td>
+                <td colspan="5" style="font-family:Century Gothic;font-size:27px;text-align:left"></td>
+                <td colspan="2" style="border-left: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left">S. Order No</td>
+                <td colspan="2" style="border-right: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left">:@Model.soNo</td>
+            </tr>
+            <tr>
+                <td colspan="4" style="border-bottom: 1px solid #000000;border-left: 1px solid #000000;border-right: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left">Email:@Model.SupplierEmail</td>
+                <td colspan="5"></td>
+                <td colspan="2" style="border-bottom: 1px solid #000000;border-left: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left">MR No.</td>
+                <td colspan="2" style="border-bottom: 1px solid #000000;border-right: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left">:@Model.ir_noMR</td>
+            </tr>
+
+            <tr>
+                <td colspan="6" style="font-family:Century Gothic;font-size:30px;text-align:left;">SHIP TO</td>
+                <td colspan="5"></td>
+            </tr>
+            @if (Model.is_vat)
+            {
+                <tr>
+                    <td colspan="4" style="border-top: 1px solid #000000;border-left:1px solid #000000; border-right : 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left;font-weight:bold;">LOTUS GREEN TEAM CO., LTD</td>
+                    <td colspan="7"></td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="border-left:1px solid #000000; border-right : 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left;font-weight:bold;">VAT No.: L001-105012696</td>
+                    <td colspan="7"></td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="border-left:1px solid #000000; border-right : 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left;">#24, Street 552, Phum 10 Sangkat Boeung Kak 1 Khan Toul Kork, Phnom Penh 120407, Cambodia</td>
+                    <td colspan="7"></td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="border-left:1px solid #000000; border-right : 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left;">Tel.Fax: +855 23 881 370 / +855 23 880 930</td>
+                    <td colspan="7"></td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="border-left:1px solid #000000; border-right : 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left;">Email: info@lotusgreenteam.com</td>
+                    <td colspan="7"></td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="border-bottom: 1px solid #000000; border-left:1px solid #000000;border-right: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left;">Consignee: Lotus Green Team</td>
+                    <td colspan="7"></td>
+                </tr>
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4" style="border-top : 1px solid #000000;border-left:1px solid #000000; border-right : 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left;font-weight:bold;">Delivery  : Mr. @Model.SMFullName </td>
+                    <td colspan="7"></td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="border-bottom:1px solid #000000; border-left:1px solid #000000; border-right : 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left;font-weight:bold;">Tel:</td>
+                    <td colspan="7"></td>
+                </tr>
+            }
+
+
+            <!-- End Header Information -->
+            <!-- Start Item Table -->
+            <tr>
+                <td colspan="11"><h1></h1></td>
+            </tr>
+            <tr>
+                <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">Item</td>
+                <td colspan="2" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">Description</td>
+                <td colspan="2" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">Brand</td>
+                <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">P/N</td>
+                <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">Picture</td>
+                <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">Qty</td>
+                <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">Unit</td>
+                <td colspan="2" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">Unit Price USD</td>
+                <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">Dis. %</td>
+                <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">Amount USD</td>
+            </tr>
+            @{
+                int count = 1;
+                foreach (var item in Model.poItems)
+                {
+                    <tr style="line-height: 50px;">
+                        <td style="border: thin solid #000000;-webkit-background-clip: padding-box;background-clip: padding-box;border-collapse: collapse; font-family:Century Gothic; font-size:27px;text-align:center; vertical-align:middle;">@count</td>
+                        <td colspan="2" style="line-height: 50px;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left; vertical-align:middle;"><br /> @Html.Raw(string.Format("{0}<br/><br/>", item.ItemName))</td>
+                        <td colspan="2" style="border:thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left; vertical-align:middle;">@item.brand</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left; vertical-align:middle;">@item.ItemCode</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right; vertical-align:middle;"></td>
+                        <td style="border: thin solid #000000;border-collapse: collapse; font-family:Century Gothic; font-size:27px;text-align:center; vertical-align:middle;">@item.POQquantity</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:left; vertical-align:middle;">@item.ItemUnit</td>
+                        <td colspan="2" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;vertical-align:middle; mso-number-format:'#,##0.000' ">@item.UnitPrice</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;vertical-align:middle; mso-number-format:'#,##0.000' ">@item.Discount</td>
+                        <td style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;vertical-align:middle; mso-number-format:'#,##0.000'">@item.Amount</td>
+                    </tr>
+                    count++;
+                }
+                @*<tr>
+                        <td​ colspan="11" style="vertical-align:middle; border: thin solid #000000;border-collapse: collapse; font-family:Century Gothic;font-size:27px;text-align:right;font-weight:bold;">Total purchasing amount in USD</td​>
+                        <td style="vertical-align:middle;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right; font-weight:bold; mso-number-format:'#,##0.000'">@Model.SubTotal</td>
+                    </tr>*@
+                <tr>
+                    <td colspan="12" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;font-weight:bold;vertical-align:middle;">Total purchasing amount in USD</td>
+                    <td style="vertical-align:middle;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic; font-size:27px;text-align:right;font-weight: bold; mso-number-format:'#,##0.000'"><br />@Model.AmountBeforeDiscount</td>
+                </tr>
+                <tr>
+                    <td colspan="12" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;font-weight:bold;vertical-align:middle;">Discount</td>
+                    <td style="vertical-align:middle;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic; font-size:27px;text-align:right;font-weight: bold; mso-number-format:'#,##0.000'"><br />@Model.LumpSumDiscountAmount</td>
+                </tr>
+
+                <tr>
+                    <td colspan="12" style="border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;font-weight:bold;vertical-align:middle;">Total purchasing amount after discount in USD</td>
+                    <td style="vertical-align:middle;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic; font-size:27px;text-align:right;font-weight: bold; mso-number-format:'#,##0.000'"><br />@Model.SubTotal</td>
+                </tr>
+                <tr>
+                    <td colspan="12" style="vertical-align:middle;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:right;font-weight:bold;">Total amount VAT @vatNumber% in USD</td>
+                    <td style="vertical-align:middle;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic; font-size:27px;text-align:right;font-weight: bold; mso-number-format:'#,##0.000'">@Model.VAT</td>
+                </tr>
+                <tr>
+                    <td colspan="12" style="vertical-align:middle;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic; font-size:27px;text-align:right;font-weight:bold;">Total purchasing amount after @vatNumber% in USD</td>
+                    <td style="vertical-align:middle;border: thin solid #000000;border-collapse: collapse;font-family:Century Gothic; font-size:27px;text-align:right;font-weight:bold; mso-number-format:'#,##0.000'">@Model.GrandTotal</td>
+                </tr>
+            }
+            <!--End ITem Table-->
+            <!-- Start Supplier T&C-->
+            <tr>
+                <td colspan="13"><h1></h1></td>
+            </tr>
+            <tr>
+                <td colspan="9" style="border-right: 1px solid #000000;border-left: 1px solid #000000;border-top: 1px solid #000000;border-collapse: collapse; font-family:Century Gothic; font-size:27px;text-align:left;font-weight:bold;">TERMS & CONDITIONS</td>
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td colspan="9" style="border-collapse: collapse;border-right: 1px solid #000000;border-left: 1px solid #000000;font-family:Century Gothic;font-size:27px;text-align:left;">1- Incoterm: @Model.incoterm</td>
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td colspan="9" style="border-collapse: collapse;border-right: 1px solid #000000;border-left: 1px solid #000000;font-family:Century Gothic;font-size:27px;text-align:left;">2- Payment: @Model.payment</td>
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td colspan="9" style="border-collapse: collapse;border-right: 1px solid #000000;border-left: 1px solid #000000;font-family:Century Gothic;font-size:27px;text-align:left;">3- Delivery: @Model.delivery</td>
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td colspan="9" style="border-collapse: collapse;border-right: 1px solid #000000;border-left: 1px solid #000000;font-family:Century Gothic;font-size:27px;text-align:left;">4- Shipment: @Model.shipment</td>
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td colspan="9" style="border-collapse: collapse;border-right: 1px solid #000000;border-left: 1px solid #000000;font-family:Century Gothic;font-size:27px;text-align:left;">5- Warranty: @Model.warranty</td>
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td colspan="9" style="border-collapse: collapse;border-right: 1px solid #000000;border-left: 1px solid #000000;font-family:Century Gothic;font-size:27px;text-align:left;">6- Vendor Ref: @Model.vendor_ref</td>
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td colspan="9" style="border-collapse: collapse;border-right: 1px solid #000000;border-left: 1px solid #000000;border-bottom: 1px solid #000000;"></td>
+                <td colspan="4"></td>
+            </tr>
+            <!-- End Supplier T&C-->
+            <!-- Start Signature-->
+
+            <tr>
+                <td colspan="13"><h1></h1></td>
+            </tr>
+            <tr>
+                <td colspan="13"><h1></h1></td>
+            </tr>
+            @if (Model.isSignature)
+            {
+                string POCreatedBySignature = string.Format("{0}{1}", prefixDomainName, Model.createdBySignature);
+                string POCheckedBySignature = string.Format("{0}{1}", prefixDomainName, Model.checkedBySignature);
+                string POApprovedBySignature = string.Format("{0}{1}", prefixDomainName, Model.approvedBySignature);
+                <tr>
+                    <td></td>
+                    <td colspan="2" style="font-family:Century Gothic;font-size:27px;text-align:center;"><img src="@POCreatedBySignature" style="margin-top: 10px; object-fit: cover;" width="200" height="150" /></td>
+
+                    <td></td>
+                    <td colspan="4" style="font-family:Century Gothic;font-size:27px;text-align:center;"><img src="@POCheckedBySignature" style="height: 50px !important; width: 50px !important; margin-top: 10px; object-fit: cover;" width="200" height="150" /></td>
+                    <td></td>
+                    <td colspan="4" style="font-family:Century Gothic;font-size:27px;text-align:center;"><img src="@POApprovedBySignature" style="height: 50px !important; width: 50px !important; margin-top: 10px; object-fit: cover;" width="200" height="150" /></td>
+                </tr>
+            }
+            else
+            {
+                <tr>
+                    <td colspan="13"><h1></h1></td>
+                </tr>
+
+            }
+
+
+            <tr>
+                <td colspan="13"><h1></h1></td>
+            </tr>
+            <tr>
+
+                <td colspan="2" style="border-top: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">Acknowledge by</td>
+                <td></td>
+                <td></td>
+                <td colspan="4" style="border-top: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">Operation/Service Director</td>
+                <td></td>
+                <td colspan="4" style="border-top: 1px solid #000000;border-collapse: collapse;font-family:Century Gothic;font-size:27px;text-align:center;font-weight:bold;">Finance/Account Manager</td>
+            </tr>
+            <tr>
+
+                <td colspan="2" style="font-family:Century Gothic;font-size:27px;text-align:center;">@Model.PreparedBy</td>
+                <td></td>
+                <td></td>
+                <td colspan="4" style="font-family:Century Gothic;font-size:27px;text-align:center;">@Model.CheckedBy</td>
+                <td></td>
+                <td colspan="4" style="font-family:Century Gothic;font-size:27px;text-align:center;">@Model.ApprovedBy</td>
+            </tr>
+
+
+
+            <!-- End Signature-->
+
+        </table>
+    }
+
+
+
+
+    <!-- START QUOTE SECTION-->
+    @if (Model.isQuote)
+    {
+        var selectedSupplier = Model.quote.supplierQuotes.Where(s => s.is_quote_selected == true).ToList();
+        var prId = Model.quote.item_request_id;
+
+        <table width="100%" style="border-collapse: collapse; " id="table2" border="1" cellspacing="5" cellpadding="5" data-SheetName="Quote">
+            @foreach (var supplier in selectedSupplier)
+            {
+                var supplierQuoteAttachments = QuoteViewModel.GetSupplierQuoteByPRAndSupplier(prId, supplier.supplier_id).attachments;
+                foreach (var attachment in supplierQuoteAttachments)
+                {
+                    if (Model.isSignature)
+                    {
+                        if (BT_KimMex.Class.CommonClass.isFileIsImageByExtenstion(attachment.attachment_extension))
+                        {
+                            var file_path = string.Format("http://{0}/Documents/Attachment/{1}_watermark{2}", host, attachment.attachment_id, attachment.attachment_extension);
+                            <tr>
+                                <td><img src="@file_path" width="100%" @*style="height:100px; width:300px; margin-top:10px; "*@ /></td>
+                            </tr>
+                        }
+                        else if (string.Compare(attachment.attachment_extension, ".pdf") == 0)
+                        {
+                            var pdfAttachments = BT_KimMex.Class.Inventory.GetAttachments(attachment.attachment_id);
+                            <tr>
+                                @foreach (var pdfAtt in pdfAttachments)
+                                {
+                                    var file_path = string.Format("http://{0}/Documents/Attachment/{1}_watermark{2}", host, pdfAtt.attachment_id, pdfAtt.attachment_extension);
+                                    System.Drawing.Image image = System.Drawing.Image.FromFile(pdfAtt.attachment_path);
+                                    var height = string.Format("{0}px", image.Height * 2);
+                                    var width = string.Format("{0}px", image.Width * 2);
+
+                                    <td style="width:@width"><img src="@file_path" width="100%" @*style="height:100px; width:300px; margin-top:10px; "*@ /><br /></td>
+
+                                }
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        if (BT_KimMex.Class.CommonClass.isFileIsImageByExtenstion(attachment.attachment_extension))
+                        {
+                            var file_path = string.Format("http://{0}/Documents/Attachment/{1}{2}", host, attachment.attachment_id, attachment.attachment_extension);
+                            <tr>
+                                <td><img src="@file_path" width="100%" @*style="height:100px; width:300px; margin-top:10px; "*@ /></td>
+                            </tr>
+                        }
+                        else if (string.Compare(attachment.attachment_extension, ".pdf") == 0)
+                        {
+                            var pdfAttachments = BT_KimMex.Class.Inventory.GetAttachments(attachment.attachment_id);
+                            <tr>
+                                @foreach (var pdfAtt in pdfAttachments)
+                                {
+                                    var file_path = string.Format("http://{0}/Documents/Attachment/{1}{2}", host, pdfAtt.attachment_id, pdfAtt.attachment_extension);
+                                    System.Drawing.Image image = System.Drawing.Image.FromFile(pdfAtt.attachment_path);
+                                    var width = string.Format("{0}px", image.Width * 2);
+                                    <td style="width:@width"><img src="@file_path" width="100%" @*style="height:100px; width:300px; margin-top:10px; "*@ /><br /></td>
+                                }
+                            </tr>
+
+
+                        }
+                    }
+                }
+            }
+        </table>
+
+        @*<table width="100%" style="border-collapse: collapse; " id="table2" border="1" cellspacing="5" cellpadding="5" data-SheetName="Quote">
+                <tr>
+                    <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align:center; vertical-align:middle; " rowspan="2"><h5>No.</h5></td>
+                    <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; " rowspan="2"><h5>Item Code</h5></td>
+                    <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; " rowspan="2"><h5>Item Name</h5></td>
+                    <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; " rowspan="2"><h5>QTY</h5></td>
+                    <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; " rowspan="2"><h5>Unit</h5></td>
+                    @foreach (var supplier in Model.quote.supplierQuotes)
+                    {
+                        <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; " colspan="4"><h5>@supplier.supplier_name</h5></td>
+                    }
+                    <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; background-color:yellow; " colspan="6"><h5>Selected Supplier</h5></td>
+                    <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; " rowspan="2"><h5>Total</h5></td>
+                    <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; " rowspan="2"><h5>Remark</h5></td>
+                    <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; " rowspan="2"><h5>Status</h5></td>
+                </tr>
+                <tr>
+                    @foreach (var supplier in Model.quote.supplierQuotes.OrderBy(s => s.supplier_name))
+                    {
+                        <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; "><h5>VAT @Convert.ToDecimal(supplier.discount).ToString("G2") %</h5></td>
+
+                        <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; "><h5>Dis. (%)</h5></td>
+                        <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; "><h5>Unit Price</h5></td>
+                        <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; "><h5>T&C</h5></td>
+                    }
+                    <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; "><h5>VAT</h5></td>
+                    <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; "><h5>Name</h5></td>
+                    <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; "><h5>Dis.(%)</h5></td>
+                    <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; "><h5>Unit Price</h5></td>
+                    <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; "><h5>PO QTY</h5></td>
+                    <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; "><h5>PO Unit</h5></td>
+                </tr>
+
+                @foreach (var item in Model.quote.poDetails.Select((x, i) => new { x, i }))
+                {
+                    var value = item.x;
+                    string requestQty = string.Format("{0:G29}", decimal.Parse(value.quantity.ToString()));
+
+                    var selectedSupplier = value.poSuppliers.Where(s => s.is_selected == true).FirstOrDefault();
+                    string poQty = string.Format("{0:G29}", decimal.Parse(value.po_quantity.ToString()));
+                    string poUnit = string.IsNullOrEmpty(value.po_unit) ? "" : db.tb_unit.Find(value.po_unit).Name;
+                    decimal total = Convert.ToDecimal(selectedSupplier.unit_price * value.po_quantity);
+                    string itemTotalAmount = string.Format("{0:N4}", decimal.Parse(total.ToString()));
+
+                    <tr>
+                        <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; ">@(item.i+1)</td>
+                        <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; ">@value.product_code</td>
+                        <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: left; vertical-align: middle; ">@value.product_name</td>
+                        <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; ">@requestQty</td>
+                        <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; ">@value.item_unit</td>
+                        @foreach (var sup in value.poSuppliers.OrderBy(s => s.supplier_name).ToList())
+                        {
+                            var supplierQuote = Model.quote.supplierQuotes.Where(s => string.Compare(s.supplier_id, sup.supplier_id) == 0).FirstOrDefault();
+                            <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; ">
+                                @Convert.ToDecimal(supplierQuote.discount).ToString("G2") %
+                            </td>
+
+                            <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; ">@Convert.ToDecimal(sup.discount_percentage).ToString("N4")</td>
+                            <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; ">@Convert.ToDecimal(sup.original_price).ToString("N4")</td>
+                            <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: left; vertical-align: middle; ">
+                                <span>Incoterms: @sup.incoterm</span><br />
+                                <span>Payment: @sup.payment</span><br />
+                                <span>Delivery: @sup.delivery</span><br />
+                                <span>Shipment: @sup.shipment</span><br />
+                                <span>Wanrranty: @sup.warranty</span><br />
+                                <span>Vendor Ref.:@sup.vendor_ref</span>
+                            </td>
+                        }
+
+                        <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; "></td>
+                        <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; ">@selectedSupplier.supplier_name</td>
+                        <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; ">@selectedSupplier.discount_percentage</td>
+                        <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; ">@selectedSupplier.original_price</td>
+                        <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; ">@poQty</td>
+                        <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; ">@poUnit</td>
+                        <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; ">@itemTotalAmount</td>
+                        <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; ">@selectedSupplier.Reason</td>
+                        <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; ">@value.item_status</td>
+                    </tr>
+                    if (Convert.ToBoolean(selectedSupplier.vat))
+                    {
+                        var vatamount = Convert.ToDecimal(selectedSupplier.discount / 100);
+                        totalAmount = totalAmount + Convert.ToDecimal(selectedSupplier.unit_price * value.po_quantity) + (Convert.ToDecimal(selectedSupplier.unit_price * value.po_quantity) * vatamount);
+                    }
+                    else
+                    {
+                        totalAmount = totalAmount + Convert.ToDecimal(selectedSupplier.unit_price * value.po_quantity);
+                    }
+                }
+                <!-- Sub Total VAT/Non VAT by supplier -->
+                <!--<tr>
+                    <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; " colspan="5">Sub Total VAT/NON VAT (USD):</td>
+                    @foreach (var sup in Model.quote.supplierQuotes)
+                    {
+                        BT_KimMex.Models.QuoteBySupplierAmountModel obj = PurchaseOrderViewModel.QuoteAmountBySupplier(Model.quote.purchase_order_id, sup, Model.quote.purchase_order_status);
+                        <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; " colspan="2">@string.Format("{0:N4}", decimal.Parse(obj.VATAmount.ToString()))</td>
+                        <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; " colspan="2">@string.Format("{0:N4}", decimal.Parse(obj.NONVATAmount.ToString()))</td>
+                    }
+                    <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; " colspan="6"></td>
+                    <td style="font-family: Source Sans Pro; border: thin solid #000000; padding: 10px; text-align: center; vertical-align: middle; " colspan="3"></td>
+                </tr>-->
+
+                <!-- Total Amount Per supplier -->
+                <!--<tr>
+                    <td colspan="5" style="font-family: Source Sans Pro; border: thin solid #000000; text-align: center; vertical-align: middle; ">Total Amount per Supplier (USD):</td>
+                    @foreach (var sup in Model.quote.supplierQuotes)
+                    {
+                        decimal totalAmountPerSupplier = PurchaseOrderViewModel.QuoteAmountBySupplier(Model.quote.purchase_order_id, sup, Model.quote.purchase_order_status).TotalAmount;
+                        //totalAmountPerRequest = totalAmountPerRequest + totalAmountPerSupplier;
+                        totalAmountPerRequest = totalAmountPerRequest + (totalAmountPerSupplier - (decimal)sup.lump_sum_discount_amount);
+                        <td colspan="4" style="font-family: Source Sans Pro; border: thin solid #000000; text-align: center; vertical-align: middle; ">@string.Format("{0:N4}", decimal.Parse(totalAmountPerSupplier.ToString()))</td>
+                    }
+                    <td colspan="6" style="font-family: Source Sans Pro; border: thin solid #000000; text-align: center; vertical-align: middle; "></td>
+                    <td colspan="3" style="font-family: Source Sans Pro; border: thin solid #000000; text-align: center; vertical-align: middle; "></td>
+                </tr>-->
+                <!-- Lump sum discount -->
+                <!--<tr>
+                    <th colspan="5" style="font-family: Source Sans Pro; border: thin solid #000000; text-align: center; vertical-align: middle; ">Discount per Supplier (USD):</th>
+                    @foreach (var sup in Model.quote.supplierQuotes)
+                    {
+                        var lumpsumDiscountAmount = sup.lump_sum_discount_amount;
+                        <th colspan="4" style="font-family: Source Sans Pro; border: thin solid #000000; text-align: center; vertical-align: middle; ">@string.Format("{0:N4}", decimal.Parse(lumpsumDiscountAmount.ToString()))</th>
+                    }
+                    <td colspan="6" style="font-family: Source Sans Pro; border: thin solid #000000; text-align: center; vertical-align: middle; "></td>
+                    <td colspan="3" style="font-family: Source Sans Pro; border: thin solid #000000; text-align: center; vertical-align: middle; "></td>
+                </tr>-->
+
+                <!-- Total After Discount -->
+                <!--<tr>
+                    <td colspan="5" style="font-family: Source Sans Pro; border: thin solid #000000; text-align: center; vertical-align: middle; ">Total Amount per Supplier after Discount (USD):</td>
+                    @foreach (var sup in Model.quote.supplierQuotes)
+                    {
+                        decimal totalAmountPerSupplier = PurchaseOrderViewModel.QuoteAmountBySupplier(Model.quote.purchase_order_id, sup, Model.quote.purchase_order_status).TotalAmount;
+                        //totalAmountPerRequest = totalAmountPerRequest + totalAmountPerSupplier;
+                        decimal totalAmountAfterDiscount = (totalAmountPerSupplier - (decimal)sup.lump_sum_discount_amount);
+                        <td colspan="4" style="font-family: Source Sans Pro; border: thin solid #000000; text-align: center; vertical-align: middle; ">@string.Format("{0:N4}", decimal.Parse(totalAmountAfterDiscount.ToString()))</td>
+                    }
+                    <td colspan="6" style="font-family: Source Sans Pro; border: thin solid #000000; text-align: center; vertical-align: middle; "></td>
+                    <td colspan="3" style="font-family: Source Sans Pro; border: thin solid #000000; text-align: center; vertical-align: middle; "></td>
+                </tr>-->
+
+                <!-- Total Amount per Request-->
+                <!--<tr>
+                    <td colspan="5" style="font-family: Source Sans Pro; border: thin solid #000000; text-align: center; vertical-align: middle; ">Grand Total Amount Per Request (USD):</td>
+                    <td colspan="@colspanfoot" style="font-family: Source Sans Pro; border: thin solid #000000; text-align: center; vertical-align: middle; ">@string.Format("{0:N4}", decimal.Parse(totalAmountPerRequest.ToString()))</td>
+                    <td colspan="6" style="font-family: Source Sans Pro; border: thin solid #000000; text-align: center; vertical-align: middle; "></td>
+                    <th colspan="3" style="font-family: Source Sans Pro; border: thin solid #000000; text-align: center; vertical-align: middle; "></th>
+                </tr>
+
+                @{
+                    int cspan = 11 + (Model.quote.supplierQuotes.Count() * 4);
+
+                    var grouplumpsums = Model.quote.poDetails.GroupBy(s => s.lump_sum_discount_amount).ToList();
+                    foreach (var gls in grouplumpsums)
+                    {
+                        totalAmount = totalAmount - Convert.ToDecimal(gls.Key);
+                    }
+
+                    <tr>
+                        <td colspan="@cspan" style="font-family: Source Sans Pro; border: thin solid #000000; text-align: center; vertical-align: middle; "><label style="font-weight:bold !important;">Grand Total Approved Amount (USD):</label></td>-->
+
+                        <td style="font-family: Source Sans Pro; border: thin solid #000000; text-align: center; vertical-align: middle; "><label style="font-weight:bold !important;"><b>@string.Format("{0:N4}", decimal.Parse(totalAmount.ToString()))</b></label></td>
+                        <td colspan="2" style="font-family: Source Sans Pro; border: thin solid #000000; text-align: center; vertical-align: middle; "></td>
+                    </tr>
+
+                }
+
+                <tr>
+                    <td colspan="@colspanfoot"><h1></h1></td>
+                </tr>
+                <tr>
+                    <td colspan="2"></td>
+                    <td colspan="2" style="font-family: Source Sans Pro; text-align: left; vertical-align: middle; ">Prepared By</td>
+                    <td colspan="2"></td>
+                    <td colspan="2" style="font-family: Source Sans Pro; text-align: center; vertical-align: middle; ">Approved By</td>
+                    <td colspan="2"></td>
+                    <td colspan="2" style="font-family: Source Sans Pro; text-align: center; vertical-align: middle; ">Approved By</td>
+                </tr>
+                @if (Model.isSignature)
+                {
+                    string quoteCreatedBySignature = string.Format("{0}{1}", prefixDomainName, Model.quote.created_by_signature);
+                    string quoteApprovedBySignature = string.Format("{0}{1}", prefixDomainName, Model.quote.approved_by_signature);
+                    string quoteCheckedBySignature = string.Format("{0}{1}", prefixDomainName, Model.quote.checked_by_signature);
+                    <tr>
+                        <td colspan="2"></td>
+                        <td colspan="1" style="font-family: Source Sans Pro; text-align: center; vertical-align: middle; ">
+                            <img src="@quoteCreatedBySignature" style="height:50px !important; width:50px !important; margin-top:10px; object-fit:cover;" width="100" height="100" />
+                        </td>
+                        <td colspan="3"></td>
+                        <td colspan="2" style="font-family: Source Sans Pro; text-align: center; vertical-align: middle; ">
+                            <img src="@quoteApprovedBySignature" style="height:50px !important; width:50px !important; margin-top:10px; object-fit:cover;" width="100" height="100" />
+                        </td>
+                        <td colspan="2"></td>
+                        <td colspan="2" style="font-family: Source Sans Pro; text-align: center; vertical-align: middle; ">
+                            <img src="@quoteCheckedBySignature" style="height:50px !important; width:50px !important; margin-top:10px; object-fit:cover;" width="100" height="100" />
+                        </td>
+                    </tr>
+                }
+
+                <tr>
+                    <td colspan="@colspanfoot"><h1></h1></td>
+                </tr>
+
+                <tr>
+                    <td colspan="2"></td>
+                    <td colspan="2" style="font-family: Source Sans Pro; text-align: left; vertical-align: middle; ">Purchaser</td>
+                    <td colspan="2"></td>
+                    <td colspan="2" style="font-family: Source Sans Pro; text-align: center; vertical-align: middle; ">Project Manager</td>
+                    <td colspan="2"></td>
+                    <td colspan="2" style="font-family: Source Sans Pro; text-align: center; vertical-align: middle; ">Technical Director</td>
+                </tr>
+                <tr>
+                    <td colspan="2"></td>
+                    <td colspan="2" style="font-family: Source Sans Pro; text-align: left; vertical-align: middle; ">Name: @Model.quote.created_by_text</td>
+                    <td colspan="2"></td>
+                    <td colspan="2" style="font-family: Source Sans Pro; text-align: center; vertical-align: middle; ">Name: @BT_KimMex.Class.CommonClass.GetUserFullnameByUserId(Model.quote.approved_by)</td>
+                    <td colspan="2"></td>
+                    <td colspan="2" style="font-family: Source Sans Pro; text-align: center; vertical-align: middle; ">Name: @BT_KimMex.Class.CommonClass.GetUserFullnameByUserId(Model.quote.checked_by)</td>
+                </tr>
+                <tr>
+                    <td colspan="2"></td>
+                    <td colspan="2" style="font-family: Source Sans Pro; text-align: left; vertical-align: middle; ">@Convert.ToDateTime(Model.quote.created_date).ToString("dd-MM-yyyy")</td>
+                    <td colspan="2"></td>
+                    <td colspan="2" style="font-family: Source Sans Pro; text-align: center; vertical-align: middle; ">@quoteApprovedDate</td>
+                    <td colspan="2"></td>
+                    <td colspan="2" style="font-family: Source Sans Pro; text-align: center; vertical-align: middle; ">@Convert.ToDateTime(Model.quote.checked_date).ToString("dd-MM-yyyy")</td>
+                </tr>
+
+
+            </table>*@
+    }
+
+    <!-- END QUOTE SECTION -->
+    <!-- MR TAble -->
+    @if (Model.isMR)
+    {
+        <table width="100%" style="border-collapse: collapse; " id="table1" border="1" cellspacing="5" cellpadding="5" data-SheetName="MR">
+            <tbody>
+                <tr>
+                    <td colspan="4"><img src="https://lgtss.com/Assets/images/lotusgreeenteam.png" style="height:110px; width:400px; margin-top:10px; " /></td>
+                    <td></td>
+                    <td colspan="4" style="font-weight:bold;font-size:12px;font-family:Century Gothic;text-align:left;vertical-align:middle;text-decoration: underline;">VENDOR </td>
+                </tr>
+
+                <tr>
+                    <td colspan="5" style=""></td>
+                    <td colspan="4" style="border-top: thin solid black; border-left: thin solid black; border-right: thin solid black; border-collapse: collapse; "></td>
+                </tr>
+                <tr>
+                    <td colspan="5" style=""></td>
+                    <td colspan="4" style="border-left: thin solid black; border-right: thin solid black; border-collapse: collapse; "></td>
+                </tr>
+                <tr>
+                    <td colspan="5" style=""></td>
+                    <td colspan="4" style="border-left: thin solid black; border-right: thin solid black; border-collapse: collapse; "></td>
+                </tr>
+                <tr>
+                    <td colspan="5" style=""></td>
+                    <td colspan="4" style="border-left: thin solid black; border-right: thin solid black; border-collapse: collapse; "></td>
+                </tr>
+                <tr>
+                    <td colspan="5" style="font-size:12px;color:red;font-family:Century Gothic;text-align:left;vertical-align:middle;font-weight:bold;">Note that material sourcing time is at least 7 days.</td>
+                    <td colspan="4" style="border-left: thin solid black; border-right: thin solid black; border-collapse: collapse; "></td>
+                </tr>
+                <tr>
+
+                    <td colspan="5" style=""></td>
+                    <td colspan="4" style="border-bottom: thin solid black; border-left: thin solid black; border-right: thin solid black; border-collapse: collapse; "></td>
+                </tr>
+                <tr>
+                    <td colspan="9"></td>
+                </tr>
+                <tr>
+                    <td colspan="5"></td>
+                    <td colspan="4" style="font-weight: bold; font-family: Century Gothic; font-size: 12px; border-top: thin solid black; border-left: thin solid black; border-right: thin solid black; border-collapse: collapse; text-align: left; vertical-align: middle; ">TERMS & CONDITIONS</td>
+                </tr>
+                <tr>
+                    <td colspan="5"></td>
+                    <td style="font-family: Century Gothic; font-size: 12px; border-left: thin solid black; border-collapse: collapse; text-align: right; vertical-align: middle;">1-</td>
+                    <td style="font-family:Century Gothic;font-size:12px;border-collapse: collapse;text-align:left;vertical-align:middle;"> Incoterm:</td>
+                    <td style="border-right: thin solid black; border-collapse: collapse;" colspan="2"></td>
+                </tr>
+                <tr>
+                    <td colspan="5"></td>
+                    <td style="font-family: Century Gothic; font-size: 12px; border-left: thin solid black; border-collapse: collapse; text-align: right; vertical-align: middle;">2-</td>
+                    <td style="font-family:Century Gothic;font-size:12px;border-collapse: collapse;text-align:left;vertical-align:middle;">Payment: </td>
+                    <td style="border-right: thin solid black; border-collapse: collapse;" colspan="2"></td>
+                </tr>
+                <tr>
+                    <td colspan="5"></td>
+                    <td style="font-family: Century Gothic; font-size: 12px; border-left: thin solid black; border-collapse: collapse; text-align: right; vertical-align: middle;">3-</td>
+                    <td style="font-family:Century Gothic;font-size:12px;border-collapse: collapse;text-align:left;vertical-align:middle;">Delivery: </td>
+                    <td style="border-right: thin solid black; border-collapse: collapse;" colspan="2"></td>
+                </tr>
+                <tr>
+                    <td colspan="5"></td>
+                    <td style="font-family: Century Gothic; font-size: 12px; border-left: thin solid black; border-collapse: collapse; text-align: right; vertical-align: middle;">4-</td>
+                    <td style="font-family:Century Gothic;font-size:12px;border-collapse: collapse;text-align:left;vertical-align:middle;">Shipment: </td>
+                    <td style="border-right: thin solid black; border-collapse: collapse;" colspan="2"></td>
+                </tr>
+                <tr>
+                    <td colspan="5"></td>
+                    <td style="font-family: Century Gothic; font-size: 12px; border-left: thin solid black; border-collapse: collapse; text-align: right; vertical-align: middle;">5-</td>
+                    <td style="font-family:Century Gothic;font-size:12px;border-collapse: collapse;text-align:left;vertical-align:middle;">Warranty: </td>
+                    <td style="border-right: thin solid black; border-collapse: collapse;" colspan="2"></td>
+                </tr>
+                <tr>
+                    <td colspan="5"></td>
+                    <td style="font-family: Century Gothic; font-size: 12px; border-left: thin solid black; border-bottom: thin solid black; border-collapse: collapse; text-align: right; vertical-align: middle; ">6-</td>
+                    <td style="font-family: Century Gothic; font-size: 12px; border-bottom: thin solid black; border-collapse: collapse; text-align: left; vertical-align: middle;">Vendor Ref: </td>
+                    <td style="border-right: thin solid black; border-bottom: thin solid black; border-collapse: collapse; " colspan="2"></td>
+                </tr>
+
+
+                @*<tr>
+                        <td colspan="8" style="font-size:12px;color:red;font-family:Century Gothic;text-align:left;vertical-align:middle;">Note that material sourcing time is at least 7 days.</td>
+                    </tr>*@
+                <tr>
+                    <td colspan="9"></td>
+                </tr>
+                <tr>
+                    <td colspan="9" style="border: thin solid black; border-collapse: collapse; font-size: 12px; text-align: center; font-size: 1.5em; font-weight: bold; font-family: Century Gothic; vertical-align: central;">MATERIAL REQUEST (MR)</td>
+                </tr>
+                <tr>
+                    <td colspan="8" style=""></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td style="font-weight: bold; font-family: Century Gothic; text-align: left; vertical-align: middle; font-size: 12px;">Requested By:</td>
+                    <td colspan="2" style="font-family: Century Gothic; text-align: left; vertical-align: middle; font-size: 12px;">@Model.materialRequest.created_by</td>
+                    <td style="font-weight: bold; font-family: Century Gothic; text-align: right; vertical-align: middle; font-size: 12px;">Project Name:</td>
+                    <td colspan="3" style="font-family: Century Gothic; text-align: left; vertical-align: middle; font-size: 12px;">@Model.materialRequest.project_full_name</td>
+                </tr>
+                <tr>
+                    <td colspan="8"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td style="font-weight: bold; font-family: Century Gothic; text-align: left; vertical-align: middle; font-size: 12px;">Request Date:</td>
+                    <td colspan="2" style="font-family: Century Gothic; text-align: left; vertical-align: middle; font-size: 12px;">@Convert.ToDateTime(Model.materialRequest.created_date).ToString("dd-MMM-yy")</td>
+                    <td style="font-weight: bold; font-family: Century Gothic; text-align: right; vertical-align: middle; font-size: 12px;">SO No:</td>
+                    <td colspan="3" style="font-family: Century Gothic; text-align: left; vertical-align: middle; font-size: 12px;">@Model.materialRequest.so_number</td>
+                </tr>
+                <tr>
+                    <td colspan="8"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td style="font-weight: bold; font-family: Century Gothic; text-align: left; vertical-align: middle; font-size: 12px;">Expec date of Del:</td>
+                    <td colspan="2" style="font-family: Century Gothic; text-align: left; vertical-align: middle; font-size: 12px;">@expectedDeliveryDate</td>
+                    <td style="font-weight: bold; font-family: Century Gothic; text-align: right; vertical-align: middle; font-size: 12px;">MR No: </td>
+                    <td colspan="3" style="font-family: Century Gothic; text-align: left; vertical-align: middle; font-size: 12px;">@Model.materialRequest.ir_no </td>
+                </tr>
+
+
+                <tr>
+                    <td colspan="8" style="padding:20px;"><h2></h2></td>
+                </tr>
+                <tr>
+                    <th style="border: thin solid black; border-collapse: collapse; font-family: Century Gothic; width: 50px;">No.</th>
+                    <th style="border: thin solid black; border-collapse: collapse; font-family: Century Gothic;">Item Code</th>
+                    <th colspan="2" style="border: thin solid black; border-collapse: collapse; font-family: Century Gothic;">Item Name</th>
+                    <th style="border: thin solid black; border-collapse: collapse; font-family: Century Gothic;">QTY</th>
+                    <th style="border: thin solid black; border-collapse: collapse; font-family: Century Gothic;">Unit</th>
+                    <th style="border: thin solid black; border-collapse: collapse; font-family: Century Gothic;">Remark</th>
+                    <th style="border: thin solid black; border-collapse: collapse; font-family: Century Gothic;">Approved QTY</th>
+                    <th style="border: thin solid black; border-collapse: collapse; font-family: Century Gothic;">Reason</th>
+                </tr>
+                @{
+                    int ddCount = 1;
+                    foreach (var ddIr in Model.materialRequest.ir1[0].ir2)
+                    {
+                        string requestQty = string.Format("{0:G29}", decimal.Parse(ddIr.ir_qty.ToString()));
+                        string approvedQty = ddIr.approved_qty.HasValue ? string.Format("{0:G29}", decimal.Parse(ddIr.approved_qty.ToString())) : string.Empty;
+                        <tr>
+                            <td style="width: 30px; border: thin solid black; border-collapse: collapse; vertical-align: middle !important; font-family: Century Gothic; text-align: center !important; font-size: 12px;">@ddCount</td>
+                            <td style="text-align: center !important; vertical-align: middle !important; border: thin solid black; border-collapse: collapse; font-family: Century Gothic; font-size: 12px;">@ddIr.product_code</td>
+                            <td colspan="2" style="vertical-align: middle; border: thin solid black; border-collapse: collapse; font-family: Century Gothic; font-size: 12px;"><p>@ddIr.product_name</p></td>
+                            <td style="text-align: center !important; vertical-align: middle !important; border: thin solid black; border-collapse: collapse; font-family: Century Gothic; font-size: 12px;">@requestQty</td>
+                            <td style="text-align: center !important; vertical-align: middle !important; border: thin solid black; border-collapse: collapse; font-family: Century Gothic; font-size: 12px;">@ddIr.requested_unit</td>
+                            <td style="vertical-align: middle !important; border: thin solid black; border-collapse: collapse; font-family: Century Gothic; font-size: 12px;">@ddIr.remark</td>
+                            <td style="text-align: center !important; vertical-align: middle !important; border: thin solid black; border-collapse: collapse; font-family: Century Gothic; font-size: 12px;">@approvedQty</td>
+                            <td style="border: thin solid black; border-collapse: collapse; font-family: Century Gothic; font-size: 12px;">@ddIr.reason</td>
+                        </tr>
+                        ddCount++;
+                    }
+
+
+                }
+                <tr>
+                    <td colspan="9" style="padding:20px;"><h2></h2></td>
+                </tr>
+
+                <tr>
+                    <td colspan="2" style="font-family: Century Gothic; font-size: 12px;">Prepared By:</td>
+                    <td></td>
+                    <td colspan="2" style="font-family: Century Gothic; font-size: 12px;">Approved By:</td>
+                    <td></td>
+                    <td colspan="2" style="font-family: Century Gothic; font-size: 12px;">Approved By:</td>
+                </tr>
+                @if (Model.isSignature)
+                {
+                    string mrCreatedBySignature = string.Format("{0}{1}", prefixDomainName, Model.materialRequest.created_by_signature);
+                    string mrApprovedBySignature = string.Format("{0}{1}", prefixDomainName, Model.materialRequest.approved_by_signature);
+                    <tr>
+                        <td colspan="2" style="font-family: Century Gothic; font-size: 12px;"><img src="@mrCreatedBySignature" style="height:50px !important; width:100px !important; margin-top:10px; object-fit:cover;" width="100" height="100" /></td>
+                        <td></td>
+                        <td colspan="2" style="font-family: Century Gothic; font-size: 12px;"></td>
+                        <td></td>
+                        <td colspan="2" style="font-family: Century Gothic; font-size: 12px;"><img src="@mrApprovedBySignature" style="height:50px !important; width:100px !important; margin-top:10px; object-fit:cover;" width="100" height="100" /></td>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8"><h1></h1></td>
+                    </tr>
+                }
+
+                <tr>
+                    <td colspan="8"><h1></h1></td>
+                </tr>
+
+
+                <tr>
+                    <td colspan="2" style="font-family: Century Gothic; font-size: 12px;">Site Supervisor</td>
+                    <td></td>
+                    <td colspan="2" style="font-family: Century Gothic; font-size: 12px;">Technical director</td>
+                    <td></td>
+                    <td colspan="2" style="font-family: Century Gothic; font-size: 12px;">Site Manager </td>
+
+                </tr>
+                <tr>
+                    <td colspan="2" style="font-family: Century Gothic; font-size: 12px;">Name: @Model.materialRequest.created_by</td>
+                    <td></td>
+                    <td colspan="2" style="font-family: Century Gothic; font-size: 12px;">Name:</td>
+                    <td></td>
+                    <td colspan="2" style="font-family: Century Gothic; font-size: 12px;">Name: @Model.materialRequest.approved_by</td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="font-family: Century Gothic; font-size: 12px;">Date: @Convert.ToDateTime(Model.materialRequest.created_date).ToString("dd-MMM-yy")</td>
+                    <td></td>
+                    <td colspan="2" style="font-family: Century Gothic; font-size: 12px;">Date: </td>
+                    <td></td>
+                    <td colspan="2" style="font-family: Century Gothic; font-size: 12px;">Date: @Convert.ToDateTime(Model.materialRequest.approved_date).ToString("dd-MMM-yy")</td>
+                </tr>
+
+            </tbody>
+        </table>
+    }
+
+
+    <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery-1.12.4.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js" integrity="sha512-csNcFYJniKjJxRWRV1R7fvnXrycHP6qDR21mgz1ZP55xY5d+aHLfo9/FcGDQLfn2IfngbAHd8LdfsagcCqgTcQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/TableExport/5.2.0/js/tableexport.min.js" integrity="sha512-XmZS54be9JGMZjf+zk61JZaLZyjTRgs41JLSmx5QlIP5F+sSGIyzD2eJyxD4K6kGGr7AsVhaitzZ2WTfzpsQzg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.core.min.js" integrity="sha512-UhlYw//T419BPq/emC5xSZzkjjreRfN3426517rfsg/XIEC02ggQBb680V0VvP+zaDZ78zqse3rqnnI5EJ6rxA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script type="text/javascript">
+
+        $(function () {
+            //console.log('@domainName');
+            //exportTableToExcel('table', '@Model.projectshortname' + '-' + '@Model.purchaseOrderNumber');
+
+            ////tablesToExcel(['table', 'table1'], ['Purchase Order', 'Quote'], '@Model.projectshortname' + '-' + '@Model.purchaseOrderNumber' + '.xls', 'Excel');
+
+            tablesToExcel1('#table,#table1,#table2', '@Model.projectshortname' + '-' + '@Model.purchaseOrderNumber' + '.xls');
+
+            //$("#table").tableExport();
+            /* Defaults */
+//            TableExport(document.getElementById("table"), {
+//  headers: true,                      // (Boolean), display table headers (th or td elements) in the <thead>, (default: true)
+//  footers: true,                      // (Boolean), display table footers (th or td elements) in the <tfoot>, (default: false)
+//  formats: ["xlsx", "csv", "txt"],    // (String[]), filetype(s) for the export, (default: ['xlsx', 'csv', 'txt'])
+//                filename: "id",                     // (id, String), filename for the downloaded file, (default: 'id')
+//                bootstrap: true,                   // (Boolean), style buttons using bootstrap, (default: true)
+//  exportButtons: true,                // (Boolean), automatically generate the built-in export buttons for each of the specified formats (default: true)
+//  position: "bottom",                 // (top, bottom), position of the caption element relative to table, (default: 'bottom')
+//  ignoreRows: null,                   // (Number, Number[]), row indices to exclude from the exported file(s) (default: null)
+//  ignoreCols: null,                   // (Number, Number[]), column indices to exclude from the exported file(s) (default: null)
+//  trimWhitespace: true,               // (Boolean), remove all leading/trailing newlines, spaces, and tabs from cell text in the exported file(s) (default: false)
+//  RTL: false,                         // (Boolean), set direction of the worksheet to right-to-left (default: false)
+//  sheetname: "id"                     // (id, String), sheet name for the exported spreadsheet, (default: 'id')
+//});
+                
+            if (navigator.userAgent.indexOf("Firefox") > 0) {
+                window.setTimeout(function () { window.close(); }, 1000);
+            } else {
+                window.top.close();
+            }
+
+                
+
+        });
+
+        function ExportToExcel(type, fn, dl) {
+            var elt = document.getElementById('table');
+            var wb = XLSX.utils.table_to_book(elt, { sheet: "sheet1" });
+            return dl ?
+              XLSX.write(wb, { bookType: type, bookSST: true, type: 'base64' }) :
+              XLSX.writeFile(wb, fn || ('MySheetName.' + (type || 'xlsx')));
+        }
+
+        function exportTableToExcel(tableId, filename) {
+            let dataType = 'application/vnd.ms-excel';
+            let extension = '.xls';
+
+            let base64 = function (s) {
+
+                //return window.btoa(unescape(encodeURIComponent(s)))
+                //return window.btoa(unescape(escape(s)))
+                //return btoa(unescape(escape(s)))
+                try {
+                    return window.btoa(unescape(escape(s)));
+                }
+                catch(err) {
+                    return window.btoa(unescape(encodeURIComponent(s)));
+                }
+                //finally {
+                //    return window.btoa(unescape(escape(s)));
+
+                //}
+            };
+
+            let template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>';
+            let render = function (template, content) {
+                return template.replace(/{(\w+)}/g, function (m, p) { return content[p]; });
+            };
+
+            let tableElement = document.getElementById(tableId);
+
+            let tableExcel = render(template, {
+                worksheet: filename,
+                //table: tableElement.innerHTML,
+                table: tableElement.innerHTML.normalize('NFD').replace("–", "-")
+            });
+
+            filename = filename + extension;
+
+            if (navigator.msSaveOrOpenBlob) {
+                let blob = new Blob(
+                    ['\ufeff', tableExcel],
+                    { type: dataType }
+                );
+
+                navigator.msSaveOrOpenBlob(blob, filename);
+
+
+            } else {
+                let downloadLink = document.createElement("a");
+
+                document.body.appendChild(downloadLink);
+                downloadLink.download = filename;
+                downloadLink.href = 'data:' + dataType + ';base64,' + base64(tableExcel);
+
+                downloadLink.click();
+            }
+
+        }
+
+        var tablesToExcel = (function () {
+            var uri = 'data:application/vnd.ms-excel;base64,'
+                , tmplWorkbookXML = '<?xml version="1.0"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">'
+                    + '<DocumentProperties xmlns="urn:schemas-microsoft-com:office:office"><Author>Axel Richter</Author><Created>{created}</Created></DocumentProperties>'
+                    + '<Styles>'
+                    + '<Style ss:ID="Currency"><NumberFormat ss:Format="Currency"></NumberFormat></Style>'
+                    + '<Style ss:ID="Date"><NumberFormat ss:Format="Medium Date"></NumberFormat></Style>'
+                    + '</Styles>'
+                    + '{worksheets}</Workbook>'
+                , tmplWorksheetXML = '<Worksheet ss:Name="{nameWS}"><Table>{rows}</Table></Worksheet>'
+                , tmplCellXML = '<Cell{attributeStyleID}{attributeFormula}><Data ss:Type="{nameType}">{data}</Data></Cell>'
+                , base64 = function (s) { return window.btoa(unescape(encodeURIComponent(s))) }
+                , format = function (s, c) { return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; }) }
+            return function (tables, wsnames, wbname, appname) {
+                var ctx = "";
+                var workbookXML = "";
+                var worksheetsXML = "";
+                var rowsXML = "";
+
+                for (var i = 0; i < tables.length; i++) {
+                    if (!tables[i].nodeType) tables[i] = document.getElementById(tables[i]);
+                    for (var j = 0; j < tables[i].rows.length; j++) {
+                        rowsXML += '<Row>'
+                        for (var k = 0; k < tables[i].rows[j].cells.length; k++) {
+                            var dataType = tables[i].rows[j].cells[k].getAttribute("data-type");
+                            var dataStyle = tables[i].rows[j].cells[k].getAttribute("data-style");
+                            var dataValue = tables[i].rows[j].cells[k].getAttribute("data-value");
+                            dataValue = (dataValue) ? dataValue : tables[i].rows[j].cells[k].innerHTML;
+                            var dataFormula = tables[i].rows[j].cells[k].getAttribute("data-formula");
+                            dataFormula = (dataFormula) ? dataFormula : (appname == 'Calc' && dataType == 'DateTime') ? dataValue : null;
+                            ctx = {
+                                attributeStyleID: (dataStyle == 'Currency' || dataStyle == 'Date') ? ' ss:StyleID="' + dataStyle + '"' : ''
+                                , nameType: (dataType == 'Number' || dataType == 'DateTime' || dataType == 'Boolean' || dataType == 'Error') ? dataType : 'String'
+                                , data: (dataFormula) ? '' : dataValue
+                                , attributeFormula: (dataFormula) ? ' ss:Formula="' + dataFormula + '"' : ''
+                            };
+                            rowsXML += format(tmplCellXML, ctx);
+                        }
+                        rowsXML += '</Row>'
+                    }
+                    ctx = { rows: rowsXML, nameWS: wsnames[i] || 'Sheet' + i };
+                    worksheetsXML += format(tmplWorksheetXML, ctx);
+                    rowsXML = "";
+                }
+
+                ctx = { created: (new Date()).getTime(), worksheets: worksheetsXML };
+                workbookXML = format(tmplWorkbookXML, ctx);
+
+                console.log(workbookXML);
+
+                var link = document.createElement("A");
+                link.href = uri + base64(workbookXML);
+                link.download = wbname || 'Workbook.xls';
+                link.target = '_blank';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        })();
+
+        var tablesToExcel1 = (function ($) {
+            var uri = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,'
+                //uri = 'data:application/vnd.ms-excel;base64,'
+                //, html_start = `<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">`
+                , html_start = `<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><meta http-equiv="content-type" content="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8">`
+                , template_ExcelWorksheet = `<x:ExcelWorksheet><x:Name>{SheetName}</x:Name><x:WorksheetSource HRef="sheet{SheetIndex}.htm"/></x:ExcelWorksheet>`
+                , template_ListWorksheet = `<o:File HRef="sheet{SheetIndex}.htm"/>`
+                , template_HTMLWorksheet = `
+------=_NextPart_dummy
+Content-Location: sheet{SheetIndex}.htm
+Content-Type: text/html; charset=windows-1252
+
+` + html_start + `
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <link id="Main-File" rel="Main-File" href="../WorkBook.htm">
+  <link rel="File-List" href="filelist.xml">
+</head>
+<body><table>{SheetContent}</table></body>
+</html>`
+                , template_WorkBook = `MIME-Version: 1.0
+X-Document-Type: Workbook
+Content-Type: multipart/related; boundary="----=_NextPart_dummy"
+
+------=_NextPart_dummy
+Content-Location: WorkBook.htm
+Content-Type: text/html; charset=windows-1252
+
+` + html_start + `
+<head>
+<meta name="Excel Workbook Frameset">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<link rel="File-List" href="filelist.xml">
+<!--[if gte mso 9]><xml>
+ <x:ExcelWorkbook>
+  <x:ExcelWorksheets>{ExcelWorksheets}</x:ExcelWorksheets>
+  <x:ActiveSheet>0</x:ActiveSheet>
+ </x:ExcelWorkbook>
+</xml><![endif]-->
+</head>
+<frameset>
+  <frame src="sheet0.htm" name="frSheet">
+  <noframes><body><p>This page uses frames, but your browser does not support them.</p></body></noframes>
+</frameset>
+</html>
+{HTMLWorksheets}
+Content-Location: filelist.xml
+Content-Type: text/xml; charset="utf-8"
+
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+  <o:MainFile HRef="../WorkBook.htm"/>
+  {ListWorksheets}
+  <o:File HRef="filelist.xml"/>
+</xml>
+------=_NextPart_dummy--
+`
+                , base64 = function (s) {
+                    //return window.btoa(unescape(encodeURIComponent(s)))
+                    try {
+                        return window.btoa(unescape(escape(s)));
+                    }
+                    catch (err) {
+                        return window.btoa(unescape(encodeURIComponent(s)));
+                    }
+
+
+                }
+                , format = function (s, c) {
+                    return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; })
+                }
+            return function (tables, filename) {
+                var context_WorkBook = {
+                    ExcelWorksheets: ''
+                    , HTMLWorksheets: ''
+                    , ListWorksheets: ''
+                };
+                var tables = jQuery(tables);
+                $.each(tables, function (SheetIndex) {
+                    var $table = $(this);
+                    var SheetName = $table.attr('data-SheetName');
+                    if ($.trim(SheetName) === '') {
+                        SheetName = 'Sheet' + SheetIndex;
+                    }
+                    context_WorkBook.ExcelWorksheets += format(template_ExcelWorksheet, {
+                        SheetIndex: SheetIndex
+                        , SheetName: SheetName
+                    });
+                    context_WorkBook.HTMLWorksheets += format(template_HTMLWorksheet, {
+                        SheetIndex: SheetIndex
+                        , SheetContent: $table.html()
+                    });
+                    context_WorkBook.ListWorksheets += format(template_ListWorksheet, {
+                        SheetIndex: SheetIndex
+                    });
+                });
+
+                var blob = new Blob([s2ab(atob(base64(format(template_WorkBook, context_WorkBook))))], {
+                    type: ''
+                });
+
+                var link = document.createElement("A");
+                //link.href = uri + base64(format(template_WorkBook, context_WorkBook));
+                link.href = URL.createObjectURL(blob);
+                link.download = filename || 'Workbook.xlsx';
+                link.target = '_blank';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+                })(jQuery);
+
+                function s2ab(s) {
+                  var buf = new ArrayBuffer(s.length);
+                  var view = new Uint8Array(buf);
+                  for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+                  return buf;
+                }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+﻿/*.navbar-default {
+    background-color: #CC0000 !important;
+    border-color: #ff3333 ;
+}
+.navbar-default .navbar-nav > li > a {
+    color: #f2f2f2 !important;
+}
+.navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:hover, .navbar-default .navbar-nav > .open > a:focus {
+    background-color: #ff0000 !important;
+}
+.navbar-default .navbar-brand {
+    color: #000099 !important;
+}
+    */
+.datatable-control {
+    height: 34px !important;
+    padding: 6px 12px !important;
+    font-size: 14px !important;
+    line-height: 1.428571429 !important;
+    color: #555555 !important;
+    vertical-align: middle !important;
+    background-color: #ffffff !important;
+    border: 1px solid #cccccc !important;
+    border-radius: 4px !important;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075) !important;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075) !important;
+    -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s !important;
+    transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s !important;
+}
+
+

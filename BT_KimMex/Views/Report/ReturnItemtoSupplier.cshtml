@@ -1,0 +1,53 @@
+﻿@model BT_KimMex.Models.ReturnItemtoSupplierReport
+@{
+    ViewBag.Title = "Return Item to Supplier";
+    string currentDate = DateTime.Now.ToString("MM/dd/yyyy");
+}
+
+<h3 class="title">Return Item to Supplier Report</h3>
+@using (Html.BeginForm())
+{
+<div class="form-horizontal">
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="form-group">
+        <label class="col-md-2">From Date <strong style="color:red !important">*</strong>:</label>
+        <div class="col-md-4">
+            <div class="input-group date" data-provide="datepicker" style="width:280px !important;">
+                @Html.EditorFor(model => model.dateFrom, new { htmlAttributes = new { @class = "form-control", placeholder = "MM/DD/YYYY" } })
+                <div class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </div>
+            </div>
+            @Html.ValidationMessageFor(model => model.dateFrom, "", new { @class = "text-danger" })
+        </div>
+        <label class="col-md-2">To Date <strong style="color:red !important">*</strong>:</label>
+        <div class="col-md-4">
+            <div class="input-group date" data-provide="datepicker" style="width:280px !important;">
+                @Html.EditorFor(model => model.dateTo, new { htmlAttributes = new { @class = "form-control", placeholder = "MM/DD/YYYY" } })
+                <div class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </div>
+            </div>
+            @Html.ValidationMessageFor(model => model.dateTo, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Generate" class="btn btn-default" />
+            @*<a href="@Url.Action("Index")" class="btn btn-default">Cancel</a>*@
+        </div>
+    </div>
+</div>
+}
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            //$(".date").datepicker({ format: 'dd/mm/yyyy' });
+            $('#dateFrom').val('@currentDate');
+            $('#dateTo').val('@currentDate');
+            $('div.date').on('changeDate', function () {
+                $(this).datepicker('hide');
+            });
+        });
+    </script>
+}

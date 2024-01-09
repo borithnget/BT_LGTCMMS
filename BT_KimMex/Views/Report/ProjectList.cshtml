@@ -1,0 +1,34 @@
+﻿
+@{
+    ViewBag.Title = "ProjectList";
+}
+
+<h3 class="title">Project List Report</h3>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="form-group">
+            <label class="col-md-2 control-label">Status:</label>
+            <div class="col-md-10">
+                <select class="form-control" id="status" name="status">
+                    <option value="All" selected>All</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Completed">Completed</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="GO" class="btn btn-default" />
+                <a href="@Url.Action("Index")" class="btn btn-default">Cancel</a>
+            </div>
+        </div>
+    </div>
+                                    }
+

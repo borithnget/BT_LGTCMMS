@@ -1,0 +1,669 @@
+﻿
+@using BT_KimMex.Class;
+@using Microsoft.AspNet.Identity;
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LGT STOCK - @ViewBag.Title</title>
+    @Styles.Render("~/Content/css")
+    <link id="favicon" rel="shortcut icon" type="image/jpg" href="~/Assets/images/Lotus.ico" />
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/responsive/2.2.1/css/responsive.bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.min.css" rel="stylesheet" />
+    <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
+    <link href="~/Assets/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/Assets/plugins/datatables/datatables.min.css" rel="stylesheet" />
+    @*<link href="~/Assets/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css" rel="stylesheet"/>*@
+    <link href="~/Assets/plugins/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet" />
+    <link href="~/Assets/plugins/jquery-ui/jquery-ui.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+    <link href="~/Content/w3.css" rel="stylesheet" type="text/css" />
+    <link href="~/Assets/plugins/select2/css/select2.min.css" type="text/css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro" rel="stylesheet">
+    @Scripts.Render("~/bundles/modernizr")
+    <style type="text/css">
+        .navbar-default {
+            color: #fff;
+            background-color: #75AC15;
+            border-color: #aca1a2;
+        }
+
+            .navbar-default .navbar-nav > li > a {
+                color: #fff;
+            }
+
+            .navbar-default .navbar-nav > .dropdown > a .caret {
+                border-top-color: #fff;
+                border-bottom-color: #fff;
+            }
+
+            .navbar-default .navbar-brand {
+                color: #fff;
+            }
+
+            .navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
+                color: rgb(208, 206, 207) !important;
+                background-color: transparent;
+            }
+
+        .menu-large {
+            position: static !important;
+        }
+
+        .megamenu {
+            padding: 20px 0px;
+            width: 100%;
+        }
+
+            .megamenu > li > ul {
+                padding: 0;
+                margin: 0;
+            }
+
+                .megamenu > li > ul > li {
+                    list-style: none;
+                }
+
+                    .megamenu > li > ul > li > a {
+                        display: block;
+                        padding: 3px 20px;
+                        clear: both;
+                        font-weight: normal;
+                        line-height: 1.428571429;
+                        color: #333333;
+                        white-space: normal;
+                    }
+
+            .megamenu > li ul > li > a:hover,
+            .megamenu > li ul > li > a:focus {
+                text-decoration: none;
+                color: #262626;
+                background-color: #f5f5f5;
+            }
+
+            .megamenu.disabled > a,
+            .megamenu.disabled > a:hover,
+            .megamenu.disabled > a:focus {
+                color: #999999;
+            }
+
+                .megamenu.disabled > a:hover,
+                .megamenu.disabled > a:focus {
+                    text-decoration: none;
+                    background-color: transparent;
+                    background-image: none;
+                    filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+                    cursor: not-allowed;
+                }
+
+            .megamenu.dropdown-header {
+                color: #428bca;
+                font-size: 18px;
+            }
+
+        table thead th {
+            background-color: #75AC15 !important;
+        }
+
+        table thead th {
+            color: white !important;
+        }
+
+        .datatable-control {
+            height: 34px !important;
+            padding: 6px 12px !important;
+            font-size: 14px !important;
+            line-height: 1.428571429 !important;
+            color: #555555 !important;
+            vertical-align: middle !important;
+            background-color: #ffffff !important;
+            border: 1px solid #cccccc !important;
+            border-radius: 4px !important;
+            -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075) !important;
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075) !important;
+            -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s !important;
+            transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s !important;
+        }
+
+        .menu-bg, footer {
+            /*font-family: 'Source Sans Pro', sans-serif !important;*/
+            font-family: 'Kantumruy Pro', sans-serif !important;
+        }
+
+        .body-content {
+            /*font-family: 'Khmer OS Content', sans-serif !important;*/
+            /*font-family: 'Open Sans', sans-serif !important;*/
+            /*font-family: "Raleway", sans-serif !important;*/
+            font-family: 'Kantumruy Pro', sans-serif !important;
+        }
+
+        .title, h3 {
+            padding-top: 20px !important;
+        }
+
+        #item_request_table tr th, #item_request_table tr td {
+            text-align: center !important;
+            vertical-align: middle !important;
+        }
+
+        body {
+            font: 400 15px/1.8 Lato, sans-serif !important;
+        }
+
+        table tr td {
+            vertical-align: middle !important;
+        }
+
+        .nav * {
+            font-size: 11px !important;
+        }
+
+        .panel-heading {
+            font-size: 20px !important;
+            font-weight: bold !important;
+        }
+        .nav > li > a{
+            padding-left:10px !important;
+            padding-right:10px !important;
+        }
+    </style>
+</head>
+<body style="background-color:#d0cecf">
+    @*<div style="height:150px; width:100%; background-color: rgba(19, 121, 179, 0.29); margin-top:-50px;" class="container-fluid menu-bg">*@
+    <div style="height:150px; width:100%; background-color:white; margin-top:-50px;" class="container-fluid menu-bg">
+        <div class="container-fluid" style="margin-left:100px; margin-right:100px;">
+
+            <img src="~/Assets/images/lotusgreeenteam.png" style="height:110px; width:400px; margin-top:10px; " />
+            <span style="float:right; margin-top:80px; color:#3b3280">
+                @Html.Partial("_LoginPartial")
+            </span>
+        </div>
+    </div>
+
+    <div class="navbar navbar-default navbar-static-top menu-bg " style="background-color:#d0cecf!important;padding-left:10px;padding-right:10px; margin-top:-20px;  border-width:0 0 0 0; z-index:unset !important;">
+        <div style="background-color:#75AC15; margin-left:0px; margin-right:0px;">
+            <div class="navbar-header " style="height:50px">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse" style="margin-right:-50px">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @*<a class="navbar-brand" href="@Url.Action("index", "home")"><i class="fa fa-home"></i></a>*@
+
+            </div>
+            <div class="navbar-collapse collapse " style="padding-left:0px !important;">
+                <ul class="nav navbar-nav ">
+                    <li><a href="@Url.Action("index", "home")" style="font-size:15px !important;"><i class="fa fa-home"></i></a></li>
+                    @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.OperationDirector))
+                    {
+                        <li>@Html.ActionLink("PROJECT", "Index", "Project")</li>
+                    }
+                    @*@if (User.IsInRole("Admin") || User.IsInRole("Economic Engineer") || User.IsInRole("Project Manager") || User.IsInRole("Director"))
+        {
+            <li>@Html.ActionLink("BoQ", "Index", "BOQ", new { status = "All" }, "")</li>
+        }*@
+                    @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.SiteSupervisor) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.SiteAdmin) || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.AstOperationDirector) || User.IsInRole(Role.OperationDirector) || User.IsInRole(Role.TechnicalDirector) || User.IsInRole(Role.ManagingDirector) || User.IsInRole(Role.Purchaser))
+                    {
+                        <li class="dropdown menu-large ">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">MATERIAL REQUEST <b class="caret"></b></a>
+                            <ul class="dropdown-menu megamenu  container-fluid" style="padding-left:100px;padding-right:100px; background-color:#d0cecf; ">
+                                <li class="col-sm-12" style="border:1px solid #3b3280;">
+                                    <br />
+                                    <span style="background-color:#3b3280;  margin-left:-10px 20px 10px 0px; width:50px; height:30px;margin-top:10px; padding:10px;">MATERIAL REQUEST</span>
+                                    <ul style="margin-bottom:15px; margin-top:15px">
+                                        @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.SiteSupervisor))
+                                        {
+                                            <li>@Html.ActionLink("New Request", "NewRequest", "ItemRequest")</li>
+                                            <li>@Html.ActionLink("My Request", "MyRequest", "ItemRequest")</li>
+                                        }
+                                        @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.SiteManager))
+                                        {
+                                            <li>@Html.ActionLink("My Approval", "Index", "ItemRequest")</li>
+                                        }
+                                        @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser) || User.IsInRole(Role.SiteSupervisor))
+                                        {
+                                            <li>@Html.ActionLink("Cut-off List", "Index", "MRCutOff")</li>
+                                        }
+                                        <li>@Html.ActionLink("Material Request List", "RequestedList", "ItemRequest")</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+
+                    @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser) || User.IsInRole(Role.WorkshopController) || User.IsInRole(Role.SiteAdmin) || User.IsInRole(Role.SiteSupervisor) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.AstOperationDirector) || User.IsInRole(Role.ProcurementManager) || User.IsInRole(Role.OperationDirector) || User.IsInRole(Role.TechnicalDirector) || User.IsInRole(Role.ManagingDirector))
+                    {
+                        <li class="dropdown menu-large ">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">PURCHASE REQUISITION <b class="caret"></b></a>
+                            <ul class="dropdown-menu megamenu  container-fluid" style="padding-left:100px;padding-right:100px; background-color:#d0cecf; ">
+                                <li class="col-sm-12" style="border:1px solid #3b3280;">
+                                    <br />
+                                    <span style="background-color:#3b3280;  margin-left:-10px 20px 10px 0px; width:50px; height:30px;margin-top:10px; padding:10px;">PURCHASE REQUISITION</span>
+                                    <ul style="margin-bottom:15px; margin-top:15px">
+                                        @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser))
+                                        {
+                                            <li>@Html.ActionLink("New Request", "Create", "PurchaseRequisition")</li>
+                                            <li>@Html.ActionLink("My Request", "RequestList", "PurchaseRequisition")</li>
+                                        }
+                                        @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProcurementManager))
+                                        {
+                                            <li>@Html.ActionLink("My Approval", "ApprovalList", "PurchaseRequisition")</li>
+                                        }
+                                        <li>@Html.ActionLink("Purchase Requisition List", "Index", "PurchaseRequisition")</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+
+                    @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser))
+                    {
+                        <li>@Html.ActionLink("SUPPLIER QUOTE", "Index", "Quote")</li>
+                    }
+
+                    @*@if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser) || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.TechnicalDirector))
+        {
+            <li class="dropdown menu-large ">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">QUOTE <b class="caret"></b></a>
+                <ul class="dropdown-menu megamenu  container-fluid" style="padding-left:100px;padding-right:100px; background-color:#d0cecf; ">
+                    <li class="col-sm-12" style="border:1px solid #3b3280;">
+                        <br />
+                        <span style="background-color:#3b3280;  margin-left:-10px 20px 10px 0px; width:50px; height:30px;margin-top:10px; padding:10px;">QUOTE</span>
+                        <ul style="margin-bottom:15px; margin-top:15px">
+                            @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser))
+                            {
+                                <li>@Html.ActionLink("New Request", "Create", "Quote")</li>
+                                <li>@Html.ActionLink("My Request", "PendingRequest", "Quote")</li>
+                            }
+                            @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager) ||User.IsInRole(Role.TechnicalDirector))
+                            {
+                                <li>@Html.ActionLink("My Approval", "Index", "Quote")</li>
+                            }
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        }*@
+
+
+                    @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser) || User.IsInRole(Role.ProcurementManager) || User.IsInRole(Role.ManagingDirector) || User.IsInRole(Role.TechnicalDirector) 
+                        || User.IsInRole(Role.OperationDirector) || User.IsInRole(Role.FinanceManager) || User.IsInRole(Role.AccountingManager) || User.IsInRole(Role.AstOperationDirector) 
+                        || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.SiteManager))
+                    {
+                        <li class="dropdown menu-large ">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">QUOTE <b class="caret"></b></a>
+                            <ul class="dropdown-menu megamenu  container-fluid" style="padding-left:100px;padding-right:100px; background-color:#d0cecf; ">
+                                <li class="col-sm-12" style="border:1px solid #3b3280;">
+                                    <br />
+                                    <span style="background-color:#3b3280;  margin-left:-10px 20px 10px 0px; width:50px; height:30px;margin-top:10px; padding:10px;">QUOTE</span>
+                                    <ul style="margin-bottom:15px; margin-top:15px">
+                                        @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser))
+                                        {
+                                            <li>@Html.ActionLink("New Request", "Create", "PurchaseOrder")</li>
+                                            <li>@Html.ActionLink("My Request", "MyRequest", "PurchaseOrder")</li>
+                                        }
+                                        @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.TechnicalDirector) || User.IsInRole(Role.OperationDirector))
+                                        {
+                                            <li>@Html.ActionLink("My Approval", "MyApproval", "PurchaseOrder")</li>
+                                        }
+                                        <li>@Html.ActionLink("Quote List", "List", "PurchaseOrder")</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+
+                    <!--Purchase Order-->
+
+                    @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser) || User.IsInRole(Role.FinanceManager) || User.IsInRole(Role.AccountingManager) || User.IsInRole(Role.OperationDirector) || User.IsInRole(Role.WorkshopController) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.AstOperationDirector) || User.IsInRole(Role.ProcurementManager) || User.IsInRole(Role.TechnicalDirector) || User.IsInRole(Role.ManagingDirector) || User.IsInRole(Role.InvoiceClerk))
+                    {
+                        @*<li>@Html.ActionLink("PURCHASE ORDER", "Index", "PurchaseOrderAandR")</li>*@
+
+                        <li class="dropdown menu-large ">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">PURCHASE ORDER <b class="caret"></b></a>
+                            <ul class="dropdown-menu megamenu  container-fluid" style="padding-left:100px;padding-right:100px; background-color:#d0cecf; ">
+                                <li class="col-sm-12" style="border:1px solid #3b3280;">
+                                    <br />
+                                    <span style="background-color:#3b3280;  margin-left:-10px 20px 10px 0px; width:50px; height:30px;margin-top:10px; padding:10px;">PURCHASE ORDER</span>
+                                    <ul style="margin-bottom:15px; margin-top:15px">
+                                        @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser))
+                                        {
+                                            <li>@Html.ActionLink("New Request", "Create", "PurchaseOrderAandR")</li>
+                                            <li>@Html.ActionLink("My Request", "MyRequest", "PurchaseOrderAandR")</li>
+                                        }
+                                        @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.FinanceManager) || User.IsInRole(Role.AccountingManager) || User.IsInRole(Role.OperationDirector))
+                                        {
+                                            <li>@Html.ActionLink("My Approval", "MyApproval", "PurchaseOrderAandR")</li>
+                                        }
+                                        <li>@Html.ActionLink("Purchase Order List", "Index", "PurchaseOrderAandR")</li>
+                                        @if (User.IsInRole(Role.SystemAdmin))
+                                        {
+
+                                        }
+                                        <li>@Html.ActionLink("Invoice", "Index", "Invoice")</li>
+
+                                        @if (string.Compare(User.Identity.GetUserName().ToString(), "bt_admin") == 0)
+                                        {
+                                            <li>@Html.ActionLink("Purchase Order Report", "PurchaseOrderList", "PurchaseOrderAandR")</li>
+                                        }
+
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+
+
+                    @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.SiteStockKeeper) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.OperationDirector) || User.IsInRole(Role.FinanceManager) || User.IsInRole(Role.AccountingManager) || User.IsInRole(Role.ProcurementManager) || User.IsInRole(Role.AstOperationDirector) || User.IsInRole(Role.ProcurementManager) || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.SiteSupervisor) || User.IsInRole(Role.SiteAdmin) || User.IsInRole(Role.QAQCOfficer) || User.IsInRole(Role.Purchaser))
+                    {
+                        <li class="dropdown menu-large ">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">GOOD RECEIVE NOTE<b class="caret"></b></a>
+                            <ul class="dropdown-menu megamenu  container-fluid" style="padding-left:100px;padding-right:100px; background-color:#d0cecf; ">
+                                <li class="col-sm-12" style="border:1px solid #3b3280;">
+                                    <br />
+                                    <span style="background-color:#3b3280;  margin-left:-10px 20px 10px 0px; width:50px; height:30px;margin-top:10px; padding:10px;">GOOD RECEIVE NOTE</span>
+                                    <ul style="margin-bottom:15px; margin-top:15px">
+                                        @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.SiteStockKeeper))
+                                        {
+                                            <li>@Html.ActionLink("New Request", "Create", "ItemReceive")</li>
+                                            <li>@Html.ActionLink("My Request", "MyRequest", "ItemReceive")</li>
+                                        }
+                                        @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.QAQCOfficer))
+                                        {
+                                            <li>@Html.ActionLink("My Approval", "MyApproval", "ItemReceive")</li>
+                                        }
+                                        <li>@Html.ActionLink("Request List", "List", "ItemReceive")</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+
+                    <li class="dropdown menu-large ">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">STOCKS <b class="caret"></b></a>
+                        <ul class="dropdown-menu megamenu  container-fluid" style="padding-left:100px;padding-right:100px; background-color:#d0cecf; ">
+
+                            <li class="col-sm-12" style="border:1px solid #3b3280;">
+                                <br />
+                                <span style="background-color:#3b3280;  margin-left:-10px 20px 10px 0px; width:50px; height:30px;margin-top:10px; padding:10px;">STOCKS</span>
+                                <ul style="margin-bottom:15px; margin-top:15px">
+
+
+                                    @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.SiteStockKeeper) || User.IsInRole(Role.QAQCOfficer) || User.IsInRole(Role.SiteManager))
+                                    {
+                                        <li>@Html.ActionLink("Stock Return to Supplier", "Index", "ItemReturn")</li>
+
+                                    }
+
+                                    @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser) || User.IsInRole(Role.QAQCOfficer) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.SiteStockKeeper))
+                                    {
+                                        <li>@Html.ActionLink("Stock Transfer", "Index", "StockTransfer")</li>
+                                        <li>@Html.ActionLink("Stock Return", "Index", "StockIssueReturn")</li>
+                                    }
+                                    @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.SiteSupervisor) || User.IsInRole(Role.SiteAdmin) || User.IsInRole(Role.SiteStockKeeper) || User.IsInRole(Role.QAQCOfficer))
+                                    {
+                                        @*<li>@Html.ActionLink("Stock Damage", "Index", "StockDamage")</li>*@
+                                        <li>@Html.ActionLink("Work Order Issued", "Index", "StockIssue")</li>
+                                        <li>@Html.ActionLink("Work Order Returned", "Index", "WorkOrderReturned")</li>
+
+                                    }
+                                    @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.SiteStockKeeper) || User.IsInRole(Role.QAQCOfficer) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.ProjectManager))
+                                    {
+                                        <li>@Html.ActionLink("Stock Adjustment", "Index", "StockAdjustment")</li>
+                                    }
+
+                                    @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser) || User.IsInRole(Role.WorkshopController) || User.IsInRole(Role.QAQCOfficer) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.SiteStockKeeper) | User.IsInRole(Role.SiteSupervisor) || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.AstOperationDirector) || User.IsInRole(Role.ProcurementManager) || User.IsInRole(Role.FinanceManager) || User.IsInRole(Role.AccountingManager) || User.IsInRole(Role.OperationDirector) || User.IsInRole(Role.TechnicalDirector) || User.IsInRole(Role.ManagingDirector))
+                                    {
+                                        <li>@Html.ActionLink("Transfer From Workshop", "Index", "TransferFromMainStock")</li>
+                                    }
+                                    @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.QAQCOfficer) || User.IsInRole(Role.SiteStockKeeper) || User.IsInRole(Role.WorkshopController) || User.IsInRole(Role.ProjectManager))
+                                    {
+                                        <li>@Html.ActionLink("Return to Workshop", "Index", "ReturnMainStock")</li>
+                                    }
+                                    @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.SiteStockKeeper))
+                                    {
+                                        <li>@Html.ActionLink("Block Item QTY", "ItemBlocking", "Stock")</li>
+                                    }
+                                    <li>@Html.ActionLink("Stock Balance", "StockBalance", "Stock")</li>
+                                    <li>@Html.ActionLink("Workshop Balance", "WorkShopBalance", "Stock")</li>
+
+                                    @if(User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.SiteSupervisor) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.SiteStockKeeper) || User.IsInRole(Role.QAQCOfficer) || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.OperationDirector) )
+            {
+                                    <li>@Html.ActionLink("Work Order Planning", "PlanningWorkOrderList", "StockIssue")</li>
+            }
+                                </ul>
+                            </li>
+
+                        </ul>
+                    </li>
+
+                    <li class="dropdown menu-large ">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">REPORTS <b class="caret"></b></a>
+                        <ul class="dropdown-menu megamenu  container-fluid" style="padding-left:100px;padding-right:100px; background-color:#d0cecf; ">
+                            <li class="col-sm-12" style="border:1px solid #3b3280;">
+                                <br />
+                                <span style="background-color:#3b3280;  margin-left:-10px 20px 10px 0px; width:50px; height:30px;margin-top:10px; padding:10px;">REPORTS</span>
+                                <ul style="margin-bottom:15px; margin-top:15px">
+                                    @if (User.IsInRole("Admin") || User.IsInRole(Role.Purchaser) || User.IsInRole(Role.ManagingDirector) || User.IsInRole(Role.OperationDirector)
+                                        || User.IsInRole(Role.AstOperationDirector) || User.IsInRole(Role.TechnicalDirector))
+                                    {
+                                        @*<li>@Html.ActionLink("BoQ vs Actual Balance by Project", "ItemRequestbyProject", "Report")</li>*@
+                                        <li>@Html.ActionLink("Purchase Order", "PurchaseOrder", "Report", new { id = 0 }, htmlAttributes: null)</li>
+                                        @*<li>@Html.ActionLink("Purchase Order by supplier with balance", "PurchaseOrderBySupplier", "Report")</li>*@
+                                        @*<li>@Html.ActionLink("Stock movement", "StockMovement", "Report")</li>*@
+                                        <li>@Html.ActionLink("Return item to supplier", "ReturnItemtoSupplier", "Report")</li>
+                                        <li>@Html.ActionLink("Purchase Order vs Good Received Note", "PurchaseOrderVsItemReceived", "Report")</li>
+
+                                        @*<li>@Html.ActionLink("Stock Usage by Site with remain balance", "StockUsageBySiteWithRemainBalance", "Report")</li>*@
+                                        @*<li>@Html.ActionLink("Stock Balance by warehouse", "StockBalanceBywarehouse", "Report")</li>*@
+
+                                        <li>@Html.ActionLink("Stock Balance Monthly", "StockBalanceByDateandWarehouse", "Report")</li>
+                                        @*<li>@Html.ActionLink("Detail PO Receiving", "DetailPurchaseOrderReceiving", "Report")</li>*@
+                                    }
+                                    @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.SiteSupervisor) || User.IsInRole(Role.SiteStockKeeper))
+                                    {
+                                        <li>@Html.ActionLink("Work Order Isuse VS Work Order Return", "WorkOrderIsuseVSWorkOrderReturn", "Report")</li>
+                                    }
+                                    @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.FinanceManager) || User.IsInRole(Role.AccountingManager)|| User.IsInRole(Role.ProcurementManager))
+                                    {
+                                        <li>@Html.ActionLink("Purchase Order for Finance", "PurchaseOrder", "Report", new { id = 1 }, htmlAttributes: null)</li>
+                                    }
+                                    @if (User.IsInRole(Role.SiteStockKeeper))
+                                    {
+                                        @*<li>@Html.ActionLink("Stock Balance Monthly", "StockBalanceByDateandWarehouseStockKeeper", "Report")</li>*@
+                                        <li>@Html.ActionLink("Stock Balance Monthly", "StockBalanceByDateandWarehouse", "Report", new { id=1 }, htmlAttributes: null)</li>
+                                    }
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+
+                    @*@if (User.IsInRole("Admin"))
+                    {
+                        <li>@Html.ActionLink("USER", "Index", "User")</li>
+                    }*@
+
+                    @if (User.IsInRole("Admin") || User.IsInRole(Role.Purchaser))
+                    {
+                        <li class="dropdown menu-large ">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">PRODUCT SET UP<b class="caret"></b></a>
+                            <ul class="dropdown-menu megamenu  container-fluid" style="padding-left:100px;padding-right:100px; background-color:#d0cecf; ">
+
+                                <li class="col-sm-12" style="border:1px solid #3b3280;">
+                                    <br />
+                                    <span style="background-color:#3b3280;  margin-left:-10px 20px 10px 0px; width:50px; height:30px;margin-top:10px; padding:10px;">PRODUCT SET UP</span>
+                                    <ul style="margin-bottom:15px; margin-top:15px">
+                                        @if (User.IsInRole(Role.SystemAdmin))
+                                        {
+                                            <li>@Html.ActionLink("Class Type", "Index", "ClassType")</li>
+                                            <li>@Html.ActionLink("Group", "Index", "Class")</li>
+                                            <li>@Html.ActionLink("Sub Group", "Index", "SubGroup")</li>
+                                            <li>@Html.ActionLink("Category", "Index", "ProductCategory")</li>
+                                            <li>@Html.ActionLink("Product Type", "Index", "ProductType")</li>
+                                            <li>@Html.ActionLink("Product Class", "Index", "ProductClass")</li>
+                                            <li>@Html.ActionLink("Product Size", "Index", "ProductSize")</li>
+                                            <li>@Html.ActionLink("Brand", "Index", "Brand")</li>
+                                            <li>@Html.ActionLink("Product", "Index", "Product")</li>
+                                            <li>@Html.ActionLink("Unit", "Index", "Unit")</li>
+
+                                        }
+
+                                    </ul>
+                                </li>
+
+                            </ul>
+                        </li>
+
+                        <li class="dropdown menu-large ">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">SET UP <b class="caret"></b></a>
+                            <ul class="dropdown-menu megamenu  container-fluid" style="padding-left:100px;padding-right:100px; background-color:#d0cecf; ">
+
+                                <li class="col-sm-12" style="border:1px solid #3b3280;">
+                                    <br />
+                                    <span style="background-color:#3b3280;  margin-left:-10px 20px 10px 0px; width:50px; height:30px;margin-top:10px; padding:10px;">SET UP</span>
+                                    <ul style="margin-bottom:15px; margin-top:15px">
+                                        @if (User.IsInRole(Role.SystemAdmin))
+                                        {
+                                            @*<li>@Html.ActionLink("Brand", "Index", "Brand")</li>
+                                <li>@Html.ActionLink("Category", "Index", "ProductCategory")</li>
+                                <li>@Html.ActionLink("Class Type", "Index", "ClassType")</li>
+                                    <li>@Html.ActionLink("Group", "Index", "Class")</li>
+                                                                    <li>@Html.ActionLink("Product Class", "Index", "ProductClass")</li>
+                                                                <li>@Html.ActionLink("Product Size", "Index", "ProductSize")</li>
+                                                                <li>@Html.ActionLink("Product Type", "Index", "ProductType")</li>
+                                                                    <li>@Html.ActionLink("Unit", "Index", "Unit")</li>
+                                                                    <li>@Html.ActionLink("Product", "Index", "Product")</li>
+                                            *@
+                                            <li>@Html.ActionLink("Customer", "Index", "Customer")</li>
+                                            <li>@Html.ActionLink("Position", "Index", "Position")</li>
+                                            <li>@Html.ActionLink("Site", "Index", "Site")</li>
+                                            <li>@Html.ActionLink("Warehouse", "Index", "WareHouse")</li>
+                                        }
+                                        @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser))
+                                        {
+                                            <li>@Html.ActionLink("Supplier", "Index", "Supplier")</li>
+                                        }
+
+                                    </ul>
+                                </li>
+
+                            </ul>
+                        </li>
+
+                    }
+
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div style="padding-left:5px;padding-right:5px; margin-top:-20px !important;">
+        <div style="background-color:white!important;">
+            <div class="container-fluid body-content" style="background-color:white!important;margin-bottom:20px !important;padding-top:5px !important;">
+                @RenderBody()
+                <hr />
+                <footer style="background-color:white!important">
+                    <p class="pull-left">&copy; @DateTime.Now.Year - LOTUS GREEN TEAM</p>
+                    @*<p class="pull-left">&copy; @DateTime.Now.Year - BOKOR TECHNOLOGY CO., LTD</p>*@
+                    <p class="pull-right">Powered By: <a href="http://www.bokortechnology.com" target="_blank">BOKOR TECHNOLOGY CO., LTD</a></p>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/custom")
+    <script>
+        jQuery(document).ready(function () {
+            //$(".dropdown").hover(
+            //    function () {
+            //        $('.dropdown-menu', this).stop().fadeIn("fast");
+            //    },
+            //    function () {
+            //        $('.dropdown-menu', this).stop().fadeOut("fast");
+            //    });
+            function validateFloatKeyPress(el) {
+                var v = parseFloat(el.value);
+                el.value = (isNaN(v)) ? '' : v.toFixed(2);
+            }
+        });
+        function formatMoney(n) {
+            return (Math.round(n * 100) / 100).toLocaleString().toFixed(4);
+        }
+        function numberWithCommas(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+        function ReplaceNumberWithCommas(yourNumber) {
+            //Seperates the components of the number
+            var n = yourNumber.toString().split(".");
+            //Comma-fies the first part
+            n[0] = n[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            //Combines the two sections
+            return n.join(".");
+        }
+        function RemoveCommaFromNumber(number) {
+            return number.replace(/,/g, '');
+        }
+        function getDateIfDate(d) {
+            var m = d.match(/\/Date\((\d+)\)\//);
+            return m ? (new Date(+m[1])).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : d;
+        }
+        function ConvertMMDDYYYYtoDDMMYYYY(date) {
+            var d = date.split('/');
+            return d[1] + "/" + d[0] + "/" + d[2];
+        }
+        // Read a page's GET URL variables and return them as an associative array.
+        function getUrlVars()
+        {
+            var vars = [], hash;
+            var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+            for(var i = 0; i < hashes.length; i++)
+            {
+                hash = hashes[i].split('=');
+                vars.push(hash[0]);
+                vars[hash[0]] = hash[1];
+            }
+            return vars;
+        }
+    </script>
+
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js" type="text/javascript"></script>*@
+    @*<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js"></script>*@
+    <script type="text/javascript" src="~/Assets/plugins/jquery-ui/jquery-ui.min.js"></script>
+    <script src="~/Scripts/notify.min.js" type="text/javascript"></script>
+    <script src="~/Scripts/jQuery.print.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="~/Assets/js/bootstrap-datepicker.min.js"></script>
+
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js" type="text/javascript"></script>
+    @*<script src="~/Scripts/custom-script.js" type="text/javascript"></script>*@
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.flash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js" type="text/javascript"></script>
+    <script src="~/Assets/plugins/select2/js/select2.min.js" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
+    <script type="text/javascript" src="~/Scripts/custom/custom-script.js"></script>
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>

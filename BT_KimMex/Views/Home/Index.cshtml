@@ -1,0 +1,803 @@
+﻿@model BT_KimMex.Models.Home
+@using BT_KimMex.Class;
+@{
+    ViewBag.Title = "Home Page";
+}
+@*<link href="~/Assets/style.min.css"  type="text/css" rel="stylesheet"/>*@
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+<style>
+    .widget-overview {
+        margin-bottom: 10px;
+        /*border-radius:50% !important;*/
+    }
+
+        .widget-overview > .inner {
+            padding: 15px;
+            color: #fff;
+        }
+
+            .widget-overview > .inner > h2 {
+                font-weight: 900;
+            }
+
+            .widget-overview > .inner > p {
+                font-weight: bold;
+            }
+
+        .widget-overview > .icon {
+            position: absolute;
+            right: 25px;
+            top: 5px;
+            font-size: 60px;
+            color: rgba(0, 0, 0, 0.25);
+        }
+
+        .widget-overview > .details {
+            padding: 3px;
+            color: #fff;
+            text-align: center;
+            /*font-size: 0.688rem;*/
+            opacity: 0.85;
+        }
+
+            .widget-overview > .details:hover {
+                opacity: 1;
+                cursor: pointer;
+            }
+
+            .widget-overview > .details > span i {
+                margin-left: 5px;
+            }
+
+    .text-primary-1 {
+        color: #65A6CC;
+    }
+
+    .bg-primary-1 {
+        background-color: #65A6CC;
+    }
+
+    .bg-primary-2 {
+        background-color: #398DBD;
+    }
+
+    .bg-primary-3 {
+        background-color: #2380B6;
+    }
+
+    .bg-primary-4 {
+        background-color: #0E74AF;
+    }
+
+    .bg-primary-5 {
+        background-color: #0D6AA0;
+    }
+
+    .bg-success-1 {
+        background-color: #8EBE86;
+    }
+
+    .bg-success-2 {
+        background-color: #69A95E;
+    }
+
+    .bg-success-3 {
+        background-color: #569E4A;
+    }
+
+    .bg-success-4 {
+        background-color: #3C7D30;
+    }
+
+    .bg-success-5 {
+        background-color: #2D7D1F;
+    }
+
+    .bg-danger-1 {
+        background-color: #FF9C9C;
+    }
+
+    .bg-danger-2 {
+        background-color: #FF7474;
+    }
+
+    .bg-danger-3 {
+        background-color: #FF4D4D;
+    }
+
+    .bg-danger-4 {
+        background-color: #FF3939;
+    }
+
+    .bg-danger-5 {
+        background-color: #FF2626;
+    }
+
+    .bg-warning-1 {
+        background-color: #FAB68E;
+    }
+
+    .bg-warning-2 {
+        background-color: #F99E69;
+    }
+
+    .bg-warning-3 {
+        background-color: #F89256;
+    }
+
+    .bg-warning-4 {
+        background-color: #F78643;
+    }
+
+    .bg-warning-5 {
+        background-color: #F77A31;
+    }
+
+    .bg-info-1 {
+        background-color: red;
+    }
+
+    .bg-info-2 {
+        background-color: #67979E;
+    }
+
+    .bg-info-3 {
+        background-color: #468189;
+    }
+
+    .bg-info-4 {
+        background-color: #40767D;
+    }
+
+    .bg-info-5 {
+        background-color: #3A6A71;
+    }
+
+    /*h1, h2, h3, h4, h5, h6 {
+                font-family: 'Gothic A1',sans-serif !important;
+            }*/
+    html, body, h1, h2, h3, h4, h5 {
+        font-family: "Raleway", sans-serif !important;
+    }
+
+    .shortcuts {
+        text-align: center;
+    }
+    /*.btn-lg {
+            padding: 10px 60px;
+            font-size: 40px;
+            line-height: 1.33;
+            /*border-radius: 6px;
+            margin-bottom: 5px;
+        }*/
+    .box {
+        border-radius: 0px;
+        padding: 10px;
+        margin-bottom: 5px !important;
+    }
+
+    .text-center {
+        text-align: center !important;
+    }
+
+    .bg-cyan {
+        background-color: #27a9e3 !important;
+        /*background-color:red;*/
+    }
+
+    .text-white {
+        color: #fff !important;
+    }
+
+    .card-hover:hover {
+        webkit-transform: translateY(-4px) scale(1.01);
+        -moz-transform: translateY(-4px) scale(1.01);
+        -ms-transform: translateY(-4px) scale(1.01);
+        -o-transform: translateY(-4px) scale(1.01);
+        -o-transform: translateY(-4px) scale(1.01);
+        -webkit-transform: translateY(-4px) scale(1.01);
+        transform: translateY(-4px) scale(1.01);
+        -webkit-box-shadow: 0 14px 24px rgba(62, 57, 107, 0.1);
+        box-shadow: 0 14px 24px rgba(62, 57, 107, 0.1);
+        cursor: pointer;
+    }
+
+    body {
+        padding-top: 50px;
+        padding-bottom: 20px;
+        font-family: 'Gothic A1',sans-serif;
+        font-size: 14px;
+    }
+
+    .mySlides {
+        display: none;
+    }
+
+    .customLogo {
+        width: 65px;
+        height: 65px;
+        border-radius: 50%;
+        margin-top: -20px;
+    }
+
+    .customLogo2 {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+    }
+
+    .page-title {
+        color: white !important;
+    }
+
+    .w3-badge{
+        background-color:white !important;
+        color:red !important;
+    }
+    .inner h2{
+        color: green !important;
+    }
+</style>
+<body style="background-color:rgba(20, 76, 70, 0.2); " class="row">
+    @*<div class="row" style="background-color:#d0cecf; margin-top:-30px !important">
+            <div class="w3-content w3-section" style="max-width:100%">
+                <img class="mySlides" src="~/Assets/img/photo_2018-06-07_09-01-00.jpg" style="width:100%">
+                <img class="mySlides" src="~/Assets/img/photo_2018-06-07_09-14-46.jpg" style="width:100%">
+            </div>
+        </div>*@
+    <div style="background-color:#d0cecf">
+        <div class="row" Style="background-color:#3b3280;margin-top:-10px;">
+            <div class="col-md-12">
+                <h4 class="page-title">Pending Request</h4>
+            </div>
+        </div>
+        
+        <div class="row" style="border:1px solid #f8f8f8;padding-bottom:5px; background-color:white ">
+            <div style="margin-top:15px; ">
+                
+                @if (User.IsInRole("Admin") || User.IsInRole(Role.SiteManager))
+                {
+                    <div class="col-lg-2 col-xs-6">
+                        <div class="widget-overview " style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                            <div class="inner">
+                                <h2>@Model.pendingIR</h2>
+                                <p>Material Request</p>
+                            </div>
+                            <div class="icon">
+                                <img src="~/Assets/Images/logo2.jpg" class="customLogo" />
+                            </div>
+                            <div class="details bg-info-3">
+                                <a href="@Url.Action("Index", "ItemRequest", new { status = "Pending" })" style="color:white!important;text-decoration:none !important;">View Details <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (User.IsInRole("Admin") || User.IsInRole(Role.ProcurementManager))
+                {
+                    <div class="col-lg-2 col-xs-6">
+                        <div class="widget-overview " style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                            <div class="inner">
+                                <h2>@Model.countPR</h2>
+                                <p>Purchase Request</p>
+                            </div>
+                            <div class="icon">
+                                <img src="~/Assets/Images/logo3.jpg" class="customLogo" />
+                                @*<i class="fa fa-money"></i>*@
+                            </div>
+                            <div class="details bg-info-3">
+                                <a href="@Url.Action("ApprovalList", "PurchaseRequisition", new { status = "pending" })" style="color:white!important;text-decoration:none !important;">View Details <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (User.IsInRole("Admin") || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.TechnicalDirector) || User.IsInRole(Role.OperationDirector))
+                {
+                    <div class="col-lg-2 col-xs-6">
+                        <div class="widget-overview " style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                            <div class="inner">
+                                <h2>@Model.countQuote</h2>
+                                <p>Quote</p>
+                            </div>
+                            <div class="icon">
+                                <img src="~/Assets/Images/logo3.jpg" class="customLogo" />
+                                @*<i class="fa fa-money"></i>*@
+                            </div>
+                            <div class="details bg-info-3">
+                                <a href="@Url.Action("MyApproval", "PurchaseOrder", new { status = "Approved" })" style="color:white!important;text-decoration:none !important;">View Details <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                
+                @if (User.IsInRole("Admin") || User.IsInRole(Role.FinanceManager) || User.IsInRole(Role.AccountingManager) || User.IsInRole(Role.OperationDirector))
+                {
+                    <div class="col-lg-2 col-xs-6">
+                        <div class="widget-overview " style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                            <div class="inner">
+                                <h2>@Model.countPO</h2>
+                                <p>Purchase Order</p>
+                            </div>
+                            <div class="icon">
+                                <img src="~/Assets/Images/logo4.jpg" class="customLogo" />
+                                @*<i class="fa fa-download"></i>*@
+                            </div>
+                            <div class="details bg-info-3">
+                                <a href="@Url.Action("Index", "PurchaseOrderAandR", new { status = "Pending" })" style="color:white!important;text-decoration:none !important;">View Details <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (User.IsInRole("Admin") || User.IsInRole(Role.SiteManager))
+                {
+                    <div class="col-lg-2 col-xs-6">
+                        <div class="widget-overview " style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                            <div class="inner">
+                                <h2>@Model.PendingIRec</h2>
+                                <p>Good Receive Note</p>
+                            </div>
+                            <div class="icon">
+                                <img src="~/Assets/Images/logo5.jpg" class="customLogo" />
+                                @*<i class="fa fa-reply-all"></i>*@
+                            </div>
+                            <div class="details bg-info-3">
+                                <a href="@Url.Action("MyApproval", "ItemReceive", new { status = "Pending" })" style="color:white!important;text-decoration:none !important;">View Details <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @if (User.IsInRole("Admin") || User.IsInRole(Role.QAQCOfficer) || User.IsInRole(Role.SiteManager))
+                {
+                    <div class="col-lg-2 col-xs-6">
+                        <div class="widget-overview " style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                            <div class="inner">
+                                <h2>@Model.PendingIRet</h2>
+                                <p>Stock Return to Supplier</p>
+                            </div>
+                            <div class="icon">
+                                <img src="~/Assets/Images/logo6.jpg" class="customLogo" />
+                                @*<i class="fa fa-exchange"></i>*@
+                            </div>
+                            <div class="details bg-info-3">
+                                <a href="@Url.Action("Index", "ItemReturn", new { status = "Pending" })" style="color:white!important;text-decoration:none !important;">View Details <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @if (User.IsInRole("Admin") || User.IsInRole(Role.QAQCOfficer) || User.IsInRole(Role.SiteManager))
+                {
+                    <div class="col-lg-2 col-xs-6">
+                        <div class="widget-overview " style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                            <div class="inner">
+                                <h2>@Model.PendingST</h2>
+                                <p>Stock Transfer</p>
+                            </div>
+                            <div class="icon">
+                                <img src="~/Assets/Images/logo6.jpg" class="customLogo" />
+                                @*<i class="fa fa-exchange"></i>*@
+                            </div>
+                            <div class="details bg-info-3">
+                                <a href="@Url.Action("Index", "StockTransfer", new { status = "Pending" })" style="color:white!important;text-decoration:none !important;">View Details <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (User.IsInRole("Admin") || User.IsInRole(Role.QAQCOfficer) || User.IsInRole(Role.SiteManager))
+                {
+                    <div class="col-lg-2 col-xs-6">
+                        <div class="widget-overview " style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                            <div class="inner">
+                                <h2>@Model.countSR</h2>
+                                <p>Stock Return</p>
+                            </div>
+                            <div class="icon">
+                                <img src="~/Assets/Images/logo7.jpg" class="customLogo" />
+                                @*<i class="fa fa-chain-broken"></i>*@
+                            </div>
+                            <div class="details bg-info-3">
+                                <a href="@Url.Action("Index", "StockIssueReturn", new { status = "Pending" })" style="color:white!important;text-decoration:none !important;">View Details <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @if (User.IsInRole("Admin") || User.IsInRole(Role.SiteStockKeeper) || User.IsInRole(Role.SiteManager))
+                {
+                    <div class="col-lg-2 col-xs-6">
+                        <div class="widget-overview " style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                            <div class="inner">
+                                <h2>@Model.PendingSIss</h2>
+                                <p>Work Order Issued</p>
+                            </div>
+                            <div class="icon">
+                                <img src="~/Assets/Images/logo8.jpg" class="customLogo" />
+                                @*<i class="fa fa-location-arrow"></i>*@
+                            </div>
+                            <div class="details bg-info-3">
+                                <a href="@Url.Action("Index", "StockIssue", new { status = "Pending" })" style="color:white!important;text-decoration:none !important;">View Details <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (User.IsInRole("Admin") || User.IsInRole(Role.SiteStockKeeper) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.QAQCOfficer))
+                {
+                    <div class="col-lg-2 col-xs-6">
+                        <div class="widget-overview " style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                            <div class="inner">
+                                <h2>@Model.PendingIssRe</h2>
+                                <p>Work Order Returned</p>
+                            </div>
+                            <div class="icon">
+                                <img src="~/Assets/Images/logo9.jpg" class="customLogo" />
+                                @*<i class="fa fa-refresh"></i>*@
+                            </div>
+                            <div class="details bg-info-3">
+                                <a href="@Url.Action("Index", "WorkOrderReturned", new { status = "Pending" })" style="color:white!important;text-decoration:none !important;">View Details <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (User.IsInRole("Admin") || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.QAQCOfficer))
+                {
+                    <div class="col-lg-2 col-xs-6">
+                        <div class="widget-overview " style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                            <div class="inner">
+                                <h2>@Model.countSA</h2>
+                                <p>Stock Adjustment</p>
+                            </div>
+                            <div class="icon">
+                                <img src="~/Assets/Images/logo9.jpg" class="customLogo" />
+                                @*<i class="fa fa-refresh"></i>*@
+                            </div>
+                            <div class="details bg-info-3">
+                                <a href="@Url.Action("Index", "StockAdjustment", new { status = "Pending" })" style="color:white!important;text-decoration:none !important;">View Details <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @if (User.IsInRole("Admin") || User.IsInRole(Role.WorkshopController))
+                {
+                    <div class="col-lg-2 col-xs-6">
+                        <div class="widget-overview " style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                            <div class="inner">
+                                <h2>@Model.countTW</h2>
+                                <p>Transfer from Wrokshop</p>
+                            </div>
+                            <div class="icon">
+                                <img src="~/Assets/Images/logo9.jpg" class="customLogo" />
+                                @*<i class="fa fa-refresh"></i>*@
+                            </div>
+                            <div class="details bg-info-3">
+                                <a href="@Url.Action("Index", "TransferFromMainStock", new { status = "Pending" })" style="color:white!important;text-decoration:none !important;">View Details <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @if (User.IsInRole("Admin") || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.WorkshopController) || User.IsInRole(Role.QAQCOfficer))
+                {
+                    <div class="col-lg-2 col-xs-6">
+                        <div class="widget-overview " style="border:1px solid rgba(201, 76, 76, 0.5);background-color:rgba(128, 128, 128,0.5)">
+                            <div class="inner">
+                                <h2>@Model.countRW</h2>
+                                <p>Return to Wrokshop</p>
+                            </div>
+                            <div class="icon">
+                                <img src="~/Assets/Images/logo9.jpg" class="customLogo" />
+                                @*<i class="fa fa-refresh"></i>*@
+                            </div>
+                            <div class="details bg-info-3">
+                                <a href="@Url.Action("Index", "ReturnMainStock", new { status = "Pending" })" style="color:white!important;text-decoration:none !important;">View Details <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                
+            </div>
+        </div>
+
+        <div class="row w3-white">
+            @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser))
+            {
+
+                <div class="col-md-3 col-xs-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading w3-teal" style="padding-top:1px !important;padding-bottom:0px !important;">
+                            <h6>Completed Material Request <span class="w3-badge w3-padding">@Model.countApprovedMR</span></h6>
+                        </div>
+                        <div class="panel-body w3-padding-small" style="font-size:11px !important;">
+                            <table class="w3-table w3-striped w3-bordered w3-border w3-hoverable w3-white">
+                                @if (Model.approvedMrListItems.Count == 0)
+                                {
+                                    <tr>
+                                        <td>No Item Available</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    foreach (var item in Model.approvedMrListItems)
+                                    {
+                                        <tr>
+                                            <td><a href="@Url.Action("Detail","ItemRequest",new { id = item.ir_id })">@item.ir_no</a></td>
+                                            <td>@item.project_short_name</td>
+                                            @*<td>@Convert.ToDateTime(item.created_date).ToString("dd/MM/yyyy")</td>*@
+                                        </tr>
+                                    }
+                                }
+                            </table><br>
+                            <a href="@Url.Action("RequestedList","ItemRequest")" class="w3-button w3-dark-grey w3-tiny">View More  <i class="fa fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+
+            }
+            @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser))
+            {
+
+                <div class="col-md-3 col-xs-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading w3-teal" style="padding-top:1px !important;padding-bottom:0px !important;">
+                            <h6>Completed Purchase Request <span class="w3-badge w3-padding">@Model.countApprovedPR</span></h6>
+                        </div>
+                        <div class="panel-body w3-padding-small" style="font-size:11px !important;">
+                            <table class="w3-table w3-striped w3-bordered w3-border w3-hoverable w3-white">
+                                @if (Model.approvedPRListItems.Count == 0)
+                                {
+                                    <tr>
+                                        <td>No Item Available</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    foreach (var item in Model.approvedPRListItems)
+                                    {
+                                        <tr>
+                                            <td><a href="@Url.Action("Detail","PurchaseRequisition",new { id = item.purchase_requisition_id })">@item.purchase_requisition_number</a></td>
+                                            <td>@item.project_short_name</td>
+                                            @*<td>@Convert.ToDateTime(item.created_date).ToString("dd/MM/yyyy")</td>*@
+                                        </tr>
+                                    }
+                                }
+                            </table><br>
+                            <a href="@Url.Action("RequestList","PurchaseRequisition")" class="w3-button w3-dark-grey w3-tiny">View More  <i class="fa fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+
+            }
+            @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser))
+            {
+
+                <div class="col-md-3 col-xs-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading w3-teal" style="padding-top:1px !important;padding-bottom:0px !important;">
+                            <h6>Completed Purchase Order <span class="w3-badge w3-padding">@Model.countApprovedPO</span></h6>
+                        </div>
+                        <div class="panel-body w3-padding-small" style="font-size:11px !important;">
+                            <table class="w3-table w3-striped w3-bordered w3-border w3-hoverable w3-white">
+                                @if (Model.approvedPOListItems.Count == 0)
+                                {
+                                    <tr>
+                                        <td>No Item Available</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    foreach (var item in Model.approvedPOListItems)
+                                    {
+                                        <tr>
+                                            <td><a href="@Url.Action("Details","PurchaseOrderAandR",new { id = item.purchase_order_id })">@item.purchase_request_number</a></td>
+                                            <td>@item.project_short_name</td>
+                                        </tr>
+                                    }
+                                }
+                            </table><br>
+                            <a href="@Url.Action("Index","PurchaseOrderAandR")" class="w3-button w3-dark-grey w3-tiny">View More  <i class="fa fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+
+            }
+            @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser))
+            {
+
+                <div class="col-md-3 col-xs-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading w3-teal" style="padding-top:1px !important;padding-bottom:0px !important;">
+                            <h6>Completed Good Receive Note <span class="w3-badge w3-padding">@Model.countApprovedGRN</span></h6>
+                        </div>
+                        <div class="panel-body w3-padding-small" style="font-size:11px !important;">
+                            <table class="w3-table w3-striped w3-bordered w3-border w3-hoverable w3-white">
+                                @if (Model.approvedGRNListItems.Count == 0)
+                                {
+                                    <tr>
+                                        <td>No Item Available</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    foreach (var item in Model.approvedGRNListItems)
+                                    {
+
+                                        <tr>
+                                            <td><a href="@Url.Action("Detail", "ItemReceive", new { id = item.receive_item_voucher_id })">@item.received_number</a></td>
+                                            <td>@item.project_full_name</td>
+                                        </tr>
+
+                                    }
+                                }
+                            </table><br>
+                            <a href="@Url.Action("Index","ItemReceive")" class="w3-button w3-dark-grey w3-tiny">View More  <i class="fa fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+            }
+        </div>
+        <div class="row w3-white">
+            @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser))
+            {
+
+                <div class="col-md-3 col-xs-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading w3-teal" style="padding-top:1px !important;padding-bottom:0px !important;">
+                            <h6>Completed Stock Transfer <span class="w3-badge w3-padding">@Model.countApprovedST</span></h6>
+                        </div>
+                        <div class="panel-body w3-padding-small" style="font-size:11px !important;">
+                            <table class="w3-table w3-striped w3-bordered w3-border w3-hoverable w3-white">
+                                @if (Model.approvedSTListItems.Count == 0)
+                                {
+                                    <tr>
+                                        <td>No Item Available</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    foreach (var item in Model.approvedSTListItems)
+                                    {
+                                        <tr>
+                                            <td><a href="@Url.Action("Detail","StockTransfer",new { id = item.stock_transfer_id })">@item.stock_transfer_no</a></td>
+                                            <td>@item.project_short_name</td>
+                                        </tr>
+                                    }
+                                }
+                            </table><br>
+                            <a href="@Url.Action("Index","StockTransfer")" class="w3-button w3-dark-grey w3-tiny">View More  <i class="fa fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+
+            }
+            @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser))
+            {
+
+                <div class="col-md-3 col-xs-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading w3-teal" style="padding-top:1px !important;padding-bottom:0px !important;">
+                            <h6>Completed Stock Return <span class="w3-badge w3-padding">@Model.countApprovedSR</span></h6>
+                        </div>
+                        <div class="panel-body w3-padding-small" style="font-size:11px !important;">
+                            <table class="w3-table w3-striped w3-bordered w3-border w3-hoverable w3-white">
+                                @if (Model.approvedSRListItems.Count == 0)
+                                {
+                                    <tr>
+                                        <td>No Item Available</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    foreach (var item in Model.approvedSRListItems)
+                                    {
+                                        <tr>
+                                            <td><a href="@Url.Action("Details","StockIssueReturn",new { id = item.stock_issue_return_id })">@item.stock_issue_number</a></td>
+                                            <td>@item.project_short_name</td>
+                                        </tr>
+                                    }
+                                }
+                            </table><br>
+                            <a href="@Url.Action("Index","StockIssueReturn")" class="w3-button w3-dark-grey w3-tiny">View More  <i class="fa fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+
+            }
+            @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser))
+            {
+
+                <div class="col-md-3 col-xs-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading w3-teal" style="padding-top:1px !important;padding-bottom:0px !important;">
+                            <h6>Completed Stock Return To Supplier <span class="w3-badge w3-padding">@Model.countApprovedRW</span></h6>
+                        </div>
+                        <div class="panel-body w3-padding-small" style="font-size:11px !important;">
+                            <table class="w3-table w3-striped w3-bordered w3-border w3-hoverable w3-white">
+                                @if (Model.approvedRWListItems.Count == 0)
+                                {
+                                    <tr>
+                                        <td>No Item Available</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    foreach (var item in Model.approvedRWListItems)
+                                    {
+                                        <tr>
+                                            <td><a href="@Url.Action("Detail","ReturnMainStock",new { id = item.return_main_stock_id })">@item.return_main_stock_no</a></td>
+                                            <td>@item.project_short_name</td>
+                                        </tr>
+                                    }
+                                }
+                            </table><br>
+                            <a href="@Url.Action("Index","ReturnMainStock")" class="w3-button w3-dark-grey w3-tiny">View More  <i class="fa fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+
+            }
+            @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser))
+            {
+
+                <div class="col-md-3 col-xs-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading w3-teal" style="padding-top:1px !important;padding-bottom:0px !important;">
+                            <h6>Completed Transfer From Workshop <span class="w3-badge w3-padding">@Model.countApprovedTW</span></h6>
+                        </div>
+                        <div class="panel-body w3-padding-small" style="font-size:11px !important;">
+                            <table class="w3-table w3-striped w3-bordered w3-border w3-hoverable w3-white">
+                                @if (Model.approvedTWListItems.Count == 0)
+                                {
+                                    <tr>
+                                        <td>No Item Available</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    foreach (var item in Model.approvedTWListItems)
+                                    {
+                                        <tr>
+                                            <td><a href="@Url.Action("Detail","TransferFromMainStock",new { id = item.stock_transfer_id })">@item.stock_transfer_no</a></td>
+                                            <td>@item.project_short_name</td>
+                                        </tr>
+                                    }
+                                }
+                            </table><br>
+                            <a href="@Url.Action("Index","TransferFromMainStock")" class="w3-button w3-dark-grey w3-tiny">View More  <i class="fa fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+
+            }
+        </div>
+    </div>
+
+</body>
+@section Scripts{
+    <script type="text/javascript">
+        var myIndex = 0;
+        $(function () {
+            carousel();
+        });
+
+        function carousel() {
+            var i;
+            var x = document.getElementsByClassName("mySlides");
+            for (i = 0; i < x.length; i++) {
+                x[i].style.display = "none";
+            }
+            myIndex++;
+            if (myIndex > x.length) { myIndex = 1 }
+            x[myIndex - 1].style.display = "block";
+            setTimeout(carousel, 5000); // Change image every 2 seconds
+        }
+    </script>
+}

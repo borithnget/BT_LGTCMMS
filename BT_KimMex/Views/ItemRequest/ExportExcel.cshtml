@@ -1,0 +1,341 @@
+﻿@model BT_KimMex.Models.ItemRequestViewModel
+
+@{
+    Layout = null;
+    string expectedDeliveryDate = string.Empty;
+    if (Model.expected_delivery_date.HasValue)
+    {
+        expectedDeliveryDate = Convert.ToDateTime(Model.expected_delivery_date).ToString("dd-MMM-yy");
+    }
+}
+
+<head>
+    <meta http-equiv="content-type" content="text/plain; charset=UTF-8" />
+    <style type="text/css">
+        /*#mr_table,#mr_table th,#mr_table td {
+          border: 1px solid black;
+          border-collapse: collapse;
+        }*/
+    </style>
+    <link rel="stylesheet" href="~/Assets/plugins/TableExport/css/tableexport.min.css" type="text/css" />
+</head>
+
+<body>
+    @*<div class="row" id="myform" style="width:21cm;height:29.7cm;font-family:Century Gothic;background-color:lightgray;">*@
+        <div class="row" id="myform">
+
+            <div style="width:100%; margin-top:50px">
+                <table width="100%" style="border-collapse: collapse; margin-top:30px;" id="mr_table" cellpadding="10">
+                    <tbody>
+                        <tr>
+                            <td colspan="4"><img src="https://lgtss.com/Assets/images/lotusgreeenteam.png" style="height:110px; width:400px; margin-top:10px; " /></td>
+                            <td></td>
+                            <td colspan="4" style="font-weight:bold;font-size:12px;font-family:Century Gothic;text-align:left;vertical-align:middle;text-decoration: underline;">VENDOR </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="5" style=""></td>
+                            <td colspan="4" style="border-top: 1px solid black;border-left: 1px solid black;border-right: 1px solid black;border-collapse: collapse;"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" style=""></td>
+                            <td colspan="4" style="border-left: 1px solid black;border-right: 1px solid black;border-collapse: collapse;"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" style=""></td>
+                            <td colspan="4" style="border-left: 1px solid black;border-right: 1px solid black;border-collapse: collapse;"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" style=""></td>
+                            <td colspan="4" style="border-left: 1px solid black;border-right: 1px solid black;border-collapse: collapse;"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" style="font-size:12px;color:red;font-family:Century Gothic;text-align:left;vertical-align:middle;font-weight:bold;">Note that material sourcing time is at least 7 days.</td>
+                            <td colspan="4" style="border-left: 1px solid black;border-right: 1px solid black;border-collapse: collapse;"></td>
+                        </tr>
+                        <tr>
+                            
+                            <td colspan="5" style=""></td>
+                            <td colspan="4" style="border-bottom: 1px solid black;border-left: 1px solid black;border-right: 1px solid black;border-collapse: collapse;"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="9"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5"></td>
+                            <td colspan="4" style="font-weight:bold; font-family:Century Gothic;font-size:12px;border-top: 1px solid black;border-left: 1px solid black;border-right: 1px solid black;border-collapse: collapse;text-align:left;vertical-align:middle;">TERMS & CONDITIONS</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5"></td>
+                            <td style="font-family:Century Gothic;font-size:12px;border-left: 1px solid black;border-collapse: collapse;text-align:right;vertical-align:middle;">1-</td>
+                            <td style="font-family:Century Gothic;font-size:12px;border-collapse: collapse;text-align:left;vertical-align:middle;"> Incoterm:</td>
+                            <td style="border-right: 1px solid black;border-collapse: collapse;" colspan="2"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5"></td>
+                            <td style="font-family:Century Gothic;font-size:12px;border-left: 1px solid black;border-collapse: collapse;text-align:right;vertical-align:middle;">2-</td>
+                            <td style="font-family:Century Gothic;font-size:12px;border-collapse: collapse;text-align:left;vertical-align:middle;">Payment: </td>
+                            <td style="border-right: 1px solid black;border-collapse: collapse;" colspan="2"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5"></td>
+                            <td style="font-family:Century Gothic;font-size:12px;border-left: 1px solid black;border-collapse: collapse;text-align:right;vertical-align:middle;">3-</td>
+                            <td style="font-family:Century Gothic;font-size:12px;border-collapse: collapse;text-align:left;vertical-align:middle;">Delivery: </td>
+                            <td style="border-right: 1px solid black;border-collapse: collapse;" colspan="2"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5"></td>
+                            <td style="font-family:Century Gothic;font-size:12px;border-left: 1px solid black;border-collapse: collapse;text-align:right;vertical-align:middle;">4-</td>
+                            <td style="font-family:Century Gothic;font-size:12px;border-collapse: collapse;text-align:left;vertical-align:middle;">Shipment: </td>
+                            <td style="border-right: 1px solid black;border-collapse: collapse;" colspan="2"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5"></td>
+                            <td style="font-family:Century Gothic;font-size:12px;border-left: 1px solid black;border-collapse: collapse;text-align:right;vertical-align:middle;">5-</td>
+                            <td style="font-family:Century Gothic;font-size:12px;border-collapse: collapse;text-align:left;vertical-align:middle;">Warranty: </td>
+                            <td style="border-right: 1px solid black;border-collapse: collapse;" colspan="2"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5"></td>
+                            <td style="font-family:Century Gothic;font-size:12px;border-left: 1px solid black;border-bottom: 1px solid black;border-collapse: collapse;text-align:right;vertical-align:middle;">6-</td>
+                            <td style="font-family:Century Gothic;font-size:12px;border-bottom: 1px solid black;border-collapse: collapse;text-align:left;vertical-align:middle;">Vendor Ref: </td>
+                            <td style="border-right: 1px solid black;border-bottom: 1px solid black; border-collapse: collapse;" colspan="2"></td>
+                        </tr>
+                        
+                        
+                        @*<tr>
+                            <td colspan="8" style="font-size:12px;color:red;font-family:Century Gothic;text-align:left;vertical-align:middle;">Note that material sourcing time is at least 7 days.</td>
+                        </tr>*@
+                        <tr>
+                            <td colspan="9"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="9" style="border: 1px solid black;border-collapse: collapse;font-size:12px;text-align:center;font-size:1.5em;font-weight:bold;font-family:Century Gothic;vertical-align:central;">MATERIAL REQUEST (MR)</td>
+                        </tr>
+                        <tr>
+                            <td colspan="8" style=""></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td style="font-weight:bold;font-family:Century Gothic;text-align:left;vertical-align:middle;">Requested By:</td>
+                            <td colspan="2" style="font-family:Century Gothic;text-align:left;vertical-align:middle;">@Model.created_by</td>
+                            <td style="font-weight:bold;font-family:Century Gothic;text-align:right;vertical-align:middle;">Project Name:</td>
+                            <td colspan="3" style="font-family:Century Gothic;text-align:left;vertical-align:middle;">@Model.project_full_name</td>
+                        </tr>
+                        <tr>
+                            <td colspan="8"></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td style="font-weight:bold;font-family:Century Gothic;text-align:left;vertical-align:middle;">Request Date:</td>
+                            <td colspan="2" style="font-family:Century Gothic;text-align:left;vertical-align:middle;">@Convert.ToDateTime(Model.created_date).ToString("dd-MMM-yy")</td>
+                            <td style="font-weight:bold;font-family:Century Gothic;text-align:right;vertical-align:middle;">SO No:</td>
+                            <td colspan="3" style="font-family:Century Gothic;text-align:left;vertical-align:middle;">@Model.so_number</td>
+                        </tr>
+                        <tr>
+                            <td colspan="8"></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td style="font-weight:bold;font-family:Century Gothic;text-align:left;vertical-align:middle;">Expec date of Del:</td>
+                            <td colspan="2" style="font-family:Century Gothic;text-align:left;vertical-align:middle;">@expectedDeliveryDate</td>
+                            <td style="font-weight:bold;font-family:Century Gothic;text-align:right;vertical-align:middle;">MR No: </td>
+                            <td colspan="3" style="font-family:Century Gothic;text-align:left;vertical-align:middle;">@Model.ir_no </td>
+                        </tr>
+
+
+                        <tr>
+                            <td colspan="8" style="padding:20px;"><h2></h2></td>
+                        </tr>
+                        <tr>
+                            <th style="border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;width:50px;">No.</th>
+                            <th style="border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;">Item Code</th>
+                            <th colspan="2" style="border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;">Item Name</th>
+                            <th style="border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;">QTY</th>
+                            <th style="border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;">Unit</th>
+                            <th style="border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;">Remark</th>
+                            <th style="border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;">Approved QTY</th>
+                            <th style="border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;">Reason</th>
+                        </tr>
+                        @{
+                            int ddCount = 1;
+                            foreach (var ddIr in Model.ir1[0].ir2)
+                            {
+                                string requestQty = string.Format("{0:G29}", decimal.Parse(ddIr.ir_qty.ToString()));
+                                string approvedQty = ddIr.approved_qty.HasValue ? string.Format("{0:G29}", decimal.Parse(ddIr.approved_qty.ToString())) : string.Empty ;
+                                <tr>
+                                    <td style="width:30px;border: 1px solid black;border-collapse: collapse;vertical-align:middle !important; font-family:Century Gothic;text-align:center !important;font-size:12px;">@ddCount</td>
+                                    <td style="text-align:center !important;vertical-align:middle !important;border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;font-size:12px;">@ddIr.product_code</td>
+                                    <td colspan="2" style="vertical-align:middle;border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;font-size:12px;"><p>@ddIr.product_name</p></td>
+                                    <td style="text-align:center !important;vertical-align:middle !important; border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;font-size:12px;">@requestQty</td>
+                                    <td style="text-align:center !important;vertical-align:middle !important; border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;font-size:12px;">@ddIr.requested_unit</td>
+                                    <td style="vertical-align:middle !important;border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;font-size:12px;">@ddIr.remark</td>
+                                    <td style="text-align:center !important;vertical-align:middle !important; border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;font-size:12px;">@approvedQty</td>
+                                    <td style="border: 1px solid black;border-collapse: collapse; font-family:Century Gothic;font-size:12px;">@ddIr.reason</td>
+                                </tr>
+                                ddCount++;
+                            }
+                        }
+                        <tr>
+                            <td colspan="9" style="padding:20px;"><h2></h2></td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="2" style="font-family:Century Gothic;">Prepared By:</td>
+                            <td></td>
+                            <td colspan="2" style="font-family:Century Gothic;">Approved By:</td>
+                            <td></td>
+                            <td colspan="2" style="font-family:Century Gothic;">Approved By:</td>
+                        </tr>
+                        <tr>
+                            <td colspan="8" ><h1></h1></td>
+                        </tr>
+                        <tr>
+                            <td colspan="8"><h1></h1></td>
+                        </tr>
+                        <tr>
+                            <td colspan="8"><h1></h1></td>
+                        </tr>
+                        <tr>
+                        
+                        <tr>                           
+                            <td colspan="2" style="font-family:Century Gothic;">Site Supervisor</td>
+                            <td></td>
+                            <td colspan="2" style="font-family:Century Gothic;">Technical director</td>
+                            <td></td>
+                            <td colspan="2" style="font-family:Century Gothic;">Site Manager </td>
+                            
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="font-family:Century Gothic;">Name: @Model.created_by</td>
+                            <td></td>
+                            <td colspan="2" style="font-family:Century Gothic;">Name:</td>
+                            <td></td>
+                            <td colspan="2" style="font-family:Century Gothic;">Name: @Model.approved_by</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="font-family:Century Gothic;">Date: @Convert.ToDateTime(Model.created_date).ToString("dd-MMM-yy")</td>
+                            <td></td>
+                            <td colspan="2" style="font-family:Century Gothic;">Date: </td>
+                            <td></td>
+                            <td colspan="2" style="font-family:Century Gothic;">Date: @Convert.ToDateTime(Model.approved_date).ToString("dd-MMM-yy")</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    @using (Html.BeginForm("Export", "ItemRequest", FormMethod.Post, new { id = "my-form" }))
+    {
+        <input type="hidden" name="GridHtml" />
+        <input type="submit" id="btnExport" value="Export" />
+    }
+</body>
+
+<script type="text/javascript" src="~/Scripts/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="~/Assets/plugins/TableExport/js/xlsx.core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js" integrity="sha512-csNcFYJniKjJxRWRV1R7fvnXrycHP6qDR21mgz1ZP55xY5d+aHLfo9/FcGDQLfn2IfngbAHd8LdfsagcCqgTcQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.6/shim.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.6/cpexcel.js"></script>
+
+<script type="text/javascript" src="~/Assets/plugins/TableExport/js/tableexport.min.js"></script>
+<script type="text/javascript" src="~/Scripts/jQuery.print.min.js"></script>
+<script type="text/javascript" >
+
+    @*var tableToExcel = (function () {
+        // Define your style class template.
+        var style = "<style>.green { background-color: green; } td{padding: 10px !important;}</style>";
+        var uri = 'data:application/vnd.ms-excel;base64,'
+            , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->' + style + '</head><body><table>{table}</table></body></html>'
+            , base64 = function (s) {
+                return window.btoa(unescape(encodeURIComponent(s)))
+            }
+            , format = function (s, c) {
+                return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; })
+            }
+        return function (table, name) {
+            name = '@Model.project_full_name' + ":" + '@Model.ir_no';
+            if (!table.nodeType) table = document.getElementById(table)
+            var ctx = { worksheet: name || 'Worksheet', table: table.innerHTML }
+            window.location.href = uri + base64(format(template, ctx))
+        }
+    })();*@
+
+    function exportTableToExcel(tableId, filename) {
+        let dataType = 'application/vnd.ms-excel';
+        let extension = '.xls';
+
+        let base64 = function (s) {
+            //return window.btoa(unescape(encodeURIComponent(s)))
+            //return window.btoa(unescape(escape(s)))
+            //return window.btoa(escape(s))
+
+            try {
+                return window.btoa(unescape(escape(s)));
+            }
+            catch (err) {
+                return window.btoa(unescape(encodeURIComponent(s)));
+            }
+
+        };
+
+        let template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>';
+        let render = function (template, content) {
+            return template.replace(/{(\w+)}/g, function (m, p) { return content[p]; });
+        };
+
+        let tableElement = document.getElementById(tableId);
+
+        let tableExcel = render(template, {
+            worksheet: filename,
+            table: tableElement.innerHTML.normalize('NFD').replace("–", "-")
+        });
+        //console.log(tableExcel);
+
+        filename = filename + extension;
+
+        if (navigator.msSaveOrOpenBlob) {
+            let blob = new Blob(
+                ['\ufeff', tableExcel],
+                { type: dataType }
+            );
+
+            navigator.msSaveOrOpenBlob(blob, filename);
+        } else {
+            let downloadLink = document.createElement("a");
+
+            document.body.appendChild(downloadLink);
+
+            downloadLink.href = 'data:' + dataType + ';base64,' + base64(tableExcel);
+
+            downloadLink.download = filename;
+
+            downloadLink.click();
+        }
+    }
+
+
+
+    //tableToExcel();
+
+    $(function () {
+        $("input[name='GridHtml']").val($("#myform").html());
+        //$("#my-form").submit();
+
+        //tableToExcel('mr_table', 'W3C Example Table');
+
+        exportTableToExcel('mr_table', '@Model.project_full_name' + ":" + '@Model.ir_no');
+
+        if (navigator.userAgent.indexOf("Firefox") > 0) {
+            window.setTimeout(function () { window.close(); }, 1000);
+        } else {
+            window.top.close();
+        }
+        //window.top.close();
+
+        //$.print("#mr_table");
+        //window.onfocus = function () { setTimeout(function () { window.close(); }, 500); }
+      
+    });
+</script>

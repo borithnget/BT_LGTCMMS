@@ -1,0 +1,46 @@
+﻿
+@{
+    ViewBag.Title = "ProjectList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    BT_KimMex.Entities.kim_mexEntities db = new BT_KimMex.Entities.kim_mexEntities();
+    var projects = (from pro in db.tb_project
+                    join st in db.tb_site on pro.site_id equals st.site_id
+                    orderby pro.created_date descending
+                    where pro.project_status == true
+                    select new { pro, st }).ToList();
+}
+
+<h3 class="title">Project List</h3>
+
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Project Name</th>
+                <th>Site Name</th>
+                <th>Warehouse</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{ 
+                foreach(var item in projects)
+                {
+                    string warehouse = string.Empty;
+                    var warehouses = db.tb_warehouse.Where(w => string.Compare(w.warehouse_site_id, item.st.site_id) == 0).ToList();
+                    <tr>
+                        <td>@item.pro.project_full_name</td>
+                        <td>@item.st.site_name</td>
+                        <td>
+                            @foreach(var wh in warehouses)
+                            {
+                                warehouse = warehouse + " " + wh.warehouse_name;
+                            }
+                            <label>@warehouse</label>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+

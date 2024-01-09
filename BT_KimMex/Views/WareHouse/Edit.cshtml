@@ -1,0 +1,399 @@
+﻿@model BT_KimMex.Models.WareHouseViewModel
+@using BT_KimMex.Models
+@using BT_KimMex.Class
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h3>Edit Warehouse</h3>
+@using (Html.BeginForm())
+{
+    <div class="form-horizontal">
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.warehouse_id)
+        @Html.HiddenFor(model => model.date)
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Date :</label>
+            @Html.DisplayFor(model => model.date, new { @class = "col-md-10" })
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Warehouse Name <strong style="color:red !important;">*</strong>:</label>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.warehouse_name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.warehouse_name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Telephone :</label>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.warehouse_telephone, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Address :</label>
+            <div class="col-md-10">
+                @Html.TextAreaFor(model => model.warehouse_address, new { @class = "form-control", Rows = "5" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">QA/ QC Officer <strong style="color:red;">*</strong> :</label>
+            <div class="col-md-8">
+                @*@if (Model.warehouseQAQC == null)
+                {
+                    @Html.DropDownList("qaqc_id", new SelectList(BT_KimMex.Class.CommonFunctions.GetUserListItemsByRole(BT_KimMex.Class.Role.QAQCOfficer), "UserId", "Username"),"Select QA/ QC Officer", new { @class = "form-control", id = "qaqc_id", style = "display:inline-block !important;" })
+                    @Html.ValidationMessageFor(model => model.warehouse_site_id, "", new { @class = "text-danger", style = "display:block !important;" })
+                }
+                else
+                {
+                    @Html.DropDownList("qaqc_id", new SelectList(BT_KimMex.Class.CommonFunctions.GetUserListItemsByRole(BT_KimMex.Class.Role.QAQCOfficer), "UserId", "Username", Model.warehouseQAQC.qaqc_id), new { @class = "form-control", id = "qaqc_id", style = "display:inline-block !important;" })
+                    @Html.ValidationMessageFor(model => model.warehouse_site_id, "", new { @class = "text-danger", style = "display:block !important;" })
+                }*@
+                <select class="form-control" name="qaqcs[]" id = "qaqc_id" multiple="multiple">
+                    @foreach (var qaqc in BT_KimMex.Class.CommonFunctions.GetUserListItemsByRole(BT_KimMex.Class.Role.QAQCOfficer))
+                    {
+                        var isExist = Model.warehouseQAQCs.Where(s => string.Compare(s.qaqc_id, qaqc.UserId) == 0).FirstOrDefault();
+                        if (isExist == null)
+                        {
+                            <option value="@qaqc.UserId">@qaqc.Username</option>
+                        }
+                        else
+                        {
+                            <option value="@qaqc.UserId" selected>@qaqc.Username</option>
+                        }
+                    }
+                </select>
+                <span><b class="text-danger">(**multiple)</b></span>
+                @Html.ValidationMessageFor(model => model.qaqcs, "", new { @class = "text-danger", style = "display:block !important;" })
+
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Site Name <strong style="color:red;">*</strong> :</label>
+            <div class="col-md-10">
+                @Html.DropDownList("warehouse_site_id", @ViewBag.SiteID as SelectList, "Select Site Name", new { @class = "form-control", id = "warehouse_site_id", style = "display:inline-block !important;" })
+                <button type="button" class="btn btn-default" id="site-promp"><span class='glyphicon glyphicon-plus'></span></button>
+                @Html.ValidationMessageFor(model => model.warehouse_site_id, "", new { @class = "text-danger", style = "display:block !important;" })
+            </div>
+        </div>
+
+        @*<div class="form-group">
+            <label class="control-label col-md-2">Project <strong style="color:red !important">*</strong>:</label>
+            <div class="col-md-8">
+                @if (string.IsNullOrEmpty(Model.warehouse_project_id))
+                {
+                    @Html.DropDownList("warehouse_project_id", new SelectList(Model.siteProjects, "project_id", "project_full_name"), "Select Project", new { @class = "form-control", id = "warehouse_project_id" })
+                }
+                else
+                {
+                    @Html.DropDownList("warehouse_project_id", new SelectList(Model.siteProjects, "project_id", "project_full_name",Model.warehouse_project_id), new { @class = "form-control", id = "warehouse_project_id" })
+                }
+            </div>
+        </div>*@
+
+        <!--Add Stock Keeper-->
+        <div class="form-group">
+            <label class="control-label col-md-2">Stock Controller<strong style="color:red;">*</strong> :</label>
+            <div class="col-md-8">
+                @*<table style="width:100% !important;" id="StockkeeperTable">
+                </table>*@
+                <select class="form-control" name="Stock_keeper_id[]" id="Stock_keeper_id" multiple="multiple">
+                    @foreach (var stockkeeper in BT_KimMex.Class.CommonFunctions.GetUserListItemsByRole(BT_KimMex.Class.Role.SiteStockKeeper))
+                    {
+                        var isExist = Model.Stock_keeper_id.Where(s => string.Compare(s, stockkeeper.UserId) == 0).FirstOrDefault();
+                        if (isExist == null)
+                        {
+                            <option value="@stockkeeper.UserId">@stockkeeper.Username</option>
+                        }
+                        else
+                        {
+                            <option value="@stockkeeper.UserId" selected>@stockkeeper.Username</option>
+                        }
+                    }
+                </select>
+                <span><b class="text-danger">(**multiple)</b></span>
+                @Html.ValidationMessageFor(model => model.Stock_keeper_id, "", new { @class = "text-danger", style = "display:block !important;" })
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-warning" />
+                <a href="@Url.Action("Index","WareHouse")" class="btn btn-danger">Back</a>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Site modal popup-->
+<div class="modal fade" id="site_modal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2>Create New Site</h2>
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-horizontal">
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                        <div class="form-group">
+                            <label class="control-label col-md-4">Date:</label>
+                            <label class="col-md-8" id="side_current_date"></label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-4">Site Name <span style="color:red;">*</span>:</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" id="site_name" />
+                                @Html.ValidationMessageFor(model => model.site_name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-4">Address:</label>
+                            <div class="col-md-8">
+                                <textarea class="form-control" id="site_address" rows="5"></textarea>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-6 ">
+                                <button class="btn btn-warning site-confirm"><i class="fa fa-save"></i> Save</button>
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section  Scripts{
+    <script type="text/javascript">
+        $(function () {    
+            var count = 0;
+
+            $('#qaqc_id').select2();
+            $('#Stock_keeper_id').select2();
+            
+            @*@if (Model.Stock_keeper_id!=null) {
+               
+         
+          foreach(var stk in Model.Stock_keeper_id){
+              
+                <text>
+            $('#StockkeeperTable').append("" +
+                       "<tr>" +
+                           "<td width='280px'>" +
+                               "<select class='form-control Stock_keeper' name='Stock_keeper_id' id='Stock_keeper_id' [Required]>" +
+                                   "<option selected disabled value=''> Select Stock Keeper</option>" +
+                               "</select>" +
+                           "</td>" +
+                           "<td style='width:40px !important;'>" +
+                               "<button type='button' class='btn btn-default btn-sm' onclick='RemoveSiteManagerRow(this)'><span class='glyphicon glyphicon-trash'></span></button>" +
+                           "</td>" +
+                           "<td style='width:40px !important;'>" +
+
+                           "</td>" +
+                       "</tr>"
+
+                    );
+                         InitialStockkeeper(count,'@stk');
+                    count++;
+            </text>
+           }  
+            }*@           
+            
+                  //InitailStockKeeperTable();
+          
+           
+            $('#StockkeeperTable tbody tr:last-child td:nth-child(3)').html("<button type='button' class='btn btn-default btn-sm' onclick='AddSiteManagerRow(this)'><span class='glyphicon glyphicon-plus'></span></button>");
+            $('#site-promp').click(function () {
+                $('#side_current_date').text(getFormattedDateMMDDYYYY(new Date()));
+                $('#site_modal').modal('show');
+            });
+
+            $('.site-confirm').on("click", function (e) {
+                e.preventDefault();
+                var site_name = $('#site_name').val();
+                var site_address = $('#site_address').val();
+                if (site_name == "" || site_name == null) {
+                    alert("Site name is required.");
+                }
+                else {
+                    $.ajax({
+                        url: "/Site/CreateJson",
+                        data: {
+                            site_name: site_name,
+                            site_address: site_address
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#site_modal').modal('hide');
+                            if (da.Message == "Success") {
+                                InitialSiteDropDownList(da.site_id);
+                            }
+                            else if (da.Message == "Fail") {
+                                if (!$('.modal-header').hasClass('alert-danger')) {
+                                    $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                    $('.delete-confirm').css('display', 'none');
+                                }
+                                $('.success-message').html('Your data is error while saving!');
+                            }
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html('Your data is error while saving!');
+
+                        }
+                    });
+                }
+            });
+            function InitialSiteDropDownList(site_id) {
+                $.ajax({
+                    url: "@Url.Action("SiteDropDown", "Site")",
+                    type: "get",
+                    dataType: "json",
+                    success: function (data) {
+                        $('#warehouse_site_id').empty();
+                        $('#warehouse_site_id').append("" +
+                            "<option value>Select Site Name</option>"
+                        );
+                        $.each(data, function (index, item) {
+                            $.each(item, function (index1, item1) {
+                                $('#warehouse_site_id').append("" +
+                                        "<option value='" + item1.site_id + "'>" + item1.site_name + "</option>"
+                                    );
+                            });
+                        });
+                        $('#warehouse_site_id').val(site_id);
+                    },
+                    error: function (data) {
+
+                    }
+                });
+            }
+        });
+    </script>
+
+            <script type="text/javascript">
+                function InitailStockKeeperTable() {
+                    var element = {};
+                    var warehouse_Stock_keeper = [];
+                    //  var spacement_attachment_id = "";
+                    var Stockkeeper = $('.Stock_keeper');
+                    for (var i = 0; i < Stockkeeper.length; i++) {
+                        if (Stockkeeper[i].value != null || Stockkeeper[i].value != "") {
+                            element = {};
+                            element.Stockkeeper = Stockkeeper[i].value;
+                            warehouse_Stock_keeper.push(element);
+                        }
+                    }    
+                    $('#StockkeeperTable').append("" +
+                            "<tr>" +
+                                "<td width='280px'>" +
+                                    "<select class='form-control Stock_keeper' name='Stock_keeper_id' id='Stock_keeper_id' [Required]>" +
+                                        "<option selected disabled value=''>select Stock Keeper</option>" +
+                                    "</select>" +
+                                "</td>" +
+                                "<td style='width:40px !important;'>" +
+                                "<button type='button' class='btn btn-default btn-sm' onclick='RemoveSiteManagerRow(this)'><span class='glyphicon glyphicon-trash'></span></button>" +
+                                "</td>" +
+                                "<td style='width:40px !important;'>" +
+                                    "<button type='button' class='btn btn-default btn-sm' onclick='AddSiteManagerRow(this)'><span class='glyphicon glyphicon-plus'></span></button>" +
+                                "</td>" +
+                            "</tr>"
+                        );
+                    InitialStockkeeperDropDown();
+                }
+               
+                function InitialStockkeeper(i, Stock_keeper) {
+                    $.ajax({
+                        url:"@Url.Action("StockKeeperDropDown", "WareHouse")",
+                        type: "get",
+                    dataType: "json",
+                    success: function (data) {
+                        $('#StockkeeperTable tr:last-child select.Stock_keeper').empty();
+                        $('#StockkeeperTable tr:last-child select.Stock_keeper').append("" +
+                            "<option selected disabled>Select Stock Keeper</option>"
+                        );
+                        $.each(data, function (index, item) {
+                          
+                            $.each(item, function (index1, item1) {
+                                var full_name = item1.Username;
+                                $('#StockkeeperTable tr select.Stock_keeper').eq(i).append("" +
+                                        "<option value='" + item1.UserId + "'>" + full_name + "</option>"
+                                    );
+                            });
+                        });
+                        $('#StockkeeperTable tr select.Stock_keeper').eq(i).val(Stock_keeper);
+                    },
+                    error: function (data){
+                        alert('fail');
+                    }
+                });
+                }
+
+                function AddSiteManagerRow(Row) {
+                    var index = Row.parentNode.parentNode.rowIndex;
+                    InitailStockKeeperTable();
+                    $('#StockkeeperTable tbody tr td:nth-child(3)').eq(index).html('');
+                }
+                function RemoveSiteManagerRow(Row) {
+                    var index = Row.parentNode.parentNode.rowIndex;
+                    var numberOfRow = $('#StockkeeperTable tbody tr').length;
+                    if (numberOfRow > 1) {
+                        document.getElementById('StockkeeperTable').deleteRow(index);
+                        if (Number(index + 1) == numberOfRow)
+                            $('#StockkeeperTable tbody tr td:nth-child(3)').eq(index - 1).html("<button type='button' class='btn btn-default btn-sm' onclick='AddSiteManagerRow(this)'><span class='glyphicon glyphicon-plus'></span></button>");
+                    }
+                }
+
+
+                function InitialStockkeeperDropDown() {
+                    $.ajax({
+                        url:"@Url.Action("StockKeeperDropDown", "WareHouse")",
+                        type: "get",
+                    dataType: "json",
+                    success: function (data) {
+                        $('#StockkeeperTable tr:last-child select.Stock_keeper').empty();
+                        $('#StockkeeperTable tr:last-child select.Stock_keeper').append("" +
+                            "<option selected disabled>Select Stock Keeper</option>"
+                        );
+                        $.each(data, function (index, item) {
+                            console.log(data);
+                            $.each(item, function (index1, item1) {
+                                var full_name = item1.Username;
+                                $('#StockkeeperTable tr:last-child select.Stock_keeper').append("" +
+                                        "<option value='" + item1.UserId + "'>" + full_name + "</option>"
+                                    );
+                            });
+                        });
+                       
+                    },
+                    error: function (data){
+                        alert('fail');
+                    }
+                });
+                }
+            </script>
+    
+
+    
+    }

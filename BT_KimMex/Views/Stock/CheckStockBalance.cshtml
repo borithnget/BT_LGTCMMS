@@ -1,0 +1,171 @@
+﻿@model BT_KimMex.Models.StockViewModel
+@using BT_KimMex.Class
+@{
+    ViewBag.Title = "CheckStockBalance";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<form>
+    <div class="form-horizontal">
+        <h3 class="title">Check Stock Balance from Site Stock</h3>
+        <div class="form-group">
+            @Html.Label("Date:", new { @class = "control-label col-md-2" })
+            <label class="col-md-10">@CommonClass.ToLocalTime(DateTime.Now).ToString("dd/MM/yyyy")</label>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">Material Request No.:</label>
+            <label class="col-md-10">@Model.mrNumber</label>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">Project :</label>
+            <label id="warehouse">@Model.projectname</label>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">To Warehouse :</label>
+            <label id="warehouse">@Model.warehouse</label>
+        </div>
+        @*<div class="form-group">
+            <label class="control-label col-md-2">From Warehouse :</label>
+            <div class="col-md-10">
+                @Html.DropDownList("from_warehouse_id",new SelectList(Model.warehouses, "warehouse_id", "warehouse_name"), "All", new { @class="form-control",id="from_warehouse_id"})
+            </div>
+        </div>*@
+        <div class="form-group">
+            <label class="control-label col-md-2">From Warehouse <strong style="color:red;">*</strong>:</label>
+            <div class="col-md-10">
+                <select class="form-control" id="from_warehouse_id" name="from_warehouse_id">
+                    <option value="">Select Warehouse</option>
+                </select>
+                
+            </div>
+        </div>
+
+        <div class="row" style="margin:0 !important;">
+            <table class="table table-bordered" id="st_table">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Description</th>
+                        <th>Stock Balance</th>
+                        <th>Requested QTY</th>
+                        @*<th>From Warehouse</th>*@
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="4">No item from warehouse to transfer.</td>
+                    </tr>
+                    @*@if (Model.stocks.Count() == 0)
+                    {
+                        <tr>
+                            <td colspan="11">No item from warehouse to transfer.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        int count = 1;
+                        foreach(var item in Model.stocks)
+                        {
+                            <tr>
+                                <td>@count</td>
+                                <td>@item.itemCode - @item.itemName</td>
+                                <td>@item.stockBalance @item.itemUnitName</td>
+                                <td>@item.requestQty @item.requestUnitName</td>
+                                <td>@item.warehouseName</td>
+                            </tr>
+
+                            count++;
+                        }
+                    }*@
+                    
+                </tbody>
+            </table>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                @if (Model.stocks.Count() > 0)
+                {
+                    @*<a href="@Url.Action("Create","StockTransfer",new { id = Model.mrId})" class="btn btn-primary">Link to Stock Transfer</a>*@
+                    <a href="javascript:void(0)" class="btn btn-primary" id="btn-transfer">Link to Stock Transfer</a>
+                }
+                @if (User.IsInRole(Role.Purchaser) || User.IsInRole(Role.SystemAdmin))
+                {
+                    <a href="@Url.Action("Create","PurchaseRequisition",new { id = Model.mrId })" class="btn btn-primary">Purchase Requisition</a>
+                }
+                
+                <a href="javascript:history.back()" class="btn btn-danger">Back</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            var itemRequest = GetURLParameter();
+
+            $('#btn-transfer').click(function () {
+                var warehouse_id = $('#from_warehouse_id').val();
+                if (warehouse_id == null || warehouse_id == '' || warehouse_id == undefined) {
+                    alert("please select warehouse to transfer.");
+                    return;
+                }
+                window.location.href = '/StockTransfer/Create/'+itemRequest+"?warehouse="+warehouse_id;
+            });
+
+            //new process get available warehouse to transfer
+            $('#from_warehouse_id').empty().append('<option value="">Select Warehouse</option>');
+            $.ajax({
+                url: '@Url.Action("GetAvailbleWarehouseToTransferbyMR", "StockTransfer")',
+                type: "GET",
+                data: { id: itemRequest },
+                success: function (data) {
+                    $.each(data.data, function (index, item) {
+                        $('#from_warehouse_id').append('<option value="' + item.warehouse_id + '">' + item.warehouse_name + '</option>');
+                    });
+                }
+            });
+
+
+            $('#from_warehouse_id').change(function (e) {
+                e.preventDefault();
+                var warehouse_id = $(this).val();
+                if (warehouse_id) {
+                    $.ajax({
+                        url: '@Url.Action("GetItemByIRID1", "StockTransfer")',
+                        type: "get",
+                        dataType: "json",
+                        data: { id: itemRequest, warehouseId: warehouse_id },
+                        success: function (da) {
+                            //console.log(da);
+                            if (da.result == "success") {
+                                $('#st_table tbody').empty();
+                                var count = 1;
+                                $.each(da.data, function (index, item) {
+                                    if (item) {
+                                        console.log(item);
+                                        $('#st_table').append("" +
+                                            "<tr>" +
+                                                "<td>" + count + "</td>" +
+                                                "<td>" + item.itemCode + " - " + item.itemName + "</td>" +
+                                                "<td><label class='stock_balance'>" + item.stockBalance + "</label> <input type='hidden' class='stock_balance_unit' value='" + item.itemUnit + "'/> <label class=''>" + item.itemUnitName + "</label></td>" +
+                                                "<td><label class='request_qty'>" + item.requestQty + "</label> <input type='hidden' class='request_unit' value='" + item.requestUnit + "'/> <label class=''>" + item.requestUnitName + "</label></td>" +
+                                            "</tr>"
+                                        );
+                                        count++;
+                                    }
+                                });
+                            }
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            console.log(textStatus);
+                        }
+                    });
+                }
+            });
+
+        });
+    </script>
+    }

@@ -1,0 +1,1744 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
+  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
+  <Import Project="..\packages\Microsoft.Net.Compilers.1.0.0\build\Microsoft.Net.Compilers.props" Condition="Exists('..\packages\Microsoft.Net.Compilers.1.0.0\build\Microsoft.Net.Compilers.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5D46AD9E-DCCC-493B-BE75-AC34459F255B}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BT_KimMex</RootNamespace>
+    <AssemblyName>BT_KimMex</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <MvcBuildViews>false</MvcBuildViews>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <Use64BitIISExpress />
+    <TypeScriptToolsVersion>3.2</TypeScriptToolsVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Eco.Handles, Version=7.0.0.11446, Culture=neutral, PublicKeyToken=46a833be9e90de8c, processorArchitecture=MSIL">
+      <HintPath>..\packages\EcoCore.7.0.0.11446\lib\net40\Eco.Handles.dll</HintPath>
+    </Reference>
+    <Reference Include="Eco.Interfaces, Version=7.0.0.11446, Culture=neutral, PublicKeyToken=46a833be9e90de8c, processorArchitecture=MSIL">
+      <HintPath>..\packages\EcoCore.7.0.0.11446\lib\net40\Eco.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Eco.LinqExtender, Version=7.0.0.11446, Culture=neutral, PublicKeyToken=46a833be9e90de8c, processorArchitecture=MSIL">
+      <HintPath>..\packages\EcoCore.7.0.0.11446\lib\net40\Eco.LinqExtender.dll</HintPath>
+    </Reference>
+    <Reference Include="Eco.WPF, Version=7.0.0.11446, Culture=neutral, PublicKeyToken=46a833be9e90de8c, processorArchitecture=MSIL">
+      <HintPath>..\packages\EcoWpf.7.0.0.11446\lib\net40\Eco.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="EPPlus, Version=4.5.1.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.4.5.1\lib\net40\EPPlus.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AI.Agent.Intercept, Version=2.0.6.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.Agent.Intercept.2.0.6\lib\net45\Microsoft.AI.Agent.Intercept.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AI.DependencyCollector, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.DependencyCollector.2.2.0\lib\net45\Microsoft.AI.DependencyCollector.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AI.PerfCounterCollector, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.2.0\lib\net45\Microsoft.AI.PerfCounterCollector.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AI.ServerTelemetryChannel, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.2.0\lib\net45\Microsoft.AI.ServerTelemetryChannel.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AI.Web, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.Web.2.2.0\lib\net45\Microsoft.AI.Web.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AI.WindowsServer, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.WindowsServer.2.2.0\lib\net45\Microsoft.AI.WindowsServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.ApplicationInsights, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.2.2.0\lib\net45\Microsoft.ApplicationInsights.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Owin, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.4.0.0\lib\net451\Microsoft.Owin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Diagnostics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Diagnostics.4.0.0\lib\net451\Microsoft.Owin.Diagnostics.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.reportviewer.common, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Users\borit\Downloads\Microsoft.reportviewer.common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.DataVisualization, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ReportViewer.Runtime.Common.12.0.2402.15\lib\Microsoft.ReportViewer.DataVisualization.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.Design, Version=15.3.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ReportingServices.ReportViewerControl.WebForms.150.1358.0\lib\net40\Microsoft.ReportViewer.Design.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.ProcessingObjectModel, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ReportViewer.2012.Runtime.11.0.3452.0\lib\Microsoft.ReportViewer.ProcessingObjectModel.DLL</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.WebDesign, Version=15.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ReportingServices.ReportViewerControl.WebForms.150.1358.0\lib\net40\Microsoft.ReportViewer.WebDesign.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.WebForms, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ReportViewer.WebForms.v12.12.0.0.0\lib\Microsoft.ReportViewer.WebForms.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.WinForms, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ReportViewer.11.0.3366.16\lib\Microsoft.ReportViewer.WinForms.DLL</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.Types, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.SqlServer.Types.14.0.314.76\lib\net40\Microsoft.SqlServer.Types.dll</HintPath>
+    </Reference>
+    <Reference Include="Neodynamic.SDK.WebClientPrint, Version=4.0.2000.0, Culture=neutral, PublicKeyToken=93565f9c313b0a45, processorArchitecture=MSIL">
+      <HintPath>..\packages\Neodynamic.SDK.WebClientPrint.4.0.2018.0\lib\Neodynamic.SDK.WebClientPrint.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="ReportViewerForMvc, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ReportViewerForMvc.1.1.1\lib\net45\ReportViewerForMvc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Abstractions" />
+    <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http">
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest">
+    </Reference>
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Optimization">
+      <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.1.3\lib\net40\System.Web.Optimization.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.3\lib\net45\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="Telegram.Bot, Version=14.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Telegram.Bot.14.6.0\lib\net45\Telegram.Bot.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="WebGrease">
+      <Private>True</Private>
+      <HintPath>..\packages\WebGrease.1.5.2\lib\WebGrease.dll</HintPath>
+    </Reference>
+    <Reference Include="Antlr3.Runtime">
+      <Private>True</Private>
+      <HintPath>..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="WECPOFLogic, Version=7.0.0.11446, Culture=neutral, PublicKeyToken=46a833be9e90de8c, processorArchitecture=MSIL">
+      <HintPath>..\packages\EcoWpf.7.0.0.11446\lib\net40\WECPOFLogic.dll</HintPath>
+    </Reference>
+    <Reference Include="WPFViewModelExternalControls, Version=7.0.0.11446, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\EcoWpf.7.0.0.11446\lib\net40\WPFViewModelExternalControls.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Owin">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.1\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.EntityFramework">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.1\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.3.0.1\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security">
+      <HintPath>..\packages\Microsoft.Owin.Security.3.0.1\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Facebook">
+      <HintPath>..\packages\Microsoft.Owin.Security.Facebook.3.0.1\lib\net45\Microsoft.Owin.Security.Facebook.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Cookies">
+      <HintPath>..\packages\Microsoft.Owin.Security.Cookies.3.0.1\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.OAuth">
+      <HintPath>..\packages\Microsoft.Owin.Security.OAuth.3.0.1\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Google">
+      <HintPath>..\packages\Microsoft.Owin.Security.Google.3.0.1\lib\net45\Microsoft.Owin.Security.Google.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Twitter">
+      <HintPath>..\packages\Microsoft.Owin.Security.Twitter.3.0.1\lib\net45\Microsoft.Owin.Security.Twitter.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.MicrosoftAccount">
+      <HintPath>..\packages\Microsoft.Owin.Security.MicrosoftAccount.3.0.1\lib\net45\Microsoft.Owin.Security.MicrosoftAccount.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="App_Start\IdentityConfig.cs" />
+    <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="App_Start\Startup.Auth.cs" />
+    <Compile Include="Class\BOQ.cs" />
+    <Compile Include="Class\ClsItemReceive.cs" />
+    <Compile Include="Class\CommonClass.cs" />
+    <Compile Include="Class\CommonFunctions.cs" />
+    <Compile Include="Class\ConvertCurrencyToWord.cs" />
+    <Compile Include="Class\EnumConstants.cs" />
+    <Compile Include="Class\Exporting.cs" />
+    <Compile Include="Class\GlobalMethod.cs" />
+    <Compile Include="Class\Importing.cs" />
+    <Compile Include="Class\ImportProductfromExcel.cs" />
+    <Compile Include="Class\ImportStockBalance.cs" />
+    <Compile Include="Class\Inventory.cs" />
+    <Compile Include="Class\ItemRequest.cs" />
+    <Compile Include="Class\PurchaseOrder.cs" />
+    <Compile Include="Class\ReportHandler.cs" />
+    <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\BOQController.cs" />
+    <Compile Include="Controllers\BrandController.cs" />
+    <Compile Include="Controllers\ClassController.cs" />
+    <Compile Include="Controllers\ClassTypeController.cs" />
+    <Compile Include="Controllers\CustomerController.cs" />
+    <Compile Include="Controllers\ErrorLogController.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\ItemReceiveController.cs" />
+    <Compile Include="Controllers\ItemRequestController.cs" />
+    <Compile Include="Controllers\ItemReturnController.cs" />
+    <Compile Include="Controllers\JobCategoryController.cs" />
+    <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\ProductCategoryController.cs" />
+    <Compile Include="Controllers\ProductClassController.cs" />
+    <Compile Include="Controllers\ProductController.cs" />
+    <Compile Include="Controllers\ProductSizeController.cs" />
+    <Compile Include="Controllers\ProductTypeController.cs" />
+    <Compile Include="Controllers\ProjectController.cs" />
+    <Compile Include="Controllers\PurchaseOrderController.cs" />
+    <Compile Include="Controllers\PurchaseRequisitionController.cs" />
+    <Compile Include="Controllers\QuoteController.cs" />
+    <Compile Include="Controllers\ReportController.cs" />
+    <Compile Include="Controllers\SiteController.cs" />
+    <Compile Include="Controllers\StockAdjustmentController.cs" />
+    <Compile Include="Controllers\StockController.cs" />
+    <Compile Include="Controllers\StockDamageController.cs" />
+    <Compile Include="Controllers\StockIssueController.cs" />
+    <Compile Include="Controllers\StockIssueReturnController.cs" />
+    <Compile Include="Controllers\StockTransferController.cs" />
+    <Compile Include="Controllers\SupplierController.cs" />
+    <Compile Include="Controllers\UnitController.cs" />
+    <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Controllers\WareHouseController.cs" />
+    <Compile Include="DataSets\BOQ.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BOQ.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="DataSets\Inventory.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Inventory.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="DataSets\Project.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Project.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="DataSets\PurchaseOrder.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PurchaseOrder.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="DataSets\PurchaseOrderVsItemReceived.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PurchaseOrderVsItemReceived.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="DataSets\Quote.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Quote.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="DataSets\ReturnItemtoSupplier.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ReturnItemtoSupplier.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="DataSets\StockBalanceByDateandWarehouse1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>StockBalanceByDateandWarehouse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="DataSets\StockBalanceBywarehouse.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>StockBalanceBywarehouse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="DataSets\StockMovement.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>StockMovement.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="DataSets\StockUsageBySiteWithRemainBalance.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>StockUsageBySiteWithRemainBalance.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="default.aspx.cs">
+      <DependentUpon>default.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="default.aspx.designer.cs">
+      <DependentUpon>default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\AspNetRole.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\AspNetUser.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\AspNetUserClaim.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\AspNetUserLogin.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\C__MigrationHistory.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\kim_mexEntities.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>kim_mexEntities.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\kim_mexEntities.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\kim_mexEntities.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>kim_mexEntities.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\sysdiagram.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tbSiteSiteSupervisor.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_attachment.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_boq_detail1.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_boq_detail2.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_boq_detail3.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_brand.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_build_of_quantity.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_build_of_quantity_detail.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_class.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_class_type.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_color.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_customer.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_error_log.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_inventory.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_inventory_detail.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_inventory_status.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_invoice.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_ire_attachment.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_ir_attachment.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_ir_detail1.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_ir_detail2.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_item_quote_attachment.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_item_request.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_item_return.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_job_category.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_multiple_uom.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_position.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_po_attachment.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_po_report.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_po_supplier.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_product.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_product_category.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_product_class.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_product_detail.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_product_size.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_product_type.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_project.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_purchase_order.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_purchase_order_detail.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_purchase_request.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_purchase_request_detail.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_purpose.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_quote.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_quote_detail.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_received_item_detail.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_receive_item_voucher.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_reject.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_site.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_site_manager_project.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_spacemen_attachment.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_stock_adjustment.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_stock_damage.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_stock_issue.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_stock_issue_return.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_stock_keeper_warehouse.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_stock_transfer_detail.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_stock_transfer_voucher.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_supplier.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_unit.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_user_deleted.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_user_detail.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_warehouse.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ErrorLog\ErrorLogger.cs" />
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\AttachmentViewModel.cs" />
+    <Compile Include="Models\BOQViewModel.cs" />
+    <Compile Include="Models\BrandViewModel.cs" />
+    <Compile Include="Models\CategoryViewModel.cs" />
+    <Compile Include="Models\ClassTypeViewModel.cs" />
+    <Compile Include="Models\ClassViewModel.cs" />
+    <Compile Include="Models\ColorViewModel.cs" />
+    <Compile Include="Models\CustomerViewModel.cs" />
+    <Compile Include="Models\ErrorLogViewModel.cs" />
+    <Compile Include="Models\ExcelBoQModel.cs" />
+    <Compile Include="Models\Home.cs" />
+    <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\Inventory.cs" />
+    <Compile Include="Models\ItemReceive.cs" />
+    <Compile Include="Models\ItemRequestViewModel.cs" />
+    <Compile Include="Models\ItemReturn.cs" />
+    <Compile Include="Models\JobCategoryViewModel.cs" />
+    <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\ProductClassViewModel.cs" />
+    <Compile Include="Models\ProductSizeViewModel.cs" />
+    <Compile Include="Models\ProductTypeViewModel.cs" />
+    <Compile Include="Models\ProductViewModel.cs" />
+    <Compile Include="Models\ProjectViewModel.cs" />
+    <Compile Include="Models\PurchaseOrder.cs" />
+    <Compile Include="Models\PurchaseRequisitionDetailViewModel.cs" />
+    <Compile Include="Models\PurchaseRequisitionViewModel.cs" />
+    <Compile Include="Models\Quote.cs" />
+    <Compile Include="Models\Report.cs" />
+    <Compile Include="Models\ReturnItemtoSupplier.cs" />
+    <Compile Include="Models\SiteManagerViewModel.cs" />
+    <Compile Include="Models\SiteViewModel.cs" />
+    <Compile Include="Models\StockAdjustmentViewModel.cs" />
+    <Compile Include="Models\StockBalanceByDateandWarehouse.cs" />
+    <Compile Include="Models\StockBalanceBywarehouse.cs" />
+    <Compile Include="Models\StockDamage.cs" />
+    <Compile Include="Models\StockIssue.cs" />
+    <Compile Include="Models\StockIssueReturn.cs" />
+    <Compile Include="Models\StockMovement.cs" />
+    <Compile Include="Models\StockTransfer.cs" />
+    <Compile Include="Models\StockUsageBySiteWithRemainBalance.cs" />
+    <Compile Include="Models\StockViewModel.cs" />
+    <Compile Include="Models\SupplierViewModel.cs" />
+    <Compile Include="Models\UnitViewModel.cs" />
+    <Compile Include="Models\UserRolesViewModel.cs" />
+    <Compile Include="Models\WareHouseViewModel.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Reports\ReportController\Project.aspx.cs">
+      <DependentUpon>Project.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Reports\ReportController\Project.aspx.designer.cs">
+      <DependentUpon>Project.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="SqlServerTypes\Loader.cs" />
+    <Compile Include="Startup.cs" />
+    <Compile Include="Views\Shared\ReportController\BOQbyProject.aspx.cs">
+      <DependentUpon>BOQbyProject.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\BOQbyProject.aspx.designer.cs">
+      <DependentUpon>BOQbyProject.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\ItemRequestbyProject.aspx.cs">
+      <DependentUpon>ItemRequestbyProject.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\ItemRequestbyProject.aspx.designer.cs">
+      <DependentUpon>ItemRequestbyProject.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\ProjectList.aspx.cs">
+      <DependentUpon>ProjectList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\ProjectList.aspx.designer.cs">
+      <DependentUpon>ProjectList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\PurchaseOrderNotVAT.aspx.cs">
+      <DependentUpon>PurchaseOrderNotVAT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\PurchaseOrderNotVAT.aspx.designer.cs">
+      <DependentUpon>PurchaseOrderNotVAT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\PurchaseOrderReport.aspx.cs">
+      <DependentUpon>PurchaseOrderReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\PurchaseOrderReport.aspx.designer.cs">
+      <DependentUpon>PurchaseOrderReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\PurchaseOrderSupplier.aspx.cs">
+      <DependentUpon>PurchaseOrderSupplier.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\PurchaseOrderSupplier.aspx.designer.cs">
+      <DependentUpon>PurchaseOrderSupplier.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\PurchaseOrderVAT.aspx.cs">
+      <DependentUpon>PurchaseOrderVAT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\PurchaseOrderVAT.aspx.designer.cs">
+      <DependentUpon>PurchaseOrderVAT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\PurchaseOrderVsItemReceived.aspx.cs">
+      <DependentUpon>PurchaseOrderVsItemReceived.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\PurchaseOrderVsItemReceived.aspx.designer.cs">
+      <DependentUpon>PurchaseOrderVsItemReceived.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\Quote.aspx.cs">
+      <DependentUpon>Quote.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\Quote.aspx.designer.cs">
+      <DependentUpon>Quote.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\ReportViewerCrossBrowserClientPrint.aspx.cs">
+      <DependentUpon>ReportViewerCrossBrowserClientPrint.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\ReportViewerCrossBrowserClientPrint.aspx.designer.cs">
+      <DependentUpon>ReportViewerCrossBrowserClientPrint.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\ReturnItemtoSupplier.aspx.cs">
+      <DependentUpon>ReturnItemtoSupplier.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\ReturnItemtoSupplier.aspx.designer.cs">
+      <DependentUpon>ReturnItemtoSupplier.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\StockBalanceByDateandWarehouse.aspx.cs">
+      <DependentUpon>StockBalanceByDateandWarehouse.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\StockBalanceByDateandWarehouse.aspx.designer.cs">
+      <DependentUpon>StockBalanceByDateandWarehouse.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\StockBalanceBywarehouse.aspx.cs">
+      <DependentUpon>StockBalanceBywarehouse.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\StockBalanceBywarehouse.aspx.designer.cs">
+      <DependentUpon>StockBalanceBywarehouse.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\StockMovement.aspx.cs">
+      <DependentUpon>StockMovement.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\StockMovement.aspx.designer.cs">
+      <DependentUpon>StockMovement.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\StockUsageBySiteWithRemainBalance.aspx.cs">
+      <DependentUpon>StockUsageBySiteWithRemainBalance.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\StockUsageBySiteWithRemainBalance.aspx.designer.cs">
+      <DependentUpon>StockUsageBySiteWithRemainBalance.aspx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\css\bootstrap.css" />
+    <Content Include="Assets\css\components.css" />
+    <Content Include="Assets\css\core.css" />
+    <Content Include="Assets\icons\fontawesome\fonts\fontawesome-webfont.svg" />
+    <Content Include="Assets\icons\fontawesome\styles.min.css" />
+    <Content Include="Assets\Images\back_login.jpg" />
+    <Content Include="Assets\Images\bg-ver1.png" />
+    <Content Include="Assets\Images\Brand Logo 1.png" />
+    <Content Include="Assets\Images\login_bg.jpeg" />
+    <Content Include="Assets\Images\Lotus.ico" />
+    <Content Include="Assets\Images\lotusgreeenteam.png" />
+    <Content Include="Assets\Images\Lotus_Logo.png" />
+    <Content Include="Assets\Images\pro_bk_for_login.png" />
+    <Content Include="Assets\Images\Pro_BT_logo.png" />
+    <Content Include="Assets\Images\Kim Mex cover.png" />
+    <Content Include="Assets\Images\Kim Mex logo.png" />
+    <Content Include="Assets\Images\Kim Mex logo1.png" />
+    <Content Include="Assets\Images\Kim Mex logo2.jpg" />
+    <Content Include="Assets\Images\Kim_mex_cover1.jpg" />
+    <Content Include="Assets\Images\Kim_mex_cover2.jpg" />
+    <Content Include="Assets\Images\kim_mex_cover3.jpg" />
+    <Content Include="Assets\Images\kim_mex_cover4.jpg" />
+    <Content Include="Assets\Images\kim_mex_cover5.jpg" />
+    <Content Include="Assets\Images\KM_logo_01.png" />
+    <Content Include="Assets\Images\logo1 - Copy.jpg" />
+    <Content Include="Assets\Images\logo1.jpg" />
+    <Content Include="Assets\Images\logo10 - Copy.jpg" />
+    <Content Include="Assets\Images\logo10.jpg" />
+    <Content Include="Assets\Images\logo11 - Copy.jpg" />
+    <Content Include="Assets\Images\logo11.jpg" />
+    <Content Include="Assets\Images\logo12 - Copy.jpg" />
+    <Content Include="Assets\Images\logo12.jpg" />
+    <Content Include="Assets\Images\logo13 - Copy.jpg" />
+    <Content Include="Assets\Images\logo13.jpg" />
+    <Content Include="Assets\Images\logo14 - Copy.jpg" />
+    <Content Include="Assets\Images\logo14.jpg" />
+    <Content Include="Assets\Images\logo15 - Copy.jpg" />
+    <Content Include="Assets\Images\logo15.jpg" />
+    <Content Include="Assets\Images\logo16.jpg" />
+    <Content Include="Assets\Images\logo17.jpg" />
+    <Content Include="Assets\Images\logo18.jpg" />
+    <Content Include="Assets\Images\logo2.jpg" />
+    <Content Include="Assets\Images\logo3.jpg" />
+    <Content Include="Assets\Images\logo4.jpg" />
+    <Content Include="Assets\Images\logo5.jpg" />
+    <Content Include="Assets\Images\logo6.jpg" />
+    <Content Include="Assets\Images\logo7.jpg" />
+    <Content Include="Assets\Images\logo8.jpg" />
+    <Content Include="Assets\Images\logo9.jpg" />
+    <Content Include="Assets\Images\photo_2018-06-07_08-55-06.jpg" />
+    <Content Include="Assets\Images\photo_2018-06-07_09-01-00.jpg" />
+    <Content Include="Assets\Images\photo_2018-06-07_09-14-46.jpg" />
+    <Content Include="Assets\Images\photo_2018-06-07_09-32-12.jpg" />
+    <Content Include="Assets\img\back_login.jpg" />
+    <Content Include="Assets\img\bg-ver1.png" />
+    <Content Include="Assets\img\Brand Logo 1.png" />
+    <Content Include="Assets\img\default-img.png" />
+    <Content Include="Assets\img\default-user.jpg" />
+    <Content Include="Assets\img\Pro_BK_index1.jpg" />
+    <Content Include="Assets\img\Pro_BK_index2.jpg" />
+    <Content Include="Assets\img\Kim Mex cover.png" />
+    <Content Include="Assets\img\Kim Mex logo.png" />
+    <Content Include="Assets\img\Kim Mex logo1.png" />
+    <Content Include="Assets\img\Kim Mex logo2.jpg" />
+    <Content Include="Assets\img\Kim_mex_cover1.jpg" />
+    <Content Include="Assets\img\Kim_mex_cover2.jpg" />
+    <Content Include="Assets\img\kim_mex_cover3.jpg" />
+    <Content Include="Assets\img\kim_mex_cover4.jpg" />
+    <Content Include="Assets\img\kim_mex_cover5.jpg" />
+    <Content Include="Assets\img\logo.png" />
+    <Content Include="Assets\img\logo1 - Copy.jpg" />
+    <Content Include="Assets\img\logo1.jpg" />
+    <Content Include="Assets\img\logo10 - Copy.jpg" />
+    <Content Include="Assets\img\logo10.jpg" />
+    <Content Include="Assets\img\logo11 - Copy.jpg" />
+    <Content Include="Assets\img\logo11.jpg" />
+    <Content Include="Assets\img\logo12 - Copy.jpg" />
+    <Content Include="Assets\img\logo12.jpg" />
+    <Content Include="Assets\img\logo13 - Copy.jpg" />
+    <Content Include="Assets\img\logo13.jpg" />
+    <Content Include="Assets\img\logo14 - Copy.jpg" />
+    <Content Include="Assets\img\logo14.jpg" />
+    <Content Include="Assets\img\logo15 - Copy.jpg" />
+    <Content Include="Assets\img\logo15.jpg" />
+    <Content Include="Assets\img\logo16.jpg" />
+    <Content Include="Assets\img\logo17.jpg" />
+    <Content Include="Assets\img\logo18.jpg" />
+    <Content Include="Assets\img\logo2.jpg" />
+    <Content Include="Assets\img\logo3.jpg" />
+    <Content Include="Assets\img\logo4.jpg" />
+    <Content Include="Assets\img\logo5.jpg" />
+    <Content Include="Assets\img\logo6.jpg" />
+    <Content Include="Assets\img\logo7.jpg" />
+    <Content Include="Assets\img\logo8.jpg" />
+    <Content Include="Assets\img\logo9.jpg" />
+    <Content Include="Assets\img\logo_kimex.jpg" />
+    <Content Include="Assets\img\logo_kimex_word.png" />
+    <Content Include="Assets\img\photo_2018-06-07_08-55-06.jpg" />
+    <Content Include="Assets\img\photo_2018-06-07_09-01-00.jpg" />
+    <Content Include="Assets\img\photo_2018-06-07_09-14-46.jpg" />
+    <Content Include="Assets\img\photo_2018-06-07_09-32-12.jpg" />
+    <Content Include="Assets\img\profile-picture.jpg" />
+    <Content Include="Assets\js\app.min.js" />
+    <Content Include="Assets\js\bootstrap-datepicker.min.js" />
+    <Content Include="Assets\js\charts_chartist.min.js" />
+    <Content Include="Assets\js\pages_datatables.min.js" />
+    <Content Include="Assets\js\pickers_date.min.js" />
+    <Content Include="Assets\js\pickers_time.min.js" />
+    <Content Include="Assets\Login\css\main.css" />
+    <Content Include="Assets\Login\css\util.css" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\css\font-awesome.css" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\css\font-awesome.min.css" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\fonts\fontawesome-webfont.svg" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\HELP-US-OUT.txt" />
+    <Content Include="Assets\Login\fonts\Linearicons-Free-v1.0.0\icon-font.min.css" />
+    <Content Include="Assets\Login\fonts\Linearicons-Free-v1.0.0\WebFont\Linearicons-Free.svg" />
+    <Content Include="Assets\Login\fonts\montserrat\OFL.txt" />
+    <Content Include="Assets\Login\images\bg-01.jpg" />
+    <Content Include="Assets\Login\images\icons\favicon.ico" />
+    <Content Include="Assets\Login\js\main.js" />
+    <Content Include="Assets\Login\vendor\animate\animate.css" />
+    <Content Include="Assets\Login\vendor\animsition\css\animsition.css" />
+    <Content Include="Assets\Login\vendor\animsition\css\animsition.min.css" />
+    <Content Include="Assets\Login\vendor\animsition\js\animsition.js" />
+    <Content Include="Assets\Login\vendor\animsition\js\animsition.min.js" />
+    <Content Include="Assets\Login\vendor\bootstrap\css\bootstrap-grid.css" />
+    <Content Include="Assets\Login\vendor\bootstrap\css\bootstrap-grid.min.css" />
+    <Content Include="Assets\Login\vendor\bootstrap\css\bootstrap-reboot.css" />
+    <Content Include="Assets\Login\vendor\bootstrap\css\bootstrap-reboot.min.css" />
+    <Content Include="Assets\Login\vendor\bootstrap\css\bootstrap.css" />
+    <Content Include="Assets\Login\vendor\bootstrap\css\bootstrap.min.css" />
+    <Content Include="Assets\Login\vendor\bootstrap\js\bootstrap.js" />
+    <Content Include="Assets\Login\vendor\bootstrap\js\bootstrap.min.js" />
+    <Content Include="Assets\Login\vendor\bootstrap\js\popper.js" />
+    <Content Include="Assets\Login\vendor\bootstrap\js\popper.min.js" />
+    <Content Include="Assets\Login\vendor\bootstrap\js\tooltip.js" />
+    <Content Include="Assets\Login\vendor\countdowntime\countdowntime.js" />
+    <Content Include="Assets\Login\vendor\css-hamburgers\hamburgers.css" />
+    <Content Include="Assets\Login\vendor\css-hamburgers\hamburgers.min.css" />
+    <Content Include="Assets\Login\vendor\daterangepicker\daterangepicker.css" />
+    <Content Include="Assets\Login\vendor\daterangepicker\daterangepicker.js" />
+    <Content Include="Assets\Login\vendor\daterangepicker\moment.js" />
+    <Content Include="Assets\Login\vendor\daterangepicker\moment.min.js" />
+    <Content Include="Assets\Login\vendor\jquery\jquery-3.2.1.min.js" />
+    <Content Include="Assets\Login\vendor\perfect-scrollbar\perfect-scrollbar.css" />
+    <Content Include="Assets\Login\vendor\perfect-scrollbar\perfect-scrollbar.min.js" />
+    <Content Include="Assets\Login\vendor\select2\select2.css" />
+    <Content Include="Assets\Login\vendor\select2\select2.js" />
+    <Content Include="Assets\Login\vendor\select2\select2.min.css" />
+    <Content Include="Assets\Login\vendor\select2\select2.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\css\bootstrap-datepicker.css" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\css\bootstrap-datepicker.min.css" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\css\bootstrap-datepicker.standalone.css" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\css\bootstrap-datepicker.standalone.min.css" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\css\bootstrap-datepicker3.css" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\css\bootstrap-datepicker3.min.css" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\css\bootstrap-datepicker3.standalone.css" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\css\bootstrap-datepicker3.standalone.min.css" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\js\bootstrap-datepicker.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\js\bootstrap-datepicker.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.ar.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.az.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.bg.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.bs.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.ca.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.cs.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.cy.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.da.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.de.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.el.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.en-GB.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.eo.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.es.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.et.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.eu.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.fa.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.fi.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.fo.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.fr-CH.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.fr.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.gl.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.he.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.hr.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.hu.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.hy.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.id.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.is.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.it-CH.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.it.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.ja.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.ka.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.kh.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.kk.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.ko.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.kr.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.lt.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.lv.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.me.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.mk.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.mn.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.ms.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.nb.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.nl-BE.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.nl.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.no.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.pl.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.pt-BR.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.pt.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.ro.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.rs-latin.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.rs.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.ru.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.sk.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.sl.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.sq.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.sr-latin.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.sr.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.sv.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.sw.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.th.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.tr.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.uk.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.vi.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.zh-CN.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datepicker\locales\bootstrap-datepicker.zh-TW.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\css\bootstrap-datetimepicker.css" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\css\bootstrap-datetimepicker.min.css" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\bootstrap-datetimepicker.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\bootstrap-datetimepicker.min.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.ar.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.az.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.bg.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.bn.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.ca.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.cs.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.da.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.de.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.ee.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.el.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.es.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.fi.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.fr.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.he.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.hr.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.hu.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.hy.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.id.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.is.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.it.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.ja.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.ka.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.ko.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.lt.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.lv.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.ms.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.nb.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.nl.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.no.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.pl.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.pt-BR.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.pt.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.ro.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.rs-latin.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.rs.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.ru.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.sk.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.sl.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.sv.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.sw.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.th.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.tr.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.ua.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.uk.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.zh-CN.js" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\js\locales\bootstrap-datetimepicker.zh-TW.js" />
+    <Content Include="Assets\plugins\bootstrap\css\bootstrap.css" />
+    <Content Include="Assets\plugins\bootstrap\css\bootstrap.min.css" />
+    <Content Include="Assets\plugins\bootstrap\fonts\bootstrap\glyphicons-halflings-regular.svg" />
+    <Content Include="Assets\plugins\bootstrap\js\bootstrap.js" />
+    <Content Include="Assets\plugins\bootstrap\js\bootstrap.min.js" />
+    <Content Include="Assets\plugins\datatables\datatables.all.min.js" />
+    <Content Include="Assets\plugins\datatables\datatables.min.css" />
+    <Content Include="Assets\plugins\datatables\datatables.min.js" />
+    <Content Include="Assets\plugins\datatables\images\back_disabled.png" />
+    <Content Include="Assets\plugins\datatables\images\back_enabled.png" />
+    <Content Include="Assets\plugins\datatables\images\back_enabled_hover.png" />
+    <Content Include="Assets\plugins\datatables\images\forward_disabled.png" />
+    <Content Include="Assets\plugins\datatables\images\forward_enabled.png" />
+    <Content Include="Assets\plugins\datatables\images\forward_enabled_hover.png" />
+    <Content Include="Assets\plugins\datatables\images\sort_asc.png" />
+    <Content Include="Assets\plugins\datatables\images\sort_asc_disabled.png" />
+    <Content Include="Assets\plugins\datatables\images\sort_both.png" />
+    <Content Include="Assets\plugins\datatables\images\sort_desc.png" />
+    <Content Include="Assets\plugins\datatables\images\sort_desc_disabled.png" />
+    <Content Include="Assets\plugins\datatables\plugins\bootstrap\datatables.bootstrap.css" />
+    <Content Include="Assets\plugins\datatables\plugins\bootstrap\datatables.bootstrap.js" />
+    <Content Include="Assets\plugins\font-awesome\css\font-awesome.css" />
+    <Content Include="Assets\plugins\font-awesome\css\font-awesome.min.css" />
+    <Content Include="Assets\plugins\font-awesome\fonts\fontawesome-webfont.svg" />
+    <Content Include="Assets\plugins\jquery-ui\images\ui-icons_444444_256x240.png" />
+    <Content Include="Assets\plugins\jquery-ui\images\ui-icons_555555_256x240.png" />
+    <Content Include="Assets\plugins\jquery-ui\images\ui-icons_777620_256x240.png" />
+    <Content Include="Assets\plugins\jquery-ui\images\ui-icons_777777_256x240.png" />
+    <Content Include="Assets\plugins\jquery-ui\images\ui-icons_cc0000_256x240.png" />
+    <Content Include="Assets\plugins\jquery-ui\images\ui-icons_ffffff_256x240.png" />
+    <Content Include="Assets\plugins\jquery-ui\jquery-ui.min.css" />
+    <Content Include="Assets\plugins\jquery-ui\jquery-ui.min.js" />
+    <Content Include="Assets\plugins\jquery-ui\LICENSE.txt" />
+    <Content Include="Assets\plugins\jquery.min.js" />
+    <Content Include="Assets\style.css" />
+    <Content Include="Assets\style.min.css" />
+    <Content Include="Content\bootstrap.css" />
+    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\Custom-Styles.css" />
+    <Content Include="Content\dataTables.bootstrap.min.css" />
+    <Content Include="Content\themes\base\accordion.css" />
+    <Content Include="Content\themes\base\all.css" />
+    <Content Include="Content\themes\base\autocomplete.css" />
+    <Content Include="Content\themes\base\base.css" />
+    <Content Include="Content\themes\base\button.css" />
+    <Content Include="Content\themes\base\core.css" />
+    <Content Include="Content\themes\base\datepicker.css" />
+    <Content Include="Content\themes\base\dialog.css" />
+    <Content Include="Content\themes\base\draggable.css" />
+    <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_75_dadada_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <Content Include="Content\themes\base\images\ui-icons_222222_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_444444_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_454545_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_555555_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_777620_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_777777_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_888888_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_cc0000_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_ffffff_256x240.png" />
+    <Content Include="Content\themes\base\jquery-ui.css" />
+    <Content Include="Content\themes\base\jquery-ui.min.css" />
+    <Content Include="Content\themes\base\menu.css" />
+    <Content Include="Content\themes\base\progressbar.css" />
+    <Content Include="Content\themes\base\resizable.css" />
+    <Content Include="Content\themes\base\selectable.css" />
+    <Content Include="Content\themes\base\selectmenu.css" />
+    <Content Include="Content\themes\base\slider.css" />
+    <Content Include="Content\themes\base\sortable.css" />
+    <Content Include="Content\themes\base\spinner.css" />
+    <Content Include="Content\themes\base\tabs.css" />
+    <Content Include="Content\themes\base\theme.css" />
+    <Content Include="Content\themes\base\tooltip.css" />
+    <Content Include="default.aspx" />
+    <Content Include="Entities\kim_mexEntities.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>kim_mexEntities.edmx</DependentUpon>
+      <LastGenOutput>kim_mexEntities.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Entities\kim_mexEntities.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>kim_mexEntities.edmx</DependentUpon>
+      <LastGenOutput>kim_mexEntities.cs</LastGenOutput>
+    </Content>
+    <Content Include="favicon.ico" />
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Global.asax" />
+    <Content Include="Content\Site.css" />
+    <Content Include="Reports\ReportController\Project.aspx" />
+    <Content Include="ReportViewerWebForm.aspx" />
+    <Content Include="Scripts\bootstrap.js" />
+    <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="ApplicationInsights.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\kim_mex-april-02-2018.bak" />
+    <Content Include="DataSets\Project.xsc">
+      <DependentUpon>Project.xsd</DependentUpon>
+    </Content>
+    <Content Include="Assets\icons\fontawesome\fonts\fontawesome-webfont.eot" />
+    <Content Include="Assets\icons\fontawesome\fonts\fontawesome-webfont.ttf" />
+    <Content Include="Assets\icons\fontawesome\fonts\fontawesome-webfont.woff" />
+    <Content Include="Assets\icons\fontawesome\fonts\fontawesome-webfont.woff2" />
+    <Content Include="Assets\icons\fontawesome\fonts\FontAwesome.otf" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\fonts\fontawesome-webfont.eot" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\fonts\fontawesome-webfont.ttf" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\fonts\fontawesome-webfont.woff" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\fonts\fontawesome-webfont.woff2" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\fonts\FontAwesome.otf" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\less\animated.less" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\less\bordered-pulled.less" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\less\core.less" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\less\fixed-width.less" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\less\font-awesome.less" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\less\icons.less" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\less\larger.less" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\less\list.less" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\less\mixins.less" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\less\path.less" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\less\rotated-flipped.less" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\less\screen-reader.less" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\less\stacked.less" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\less\variables.less" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\scss\font-awesome.scss" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\scss\_animated.scss" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\scss\_bordered-pulled.scss" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\scss\_core.scss" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\scss\_fixed-width.scss" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\scss\_icons.scss" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\scss\_larger.scss" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\scss\_list.scss" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\scss\_mixins.scss" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\scss\_path.scss" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\scss\_rotated-flipped.scss" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\scss\_screen-reader.scss" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\scss\_stacked.scss" />
+    <Content Include="Assets\Login\fonts\font-awesome-4.7.0\scss\_variables.scss" />
+    <Content Include="Assets\Login\fonts\Linearicons-Free-v1.0.0\WebFont\Linearicons-Free.eot" />
+    <Content Include="Assets\Login\fonts\Linearicons-Free-v1.0.0\WebFont\Linearicons-Free.ttf" />
+    <Content Include="Assets\Login\fonts\Linearicons-Free-v1.0.0\WebFont\Linearicons-Free.woff" />
+    <Content Include="Assets\Login\fonts\Linearicons-Free-v1.0.0\WebFont\Linearicons-Free.woff2" />
+    <Content Include="Assets\Login\fonts\montserrat\Montserrat-Black.ttf" />
+    <Content Include="Assets\Login\fonts\montserrat\Montserrat-BlackItalic.ttf" />
+    <Content Include="Assets\Login\fonts\montserrat\Montserrat-Bold.ttf" />
+    <Content Include="Assets\Login\fonts\montserrat\Montserrat-BoldItalic.ttf" />
+    <Content Include="Assets\Login\fonts\montserrat\Montserrat-ExtraBold.ttf" />
+    <Content Include="Assets\Login\fonts\montserrat\Montserrat-ExtraBoldItalic.ttf" />
+    <Content Include="Assets\Login\fonts\montserrat\Montserrat-ExtraLight.ttf" />
+    <Content Include="Assets\Login\fonts\montserrat\Montserrat-ExtraLightItalic.ttf" />
+    <Content Include="Assets\Login\fonts\montserrat\Montserrat-Italic.ttf" />
+    <Content Include="Assets\Login\fonts\montserrat\Montserrat-Light.ttf" />
+    <Content Include="Assets\Login\fonts\montserrat\Montserrat-LightItalic.ttf" />
+    <Content Include="Assets\Login\fonts\montserrat\Montserrat-Medium.ttf" />
+    <Content Include="Assets\Login\fonts\montserrat\Montserrat-MediumItalic.ttf" />
+    <Content Include="Assets\Login\fonts\montserrat\Montserrat-Regular.ttf" />
+    <Content Include="Assets\Login\fonts\montserrat\Montserrat-SemiBold.ttf" />
+    <Content Include="Assets\Login\fonts\montserrat\Montserrat-SemiBoldItalic.ttf" />
+    <Content Include="Assets\Login\fonts\montserrat\Montserrat-Thin.ttf" />
+    <Content Include="Assets\Login\fonts\montserrat\Montserrat-ThinItalic.ttf" />
+    <Content Include="Assets\Login\fonts\poppins\Poppins-Black.ttf" />
+    <Content Include="Assets\Login\fonts\poppins\Poppins-BlackItalic.ttf" />
+    <Content Include="Assets\Login\fonts\poppins\Poppins-Bold.ttf" />
+    <Content Include="Assets\Login\fonts\poppins\Poppins-BoldItalic.ttf" />
+    <Content Include="Assets\Login\fonts\poppins\Poppins-ExtraBold.ttf" />
+    <Content Include="Assets\Login\fonts\poppins\Poppins-ExtraBoldItalic.ttf" />
+    <Content Include="Assets\Login\fonts\poppins\Poppins-ExtraLight.ttf" />
+    <Content Include="Assets\Login\fonts\poppins\Poppins-ExtraLightItalic.ttf" />
+    <Content Include="Assets\Login\fonts\poppins\Poppins-Italic.ttf" />
+    <Content Include="Assets\Login\fonts\poppins\Poppins-Light.ttf" />
+    <Content Include="Assets\Login\fonts\poppins\Poppins-LightItalic.ttf" />
+    <Content Include="Assets\Login\fonts\poppins\Poppins-Medium.ttf" />
+    <Content Include="Assets\Login\fonts\poppins\Poppins-MediumItalic.ttf" />
+    <Content Include="Assets\Login\fonts\poppins\Poppins-Regular.ttf" />
+    <Content Include="Assets\Login\fonts\poppins\Poppins-SemiBold.ttf" />
+    <Content Include="Assets\Login\fonts\poppins\Poppins-SemiBoldItalic.ttf" />
+    <Content Include="Assets\Login\fonts\poppins\Poppins-Thin.ttf" />
+    <Content Include="Assets\Login\fonts\poppins\Poppins-ThinItalic.ttf" />
+    <Content Include="Assets\Login\vendor\bootstrap\css\bootstrap-grid.css.map" />
+    <Content Include="Assets\Login\vendor\bootstrap\css\bootstrap-grid.min.css.map" />
+    <Content Include="Assets\Login\vendor\bootstrap\css\bootstrap-reboot.css.map" />
+    <Content Include="Assets\Login\vendor\bootstrap\css\bootstrap-reboot.min.css.map" />
+    <Content Include="Assets\Login\vendor\bootstrap\css\bootstrap.css.map" />
+    <Content Include="Assets\Login\vendor\bootstrap\css\bootstrap.min.css.map" />
+    <Content Include="DataSets\Inventory.xsc">
+      <DependentUpon>Inventory.xsd</DependentUpon>
+    </Content>
+    <Content Include="DataSets\BOQ.xsc">
+      <DependentUpon>BOQ.xsd</DependentUpon>
+    </Content>
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\LICENSE" />
+    <Content Include="Assets\plugins\bootstrap-datetimepicker\README.md" />
+    <Content Include="Assets\plugins\bootstrap\fonts\bootstrap\glyphicons-halflings-regular.eot" />
+    <Content Include="Assets\plugins\bootstrap\fonts\bootstrap\glyphicons-halflings-regular.ttf" />
+    <Content Include="Assets\plugins\bootstrap\fonts\bootstrap\glyphicons-halflings-regular.woff" />
+    <Content Include="Assets\plugins\bootstrap\fonts\bootstrap\glyphicons-halflings-regular.woff2" />
+    <Content Include="Assets\plugins\datatables\images\Sorting icons.psd" />
+    <Content Include="Assets\plugins\font-awesome\fonts\fontawesome-webfont.eot" />
+    <Content Include="Assets\plugins\font-awesome\fonts\fontawesome-webfont.ttf" />
+    <Content Include="Assets\plugins\font-awesome\fonts\fontawesome-webfont.woff" />
+    <Content Include="Assets\plugins\font-awesome\fonts\fontawesome-webfont.woff2" />
+    <Content Include="Assets\plugins\font-awesome\fonts\FontAwesome.otf" />
+    <None Include="DataSets\BOQ.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>BOQ.Designer.cs</LastGenOutput>
+    </None>
+    <Content Include="DataSets\BOQ.xss">
+      <DependentUpon>BOQ.xsd</DependentUpon>
+    </Content>
+    <None Include="DataSets\Inventory.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>Inventory.Designer.cs</LastGenOutput>
+    </None>
+    <Content Include="DataSets\Inventory.xss">
+      <DependentUpon>Inventory.xsd</DependentUpon>
+    </Content>
+    <None Include="DataSets\Project.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>Project.Designer.cs</LastGenOutput>
+    </None>
+    <Content Include="DataSets\Project.xss">
+      <DependentUpon>Project.xsd</DependentUpon>
+    </Content>
+    <Content Include="DataSets\PurchaseOrder.xsc">
+      <DependentUpon>PurchaseOrder.xsd</DependentUpon>
+    </Content>
+    <None Include="DataSets\PurchaseOrder.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>PurchaseOrder.Designer.cs</LastGenOutput>
+    </None>
+    <Content Include="DataSets\PurchaseOrder.xss">
+      <DependentUpon>PurchaseOrder.xsd</DependentUpon>
+    </Content>
+    <Content Include="DataSets\StockMovement.xsc">
+      <DependentUpon>StockMovement.xsd</DependentUpon>
+    </Content>
+    <Content Include="DataSets\StockBalanceBywarehouse.xsc">
+      <DependentUpon>StockBalanceBywarehouse.xsd</DependentUpon>
+    </Content>
+    <Content Include="DataSets\ReturnItemtoSupplier.xsc">
+      <DependentUpon>ReturnItemtoSupplier.xsd</DependentUpon>
+    </Content>
+    <Content Include="DataSets\PurchaseOrderVsItemReceived.xsc">
+      <DependentUpon>PurchaseOrderVsItemReceived.xsd</DependentUpon>
+    </Content>
+    <None Include="DataSets\PurchaseOrderVsItemReceived.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>PurchaseOrderVsItemReceived.Designer.cs</LastGenOutput>
+    </None>
+    <Content Include="DataSets\PurchaseOrderVsItemReceived.xss">
+      <DependentUpon>PurchaseOrderVsItemReceived.xsd</DependentUpon>
+    </Content>
+    <Content Include="DataSets\Quote.xsc">
+      <DependentUpon>Quote.xsd</DependentUpon>
+    </Content>
+    <None Include="DataSets\Quote.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>Quote.Designer.cs</LastGenOutput>
+    </None>
+    <Content Include="DataSets\Quote.xss">
+      <DependentUpon>Quote.xsd</DependentUpon>
+    </Content>
+    <None Include="DataSets\ReturnItemtoSupplier.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ReturnItemtoSupplier.Designer.cs</LastGenOutput>
+    </None>
+    <Content Include="DataSets\ReturnItemtoSupplier.xss">
+      <DependentUpon>ReturnItemtoSupplier.xsd</DependentUpon>
+    </Content>
+    <Content Include="DataSets\StockBalanceByDateandWarehouse.xsc">
+      <DependentUpon>StockBalanceByDateandWarehouse.xsd</DependentUpon>
+    </Content>
+    <None Include="DataSets\StockBalanceByDateandWarehouse.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>StockBalanceByDateandWarehouse1.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <Content Include="DataSets\StockBalanceByDateandWarehouse.xss">
+      <DependentUpon>StockBalanceByDateandWarehouse.xsd</DependentUpon>
+    </Content>
+    <None Include="DataSets\StockBalanceBywarehouse.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>StockBalanceBywarehouse.Designer.cs</LastGenOutput>
+    </None>
+    <Content Include="DataSets\StockBalanceBywarehouse.xss">
+      <DependentUpon>StockBalanceBywarehouse.xsd</DependentUpon>
+    </Content>
+    <None Include="DataSets\StockMovement.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>StockMovement.Designer.cs</LastGenOutput>
+    </None>
+    <Content Include="DataSets\StockMovement.xss">
+      <DependentUpon>StockMovement.xsd</DependentUpon>
+    </Content>
+    <Content Include="DataSets\StockUsageBySiteWithRemainBalance.xsc">
+      <DependentUpon>StockUsageBySiteWithRemainBalance.xsd</DependentUpon>
+    </Content>
+    <None Include="DataSets\StockUsageBySiteWithRemainBalance.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>StockUsageBySiteWithRemainBalance.Designer.cs</LastGenOutput>
+    </None>
+    <Content Include="DataSets\StockUsageBySiteWithRemainBalance.xss">
+      <DependentUpon>StockUsageBySiteWithRemainBalance.xsd</DependentUpon>
+    </Content>
+    <EntityDeploy Include="Entities\kim_mexEntities.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>kim_mexEntities.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Entities\kim_mexEntities.edmx.diagram">
+      <DependentUpon>kim_mexEntities.edmx</DependentUpon>
+    </Content>
+    <None Include="Properties\PublishProfiles\KimMex.pubxml" />
+    <None Include="Properties\PublishProfiles\KimMexDeployment.pubxml" />
+    <None Include="Scripts\jquery-1.10.2.intellisense.js" />
+    <Content Include="Scripts\custom-script.js" />
+    <Content Include="Scripts\custom\boq-custom-script.js" />
+    <Content Include="Scripts\custom\custom-script.js" />
+    <None Include="Scripts\jquery-1.12.4.intellisense.js" />
+    <Content Include="Scripts\custom\ir-custom-script.js" />
+    <Content Include="Scripts\custom\itemReceiveScript.js" />
+    <Content Include="Scripts\custom\po-custom-script.js" />
+    <Content Include="Scripts\custom\print-script.js" />
+    <Content Include="Scripts\custom\purchase_order.js" />
+    <Content Include="Scripts\custom\stockDamageCustomScript.js" />
+    <Content Include="Scripts\jquery-1.12.4.js" />
+    <Content Include="Scripts\jquery-1.12.4.min.js" />
+    <Content Include="Scripts\jquery-1.12.4.min.map" />
+    <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery-ui-1.12.1.js" />
+    <Content Include="Scripts\jquery-ui-1.12.1.min.js" />
+    <Content Include="Scripts\jquery.dataTables.min.js" />
+    <Content Include="Scripts\jquery.print-preview.js" />
+    <Content Include="Scripts\jQuery.print.js" />
+    <Content Include="Scripts\jQuery.print.min.js" />
+    <Content Include="Scripts\jquery.validate.js" />
+    <Content Include="Scripts\jquery.validate.min.js" />
+    <Content Include="Scripts\jquery.validate.unobtrusive.js" />
+    <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\modernizr-2.6.2.js" />
+    <Content Include="Scripts\notify.js" />
+    <Content Include="Scripts\notify.min.js" />
+    <Content Include="Scripts\respond.js" />
+    <Content Include="Scripts\respond.min.js" />
+    <Content Include="Scripts\_references.js" />
+    <Content Include="SqlServerTypes\readme.htm" />
+    <Content Include="SqlServerTypes\x64\msvcr120.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\x64\SqlServerSpatial140.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\x86\msvcr120.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\x86\SqlServerSpatial140.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Shared\ReportController\BOQbyProject.aspx" />
+    <Content Include="Views\Shared\ReportController\ItemRequestbyProject.aspx" />
+    <Content Include="Views\Shared\ReportController\ProjectList.aspx" />
+    <Content Include="Views\Shared\ReportController\PurchaseOrderNotVAT.aspx" />
+    <Content Include="Views\Shared\ReportController\PurchaseOrderReport.aspx" />
+    <Content Include="Views\Shared\ReportController\PurchaseOrderSupplier.aspx" />
+    <Content Include="Views\Shared\ReportController\PurchaseOrderVAT.aspx" />
+    <Content Include="Views\Shared\ReportController\PurchaseOrderVsItemReceived.aspx" />
+    <Content Include="Views\Shared\ReportController\Quote.aspx" />
+    <Content Include="Views\Shared\ReportController\ReportViewerCrossBrowserClientPrint.aspx" />
+    <Content Include="Views\Shared\ReportController\ReturnItemtoSupplier.aspx" />
+    <Content Include="Views\Shared\ReportController\StockBalanceByDateandWarehouse.aspx" />
+    <Content Include="Views\Shared\ReportController\StockBalanceBywarehouse.aspx" />
+    <Content Include="Views\Shared\ReportController\StockMovement.aspx" />
+    <Content Include="Views\Shared\ReportController\StockUsageBySiteWithRemainBalance.aspx" />
+    <Content Include="Views\Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Home\About.cshtml" />
+    <Content Include="Views\Home\Contact.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Account\_ExternalLoginsListPartial.cshtml" />
+    <Content Include="Views\Account\ConfirmEmail.cshtml" />
+    <Content Include="Views\Account\ExternalLoginConfirmation.cshtml" />
+    <Content Include="Views\Account\ExternalLoginFailure.cshtml" />
+    <Content Include="Views\Account\ForgotPassword.cshtml" />
+    <Content Include="Views\Account\ForgotPasswordConfirmation.cshtml" />
+    <Content Include="Views\Account\Login.cshtml" />
+    <Content Include="Views\Account\Register.cshtml" />
+    <Content Include="Views\Account\ResetPassword.cshtml" />
+    <Content Include="Views\Account\ResetPasswordConfirmation.cshtml" />
+    <Content Include="Views\Account\SendCode.cshtml" />
+    <Content Include="Views\Account\VerifyCode.cshtml" />
+    <Content Include="Views\Manage\AddPhoneNumber.cshtml" />
+    <Content Include="Views\Manage\ChangePassword.cshtml" />
+    <Content Include="Views\Manage\Index.cshtml" />
+    <Content Include="Views\Manage\ManageLogins.cshtml" />
+    <Content Include="Views\Manage\SetPassword.cshtml" />
+    <Content Include="Views\Manage\VerifyPhoneNumber.cshtml" />
+    <Content Include="Views\Shared\Lockout.cshtml" />
+    <Content Include="Views\Shared\_LoginPartial.cshtml" />
+    <Content Include="Views\Site\Create.cshtml" />
+    <Content Include="Views\Site\Message.cshtml" />
+    <Content Include="Views\Site\Index.cshtml" />
+    <Content Include="Views\Site\Details.cshtml" />
+    <Content Include="Views\Site\Edit.cshtml" />
+    <Content Include="Views\Customer\Index.cshtml" />
+    <Content Include="Views\Customer\Create.cshtml" />
+    <Content Include="Views\Customer\Details.cshtml" />
+    <Content Include="Views\Customer\Edit.cshtml" />
+    <Content Include="Views\Customer\Message.cshtml" />
+    <Content Include="Views\Supplier\Index.cshtml" />
+    <Content Include="Views\Supplier\Create.cshtml" />
+    <Content Include="Views\Supplier\Details.cshtml" />
+    <Content Include="Views\Supplier\Edit.cshtml" />
+    <Content Include="Views\Supplier\Message.cshtml" />
+    <Content Include="Views\Project\Message.cshtml" />
+    <Content Include="Views\Project\Index.cshtml" />
+    <Content Include="Views\Project\Create.cshtml" />
+    <Content Include="Views\Project\Details.cshtml" />
+    <Content Include="Views\Project\Edit.cshtml" />
+    <Content Include="Views\ProductCategory\Index.cshtml" />
+    <Content Include="Views\ProductCategory\Create.cshtml" />
+    <Content Include="Views\ProductCategory\Details.cshtml" />
+    <Content Include="Views\ProductCategory\Edit.cshtml" />
+    <Content Include="Views\ProductCategory\Message.cshtml" />
+    <Content Include="Views\Product\Create.cshtml" />
+    <Content Include="Views\Product\Message.cshtml" />
+    <Content Include="Views\Product\Index.cshtml" />
+    <Content Include="Views\Product\Details.cshtml" />
+    <Content Include="Views\Product\Edit.cshtml" />
+    <Content Include="Views\PurchaseRequisition\Create.cshtml" />
+    <Content Include="Views\PurchaseRequisition\Index.cshtml" />
+    <Content Include="Views\PurchaseRequisition\Message.cshtml" />
+    <Content Include="Views\Account\Logon.cshtml" />
+    <Content Include="Views\Unit\Index.cshtml" />
+    <Content Include="Views\Unit\Create.cshtml" />
+    <Content Include="Views\Unit\Message.cshtml" />
+    <Content Include="Views\Unit\Details.cshtml" />
+    <Content Include="Views\Unit\Edit.cshtml" />
+    <Content Include="Views\BOQ\Index.cshtml" />
+    <Content Include="Views\BOQ\Message.cshtml" />
+    <Content Include="Views\BOQ\Create.cshtml" />
+    <Content Include="Views\Account\UserList.cshtml" />
+    <Content Include="Views\User\Index.cshtml" />
+    <Content Include="Views\User\Details.cshtml" />
+    <Content Include="Views\JobCategory\Index.cshtml" />
+    <Content Include="Views\JobCategory\Message.cshtml" />
+    <Content Include="Views\JobCategory\Create.cshtml" />
+    <Content Include="Views\JobCategory\Details.cshtml" />
+    <Content Include="Views\JobCategory\Edit.cshtml" />
+    <Content Include="Views\BOQ\ImportBoQ.cshtml" />
+    <Content Include="Views\BOQ\Details.cshtml" />
+    <Content Include="Views\BOQ\Edit.cshtml" />
+    <Content Include="Views\ItemRequest\Index.cshtml" />
+    <Content Include="Views\ItemRequest\Create.cshtml" />
+    <Content Include="Views\ItemRequest\Detail.cshtml" />
+    <Content Include="Views\ItemRequest\Edit.cshtml" />
+    <Content Include="Views\User\Create.cshtml" />
+    <Content Include="Views\Account\EditUser.cshtml" />
+    <Content Include="Views\PurchaseOrder\Index.cshtml" />
+    <Content Include="Views\PurchaseOrder\Create.cshtml" />
+    <Content Include="Views\PurchaseOrder\Detail.cshtml" />
+    <Content Include="Views\PurchaseOrder\Edit.cshtml" />
+    <Content Include="Views\PurchaseOrder\Approve.cshtml" />
+    <Content Include="Views\WareHouse\Index.cshtml" />
+    <Content Include="Views\WareHouse\Create.cshtml" />
+    <Content Include="Views\WareHouse\Detail.cshtml" />
+    <Content Include="Views\WareHouse\Edit.cshtml" />
+    <Content Include="Views\StockTransfer\Index.cshtml" />
+    <Content Include="Views\StockTransfer\Create.cshtml" />
+    <Content Include="Views\StockTransfer\Detail.cshtml" />
+    <Content Include="Views\StockTransfer\Edit.cshtml" />
+    <Content Include="Views\ItemReceive\Index.cshtml" />
+    <Content Include="Views\ItemReceive\Detail.cshtml" />
+    <Content Include="Views\ItemReceive\Edit.cshtml" />
+    <Content Include="Views\StockDamage\Index.cshtml" />
+    <Content Include="Views\StockDamage\Create.cshtml" />
+    <Content Include="Views\StockDamage\Detail.cshtml" />
+    <Content Include="Views\StockDamage\Edit.cshtml" />
+    <Content Include="Views\ItemRequest\Approved.cshtml" />
+    <Content Include="Views\Quote\Index.cshtml" />
+    <Content Include="Views\Quote\Details.cshtml" />
+    <Content Include="Views\Quote\Create.cshtml" />
+    <Content Include="Views\Quote\Edit.cshtml" />
+    <Content Include="Views\Project\ReportProject.cshtml" />
+    <Content Include="Views\StockIssue\Index.cshtml" />
+    <Content Include="Views\StockIssue\Details.cshtml" />
+    <Content Include="Views\StockIssue\Create.cshtml" />
+    <Content Include="Views\StockIssue\Edit.cshtml" />
+    <Content Include="Views\StockIssueReturn\Index.cshtml" />
+    <Content Include="Views\StockIssueReturn\Details.cshtml" />
+    <Content Include="Views\StockIssueReturn\Create.cshtml" />
+    <Content Include="Views\StockIssueReturn\Edit.cshtml" />
+    <Content Include="Views\WareHouse\StockBalance.cshtml" />
+    <Content Include="Views\ItemReturn\Index.cshtml" />
+    <Content Include="Views\ItemReturn\Create.cshtml" />
+    <Content Include="Views\ItemReturn\Details.cshtml" />
+    <Content Include="Views\ItemReturn\Edit.cshtml" />
+    <Content Include="Views\PurchaseOrder\DirectorApprove.cshtml" />
+    <Content Include="Views\PurchaseOrder\Cancel.cshtml" />
+    <Content Include="Views\PurchaseOrder\GenerateReport.cshtml" />
+    <Content Include="Views\PurchaseOrder\Report.cshtml" />
+    <Content Include="Views\Report\Index.cshtml" />
+    <Content Include="Views\Report\ProjectList.cshtml" />
+    <Content Include="Views\Report\GenerateProjectList.cshtml" />
+    <Content Include="Views\Report\BOQbyProject.cshtml" />
+    <Content Include="Views\Report\GenerateReport.cshtml" />
+    <Content Include="Views\Report\ItemRequestbyProject.cshtml" />
+    <Content Include="Views\Report\PurchaseOrder.cshtml" />
+    <Content Include="Views\Report\PurchaseOrderBySupplier.cshtml" />
+    <Content Include="Views\Report\StockMovement.cshtml" />
+    <Content Include="Views\Report\StockBalanceBywarehouse.cshtml" />
+    <Content Include="Views\Report\ReturnItemtoSupplier.cshtml" />
+    <Content Include="Views\Report\PurchaseOrderVsItemReceived.cshtml" />
+    <Content Include="Views\Report\StockUsageBySiteWithRemainBalance.cshtml" />
+    <Content Include="Views\Shared\_Layout - Copy.cshtml" />
+    <Content Include="Views\ItemReceive\Create.cshtml" />
+    <Content Include="Views\Quote\QuoteReport.cshtml" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Views\PurchaseOrder\ReportNotVAT.cshtml" />
+    <Content Include="Views\PurchaseOrder\Print.cshtml" />
+    <Content Include="Views\StockAdjustment\Index.cshtml" />
+    <Content Include="Views\StockAdjustment\Create.cshtml" />
+    <Content Include="Views\StockAdjustment\Details.cshtml" />
+    <Content Include="Views\StockAdjustment\Edit.cshtml" />
+    <Content Include="Views\StockAdjustment\ApproveFeedback.cshtml" />
+    <Content Include="Views\StockAdjustment\PrepareFeedback.cshtml" />
+    <Content Include="Views\StockTransfer\ApproveFeedback.cshtml" />
+    <Content Include="Views\StockTransfer\PrepareFeedback.cshtml" />
+    <Content Include="Views\ItemReceive\ApproveFeedback.cshtml" />
+    <Content Include="Views\ItemReceive\PrepareFeedback.cshtml" />
+    <Content Include="Views\ItemReturn\ApproveFeedback.cshtml" />
+    <Content Include="Views\ItemReturn\PrepareFeedback.cshtml" />
+    <Content Include="Views\StockIssue\ApproveFeedback.cshtml" />
+    <Content Include="Views\StockIssue\PrepreFeedback.cshtml" />
+    <Content Include="Views\StockIssue\PrepareFeedback.cshtml" />
+    <Content Include="Views\StockIssueReturn\ApproveFeedback.cshtml" />
+    <Content Include="Views\StockIssueReturn\PrepareFeedback.cshtml" />
+    <Content Include="Views\StockDamage\ApproveFeedback.cshtml" />
+    <Content Include="Views\StockDamage\PrepareFeedback.cshtml" />
+    <Content Include="Views\Quote\ItemMaster.cshtml" />
+    <Content Include="Views\Quote\ItemPirceDetail.cshtml" />
+    <Content Include="Views\WareHouse\ImportStockBalance.cshtml" />
+    <Content Include="Views\ErrorLog\Index.cshtml" />
+    <Content Include="Views\ClassType\Index.cshtml" />
+    <Content Include="Views\ClassType\Details.cshtml" />
+    <Content Include="Views\ClassType\Create.cshtml" />
+    <Content Include="Views\ClassType\Edit.cshtml" />
+    <Content Include="Views\ProductClass\Index.cshtml" />
+    <Content Include="Views\Brand\Create.cshtml" />
+    <Content Include="Views\Brand\Details.cshtml" />
+    <Content Include="Views\Brand\Edit.cshtml" />
+    <Content Include="Views\Brand\Index.cshtml" />
+    <Content Include="Views\Class\Create.cshtml" />
+    <Content Include="Views\Class\Details.cshtml" />
+    <Content Include="Views\Class\Edit.cshtml" />
+    <Content Include="Views\Class\Index.cshtml" />
+    <Content Include="Views\ProductClass\Create.cshtml" />
+    <Content Include="Views\ProductClass\Details.cshtml" />
+    <Content Include="Views\ProductClass\Edit.cshtml" />
+    <Content Include="Views\ProductType\Create.cshtml" />
+    <Content Include="Views\ProductType\Details.cshtml" />
+    <Content Include="Views\ProductType\Edit.cshtml" />
+    <Content Include="Views\ProductType\Index.cshtml" />
+    <Content Include="Views\Product\ImportExcel.cshtml" />
+    <Content Include="Views\ItemRequest\NewRequest-copy.cshtml" />
+    <Content Include="Views\ProductSize\Index.cshtml" />
+    <Content Include="Views\ProductSize\Details.cshtml" />
+    <Content Include="Views\ProductSize\Create.cshtml" />
+    <Content Include="Views\ProductSize\Edit.cshtml" />
+    <Content Include="Views\Shared\_LayoutBackend.cshtml" />
+    <Content Include="Views\Shared\_LayoutDashboard.cshtml" />
+    <Content Include="Views\ItemRequest\NewRequest.cshtml" />
+    <Content Include="Views\ItemRequest\MyRequest.cshtml" />
+    <Content Include="Views\ItemRequest\Index - Copy.cshtml" />
+    <Content Include="Views\PurchaseOrder\MyRequest.cshtml" />
+    <Content Include="Views\PurchaseOrder\MyApproval.cshtml" />
+    <Content Include="Views\Project\ProjectList.cshtml" />
+    <Content Include="Views\ItemRequest\RequestedList.cshtml" />
+    <Content Include="Views\ItemRequest\MyRequest - Copy.cshtml" />
+    <Content Include="Views\ItemRequest\NewRequest - Copy.cshtml" />
+    <Content Include="Views\Stock\CheckStockBalance.cshtml" />
+    <Content Include="Views\ItemReceive\MyRequest.cshtml" />
+    <Content Include="Views\ItemReceive\MyApproval.cshtml" />
+    <Content Include="Views\Shared\_Layout - Copy %282%29.cshtml" />
+    <Content Include="Views\Shared\_Layout - Copy %283%29.cshtml" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Documents\Attachment\" />
+    <Folder Include="Documents\IR Attachment\" />
+    <Folder Include="Documents\IRe Attachment\" />
+    <Folder Include="Documents\PO Attachment\" />
+    <Folder Include="Documents\Quote\" />
+    <Folder Include="Documents\Spacemen Signature\" />
+    <Folder Include="Documents\Stock Balance\" />
+    <Folder Include="Views\CustomDuplicateItemValidation\" />
+    <Folder Include="Views\DuplicateItemCode\" />
+    <Folder Include="Views\SMS\" />
+    <Folder Include="Views\StockMovement\" />
+    <Folder Include="Views\StockUsageBySiteWithRemainBalance\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="packages.config" />
+    <None Include="Project_Readme.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Reports\3PurchaseOrderSupplier.rdlc" />
+    <EmbeddedResource Include="Reports\Project.rdlc" />
+    <EmbeddedResource Include="Reports\PurchaseOrderToSupplier.rdlc">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\2PurchaseOrder.rdlc" />
+    <EmbeddedResource Include="Reports\PurchaseOrderToSupplierNotVAT.rdlc" />
+    <EmbeddedResource Include="Reports\PurchaseOrderVsItemReceived.rdlc" />
+    <EmbeddedResource Include="Reports\Quote.rdlc" />
+    <EmbeddedResource Include="Reports\ReturnItemtoSupplier.rdlc" />
+    <EmbeddedResource Include="Reports\StockBalanceByDateandWarehouse.rdlc" />
+    <EmbeddedResource Include="Reports\StockBalanceBywarehouse.rdlc" />
+    <EmbeddedResource Include="Reports\StockMovement.rdlc" />
+    <EmbeddedResource Include="Reports\StockUsageBySiteWithRemainBalance.rdlc" />
+    <EmbeddedResource Include="Reports\Table11BOQbyProject.rdlc" />
+    <EmbeddedResource Include="Reports\Table12ItemRequestbyProject.rdlc" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
+    <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>8680</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:8680/</IISUrl>
+          <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
+          <IISAppRootUrl>http://localhost:8680/</IISAppRootUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Net.Compilers.1.0.0\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Net.Compilers.1.0.0\build\Microsoft.Net.Compilers.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target> -->
+</Project>

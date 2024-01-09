@@ -1,0 +1,60 @@
+﻿@model BT_KimMex.Models.PurchaseOrderVsItemReceivedReport
+
+@{
+    ViewBag.Title = "Purchase Order Vs Good Received Note Report";
+    string currentDate = DateTime.Now.ToString("MM/dd/yyyy");
+}
+
+<div class="w3-panel w3-card-4">
+    <div class="w3-container w3-display-container">
+        <h3 class="title">@ViewBag.Title</h3>
+    </div>
+    <div class="w3-container w3-display-container">
+        @using (Html.BeginForm())
+        {
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    <label class="col-md-2">From Date <strong style="color:red !important">*</strong>:</label>
+                    <div class="col-md-4">
+                        <div class="input-group date" data-provide="datepicker" style="width:280px !important;">
+                            @Html.EditorFor(model => model.dateFrom, new { htmlAttributes = new { @class = "form-control", placeholder = "MM/DD/YYYY" } })
+                            <div class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </div>
+                        </div>
+                        @Html.ValidationMessageFor(model => model.dateFrom, "", new { @class = "text-danger" })
+                    </div>
+                    <label class="col-md-2">To Date <strong style="color:red !important">*</strong>:</label>
+                    <div class="col-md-4">
+                        <div class="input-group date" data-provide="datepicker" style="width:280px !important;">
+                            @Html.EditorFor(model => model.dateTo, new { htmlAttributes = new { @class = "form-control", placeholder = "MM/DD/YYYY" } })
+                            <div class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </div>
+                        </div>
+                        @Html.ValidationMessageFor(model => model.dateTo, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Generate to Excel" class="btn btn-success" />
+                        @*<a href="@Url.Action("Index")" class="btn btn-default">Cancel</a>*@
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('#dateFrom').val('@currentDate');
+            $('#dateTo').val('@currentDate');
+            $('div.date').on('changeDate', function () {
+                $(this).datepicker('hide');
+            });
+        });
+    </script>
+}

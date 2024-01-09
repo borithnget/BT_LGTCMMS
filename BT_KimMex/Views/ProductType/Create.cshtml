@@ -1,0 +1,85 @@
+﻿@model BT_KimMex.Models.ProductTypeViewModel
+
+
+@{
+    ViewBag.Title = "Create";
+}
+<h3 class="title">Create New Product Type</h3>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <div class="form-group">
+            <label class="control-label col-md-2">Date :</label>
+            <label class="col-md-10">@Convert.ToDateTime(DateTime.Now).ToString("dd/MM/yyyyy")</label>
+        </div>
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Group <strong style="color:red;"></strong> :</label>
+            <div class="col-md-10">
+                <select class="form-control" id="product_category_id" name="product_category_id">
+                    <option value="">Select Group</option>
+                    @{
+                        BT_KimMex.Entities.kim_mexEntities db = new BT_KimMex.Entities.kim_mexEntities();
+                        var category = db.tb_class.OrderBy(o => o.class_name).Where(w => w.active == true).ToList();
+                        foreach (var item in category)
+                        {
+                            <option value="@item.class_id">@item.class_name</option>
+                        }
+                    }
+                </select>
+                @Html.ValidationMessageFor(model => model.product_category_id, "", new { @class = "text-danger", style = "display:block !important;" })
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="control-label col-md-2">Product Type <strong style="color:red;"></strong> :</label>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.product_type_name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.product_type_name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-info" />
+                <a href="@Url.Action("Index", "ProductType")" class="btn btn-danger">Back</a>
+            </div>
+        </div>
+    </div>
+
+                        }
+@section Scripts{
+    <script>
+             $(function () {
+                    initialProductTypeDataTable();
+        });
+        function InitialSiteDropDownList(site_id) {
+                $.ajax({
+                    url: "@Url.Action("SiteDropDown", "Site")",
+                    type: "get",
+                    dataType: "json",
+                    success: function (data) {
+
+                        $('#producttype_site_id').empty();
+                        $('#producttype_site_id').append("" +
+                            "<option value>Select Site Name</option>"
+                        );
+                        $.each(data, function (index, item) {
+                            $.each(item, function (index1, item1) {
+
+                                $('#producttype_site_id').append("" +
+                                        "<option value='" + item1.site_id + "'>" + item1.site_name + "</option>"
+                                    );
+                            });
+                        });
+                                $('#producttype_site_id').val(site_id);
+                    },
+                    error: function (data) {
+
+                    }
+                });
+
+                                }
+    </script>
+}

@@ -1,0 +1,590 @@
+﻿@using System.Text.RegularExpressions;
+@model BT_KimMex.Models.ProductViewModel
+@using BT_KimMex.Class;
+@using BT_KimMex.Models;
+@using BT_KimMex.Entities;
+@{
+    ViewBag.Title = "Edit";
+    ViewBag.PageTitle = "Edit Product";
+    kim_mexEntities db = new kim_mexEntities();
+    List<CategoryViewModel> productCategories = CommonFunctions.GetCategoryDataDropdownlistbyClassId(Model.class_id, Model.p_category_id, Model.product_id);
+    string product_category_id = db.tb_product.Find(Model.product_id).product_category_id;
+}
+
+<div class="w3-panel w3-card-4">
+    <div class="w3-container w3-display-container">
+        <h3 class="title">@ViewBag.PageTitle</h3>
+    </div>
+    <div class="w3-container w3-display-container">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal">
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.HiddenFor(model => model.product_id)
+                @*@Html.HiddenFor(model => model.brand_id)*@
+                @*@Html.HiddenFor(model => model.product_class_id)*@
+
+                <div class="row col-md-12">
+                    <div class="col-md-6">
+                        @*<div class="form-group row">
+            @Html.LabelFor(model => model.created_date, htmlAttributes: new { @class = "control-label col-md-4" })
+            <label class="col-md-8" id="current_date">@Convert.ToDateTime(Model.created_date).ToString("dd/MM/yyyy")</label>
+        </div>*@
+
+                        <div class="form-group row">
+                            <label class="col-md-4 control-label">Product Code:</label>
+                            <label class="col-md-8">@Model.product_code</label>
+                        </div>
+
+                        <!--Group-->
+                        <div class="form-group row">
+                            <label class="control-label col-md-4">Group <span style="color:red;">*</span>:</label>
+                            <div class="col-md-8">
+                                @Html.DropDownList("class_id", new SelectList(CommonFunctions.GetClassListItems(), "class_id", "class_name", Model.class_id), new { @class = "form-control", id = "class_id" })
+                            </div>
+                        </div>
+
+                        <!-- Sub Group -->
+                        <div class="form-group row">
+                            <label class="control-label col-md-4">Sub Group <span style="color:red;">*</span>:</label>
+                            <div class="col-md-8">
+                                @Html.DropDownList("sub_group_id", new SelectList(SubGroupModel.GetSubGroupList(Model.class_id), "sub_group_id", "sub_group_name", Model.sub_group_id), new { id = "sub_group_id", @class = "form-control" })
+                                
+                            </div>
+                        </div>
+
+                        <!--Category-->
+                        <div class="form-group row">
+                            <label class="control-label col-md-4">Category<span style="color:red;">*</span>:</label>
+                            <div class="col-md-8">
+
+                                @Html.DropDownList("p_category_id", new SelectList(productCategories, "p_category_id", "p_category_name", product_category_id), new { id = "p_category_id", @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.p_category_id, "", new { @class = "text-danger", style = "display:block !important;" })
+                            </div>
+                        </div>
+
+                        <!--Type-->
+                        <div class="form-group row">
+                            <label class="control-label col-md-4">Type <span style="color:red;">*</span>:</label>
+                            <div class="col-md-8">
+                                @*@{
+                                    var productType = (List<SelectListItem>)ViewBag.productType;
+                                }*@
+
+                                @Html.DropDownList("product_type_id", new SelectList(CommonFunctions.GetProductTypeListItemsbyCategoryId(Model.class_id), "product_type_id", "product_type_name", Model.product_type_id), new { id = "product_type_id", @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.product_type_id, "", new { @class = "text-danger", style = "display:block !important;" })
+                            </div>
+                        </div>
+
+                        <!--Class-->
+                        <div class="form-group row">
+                            <label class="control-label col-md-4">Class <strong style="color:red;"></strong> :</label>
+                            <div class="col-md-8">
+                                @if (string.IsNullOrEmpty(Model.product_class_id))
+                                {
+                                    @Html.DropDownList("product_class_id", new SelectList(CommonFunctions.GetProductClassListItems(Model.class_id), "product_class_id", "product_class_name"), "Select Product Class", new { id = "product_class_id", @class = "form-control" })
+                                }
+                                else
+                                {
+                                    @Html.DropDownList("product_class_id", new SelectList(CommonFunctions.GetProductClassListItems(Model.class_id), "product_class_id", "product_class_name", Model.product_class_id), new { id = "product_class_id", @class = "form-control" })
+                                }
+
+                                @Html.ValidationMessageFor(model => model.product_class_id, "", new { @class = "text-danger", style = "display:block !important;" })
+                            </div>
+                        </div>
+
+                        <!--Size-->
+                        <div class="form-group row">
+                            <label class="control-label col-md-4">Size:</label>
+                            <div class="col-md-8">
+                                @if (string.IsNullOrEmpty(Model.class_id) || string.IsNullOrEmpty(Model.product_size_id))
+                                {
+                                    @Html.DropDownList("product_size_id", new SelectList(CommonFunctions.GetProductSizeListItems(Model.class_id), "product_size_id", "product_size_name"), "Select size.", new { @class = "form-control", id = "product_size_id", @onchange = "InitialProductDescription()" })
+                                }
+                                else
+                                {
+                                    @Html.DropDownList("product_size_id", new SelectList(CommonFunctions.GetProductSizeListItems(Model.class_id), "product_size_id", "product_size_name", Model.product_size_id), new { @class = "form-control", id = "product_size_id", @onchange = "InitialProductDescription()" })
+                                }
+
+                                @*@Html.EditorFor(model => model.product_type_name, new { htmlAttributes = new { id = "product_type_name", @class = "form-control" } })*@
+                            </div>
+                        </div>
+
+                        <!--Color-->
+                        <div class="form-group row">
+                            <label class="control-label col-md-4">Color <span style="color:red;">*</span>:</label>
+                            <div class="col-md-8">
+                                @{
+                                    var color = (List<SelectListItem>)ViewBag.Color;
+                                }
+
+                                @Html.DropDownList("color_id", new SelectList(CommonFunctions.GetColorListItem(), "color_id", "color_name", Model.color_id), new { id = "color_id", @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.color_id, "", new { @class = "text-danger", style = "display:block !important;" })
+                            </div>
+                        </div>
+
+                        <!--Brand-->
+                        <div class="form-group row">
+                            <label class="control-label col-md-4">Brand<strong style="color:red;">*</strong>:</label>
+                            <div class="col-md-8">
+                                @Html.DropDownList("brand_id", new SelectList(CommonFunctions.GetBrandListItemsbyCategoryId(Model.product_type_id), "brand_id", "brand_name", Model.brand_id), new { id = "brand_id", @class = "form-control", @onchange = "InitialProductDescription()" })
+                                @Html.ValidationMessageFor(model => model.brand_id, "", new { @class = "text-danger", style = "display:block !important;" })
+                            </div>
+                        </div>
+
+                        <!--Model/ Factory Code-->
+                        <div class="form-group row">
+                            <label class="control-label col-md-4">Model/ Factory Code:</label>
+                            <div class="col-md-8">
+                                @Html.EditorFor(model => model.model_factory_code, new { htmlAttributes = new { @class = "form-control" } })
+                            </div>
+                        </div>
+
+                        <!--Unit-->
+                        <div class="form-group row">
+                            <label class="control-label col-md-4">Unit <span style="color:red;">*</span>:</label>
+                            <div class="col-md-8">
+                                @Html.DropDownList("product_unit", new SelectList(ViewBag.Unit, "Id", "Name", Model.product_unit), new { id = "product_unit", @class = "form-control", onchange = "initialUOM1()" })
+                            </div>
+                        </div>
+
+                        <!--Description-->
+                        <div class="form-group row">
+                            <label class="control-label col-md-4"> Product Description <span style="color:red;">*</span>:</label>
+                            <div class="col-md-8">
+                                @*@Html.TextAreaFor(model => model.product_name, new { @class = "form-control",@rows="5" })*@
+                                <label id="Remark">@Html.Raw(Model.product_name)</label>
+                            </div>
+                        </div>
+
+
+
+                        <!--Remark-->
+                        @*<div class="form-group row">
+            <label class="control-label col-md-4"> Remark <span style="color:red;">*</span>:</label>
+            <div class="col-md-8">
+                @Html.EditorFor(model => model.Remark, new { htmlAttributes = new { @class = "form-control" } })
+                <label id="Remark"></label>
+            </div>
+        </div>*@
+                        <div class="form-group">
+                            <div class="col-md-offset-4 col-md-8">
+                                <input type="submit" value="Save" class="btn btn-primary" id="btnSubmit" />
+                                <a href="@Url.Action("Index","Product")" class="btn btn-danger">Back</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="col-md-4 control-label">Labour Hour:</label>
+                            <div class="col-md-8">
+                                <input type="number" class="form-control" id="labour_hour" name="labour_hour" step="any" value="@Model.labour_hour" />
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-4 control-label">Cash Flow:</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" id="cash_flow" name="cash_flow" value="@Model.cash_flow" />
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-4 control-label">SO Number:</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" id="so_number" name="so_number" value="@Model.so_number" />
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Unit of Measurement</div>
+                            <div class="panel-body">
+                                <table>
+                                    @if (Model.uom1_id != null && Model.uom1_qty != null && Model.uom1_price > 0)
+                                    {
+                                        Model.uom1_id = Regex.Replace(Model.uom1_id, @"\t|\n|\r", "");
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px"><label id="uom1">@Model.product_unit</label></td>
+                                            <td width="50px">=></td>
+                                            <td width="150px">@Html.TextBoxFor(model => model.uom1_qty, new { @class = "form-control", type = "Number", value = "0" })</td>
+                                            <td width="150px">@Html.DropDownList("uom1_id", new SelectList(ViewBag.Unit, "Name", "Name", Model.uom1_id), new { @class = "form-control", id = "uom1_id", onchange = "initialUOM2()" })</td>
+                                            <td width="150px">@Html.TextBoxFor(model => model.uom1_price, new { @class = "form-control", type = "number", placeholder = "Uom Price", onchange = "validateFloatKeyPress(this);", onKeyPress = "if(this.value.length==8) return false;" })</td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        @*<tr>
+                            <td width="50px"><label>1</label></td>
+                            <td width="50px"><label id="uom2">Unit</label></td>
+                            <td width="50px">=></td>
+                            <td width="150px">@Html.TextBoxFor(model => model.uom2_qty, new { @class = "form-control", type = "Number", Value = "0" })</td>
+                            <td width="150px">@Html.DropDownList("uom2_id", ViewBag.Units as SelectList, "Select Unit", new { @class = "form-control", id = "uom2_id", onchange = "initialUOM3()" })</td>
+                            <td width="150px">@Html.TextBoxFor(model => model.uom2_price, new { @class = "form-control", type = "number", placeholder = "Uom Price", onchange = "validateFloatKeyPress(this);", onKeyPress = "if(this.value.length==8) return false;" })</td>
+                        </tr>*@
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px"><label id="uom1">Unit</label></td>
+                                            <td width="50px">=></td>
+                                            <td width="150px">@Html.TextBoxFor(model => model.uom1_qty, new { @class = "form-control", type = "Number", Value = "0" })</td>
+                                            <td width="150px">@Html.DropDownList("uom1_id", ViewBag.Units as SelectList, "Select Unit", new { @class = "form-control", id = "uom1_id", onchange = "initialUOM2()" })</td>
+                                            <td width="150px">@Html.TextBoxFor(model => model.uom1_price, new { @class = "form-control", type = "number", placeholder = "Uom Price", onchange = "validateFloatKeyPress(this);", onKeyPress = "if(this.value.length==8) return false;" })</td>
+                                        </tr>
+                                    }
+                                    @if (Model.uom2_id != null && Model.uom2_qty != null && Model.uom2_price > 0)
+                                    {
+                                        Model.uom2_id = Regex.Replace(Model.uom2_id, @"\t|\n|\r", "");
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px"><label id="uom2">@Model.uom1_id</label></td>
+                                            <td width="50px">=></td>
+                                            <td width="150px">@Html.TextBoxFor(model => model.uom2_qty, new { @class = "form-control", type = "Number" })</td>
+                                            <td width="150px">@Html.DropDownList("uom2_id", new SelectList(ViewBag.Unit, "Name", "Name", Model.uom2_id), new { @class = "form-control", id = "uom2_id", onchange = "initialUOM3()" })</td>
+                                            <td width="150px">@Html.TextBoxFor(model => model.uom2_price, new { @class = "form-control", type = "number", placeholder = "Uom Price", onchange = "validateFloatKeyPress(this);", onKeyPress = "if(this.value.length==8) return false;" })</td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px"><label id="uom2">Unit</label></td>
+                                            <td width="50px">=></td>
+                                            <td width="150px">@Html.TextBoxFor(model => model.uom2_qty, new { @class = "form-control", type = "Number", Value = "0" })</td>
+                                            <td width="150px">@Html.DropDownList("uom2_id", ViewBag.Units as SelectList, "Select Unit", new { @class = "form-control", id = "uom2_id", onchange = "initialUOM3()" })</td>
+                                            <td width="150px">@Html.TextBoxFor(model => model.uom2_price, new { @class = "form-control", type = "number", placeholder = "Uom Price", onchange = "validateFloatKeyPress(this);", onKeyPress = "if(this.value.length==8) return false;" })</td>
+                                        </tr>
+                                    }
+                                    @if (Model.uom3_id != null && Model.uom3_qty != null && Model.uom3_price > 0)
+                                    {
+                                        Model.uom3_id = Regex.Replace(Model.uom3_id, @"\t|\n|\r", "");
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px"><label id="uom3">@Model.uom2_id</label></td>
+                                            <td width="50px">=></td>
+                                            <td width="150px">@Html.TextBoxFor(model => model.uom3_qty, new { @class = "form-control", type = "Number" })</td>
+                                            <td width="150px">@Html.DropDownList("uom3_id", new SelectList(ViewBag.Unit, "Name", "Name", Model.uom3_id), new { @class = "form-control", id = "uom3_id", onchange = "initialUOM4()" })</td>
+                                            <td width="150px">@Html.TextBoxFor(model => model.uom3_price, new { @class = "form-control", type = "number", placeholder = "Uom Price", onchange = "validateFloatKeyPress(this);", onKeyPress = "if(this.value.length==8) return false;" })</td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px"><label id="uom3">Unit</label></td>
+                                            <td width="50px">=></td>
+                                            <td width="150px">@Html.TextBoxFor(model => model.uom3_qty, new { @class = "form-control", type = "Number", Value = "0" })</td>
+                                            <td width="150px">@Html.DropDownList("uom3_id", ViewBag.Units as SelectList, "Select Unit", new { @class = "form-control", id = "uom3_id", onchange = "initialUOM4()" })</td>
+                                            <td width="150px">@Html.TextBoxFor(model => model.uom3_price, new { @class = "form-control", type = "number", placeholder = "Uom Price", onchange = "validateFloatKeyPress(this);", onKeyPress = "if(this.value.length==8) return false;" })</td>
+                                        </tr>
+                                    }
+                                    @if (Model.uom4_id != null && Model.uom4_qty != null && Model.uom4_price > 0)
+                                    {
+                                        Model.uom4_id = Regex.Replace(Model.uom4_id, @"\t|\n|\r", "");
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px"><label id="uom4">@Model.uom3_id</label></td>
+                                            <td width="50px">=></td>
+                                            <td width="150px">@Html.TextBoxFor(model => model.uom4_qty, new { @class = "form-control", type = "Number" })</td>
+                                            <td width="150px">@Html.DropDownList("uom4_id", new SelectList(ViewBag.Unit, "Name", "Name", Model.uom4_id), new { @class = "form-control", id = "uom4_id", onchange = "initialUOM5()" })</td>
+                                            <td width="150px">@Html.TextBoxFor(model => model.uom4_price, new { @class = "form-control", type = "number", placeholder = "Uom Price", onchange = "validateFloatKeyPress(this);", onKeyPress = "if(this.value.length==8) return false;" })</td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px"><label id="uom4">Unit</label></td>
+                                            <td width="50px">=></td>
+                                            <td width="150px">@Html.TextBoxFor(model => model.uom4_qty, new { @class = "form-control", type = "Number", Value = "0" })</td>
+                                            <td width="150px">@Html.DropDownList("uom4_id", ViewBag.Units as SelectList, "Select Unit", new { @class = "form-control", id = "uom4_id", onchange = "initialUOM5()" })</td>
+                                            <td width="150px">@Html.TextBoxFor(model => model.uom4_price, new { @class = "form-control", type = "number", placeholder = "Uom Price", onchange = "validateFloatKeyPress(this);", onKeyPress = "if(this.value.length==8) return false;" })</td>
+                                        </tr>
+                                    }
+                                    @if (Model.uom5_id != null && Model.uom5_qty != null && Model.uom5_price > 0)
+                                    {
+                                        Model.uom5_id = Regex.Replace(Model.uom5_id, @"\t|\n|\r", "");
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px"><label id="uom5">@Model.uom4_id</label></td>
+                                            <td width="50px">=></td>
+                                            <td width="150px">@Html.TextBoxFor(model => model.uom5_qty, new { @class = "form-control", type = "Number" })</td>
+                                            <td width="150px">@Html.DropDownList("uom5_id", new SelectList(ViewBag.Unit, "Name", "Name", Model.uom5_id), new { @class = "form-control", id = "uom5_id" })</td>
+                                            <td width="150px">@Html.TextBoxFor(model => model.uom5_price, new { @class = "form-control", type = "number", placeholder = "Uom Price", onchange = "validateFloatKeyPress(this);", onKeyPress = "if(this.value.length==8) return false;" })</td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td width="50px"><label>1</label></td>
+                                            <td width="50px"><label id="uom5">Unit</label></td>
+                                            <td width="50px">=></td>
+                                            <td width="150px">@Html.TextBoxFor(model => model.uom5_qty, new { @class = "form-control", type = "Number", Value = "0" })</td>
+                                            <td width="150px">@Html.DropDownList("uom5_id", ViewBag.Units as SelectList, "Select Unit", new { @class = "form-control", id = "uom5_id" })</td>
+                                            <td width="150px">@Html.TextBoxFor(model => model.uom5_price, new { @class = "form-control", type = "number", placeholder = "Uom Price", onchange = "validateFloatKeyPress(this);", onKeyPress = "if(this.value.length==8) return false;" })</td>
+                                        </tr>
+                                    }
+
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+
+            $('#class_id').select2();
+            $('#product_unit').select2();
+            $('#color_id').select2();
+            $('#product_size_id').select2();
+            $('#product_class_id').select2();
+            $('#product_type_id').select2();
+            $('#brand_id').select2();
+            $("#p_category_id").select2();
+            $('#sub_group_id').select2();
+
+            @*$('#product_unit').val('@Model.product_unit').trigger('change');*@
+            @*$("#product_unit").val('@Model.product_unit').trigger('change');
+            alert('@Model.product_unit');*@
+
+                    $('#class_id').on('change', function (e) {
+                        var classId = $(this).val();
+                        $('#sub_group_id').empty().append("<option disabled selected>Select Sub Group</option>");
+                        $('#p_category_id').empty().append("<option disabled selected>Select Category</option>");
+
+                        $('#product_type_id').empty().append("<option disabled selected>Select Product Type</option>");
+                        $('#brand_id').empty().append("<option disabled selected>Select Brand</option>");
+                        //$('#product_size_id').empty().append("<option disabled selected>Select Product Size</option>");
+                        //$('#product_class_id').empty().append("<option disabled selected>Select Product Class</option>");
+
+                        if (classId != "") {
+
+                            //SubGroup
+                            $.ajax({
+                                url: "/SubGroup/GetSubGroupDataTable",
+                                type: "get",
+                                dataType: "json",
+                                data: { group_id: classId },
+                                success: function (data) {
+                                    $.each(data.data, function (index, item) {
+                                        console.log(item);
+                                        $('#sub_group_id').append("" +
+                                            "<option value='" + item.sub_group_id + "'>" + item.sub_group_name + "</option>"
+                                        );
+                                    });
+                                }
+                            });
+
+                            //category
+                            $.ajax({
+                                url: "/ProductCategory/GetCategoryDataDropdownlistbyClassId",
+                                type: "get",
+                                dataType: "json",
+                                data: { id: classId },
+                                success: function (data) {
+                                    $.each(data.data, function (index, item) {
+                                        $('#p_category_id').append("" +
+                                                    "<option value='" + item.p_category_id + "'>" + item.p_category_name + "</option>"
+                                                );
+                                    });
+                                }
+                            });
+
+                            ////product size
+                            //$.ajax({
+                            //    url: "/ProductSize/GetProductDataDropdownlistbyClassId",
+                            //    type: "get",
+                            //    dataType: "json",
+                            //    data: { id: classId },
+                            //    success: function (data) {
+                            //        $.each(data.data, function (index, item) {
+                            //            $('#product_size_id').append("" +
+                            //                        "<option value='" + item.product_size_id + "'>" + item.product_size_name + "</option>"
+                            //                    );
+                            //        });
+                            //    }
+                            //});
+                            //product type
+                            $.ajax({
+                                url: '/ProductType/GetProductTypeListItemsbyCategoryId',
+                                type: "get",
+                                dataType: "json",
+                                async: false,
+                                data: { id: classId },
+                                success: function (da) {
+                                    //console.log(da.data);
+                                    $.each(da.data, function (ind, item) {
+                                        $('#product_type_id').append("" +
+                                            "<option value='" + item.product_type_id + "'>" + item.product_type_name + "</option>"
+                                        );
+                                    });
+                                },
+                                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                    alert('Initial Product Type:' + textStatus);
+                                }
+                            });
+
+                            ////product class
+                            //$.ajax({
+                            //    url: '/ProductClass/GetProductclassDropdownList',
+                            //    type: "get",
+                            //    dataType: "json",
+                            //    async: false,
+                            //    data: { group_id: classId },
+                            //    success: function (da) {
+                            //        //console.log(da.data);
+                            //        $.each(da.data, function (ind, item) {
+                            //            $('#product_class_id').append("" +
+                            //                "<option value='" + item.product_class_id + "'>" + item.product_class_name + "</option>"
+                            //            );
+                            //        });
+                            //    },
+                            //    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            //        alert('Initial Product Type:' + textStatus);
+                            //    }
+                            //});
+
+                            initialBrandControl();
+                        }
+                        InitialProductDescription();
+
+                    });
+
+                    $('#product_type_id').on('change', function (e) {
+                        var Id = $(this).val();
+                        $('#brand_id').empty().append("<option disabled selected>Select Brand</option>");
+                        if (Id != "") {
+
+                            $.ajax({
+                                url: "/Brand/GetBrandDataDropdownlistbyCategoryId",
+                                type: "get",
+                                dataType: "json",
+                                data: { id: Id },
+                                success: function (data) {
+                                    $.each(data, function (index, item) {
+                                        $('#brand_id').append("" +
+                                                    "<option value='" + item.brand_id + "'>" + item.brand_name + "</option>"
+                                                );
+                                    });
+                                }
+                            });
+
+                        }
+                        InitialProductDescription();
+                    });
+
+                    $('#p_category_id').on('change', function (e) {
+                        e.preventDefault();
+                        InitialProductDescription();
+                    });
+
+                    $('#color_id').on('change', function (e) {
+                        e.preventDefault();
+                        InitialProductDescription();
+                    });
+
+                    $('#model_factory_code').change(function (e) {
+                        e.preventDefault();
+                        InitialProductDescription();
+                    });
+
+                });
+
+                function initialBrandControl() {
+                    var productTypeId = $('#product_type_id').val();
+                    var groupId = $('#class_id').val();
+                    $('#brand_id').empty().append("<option selected disabled>Select Brand</option>");
+                    $.ajax({
+                        url: '/Brand/GetBrandListItemsbyCategoryId',
+                        type: "get",
+                        dataType: "json",
+                        async: false,
+                        data: { id: productTypeId, group_id: groupId },
+                        success: function (da) {
+                            //console.log(da.data);
+                            $.each(da.data, function (ind, item) {
+                                $('#brand_id').append("" +
+                                    "<option value='" + item.brand_id + "'>" + item.brand_name + " - " + item.product_type_name + "</option>"
+                                );
+                            });
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            alert('Initial Brand:' + textStatus);
+                        }
+                    });
+                }
+
+                function InitialProductDescription() {
+                    var category = $('#p_category_id').val();
+                    var ptype = $('#product_type_id').val();
+                    var pclass = $('#product_class_id').val();
+                    var psize = $('#product_size_id').val();
+                    var pcolor = $('#color_id').val();
+                    var pbrand = $('#brand_id').val();
+                    var factorycode = $('#model_factory_code').val();
+                    $('#Remark').text('');
+                    $.ajax({
+                        url: "@Url.Action("GenerateProductDescriptionJson", "Product")",
+                        type: "get",
+                        dataType: "json",
+                        data: {
+                            categroy: category,
+                            type: ptype,
+                            pclass: pclass,
+                            size: psize,
+                            color: pcolor,
+                            brand: pbrand,
+                            model: factorycode,
+                        },
+                        success: function (data) {
+                            console.log(data);
+                            $('#Remark').html(data.data);
+                        }
+                    })
+                }
+                function initialUOM1() {
+                    //var unit = $('#product_unit').val();
+                    var unit = $("#product_unit option:selected").text();
+                    if (unit != null || unit != "")
+                        $('#uom1').text(unit);
+                }
+                function initialUOM2() {
+                    //var unit = $('#uom1_id').val();
+                    var unit = $("#uom1_id option:selected").text();
+                    if (unit != null || unit != "")
+                        $('#uom2').text(unit);
+                }
+                function initialUOM3() {
+                    //var unit = $('#uom2_id').val();
+                    var unit = $("#uom2_id option:selected").text();
+                    if (unit != null || unit != "")
+                        $('#uom3').text(unit);
+                }
+                function initialUOM4() {
+                    //var unit = $('#uom3_id').val();
+                    var unit = $("#uom3_id option:selected").text();
+                    if (unit != null || unit != "")
+                        $('#uom4').text(unit);
+                }
+                function initialUOM5() {
+                    //var unit = $('#uom4_id').val();
+                    var unit = $("#uom4_id option:selected").text();
+                    if (unit != null || unit != "")
+                        $('#uom5').text(unit);
+                }
+
+    </script> 
+}
+
+
+
+
+ 

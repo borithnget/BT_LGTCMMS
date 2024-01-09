@@ -1,0 +1,526 @@
+﻿@model BT_KimMex.Models.WorkOrderIssueVSWorkOrderRequestReportResult
+@using BT_KimMex.Models;
+@using BT_KimMex.Class;
+@{
+    Layout = null;
+    var maxIssueHistory = Model.workOrderIssues.Count() == 0 ? 0 : Model.workOrderIssues.OrderByDescending(s => s.inventorieshistoryqty.Count()).FirstOrDefault().inventorieshistoryqty.Count();
+    int colActualIssueColumn = (maxIssueHistory * 5) + 1;
+    BT_KimMex.Entities.kim_mexEntities db = new BT_KimMex.Entities.kim_mexEntities();
+    var allReturns = Model.workOrderIssues.Where(s => s.workorderReturns.Count() > 0).Select(s => s.workorderReturns).ToList();
+    int colActualReturnColumn = (allReturns.Count() * 5) + 1;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>WorkOrder Isuse VS WorkOrderReturn Report</title>
+</head>
+<body>
+    <table style="width: 100%; border-collapse: collapse;" id="table_1">
+        <tr>
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;" colspan="8"></td>
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;" colspan="5">Planning – Issue Qty</td>
+            <!-- Actual Issue QTY -->
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;" colspan="@colActualIssueColumn">Actual – Issue Qty</td>
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;" colspan="@colActualReturnColumn">Actual - Return Qty</td>
+            <!-- Used QTY -->
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;" colspan="5">Actual – Used Qty</td>
+            <!-- Planned Vs Actual -->
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;" colspan="4">Planned VS Actual</td>
+        </tr>
+        <tr>
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">No.</td>
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Issue Date</td>
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Return Date</td>
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">WOI#</td>
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">WOR#</td>
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Item Code</td>
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Item Name</td>
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Unit</td>
+            <!-- Planning Issue QTY -->
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">QTY</td>
+            @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.SiteSupervisor))
+            {
+                <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Labour<br />Unit</td>
+                <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Total<br />Labour</td>
+            }
+
+            @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager))
+            {
+                <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Unit<br /></td>
+                <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Total<br />Price</td>
+            }
+
+            <!-- Actual Issue QTY -->
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Sum</td>
+            @for (int i = 1; i <= maxIssueHistory; i++)
+            {
+                <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">@i</td>
+                if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.SiteSupervisor))
+                {
+                    <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Labour<br />Unit</td>
+                    <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Total<br />Labour</td>
+                }
+
+                if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager))
+                {
+                    <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Unit<br /></td>
+                    <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Total<br />Price</td>
+                }
+
+            }
+            <!-- Actual Return QTY -->
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Sum</td>
+            @if (allReturns.Count() > 0)
+            {
+                int countReturnNumber = 1;
+                for (int i = 0; i < allReturns.Count(); i++)
+                {
+                    <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">@countReturnNumber</td>
+                    if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.SiteSupervisor))
+                    {
+                        <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Labour<br />Unit</td>
+                        <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Total<br />Labour</td>
+                    }
+
+                    if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager))
+                    {
+                        <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Unit<br /></td>
+                        <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Total<br />Price</td>
+                    }
+                    countReturnNumber++;
+                }
+            }
+
+            <!-- Actual Used QTY -->
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">QTY</td>
+            @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.SiteSupervisor))
+            {
+                <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Labour<br />Unit</td>
+                <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Total<br />Labour</td>
+            }
+
+            @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager))
+            {
+                <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Unit<br /></td>
+                <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Total<br />Price</td>
+            }
+
+            <!-- Planned VS Actual -->
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Labour<br />Unit</td>
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Total<br />Labour</td>
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Unit<br />Price</td>
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Total<br />Price</td>
+
+
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Project</td>
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Warehouse</td>
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Team ID</td>
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;">Comments<br />(WO# - Trello)</td>
+        </tr>
+        @{
+
+            foreach (var woi in Model.workOrderIssues.OrderBy(s => s.created_date))
+            {
+                decimal totalPlanningQTYperRequest = 0;
+                decimal totalItemLabourHourPerRequest = 0;
+                decimal totalPlanningLabourHourPerRequest = 0;
+                decimal totalItemUnitPricePerRequest = 0;
+                decimal totalPlanningUnitPricePerRequest = 0;
+                decimal totalActualIssueQTY = 0;
+                decimal totalReturnQTYPerRequest = 0;
+
+                List<WorkOrderIssueReportInformationModel> totalIssues = new List<WorkOrderIssueReportInformationModel>();
+                List<IssueHistoryModel> totalIssueQtys = new List<IssueHistoryModel>();
+                decimal totalIssueHitoryQty = 0;
+
+                List<BT_KimMex.Models.InventoryDetailViewModel> returnItems = new List<BT_KimMex.Models.InventoryDetailViewModel>();
+                foreach (var wori in woi.workorderReturns)
+                {
+                    returnItems.AddRange(wori.inventoryDetails);
+                }
+
+                var remainIssueHistory = maxIssueHistory - woi.inventorieshistoryqty.Count();
+                var countAllReturn = allReturns.Count();
+                var countReturnHistory = 0;
+
+                var totalFooterActualIssueQTY = woi.inventoryDetails.Sum(s => s.total_quantity);
+                decimal[] listActualHistoryQTY = new decimal[maxIssueHistory];
+                decimal[] listActualIssueTotalLabourHour = new decimal[maxIssueHistory];
+                decimal[] listActualIssueTotalUnitPrice = new decimal[maxIssueHistory];
+                decimal[] listActualReturnHistoryQTY = new decimal[countAllReturn];
+                decimal[] listActualReturnTotalLabourUnit = new decimal[countAllReturn];
+                decimal[] listActualReturnTotalUnitPrice = new decimal[countAllReturn];
+                decimal totalUsedPerRequest = 0, totalUsedLabourHourPerRequest=0, totalUsedUnitPricePerRequest=0;
+                decimal totalPlannedVSUsedPerRequestLabourUnit = 0, totalPlannedVSUsedPerReqeustTotalLabourUnit = 0, totalPlannedVSUsedPerReqeustUnitPrice = 0, totalPlannedVSUsedPerReqeustTotalPrice = 0;
+
+                foreach (var woiItem in woi.inventoryDetails)
+                {
+
+                    var itemIssuePlanning = PostWorkorderPlanningModel.GetPlanningQuatityByDateProjectItem(Convert.ToDateTime(woi.created_date), woi.project_id, woiItem.inventory_item_id, woiItem.unit);
+                    var totalLabourHour = itemIssuePlanning * woiItem.item_labour_hour;
+                    var totalUnitPrice = itemIssuePlanning * woiItem.unit_price;
+
+
+                    var issueHistorys = db.tb_history_issue_qty.Where(s => string.Compare(s.inventory_detail_id, woiItem.inventory_detail_id) == 0).OrderBy(s => s.create_at).ToList();
+                    remainIssueHistory = maxIssueHistory - issueHistorys.Count();
+
+                    var totalReturnQTY = returnItems.Where(s => string.Compare(s.inventory_item_id, woiItem.inventory_item_id) == 0).Sum(s => s.quantity);
+                    totalReturnQTYPerRequest = totalReturnQTYPerRequest + Convert.ToDecimal(totalReturnQTY);
+
+                    var workOrderReturns = woi.workorderReturns.Select(s => s.inventoryDetails).ToList();
+                    List<InventoryDetailViewModel> worItems = new List<InventoryDetailViewModel>();
+                    foreach (var wor in workOrderReturns)
+                    {
+                        var returnItem = wor.Where(s => string.Compare(s.inventory_item_id, woiItem.inventory_item_id) == 0).FirstOrDefault();
+                        if (returnItem != null)
+                        {
+                            worItems.Add(returnItem);
+                        }
+                    }
+
+                    int remainReturnCount = allReturns.Count() - worItems.Count();
+
+                    var usedQTY = woiItem.total_quantity - totalReturnQTY;
+                    totalUsedPerRequest = totalUsedPerRequest + Convert.ToDecimal(usedQTY);
+
+                    var totalUsedLabourHour = usedQTY * woiItem.item_labour_hour;
+                    totalUsedLabourHourPerRequest = totalUsedLabourHourPerRequest + Convert.ToDecimal(totalUsedLabourHour);
+                    var totalUsedUnitPrice = usedQTY * woiItem.unit_price;
+                    totalUsedUnitPricePerRequest = totalUsedUnitPricePerRequest + Convert.ToDecimal(totalUsedUnitPrice);
+
+                    totalPlanningQTYperRequest = totalPlanningQTYperRequest + itemIssuePlanning;
+                    totalItemLabourHourPerRequest = totalItemLabourHourPerRequest + Convert.ToDecimal(woiItem.item_labour_hour);
+                    totalPlanningLabourHourPerRequest = totalPlanningLabourHourPerRequest + Convert.ToDecimal(totalLabourHour);
+                    totalItemUnitPricePerRequest = totalItemUnitPricePerRequest + Convert.ToDecimal(woiItem.unit_price);
+                    totalPlanningUnitPricePerRequest = totalPlanningUnitPricePerRequest + Convert.ToDecimal(totalUnitPrice);
+
+                    totalActualIssueQTY = totalActualIssueQTY + Convert.ToDecimal(woiItem.total_quantity);
+
+                    string issueReturnNumber = string.Empty;
+                    string issueReturnDate = string.Empty;
+                    var workOrderReturn = woi.workorderReturns.FirstOrDefault();
+                    if (workOrderReturn != null)
+                    {
+                        issueReturnNumber = workOrderReturn.workorder_returned_number;
+                        issueReturnDate = CommonClass.ToLocalTime(Convert.ToDateTime(workOrderReturn.created_date)).ToString("dd-MM-yyyy");
+                    }
+
+                    var plannedVSActualQTY = itemIssuePlanning - woiItem.total_quantity;
+                    var plannedVSActualTotalLabourUnit = totalLabourHour - totalUsedLabourHour;
+                    totalPlannedVSUsedPerReqeustTotalLabourUnit = totalPlannedVSUsedPerReqeustTotalLabourUnit + Convert.ToDecimal(plannedVSActualTotalLabourUnit);
+                    var plannedVSActualTotalPriceUnit = totalUnitPrice - totalUsedUnitPrice;
+                    totalPlannedVSUsedPerReqeustTotalPrice = totalPlannedVSUsedPerReqeustTotalPrice + Convert.ToDecimal(plannedVSActualTotalPriceUnit);
+
+                    var countActualIssueHistory = 0;
+                    var countActualReturnHistory = 0;
+
+                <tr>
+                    <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+                    <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@CommonClass.ToLocalTime(Convert.ToDateTime(woi.created_date)).ToString("dd-MM-yyyy")</td>
+                    <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@issueReturnDate</td>
+                    <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@woi.stock_issue_number</td>
+                    <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@issueReturnNumber</td>
+                    <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@woiItem.itemCode</td>
+                    <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@woiItem.itemName</td>
+                    <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@woiItem.unitName</td>
+                    <!-- Planning Issue QTY-->
+                    <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@itemIssuePlanning</td>
+                    @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.SiteSupervisor))
+                    {
+                        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@woiItem.item_labour_hour</td>
+                        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@totalLabourHour</td>
+                    }
+
+                    @if (User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.SystemAdmin))
+                    {
+                        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@woiItem.unit_price</td>
+                        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@totalUnitPrice</td>
+                    }
+
+                    <!-- Actual Issue QTY -->
+                    <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@woiItem.total_quantity</td>
+
+                    @foreach (var issuehis in issueHistorys)
+                    {
+                        var totalLabourHourHis = woiItem.item_labour_hour * issuehis.issue_qty;
+                        var totalUnitPriceHis = woiItem.unit_price * issuehis.issue_qty;
+
+                        listActualHistoryQTY[countActualIssueHistory] = listActualHistoryQTY[countActualIssueHistory] + Convert.ToDecimal(issuehis.issue_qty);
+                        listActualIssueTotalLabourHour[countActualIssueHistory] = listActualIssueTotalLabourHour[countActualIssueHistory] + Convert.ToDecimal(totalLabourHourHis);
+                        listActualIssueTotalUnitPrice[countActualIssueHistory] = listActualIssueTotalUnitPrice[countActualIssueHistory] + Convert.ToDecimal(totalUnitPriceHis);
+
+                        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@issuehis.issue_qty</td>
+                        if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.SiteSupervisor))
+                        {
+                            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@woiItem.item_labour_hour</td>
+                            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@totalLabourHourHis</td>
+                        }
+
+                        if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager))
+                        {
+                            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@woiItem.unit_price</td>
+                            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@totalUnitPriceHis</td>
+                        }
+
+
+                        WorkOrderIssueReportInformationModel issue = new WorkOrderIssueReportInformationModel();
+                        //issue.quantity=issuehis.
+                        countActualIssueHistory++;
+                    }
+                    @for (int i = 0; i < remainIssueHistory; i++)
+                    {
+                        <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;"></td>
+                        <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;"></td>
+                        <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;"></td>
+                        <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;"></td>
+                        <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;"></td>
+                    }
+                    <!-- Actual Return QTY -->
+                    <!-- SUm -->
+                    <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@totalReturnQTY</td>
+                    @foreach (var worItem in worItems)
+                    {
+                        var totalIssueReturnLabourHour = woiItem.item_labour_hour * worItem.quantity;
+                        var totalIsuueReturnItemUnitPrice = woiItem.unit_price * worItem.quantity;
+                        listActualReturnHistoryQTY[countActualReturnHistory] = listActualReturnHistoryQTY[countActualReturnHistory] + Convert.ToDecimal(worItem.quantity);
+                        listActualReturnTotalLabourUnit[countActualReturnHistory] = listActualReturnTotalLabourUnit[countActualReturnHistory] + Convert.ToDecimal(totalIssueReturnLabourHour);
+                        listActualReturnTotalUnitPrice[countActualReturnHistory] = listActualIssueTotalUnitPrice[countActualReturnHistory] + Convert.ToDecimal(totalIsuueReturnItemUnitPrice);
+                        totalPlannedVSUsedPerRequestLabourUnit = totalPlannedVSUsedPerRequestLabourUnit + Convert.ToDecimal(woiItem.item_labour_hour);
+                        totalPlannedVSUsedPerReqeustUnitPrice = totalPlannedVSUsedPerReqeustUnitPrice + Convert.ToDecimal(woiItem.unit_price);
+
+                        <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;font-size: 11px !important;">@worItem.quantity</td>
+                        if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.SiteSupervisor))
+                        {
+                            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;font-size: 11px !important;">@woiItem.item_labour_hour</td>
+                            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;font-size: 11px !important;">@totalIssueReturnLabourHour</td>
+                        }
+
+                        if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager))
+                        {
+                            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;font-size: 11px !important;">@woiItem.unit_price</td>
+                            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle; font-size: 11px !important;">@totalIsuueReturnItemUnitPrice</td>
+                        }
+                        countActualReturnHistory++;
+                    }
+
+                    @for (int i = 0; i < remainReturnCount; i++)
+                    {
+                        <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;"></td>
+                        if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.SiteSupervisor))
+                        {
+                            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;"></td>
+                            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;"></td>
+                        }
+
+                        if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager))
+                        {
+                            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;"></td>
+                            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;"></td>
+                        }
+                    }
+
+                    <!-- Used QTY -->
+                    <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@usedQTY</td>
+                    @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.SiteSupervisor))
+                    {
+                        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@woiItem.item_labour_hour</td>
+                        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@totalUsedLabourHour</td>
+                    }
+
+                    @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager))
+                    {
+                        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@woiItem.unit_price</td>
+                        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@totalUsedUnitPrice</td>
+                    }
+
+                    <!-- Planned VS Actual -->
+                    <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@woiItem.item_labour_hour</td>
+                    <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@plannedVSActualTotalLabourUnit</td>
+                    <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@woiItem.unit_price</td>
+                    <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@plannedVSActualTotalPriceUnit</td>
+
+
+                    <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@woi.project_name</td>
+                    <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;">@woi.warehouse.warehouse_name</td>
+                    <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+                    <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+                </tr>
+                }
+
+    <tr>
+        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle; font-size: 11px !important; font-weight:bold;" colspan="8">Sub Total</td>
+        <!-- Footer planning -->
+        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle; font-weight:bold;">@totalPlanningQTYperRequest</td>
+        @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.SiteSupervisor))
+        {
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle; font-weight:bold;">@totalItemLabourHourPerRequest</td>
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle; font-weight: bold; ">@totalPlanningLabourHourPerRequest</td>
+        }
+
+        @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager))
+        {
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle; font-weight: bold; ">@totalItemUnitPricePerRequest</td>
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle; font-weight: bold; ">@totalPlanningUnitPricePerRequest</td>
+
+        }
+
+        <!-- Footer Actual Issue QTY -->
+        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle; font-weight:bold;">@totalActualIssueQTY</td>
+        @for (int i = 0; i < woi.inventorieshistoryqty.Count(); i++)
+        {
+
+            var footerTotalUnitPriceIssueHistory = listActualHistoryQTY[i] * totalItemUnitPricePerRequest;
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle; font-weight: bold; font-size: 11px !important; ">@listActualHistoryQTY[i]</td>
+            if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.SiteSupervisor))
+            {
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle; font-weight: bold; font-size: 11px !important; ">@totalItemLabourHourPerRequest</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle; font-weight: bold; font-size: 11px !important; ">@listActualIssueTotalLabourHour[i]</td>
+            }
+
+            if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager))
+            {
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle; font-weight: bold; font-size: 11px !important; ">@totalItemUnitPricePerRequest</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; vertical-align: middle; font-weight: bold; font-size: 11px !important; ">@listActualIssueTotalUnitPrice[i]</td>
+            }
+
+        }
+
+        @for (int i = 0; i < remainIssueHistory; i++)
+        {
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;"></td>
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;"></td>
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;"></td>
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;"></td>
+            <td style="text-align:center;font-family:'Kantumruy Pro'; border:thin solid black; vertical-align:middle;"></td>
+        }
+
+        <!-- Footer Actual Return QTY -->
+        <!-- SUm -->
+        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;font-weight: bold; font-size: 11px !important;">@totalReturnQTYPerRequest</td>
+
+
+        @for (int i = 0; i < allReturns.Count(); i++)
+        {
+            <!-- Acual Return History QTY -->
+            <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; font-weight: bold; vertical-align: middle;">@listActualReturnHistoryQTY[i]</td>
+            if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.SiteSupervisor))
+            {
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; font-weight: bold; vertical-align: middle;">@totalItemLabourHourPerRequest</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; font-weight: bold; vertical-align: middle;">@listActualReturnTotalLabourUnit[i]</td>
+            }
+
+            if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager))
+            {
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; font-weight: bold; vertical-align: middle;">@totalItemUnitPricePerRequest</td>
+                <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; font-weight: bold; vertical-align: middle;">@listActualReturnTotalUnitPrice[i]</td>
+            }
+        }
+
+        <!-- Footer Actual Use -->
+        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;font-weight: bold; font-size: 11px !important;">@totalUsedPerRequest</td>
+        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;font-weight: bold; font-size: 11px !important;">@totalItemLabourHourPerRequest</td>
+        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;font-weight: bold; font-size: 11px !important;">@totalUsedLabourHourPerRequest</td>
+        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;font-weight: bold; font-size: 11px !important;">@totalItemUnitPricePerRequest</td>
+        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;font-weight: bold; font-size: 11px !important;">@totalUsedUnitPricePerRequest</td>
+
+        <!-- Planned VS Actual -->
+        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;font-weight: bold; font-size: 11px !important;">@totalPlannedVSUsedPerRequestLabourUnit</td>
+        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;font-weight: bold; font-size: 11px !important;">@totalPlannedVSUsedPerReqeustTotalLabourUnit</td>
+        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;font-weight: bold; font-size: 11px !important;">@totalPlannedVSUsedPerReqeustUnitPrice</td>
+        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;font-weight: bold; font-size: 11px !important;">@totalPlannedVSUsedPerReqeustTotalPrice</td>
+
+        <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+        <td style="text-align: left; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+        <td style="text-align: center; font-family: 'Kantumruy Pro'; border: thin solid black; font-size: 11px !important; vertical-align: middle;"></td>
+
+
+
+    </tr>
+                
+            }
+        }
+    </table>
+
+
+    <script type="text/javascript" src="~/Scripts/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript" src="~/Assets/plugins/TableExport/js/xlsx.core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js" integrity="sha512-csNcFYJniKjJxRWRV1R7fvnXrycHP6qDR21mgz1ZP55xY5d+aHLfo9/FcGDQLfn2IfngbAHd8LdfsagcCqgTcQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.6/shim.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.6/cpexcel.js"></script>
+
+    <script type="text/javascript" src="~/Assets/plugins/TableExport/js/tableexport.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/jQuery.print.min.js"></script>
+    <script type="text/javascript">
+
+        $(function () {
+
+            exportTableToExcel('table_1', 'Workorder Issue VS Workorder Return Report ' + new Date());
+
+            if (navigator.userAgent.indexOf("Firefox") > 0) {
+                window.setTimeout(function () { window.close(); }, 1000);
+            } else {
+                window.history.back();
+            }
+
+        });
+
+        function exportTableToExcel(tableId, filename) {
+            let dataType = 'application/vnd.ms-excel';
+            let extension = '.xls';
+
+            let base64 = function (s) {
+                //return window.btoa(unescape(encodeURIComponent(s)))
+                //return window.btoa(unescape(escape(s)))
+                //return window.btoa(escape(s))
+
+                try {
+                    return window.btoa(unescape(escape(s)));
+                }
+                catch (err) {
+                    return window.btoa(unescape(encodeURIComponent(s)));
+                }
+
+            };
+
+            let template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>';
+            let render = function (template, content) {
+                return template.replace(/{(\w+)}/g, function (m, p) { return content[p]; });
+            };
+
+            let tableElement = document.getElementById(tableId);
+
+            let tableExcel = render(template, {
+                worksheet: filename,
+                table: tableElement.innerHTML.normalize('NFD').replace("–", "-")
+            });
+            //console.log(tableExcel);
+
+            filename = filename + extension;
+
+            if (navigator.msSaveOrOpenBlob) {
+                let blob = new Blob(
+                    ['\ufeff', tableExcel],
+                    { type: dataType }
+                );
+
+                navigator.msSaveOrOpenBlob(blob, filename);
+            } else {
+                let downloadLink = document.createElement("a");
+
+                document.body.appendChild(downloadLink);
+
+                downloadLink.href = 'data:' + dataType + ';base64,' + base64(tableExcel);
+
+                downloadLink.download = filename;
+
+                downloadLink.click();
+            }
+        }
+    </script>
+
+</body>
+</html>

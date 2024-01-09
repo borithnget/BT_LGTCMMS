@@ -1,0 +1,204 @@
+﻿@model IEnumerable<BT_KimMex.Models.PurchaseRequisitionViewModel>
+@using BT_KimMex.Class;
+@{
+    ViewBag.Title = "Index";
+}
+
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+<h3 class="title">Purchase Requisition List</h3>
+
+<div class="well" style="padding:8px !important; padding-bottom:30px !important;">
+    <div class="form-group">
+        <label class="control-label col-md-2">Requested Date:</label>
+        <div class="col-md-3">
+            <div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
+                <i class="fa fa-calendar"></i>&nbsp;
+                <span></span> <i class="fa fa-caret-down"></i>
+            </div>
+        </div>
+        <label class="control-label col-md-2">Status:</label>
+        <div class="col-md-3">
+            <select class="form-control" id="ddr_status" name="ddr_status">
+                <option value="0">All</option>
+                <option value="@Status.Pending">@ShowStatus.PRCreated</option>
+                <option value="@Status.Approved">@ShowStatus.PRApproved</option>
+                <option value="@Status.Rejected">@ShowStatus.PRRejected</option>
+                <option value="@Status.RequestCancelled">@ShowStatus.PRRequestCancelled</option>
+                <option value="@Status.cancelled">@ShowStatus.MRCancelled</option>
+                <option value="@Status.MREditted">@ShowStatus.MREditted</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="w3-button w3-tiny w3-blue" onclick="inititalDataTable()">Filter</button>
+        </div>
+    </div>
+</div>
+
+
+<table class="table table-bordered" id="table">
+    <thead>
+        <tr>
+            <th>No.</th>
+            <th>Request Date</th>
+            <th>Purchase Requisition No.</th>
+            <th>Requester</th>
+            <th>Material Request Ref.</th>
+            <th>Project</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @*@{ 
+            int count = 1;
+            foreach(var item in Model)
+            {
+                <tr>
+                    <td>@count</td>
+                    <td>@Convert.ToDateTime(item.created_at).ToString("dd/MM/yyyy")</td>
+                    <td><a href="@Url.Action("Detail","PurchaseRequisition",new { id = item.purchase_requisition_id })">@item.purchase_requisition_number</a></td>
+                    <td>@CommonFunctions.GetUserFullnamebyUserId(item.created_by)</td>
+                    <td>@item.materail_request_number</td>
+                    <td>@item.project_fullname</td>
+                    <td class="text-center">
+                        @if (string.Compare(item.purchase_requisition_status, Status.Pending) == 0)
+                        {
+                            <span class="label label-warning">@ShowStatus.PRCreated</span>
+                        }
+                        else if (string.Compare(item.purchase_requisition_status, Status.Approved) == 0)
+                        {
+                            <span class="label label-primary">@ShowStatus.PRApproved</span>
+                        }
+                        else if (string.Compare(item.purchase_requisition_status, Status.Rejected) == 0)
+                        {
+                            <span class="label label-danger">@ShowStatus.PRRejected</span>
+                        }
+                        else if (string.Compare(item.purchase_requisition_status, Status.RequestCancelled) == 0)
+                        {
+                            <span class="label w3-red">@ShowStatus.PRRequestCancelled</span>
+                        }
+                        else if (string.Compare(item.purchase_requisition_status, Status.cancelled) == 0)
+                        {
+                            <span class="label w3-red">@ShowStatus.MRCancelled</span>
+                        }
+                    </td>
+                    <td class="text-center"><a href="@Url.Action("Detail","PurchaseRequisition",new { id = item.purchase_requisition_id })" class="w3-button w3-tiny w3-green">View Detail</a></td>
+                </tr>
+                count++;
+            }
+        }*@
+    </tbody>
+</table>
+
+@section scripts{
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.3/moment.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+
+            $('#ddr_status').select2();
+
+            var start = moment().subtract(29, 'days');
+            var end = moment();
+
+            function cb(start, end) {
+                $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            }
+
+            $('#reportrange').daterangepicker({
+                startDate: start,
+                endDate: end,
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                }
+            }, cb);
+
+            cb(start, end);
+            inititalDataTable();
+
+        });
+
+        function inititalDataTable() {
+            var t = $('#table').DataTable({
+                "destroy": true,
+                //"responsive": true,
+                //"autoWidth": false,
+                //"scrollX": true,
+                "ajax": {
+                    "url": "/PurchaseRequisition/GetPurchaseRequisitionItemsByDateRangeandStatusAJax",
+                    "type": "GET",
+                    "datatype": "json",
+                    "data": {
+                        dateRange: $('#reportrange span').html(),
+                        status: $('#ddr_status').val(),
+                    }
+                },
+                "columns": [
+                    { "data": "purchase_requisition_number" },
+                    {"data":"created_at_text"},
+                    {
+                        "render": function (data, type, full, meta) {
+                            var btn = '<a href="/PurchaseRequisition/Detail/' + full.purchase_requisition_id + '">' + full.purchase_requisition_number + '</a>';
+                            return btn;
+                        }
+                    },
+                    
+                    { "data": "created_by_text" },
+                    //{ "data": "materail_request_number" },
+                    {
+                        "render": function (data, type, full, meta) {
+                            var btn = '<a href="/ItemRequest/Detail/' + full.material_request_id + '" target="_blank">' + full.materail_request_number + '</a>';
+                            return btn;
+                        }
+                    },
+                    { "data": "project_fullname" },
+                    { "data": "show_status_text" },
+                    {
+                        "render": function (data, type, full, meta) {
+                            //var btn = '<a href="javascript:void(0)" id="' + full.Id + '" class="btn btn-xs default btn-edit"><i class="fa fa-edit"></i> Edit</a> ';
+                            console.log(full);
+                            var btn = '<a href="/PurchaseRequisition/Detail/' + full.purchase_requisition_id + '" class="w3-button w3-tiny w3-green">View</a>';
+                            return btn;
+                        }
+                    },
+
+                ],
+                'columnDefs': [
+                    {
+                        "targets": 0,
+                        "className": "text-center",
+                    },
+                    {
+                        "targets": 1,
+                        "className": "text-center",
+                    },
+                    {
+                          "targets": 2,
+                          "className": "text-center",
+                    },
+                    {
+                        "targets": 4,
+                        "className": "text-center",
+                    },
+                    {
+                          "targets": 7,
+                          "className": "text-center",
+                    },
+                ],
+                "order": [[2, "desc"]],
+            });
+            t.on('order.dt search.dt', function () {
+                t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+        }
+
+    </script>
+    }

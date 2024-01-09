@@ -1,0 +1,57 @@
+﻿@model IEnumerable<BT_KimMex.Models.PositionViewModel>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h3 class="title">Position List</h3>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table table-bordered" id="table">
+    <thead>
+        <tr>
+            <th>
+                No.
+            </th>
+            <th>
+                Name
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int count = 1;
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @count
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.position_name)
+                    </td>
+                    <td class="text-center">
+                        @Html.ActionLink("Edit", "Edit", new { id = item.position_id }) |
+                        @Html.ActionLink("Details", "Details", new { id = item.position_id }) |
+                        @Html.ActionLink("Delete", "Delete", new { id = item.position_id })
+                    </td>
+                </tr>
+                count++;
+            }
+        }
+    </tbody>
+
+    
+
+</table>
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('#table').DataTable();
+        });
+    </script>
+    }

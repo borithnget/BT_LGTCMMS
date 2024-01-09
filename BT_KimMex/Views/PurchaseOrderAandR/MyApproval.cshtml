@@ -1,0 +1,200 @@
+﻿@using BT_KimMex.Class;
+@{
+    ViewBag.Title = "MyApproval";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+<div class="row" style="padding:10px !important;">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Purchase Order Approval List
+        </div>
+        <div class="panel-body">
+
+            <div class="well" style="padding:8px !important; padding-bottom:30px !important;">
+                <div class="form-group">
+                    <label class="control-label col-md-2">Requested Date:</label>
+                    <div class="col-md-3">
+                        <div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
+                            <i class="fa fa-calendar"></i>&nbsp;
+                            <span></span> <i class="fa fa-caret-down"></i>
+                        </div>
+                    </div>
+                    <label class="control-label col-md-2">Status:</label>
+                    <div class="col-md-3">
+                        <select class="form-control" id="ddr_status" name="ddr_status" style="width:100% !important;">
+                            <option value="0">All</option>
+                            <option value="@Status.Pending">@ShowStatus.POCreated</option>
+                            <option value="@Status.Approved">@ShowStatus.POApproved</option>
+                            <option value="@Status.Rejected">@ShowStatus.PORejected</option>
+                            <option value="@Status.Completed">@ShowStatus.POCompleted</option>
+                            <option value="@Status.cancelled">@ShowStatus.POCancelled</option>
+                            <option value="@Status.RequestCancelled">@ShowStatus.PORequestCancelled</option>
+                            <option value="@Status.CancelledMR">@ShowStatus.CancelledMR</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="w3-button w3-tiny w3-blue" onclick="initialDataTable()">Filter</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped" id="table">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Date</th>
+                                <th>PON Number</th>
+                                <th>PO Number</th>
+                                <th>Requester</th>
+                                <th>Quote Ref. Number</th>
+                                <th>MR Ref. Number</th>
+                                <th>Project</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+@section scripts{
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.3/moment.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            var start = moment().subtract(29, 'days');
+            var end = moment();
+
+            function cb(start, end) {
+                $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            }
+
+            $('#reportrange').daterangepicker({
+                startDate: start,
+                endDate: end,
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                }
+            }, cb);
+
+            cb(start, end);
+            $('#ddr_status').select2();
+            initialDataTable();
+        });
+
+        function initialDataTable() {
+            var t=$('#table').DataTable({
+                "bDestroy": true,
+                "ajax": {
+                    "url": "@Url.Action("GetPurchaseOrderApprovalAJax", "PurchaseOrderAandR")",
+                    "type": "GET",
+                    "dataType": "json",
+                    "data": {
+                        dateRange: $('#reportrange span').html(),
+                        status: $('#ddr_status').val(),
+                    }
+                },
+                "columns": [
+        { "data": "pruchase_request_id" },
+        { "data": "str_created_date" },
+                    { "data": "purchase_request_number" },
+        {
+                            "render": function (data, type, full, meta) {
+                                console.log(full);
+                                var po_number = "";
+                                $.each(full.poDetails, function (index, item) {
+                                    if (index == full.poDetails.length - 1)
+                                        po_number = po_number + '<a href="javascript:void(0)" class="link_po_report" data-quoteid="' + full.purchase_order_id + '" data-supplier="' + item.supplier_id +'">'+ item.po_report_number+'</a>';
+                                    else {
+                                        po_number = po_number + '<a href="javascript:void(0)" class="link_po_report" data-quoteid="' + full.purchase_order_id + '" data-supplier="' + item.supplier_id + '">' + item.po_report_number + '</a>' + "/";
+                                    }
+                                });
+                                return po_number;
+                                //return '<a href="/PurchaseOrderAandR/Details/' + full.pruchase_request_id + '">' + full.purchase_request_number + '</a>';
+                            }
+                        },
+        { "data": "created_by" },
+        { "data": "quote_number" },
+        {
+                        "render": function (data, type, full, meta) {
+
+                            var btn = '<a href="/ItemRequest/Detail/' + full.mr_id + '">' + full.mr_number + '</a>';
+                            return btn;
+                        }
+        },
+        { "data": "project_short_name" },
+        {
+                        "render": function (data, type, item, meta) {
+                            var span = '';
+                            if (item.purchase_request_status=='@Status.Pending')
+                            {
+                                return '<span class="label label-warning">@ShowStatus.POCreated</span>';
+                            }
+                            else if (item.purchase_request_status=='@Status.Approved')
+                            {
+                                return '<span class="label label-primary">@ShowStatus.POApproved</span>';
+                            }
+                            else if (item.purchase_request_status=='@Status.Rejected')
+                            {
+                                return '<span class="label label-danger">@ShowStatus.PORejected</span>';
+                            }
+                            else if (item.purchase_request_status=='@Status.Completed')
+                            {
+                                return '<span class="label label-success">@ShowStatus.POCompleted</span>';
+                            }
+                            else if (item.purchase_request_status== '@Status.cancelled')
+                            {
+                                return '<span class="label w3-red">@ShowStatus.POCancelled</span>';
+                            }
+                            else if (item.purchase_request_status== '@Status.RequestCancelled')
+                            {
+                                return '<span class="label w3-red">@ShowStatus.PORequestCancelled</span>';
+                            }
+                            else if (item.purchase_request_status=='@Status.CancelledMR')
+                            {
+                                return '<span class="label w3-red">@ShowStatus.CancelledMR</span>';
+                            }
+                            return span;
+                        }
+        },
+
+        {
+            "render": function (data, type, full, meta) {
+                console.log(full);
+                var btn ='<a href="/PurchaseOrderAandR/details/'+full.pruchase_request_id+'" class="w3-button w3-tiny w3-green">View Detail</a>';
+                if (full.purchase_request_status=='approved' || full.purchase_request_status=='completed' )
+                {
+                    btn = btn + ' <a href="/PurchaseOrder/GenerateReport/'+full.purchase_order_id+'" class="w3-button w3-tiny w3-orange"><span class="glyphicon glyphicon-th-list"></span> Generate</a>';
+                }
+                return btn;
+            }
+        },
+        ],
+                "order": [[2, "desc"]],
+                });
+
+        t.on('order.dt search.dt', function () {
+            t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                cell.innerHTML = i + 1;
+            });
+        }).draw();
+        }
+
+    </script>
+}
+

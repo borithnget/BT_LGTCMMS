@@ -1,0 +1,266 @@
+﻿@using BT_KimMex.Class;
+@{
+    ViewBag.Title = "StockBalance";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+<div class="row" style="padding:10px !important;">
+    <div class="panel panel-default" style="margin-top:20px !important;">
+        <div class="panel-heading">
+            Stock Balance
+            @if (User.IsInRole(Role.SystemAdmin))
+            {
+                <a href="@Url.Action("ImportStockBalance","Warehouse")" class="btn btn-sm btn-warning pull-right"><span class="glyphicon glyphicon-cloud-download"></span> Import Stock Balance</a>
+            }
+            
+        </div>
+        <div class="panel-body">
+            <div class="row" style="padding-left: 15px !important;">
+                <div class="form-group row">
+                    <label class="col-md-2">Filter Type:</label>
+                    <div class="col-md-10">
+                        <label class="radio-inline">
+                            <input type="radio" name="receiveType" value="site">Site Warehouse
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="receiveType" value="project">Project Warehouse
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-md-2">Select Warehouse :</label>
+                    <div class="col-md-10">
+                        <select class="form-control" id="warehouse_id">
+                            <option>Select Warehouse</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered" id="table">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Item Code</th>
+                            <th>Item Name</th>
+                            <th>Item Unit</th>
+                            <th>Stock Balance</th>
+                            @*<th>Amount</th>*@
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5">No Item Available in warehouse</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('#warehouse_id').select2();
+            var $rdReceiveTypes = $('input:radio[name=receiveType]');
+            if ($rdReceiveTypes.is(':checked') == false) {
+                $rdReceiveTypes.filter('[value="site"]').prop('checked', true);
+                initialSiteDropdownList();
+            }
+
+            $('input[type=radio][name=receiveType]').change(function () {
+                $('#table tbody').empty().append("<tr><td colspan='5'>No Item Available in warehouse</td><tr>");
+                if (this.value == "site") {
+                    initialSiteDropdownList();
+                }
+                else if (this.value == "project") {
+                    initialWarehouseDropdownList();
+
+                }
+            });
+
+            $('#warehouse_id').change(function (e) {
+                e.preventDefault();
+                var id = $(this).val();
+                var type = $('input[type=radio][name=receiveType]:checked').val();
+
+                //$('#table tbody').empty();
+
+                if (type == "site") {
+
+                    $('#table').width("100%");
+                    var t = $('#table').DataTable({
+                        "bDestroy": true,
+                        "processing":true,
+                        "ajax": {
+                            "url": "/Stock/GetAllItemFromWarehousebySiteJSON",
+                            "type": "GET",
+                            "dataType": "json",
+                            "data": { id: id },
+                        },
+                        "columns": [
+                            { "data": "product_id" },
+                            { "data": "itemCode" },
+                            { "data": "itemName" },
+                            { "data": "itemUnitName" },
+                            { "data": "total_quantity" },
+                        ],
+                        "columnDefs": [
+                            {
+                                'className': 'text-center',
+                                'targets': [4]
+                            },
+                        ],
+                        "order": [[1, "asc"]],
+                    });
+                    if (t) {
+                        t.on('order.dt search.dt', function () {
+                            t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                                cell.innerHTML = i + 1;
+                            });
+                        }).draw();
+                    }
+
+                    @*$.ajax({
+                        url: '@Url.Action("GetAllItemFromWarehousebySiteJSON", "Stock")',
+                        type: "get",
+                        dataType: "json",
+                        data: { id: id },
+                        success: function (da) {
+                            if (da.data.length == 0) {
+                                $('#table tbody').append("<tr><td colspan='5'>No Item Available in warehouse</td><tr>")
+                            } else {
+                                $.each(da.data, function (index, item) {
+                                    //console.log(item);
+
+                                    $('#table tbody').append("" +
+                                        "<tr id='i" + Number(index + 1) + "'>" +
+                                            "<td>" + Number(index + 1) + "</td>" +
+                                            "<td><input type='hidden' value='" + item.product_id + "' class='item_id'/><label class='item_code'>" + item.itemCode + "</label></td>" +
+                                            "<td><label class='item_name'>" + item.itemName + "</label></td>" +
+                                            "<td><label class='item_unit'>" + item.itemUnitName + "</label></td>" +
+                                            "<td class='text-center'><label class='stock_balance'>" + item.total_quantity + "</label></td>" +
+                                        "</tr>"
+                                    );
+                                });
+                            }
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            console.log("Stock Adjustment:: " + textStatus);
+                        }
+                    });*@
+                } else if (type == "project") {
+
+                    $('#table').width("100%");
+                    var t = $('#table').DataTable({
+                        "bDestroy": true,
+                        "processing": true,
+                        "ajax": {
+                            "url": "/StockAdjustment/GetAllItemsbyWarehouseJson",
+                            "type": "GET",
+                            "dataType": "json",
+                            "data": { id: id },
+                        },
+                        "columns": [
+                            { "data": "product_id" },
+                            { "data": "itemCode" },
+                            { "data": "itemName" },
+                            { "data": "itemUnitName" },
+                            { "data": "total_quantity" },
+                        ],
+                        "columnDefs": [
+                            {
+                                'className': 'text-center',
+                                'targets': [4]
+                            },
+                        ],
+                        "order": [[1, "asc"]],
+                    });
+                    if (t) {
+                        t.on('order.dt search.dt', function () {
+                            t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                                cell.innerHTML = i + 1;
+                            });
+                        }).draw();
+                    }
+
+                    @*$.ajax({
+                        url: '@Url.Action("GetAllItemsbyWarehouseJson", "StockAdjustment")',
+                        type: "get",
+                        dataType: "json",
+                        data: { id: id },
+                        success: function (da) {
+                            if (da.data.length == 0) {
+                                $('#table tbody').append("<tr><td colspan='5'>No Item Available in warehouse</td><tr>")
+                            } else {
+                                $.each(da.data, function (index, item) {
+                                    //console.log(item);
+
+                                    $('#table tbody').append("" +
+                                        "<tr id='i" + Number(index + 1) + "'>" +
+                                            "<td>" + Number(index + 1) + "</td>" +
+                                            "<td><input type='hidden' value='" + item.product_id + "' class='item_id'/><label class='item_code'>" + item.itemCode + "</label></td>" +
+                                            "<td><label class='item_name'>" + item.itemName + "</label></td>" +
+                                            "<td><label class='item_unit'>" + item.itemUnitName + "</label></td>" +
+                                            "<td class='text-center'><label class='stock_balance'>" + item.total_quantity + "</label></td>" +
+                                        "</tr>"
+                                    );
+                                });
+                            }
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            console.log("Stock Adjustment:: " + textStatus);
+                        }
+                    });*@
+
+                }
+            });
+
+        });
+
+        function initialSiteDropdownList() {
+            $('#warehouse_id').empty().append("<option>Select Warehouse</option>");
+            $.ajax({
+                url: '/Stock/GetSiteListItemsJSON',
+                type: "get",
+                dataType: "json",
+                success: function (da) {
+                    //console.log(da);
+                    if (da.data) {
+                        $.each(da.data, function (index, item) {
+                            $('#warehouse_id').append("" +
+                               "<option value='" + item.site_id + "'>" + item.site_name + "</option>"
+                                );
+                        });
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(textStatus);
+                }
+            });
+        }
+        function initialWarehouseDropdownList() {
+            $('#warehouse_id').empty().append("<option>Select Warehouse</option>");
+            $.ajax({
+                url: '/Stock/GetWarehouseListItemsJSON',
+                type: "get",
+                dataType: "json",
+                success: function (da) {
+                    //console.log(da);
+                    if (da.data) {
+                        $.each(da.data, function (index, item) {
+                            $('#warehouse_id').append("" +
+                               "<option value='" + item.warehouse_id + "'>" + item.warehouse_name + "</option>"
+                                );
+                        });
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(textStatus);
+                }
+            });
+        }
+    </script>
+}

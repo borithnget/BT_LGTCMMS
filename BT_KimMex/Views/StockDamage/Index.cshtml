@@ -1,0 +1,584 @@
+﻿@model IEnumerable<BT_KimMex.Models.StockDamageViewModel>
+@using BT_KimMex.Class
+@{
+    ViewBag.Title = "Index";
+    bool isSK = false;
+    bool isMSC = false;
+    bool isAdmin = false;
+    if (User.IsInRole("Stock Keeper"))
+    {
+        isSK = true;
+    }
+    if (User.IsInRole("Main Stock Controller")|| User.IsInRole("Purchaser"))
+    {
+        isMSC = true;
+    }
+    if(User.IsInRole("Admin"))
+    {
+        isAdmin = true;
+    }
+    string status = string.Empty;
+    if (string.IsNullOrWhiteSpace(Request.QueryString["status"]))
+    {
+        status = string.Empty;
+    }
+    else
+    {
+        status = Request.QueryString["status"].ToString();
+    }
+}
+<style type="text/css">
+    #stockDamageTable{
+        text-align:center !important;
+        vertical-align:middle !important;
+    }
+    #stockDamageTable tr td{
+        vertical-align:middle !important;
+    }
+</style>
+
+<h3 class="title">Stock Damage List</h3>
+<div class="row">
+    <div class="form-group">
+        <label class="control-label col-md-2">Stock Damage Status:</label>
+        <div class="col-md-10">
+            <select class="form-control" id="sd_status">
+                <option value="All" selected>All</option>
+                <option value="Feedbacked">Feedbacked</option>
+                <option value="Pending">Pending</option>
+                <option value="Pending Feedback">Pending Feedback</option>
+                <option value="Completed">Completed</option>
+                @*<option value="Rejected">Rejected</option>*@
+            </select>
+        </div>
+    </div>
+</div>
+<table class="table table-bordered" id="stockDamageTable">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>SD No.</th>
+            <th>Date</th>
+            <th>Warehouse</th>
+            <th>Invoice No.</th>
+            <th>Invoice Date</th>
+            <th>Status</th>
+            <th>Approve/ Feedback</th>
+            @*<th>Reject</th>*@
+            <th>Detail</th>
+            <th>Edit/ Prepare Feedback</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<!-- delete project modal popup-->
+<div class="modal fade" id="myModal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to delete this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default delete-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- approve project modal popup-->
+<div class="modal fade" id="approveModal" tabindex="=-1" role="dialog" aria-labelledby="approveModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-warning">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p class="success-message">Are you sure to <strong>Approve</strong> this item?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default approve-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- reject project modal popup-->
+<div class="modal fade" id="rejectModal" tabindex="=-1" role="dialog" aria-labelledby="rejectModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <p class="success-message col-md-12">Are you sure to <strong>Reject</strong> this item?</p>
+                    <label class="col-md-2">Comment:</label>
+                    <div class="col-md-10">
+                        <textarea class="form-control" rows="5" id="reject-comment"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default reject-confirm">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            var stockDamageId;
+            @{
+                if (!string.IsNullOrEmpty(status))
+                {
+                    <text>
+            InitialStockDamageDataTable('@status', '@isAdmin', '@isSK');
+            $('#sd_status').val('@status');
+            </text>
+                }
+                else
+                {
+                    if (isSK)
+                {
+                    <text>
+            InitialStockDamageDataTable("All",'@isAdmin', 'true');
+            </text>
+                }
+                else
+                {
+                    <text>
+            InitialStockDamageDataTable("All",'@isAdmin', 'false');
+            </text>
+                }
+                }
+
+            }
+
+            $('#stockDamageTable tbody').on('click', 'td a.delete-promp', function () {
+                stockDamageId = $(this).attr('id');
+                $('#myModal').modal('show');
+            });
+
+            $('.delete-confirm').click(function () {
+                if (stockDamageId != '') {
+                    $.ajax({
+                        url: "/StockDamage/Delete",
+                        data: {
+                            'id': stockDamageId,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#myModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been deleted!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "StockDamage")';
+                            }
+                            else if (da.result == "fail")
+                                $.notify('Your data has been error while deleting!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while deleting!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+            $('#stockDamageTable tbody').on('click', 'td a.approve-promp', function () {
+                stockDamageId = $(this).attr('id');
+                $('#approveModal').modal('show');
+            });
+
+            $('.approve-confirm').click(function () {
+                if (stockDamageId != '') {
+                    $.ajax({
+                        url: "/StockDamage/Approve",
+                        data: {
+                            'id': stockDamageId,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('#approveModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been approved!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "StockDamage")';
+                            }
+                            else if (da.result == "fail")
+                                $.notify('Your data has been error while approving!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while approving!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+            $('#stockDamageTable tbody').on('click', 'td a.reject-promp', function () {
+                stockDamageId = $(this).attr('id');
+                $('#rejectModal').modal('show');
+            });
+
+            $('.reject-confirm').click(function () {
+                if (stockDamageId != '') {
+                    var comment = $("#reject-comment").val();
+                    $.ajax({
+                        url: "/StockDamage/Reject",
+                        data: {
+                            'id': stockDamageId,
+                            'comment': comment
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            if ($('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                $('.reject-confirm').css('display', 'none');
+                            }
+                            $('#rejectModal').modal('hide');
+                            if (da.result == "success") {
+                                $.notify('Your data has been rejected!', { className: 'success' });
+                                window.location.href = '@Url.Action("Index", "StockDamage")';
+                            }
+                            else if (da.result == "fail")
+                                $.notify('Your data has been error while rejecting!', { className: 'error' });
+                        },
+                        error: function (err) {
+                            if (!$('.modal-header').hasClass('alert-danger')) {
+                                $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                $('.delete-confirm').css('display', 'none');
+                            }
+                            $('.success-message').html(err.statusText);
+                            $.notify('Your data has been error while rejecting!', { className: 'error' });
+                        }
+                    });
+                }
+            });
+
+
+            $('#sd_status').change(function () {
+                var status = $(this).val();
+                if (status != null || status != "")
+                    InitialStockDamageDataTable(status, '@isAdmin', '@isSK');
+            });
+
+            function InitialStockDamageDataTable(status, isAdmin, isSK) {
+                var t;
+                if (isAdmin == "True") {
+                    t = $('#stockDamageTable').DataTable({
+                        "bDestroy": true,
+                        "ajax": {
+                            "url": "@Url.Action("GetStockDamageDataTable", "StockDamage")",
+                            "type": "GET",
+                            "dataType": "json",
+                            "data": { status: status },
+                        },
+                        "columns": [
+                            { "data": "stock_damage_id" },
+                            { "data": "stock_damage_number" },
+                            {
+                                "data": "created_date", render: function (data, type, full, meta) {
+                                    return new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)).toISOString().slice(0, 10);
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    return full.strWarehouse;
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    return full.strInvoiceNumber;
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    return full.strInvoiceDate;
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    if (full.sd_status == "Pending" || full.sd_status == "Feedbacked")
+                                        return '<label style="color:orange !important;">' + full.sd_status + '</label>';
+                                    else if (full.sd_status == "Pending Feedback")
+                                        return '<label style="color:blue !important;">' + full.sd_status + '</label>';
+                                    else if (full.sd_status == "Completed")
+                                        return '<label style="color:green !important;">' + full.sd_status + '</label>';
+                                    else if (full.sd_status == "Rejected")
+                                        return '<label style="color:gray !important;">' + full.sd_status + '</label>';
+                                    return '';
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    if (full.sd_status == "Pending" || full.sd_status == "Feedbacked")
+                                        return '<a href="/StockDamage/ApproveFeedback/' + full.stock_damage_id + '">Approve/ Feedback</a>';
+                                        //return '<a href="javascript:void(0)" id="' + full.stock_damage_id + '" class="delete-promp">Approve</a>';
+                                    return '';
+                                }
+                            },
+                            //{
+                            //    "render": function (data, type, full, meta) {
+                            //        if (full.sd_status == "Pending")
+                            //            return '<a href="javascript:void(0)" id="' + full.stock_damage_id + '" class="delete-promp">Reject</a>';
+                            //        return '';
+                            //    }
+                            //},
+                            {
+                                "render": function (data, type, full, meta) {
+                                    return '<a href="/StockDamage/Detail/' + full.stock_damage_id + '">View Detail</a>';
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    if (full.sd_status == "Pending" || full.sd_status == "Rejected")
+                                        return '<a href="/StockDamage/Edit/' + full.stock_damage_id + '">Edit</a>';
+                                    else if (full.sd_status == "Pending Feedback")
+                                        return '<a href="/StockDamage/PrepareFeedback/' + full.stock_damage_id + '">Prepare Feedback</a>';
+                                    return '';
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    if (full.sd_status == "Pending" || full.sd_status == "Rejected")
+                                        return '<a href="javascript:void(0)" id="' + full.stock_damage_id + '" class="delete-promp">Delete</a>';
+                                    return '';
+                                }
+                            }
+                        ],
+                        "order": [[1, "desc"]],
+                    });
+                    $('#stockDamageTable_filter').append('<a href="@Url.Action("Create", "StockDamage")" class="btn btn-default pull-left" style="margin-right:10px !important;">Add New</a>');
+                }
+                else if (isSK == "true") {
+                    t = $('#stockDamageTable').DataTable({
+                        "bDestroy": true,
+                        "ajax": {
+                            "url": "@Url.Action("GetStockDamageDataTable", "StockDamage")",
+                            "type": "GET",
+                            "dataType": "json",
+                            "data": { status: status },
+                        },
+                        "columns": [
+                            { "data": "stock_damage_id" },
+                            { "data": "stock_damage_number" },
+                            {
+                                "data": "created_date", render: function (data, type, full, meta) {
+                                    return new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)).toISOString().slice(0, 10);
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    return full.strWarehouse;
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    return full.strInvoiceNumber;
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    return full.strInvoiceDate;
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    if (full.sd_status == "Pending" || full.sd_status == "Feedbacked")
+                                        return '<label style="color:orange !important;">' + full.sd_status + '</label>';
+                                    else if (full.sd_status == "Pending Feedback")
+                                        return '<label style="color:blue !important;">' + full.sd_status + '</label>';
+                                    else if (full.sd_status == "Completed")
+                                        return '<label style="color:green !important;">' + full.sd_status + '</label>';
+                                    else if (full.sd_status == "Rejected")
+                                        return '<label style="color:gray !important;">' + full.sd_status + '</label>';
+                                    return '';
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    if (full.sd_status == "Pending" || full.sd_status == "Feedbacked")
+                                        return '<a href="/StockDamage/ApproveFeedback/' + full.stock_damage_id + '">Approve/ Feedback</a>';
+                                    //return '<a href="javascript:void(0)" id="' + full.stock_damage_id + '" class="delete-promp">Approve</a>';
+                                    return '';
+                                }
+                            },
+                            //{
+                            //    "render": function (data, type, full, meta) {
+                            //        if (full.sd_status == "Pending")
+                            //            return '<a href="javascript:void(0)" id="' + full.stock_damage_id + '" class="delete-promp">Reject</a>';
+                            //        return '';
+                            //    }
+                            //},
+                            {
+                                "render": function (data, type, full, meta) {
+                                    return '<a href="/StockDamage/Detail/' + full.stock_damage_id + '">View Detail</a>';
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    if (full.sd_status == "Pending" || full.sd_status == "Rejected")
+                                        return '<a href="/StockDamage/Edit/' + full.stock_damage_id + '">Edit</a>';
+                                    else if (full.sd_status == "Pending Feedback")
+                                        return '<a href="/StockDamage/PrepareFeedback/' + full.stock_damage_id + '">Prepare Feedback</a>';
+                                    return '';
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    if (full.sd_status == "Pending" || full.sd_status == "Rejected")
+                                        return '<a href="javascript:void(0)" id="' + full.stock_damage_id + '" class="delete-promp">Delete</a>';
+                                    return '';
+                                }
+                            }
+                        ],
+                        "order": [[1, "desc"]],
+                        "columnDefs": [
+                            {
+                                "targets": [7],
+                                "visible": false,
+                            },
+                            //{
+                            //    "targets": [5],
+                            //    "visible": false,
+                            //},
+                        ]
+                    });
+                    $('#stockDamageTable_filter').append('<a href="@Url.Action("Create", "StockDamage")" class="btn btn-default pull-left" style="margin-right:10px !important;">Add New</a>');
+                }
+                else {
+                    t = $('#stockDamageTable').DataTable({
+                        "bDestroy": true,
+                        "ajax": {
+                            "url": "@Url.Action("GetStockDamageDataTable", "StockDamage")",
+                            "type": "GET",
+                            "dataType": "json",
+                            "data": { status: status },
+                        },
+                        "columns": [
+                            { "data": "stock_damage_id" },
+                            { "data": "stock_damage_number" },
+                            {
+                                "data": "created_date", render: function (data, type, full, meta) {
+                                    return new Date(parseInt(data.replace("/Date(", "").replace(")/", ""), 10)).toISOString().slice(0, 10);
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    return full.strWarehouse;
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    return full.strInvoiceNumber;
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    return full.strInvoiceDate;
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    if (full.sd_status == "Pending" || full.sd_status == "Feedbacked")
+                                        return '<label style="color:orange !important;">' + full.sd_status + '</label>';
+                                    else if (full.sd_status == "Pending Feedback")
+                                        return '<label style="color:blue !important;">' + full.sd_status + '</label>';
+                                    else if (full.sd_status == "Completed")
+                                        return '<label style="color:green !important;">' + full.sd_status + '</label>';
+                                    else if (full.sd_status == "Rejected")
+                                        return '<label style="color:gray !important;">' + full.sd_status + '</label>';
+                                    return '';
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    if (full.sd_status == "Pending" || full.sd_status == "Feedbacked")
+                                        return '<a href="/StockDamage/ApproveFeedback/' + full.stock_damage_id + '">Approve/ Feedback</a>';
+                                    //return '<a href="javascript:void(0)" id="' + full.stock_damage_id + '" class="delete-promp">Approve</a>';
+                                    return '';
+                                }
+                            },
+                            //{
+                            //    "render": function (data, type, full, meta) {
+                            //        if (full.sd_status == "Pending")
+                            //            return '<a href="javascript:void(0)" id="' + full.stock_damage_id + '" class="delete-promp">Reject</a>';
+                            //        return '';
+                            //    }
+                            //},
+                            {
+                                "render": function (data, type, full, meta) {
+                                    return '<a href="/StockDamage/Detail/' + full.stock_damage_id + '">View Detail</a>';
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    if (full.sd_status == "Pending" || full.sd_status == "Rejected")
+                                        return '<a href="/StockDamage/Edit/' + full.stock_damage_id + '">Edit</a>';
+                                    else if (full.sd_status == "Pending Feedback")
+                                        return '<a href="/StockDamage/PrepareFeedback/' + full.stock_damage_id + '">Prepare Feedback</a>';
+                                    return '';
+                                }
+                            },
+                            {
+                                "render": function (data, type, full, meta) {
+                                    if (full.sd_status == "Pending" || full.sd_status == "Rejected")
+                                        return '<a href="javascript:void(0)" id="' + full.stock_damage_id + '" class="delete-promp">Delete</a>';
+                                    return '';
+                                }
+                            }
+                        ],
+                        "order": [[1, "desc"]],
+                        "columnDefs": [
+                            {
+                                "targets": [9],
+                                "visible": false,
+                            },
+                            {
+                                "targets": [10],
+                                "visible": false,
+                            },
+                        ]
+                    });
+                }
+
+                t.on('order.dt search.dt', function () {
+                    t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                        cell.innerHTML = i + 1;
+                    });
+                }).draw();
+                $('select[name="stockDamageTable_length"]').addClass('datatable-control');
+                $('input[aria-controls="stockDamageTable"]').addClass('datatable-control');
+
+            }
+        });
+    </script>
+    }

@@ -1,0 +1,89 @@
+﻿@model BT_KimMex.Models.ProductSizeViewModel
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3 class="title">Create New Product Size</h3>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Date:</label>
+            <label class="col-md-10">@Convert.ToDateTime(DateTime.Now).ToString("dd/MM/yyyyy")</label>
+        </div>
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+       
+        <div class="form-group">
+            <label class="control-label col-md-2">Group:</label>
+            <div class="col-md-10">
+                @Html.DropDownList("class_id", new SelectList(BT_KimMex.Class.CommonFunctions.GetClassListItems(), "class_id", "class_name"), "Select Group", new { @class = "form-control", id = "class_id" })
+                @Html.ValidationMessageFor(model => model.class_id, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.product_size_name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.product_size_name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.product_size_name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-primary" />
+                @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-danger" })
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts{
+    <script>
+    $(function () {
+            //initialProductSizeDataTable();
+        });
+    function InitialSiteDropDownList(site_id) {
+                $.ajax({
+                    url: "@Url.Action("SiteDropDown", "Site")",
+                    type: "get",
+                    dataType: "json",
+                    success: function (data) {
+
+                        $('#productsize_site_id').empty();
+                        $('#productsize_site_id').append("" +
+                            "<option value>Select Site Name</option>"
+                        );
+                        $.each(data, function (index, item) {
+                            $.each(item, function (index1, item1) {
+
+                                $('#productsize_site_id').append("" +
+                                        "<option value='" + item1.site_id + "'>" + item1.site_name + "</option>"
+                                    );
+                            });
+                        });
+                        $('#productsize_site_id').val(site_id);
+                    },
+                    error: function (data) {
+
+                    }
+        });
+
+    }
+
+
+
+
+    </script>
+}
+
+
+
+

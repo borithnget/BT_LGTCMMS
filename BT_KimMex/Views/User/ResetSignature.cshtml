@@ -1,0 +1,113 @@
+﻿@model BT_KimMex.Models.UserViewModel
+
+@{
+    ViewBag.Title = "ResetSignature";
+}
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken()<div class="form-horizontal">
+    <h3 class="title">Reset Signature</h3>
+
+    @if (ViewBag.Message != null) { 
+        <div class="alert alert-success">
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+            @ViewBag.Message
+        </div>
+    }
+
+    <div class="form-group row">
+        <div class="col-md-3">
+            <input type="file" id="signature_file" class="form-control imageBrowes" accept="image/*" />
+            <input type="hidden" class="form-control" name="user_signature" id="file-path" value="">
+            <input type="hidden" id="user_detail_id" name="user_detail_id" value="@Model.user_detail_id"/>
+            <input type="hidden" id="id" name="id" value="@Model.user_id"/>
+            <div id="imgPreview" class="thumbnail">
+                @if (String.IsNullOrEmpty(Model.user_signature))
+                {
+                    <img src="@Url.Content("~/Assets/img/profile-picture.jpg")" style=" background-color:white; width: 250px;height: 250px; object-fit:fill;" class="img-responsive" id="targetImg" />
+                }
+                else
+                {
+                    <img src="@Model.user_signature" style=" background-color:white; width: 250px;height: 250px; object-fit:fill;" class="img-responsive" id="targetImg" />
+
+                }
+            </div>
+        </div>
+        
+    </div>
+
+    <div class="form-group row">
+        <div class="col-md-offset-1 col-md-10">
+            <input type="submit" value="Submit" class="btn btn-primary" />
+        </div>
+    </div>
+</div>
+}
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            $("#signature_file").change(function (e) {
+                e.preventDefault();
+                readURL(this);
+            });
+        });
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#targetImg').attr('src', e.target.result);
+                }
+
+                reader.readAsDataURL(input.files[0]); // convert to base64 string
+
+                var data = new FormData;
+                data.append("ImageFile", input.files[0]);
+
+                $.ajax({
+                    type: "Post",
+                    url: "/Account/UploadUserSignature",
+                    data: data,
+                    contentType: false,
+                    processData: false,
+                    success: function (imgID) {
+                        console.log(imgID);
+                        if (imgID != null) {
+                            $('#file-path').val(imgID.SignaturePath);
+                        }
+                    }
+
+                })
+            }
+        }
+
+        function ClearPreview() {
+            $(".imageBrowes").val('');
+            $("#description").text('');
+            $("#imgPreview").hide();
+        }
+
+        function ReadImage(file) {
+            var reader = new FileReader;
+            var image = new Image;
+
+            reader.readAsDataURL(file);
+            reader.onload = function (_file) {
+                image.src = _file.target.result;
+                image.onload = function () {
+
+                    var height = this.height;
+                    var width = this.width;
+                    var type = file.type;
+                    var size = ~~(file.size / 1048576) + " MB";
+
+                    $("#targetImg").attr('src', _file.target.result);
+                    $("#descriptionimage").text("Size:" + size + ", " + height + "X " + width + ", " + type + "");
+                    $("#imgPreview").show();
+                }
+            }
+        }
+    </script>
+    }

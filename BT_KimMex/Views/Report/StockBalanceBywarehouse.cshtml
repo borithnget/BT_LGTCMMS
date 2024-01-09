@@ -1,0 +1,31 @@
+﻿
+@{
+    ViewBag.Title = "Stock Balance By warehouse";
+}
+
+<h3 class="title">Stock Balance By warehouse</h3>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Warehouse Name:</label>
+                    <div class="col-md-8">
+                        @Html.DropDownList("warehouse_id", ViewBag.StockBalance as SelectList, "All Warehouse", new { @class = "form-control", name = "warehouse_id" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <input type="submit" value="Generate" class="btn btn-default" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+
+    </div>
+}

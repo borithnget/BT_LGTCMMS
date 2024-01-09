@@ -1,0 +1,489 @@
+﻿@model BT_KimMex.Models.StockIssueReturnViewModel
+@using System.Text.RegularExpressions;
+@{
+    ViewBag.Title = "PrepareFeedback";
+}
+<style type="text/css">
+    #issueReturnTable tr td{
+        vertical-align:middle !important;
+    }
+    #issueReturnTable tr td:nth-child(5),#issueReturnTable tr td:nth-child(6){
+        text-align:center !important;
+    }
+</style>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        @Html.HiddenFor(model => model.stock_issue_return_id)
+        @Html.HiddenFor(model=>model.stock_issue_ref)
+        <h3 class="title">Approve/ Feedback Stock Issue Return</h3>
+        <div class="form-group">
+            @Html.LabelFor(model => model.created_date, htmlAttributes: new { @class = "col-md-2" })
+            @Html.Label(BT_KimMex.Class.CommonClass.ToLocalTime(Convert.ToDateTime(Model.created_date)).ToString("dd/MM/yyyy"), new { @class = "col-md-10" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.issue_return_number, htmlAttributes: new { @class = "col-md-2" })
+            @Html.Label(Model.issue_return_number, new { @class = "col-md-10" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.stock_issue_ref, htmlAttributes: new { @class = "col-md-2" })
+            @Html.Label(Model.stock_issue_number, new { @class = "col-md-10" })
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered" id="issueReturnTable">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Item Code</th>
+                        <th>Item Name</th>
+                        <th>Warehouse</th>
+                        <th>Stock Balance</th>
+                        <th>Issue Qty</th>
+                        <th>Unit</th>
+                        <th>Invoice No.</th>
+                        <th>Invoice Date</th>
+                        <th>Reason</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int count = 1;
+                        foreach (var item in Model.inventoryDetails)
+                        {
+                            string rowID = "i" + count;
+                            string itemID = "item" + count;
+                            if (string.Compare(item.item_status, "firstapproved") == 0)
+                            {
+                                <tr id="@rowID">
+                                    <td>@count</td>
+                                    <td>@item.itemCode</td>
+                                    <td>@item.itemName</td>
+                                    <td>@item.warehouseName</td>
+                                    <td>@string.Format("{0:G29}", decimal.Parse(item.stock_balance.ToString())) @item.itemunitname</td>
+                                    <td>@string.Format("{0:G29}", decimal.Parse(item.quantity.ToString()))</td>
+                                    <td>@item.itemunitname</td>
+                                    <td>@item.invoice_number</td>
+                                    <td>@Convert.ToDateTime(item.invoice_date).ToString("dd/MM/yyyy")</td>
+                                    <td>@item.remark</td>
+                                    <td></td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr id='@rowID'>
+                                    <td>@count</td>
+                                    <td><input type='hidden' class='item-id' value='@item.inventory_item_id' /><input type='text' class='form-control item-code' id='@itemID' value='@item.itemCode' onfocus='getItemDataRow(this)' placeholder='Item Code' /></td>
+                                    <td><label class='item-name'>@item.itemName</label></td>
+                                    <td><input type='hidden' class='warehouse-id' value='@item.inventory_warehouse_id' /><label class='warehouse-name'>@item.warehouseName</label></td>
+                                    <td><label class='issue-qty'>@string.Format("{0:G29}", decimal.Parse(item.stock_balance.ToString()))</label> <label class='issue-unit'>@item.itemunitname</label></td>
+                                    <td><input type='number' class='form-control return-qty' placeholder='Issue Return Qty' value='@string.Format("{0:G29}", decimal.Parse(item.quantity.ToString()))' onchange='checkIssueReturnQty(this)' /> </td>
+                                    <td>
+                                        <select class='form-control item-unit' onchange='checkIssueReturnQty(this)'>
+                                            @if (string.Compare(item.itemUnit, item.unit) == 0)
+                                            {
+                                                <option value="@item.itemUnit" selected>@item.itemunitname</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.itemUnit">@item.itemunitname</option>
+                                            }
+                                            @{
+                                                if (item.uom != null)
+                                                {
+                                                    if (item.uom.uom1_id != null && item.uom.uom1_qty != null)
+                                                    {
+                                                        string uom1 = Regex.Replace(item.uom.uom1_id, @"\t|\n|\r", "");
+                                                        if (string.Compare(uom1, item.unit) == 0)
+                                                        {
+                                                            <option value="@uom1,@item.uom.uom1_qty" selected>@uom1</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@uom1,@item.uom.uom1_qty">@uom1</option>
+                                                        }
+                                                    }
+                                                    if (item.uom.uom2_id != null && item.uom.uom2_qty != null)
+                                                    {
+                                                        string uom2 = Regex.Replace(item.uom.uom2_id, @"\t|\n|\r", "");
+                                                        if (string.Compare(uom2, item.unit) == 0)
+                                                        {
+                                                            <option value="@uom2,@item.uom.uom2_qty" selected>@uom2</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@uom2,@item.uom.uom2_qty">@uom2</option>
+                                                        }
+                                                    }
+                                                    if (item.uom.uom3_id != null && item.uom.uom3_qty != null)
+                                                    {
+                                                        string uom3 = Regex.Replace(item.uom.uom3_id, @"\t|\n|\r", "");
+                                                        if (string.Compare(uom3, item.unit) == 0)
+                                                        {
+                                                            <option value="@uom3,@item.uom.uom3_qty" selected>@uom3</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@uom3,@item.uom.uom3_qty">@uom3</option>
+                                                        }
+                                                    }
+                                                    if (item.uom.uom4_id != null && item.uom.uom4_qty != null)
+                                                    {
+                                                        string uom4 = Regex.Replace(item.uom.uom4_id, @"\t|\n|\r", "");
+                                                        if (string.Compare(uom4, item.unit) == 0)
+                                                        {
+                                                            <option value="@uom4,@item.uom.uom4_qty" selected>@uom4</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@uom4,@item.uom.uom4_qty">@uom4</option>
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </td>
+                                    <td><input type='text' class='form-control invoice_number' value="@item.invoice_number" /></td>
+                                    <td>
+                                        <div style="display:inline-block !important;margin-right:5px !important;">
+                                            <div class="input-group date" data-provide="datepicker" data-autoclose="true" style="width:150px !important;">
+                                                <input type="text" class="form-control invoice_date" style="width:130px !important;" value="@Convert.ToDateTime(item.invoice_date).ToString("dd/MM/yyyy")" />
+                                                <div class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><textarea class='form-control remark' placeholder='Remark'>@item.remark</textarea></td>
+                                    <td><a href='javascript:void(0)' class="btn-sm btn-default" onclick='removeItemRow(this)'><i class='fa fa-minus-circle'></i></a></td>
+                                </tr>
+                                                }
+                                                count++;
+                                            }
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="button" value="Submit" class="btn btn-default" onclick="prepareFeedbackStockIssueReturn()" />
+                @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-default" })
+            </div>
+        </div>
+    </div>
+                                        }
+@section Scripts{
+    <script type="text/javascript">
+
+        function prepareFeedbackStockIssueReturn() {
+            var inventories = [];
+            var item_element = {};
+            var warehouses = $('.warehouse-id');
+            var items = $('.item-id');
+            var issueQtys = $('.issue-qty');
+            var issueReturnQtys = $('.return-qty');
+            var issueReturnUnit = $('.item-unit');
+            var remarks = $('.remark');
+            var countInvalid = 0;
+            var issue_ref = $('#stock_issue_ref').val();
+            var invoiceNumbers = $('.invoice_number');
+            var invoiceDates = $('.invoice_date');
+            if (!issue_ref) {
+                alert('Stock Issue Ref. is required.');
+                return;
+            }
+
+            for (var i = 0; i < items.length; i++) {
+                var splitUnit = (issueReturnUnit[i].value).split(',');
+                if (warehouses[i].value && items[i].value && issueQtys[i].innerHTML && Number(issueReturnQtys[i].value) > 0) { //&& Number(issueQtys[i].innerHTML) >= Number(issueReturnQtys[i].value)
+                    item_element = {};
+                    item_element.warehouse_id = warehouses[i].value;
+                    item_element.product_id = items[i].value;
+                    item_element.total_quantity = issueQtys[i].innerHTML;
+                    item_element.in_quantity = issueReturnQtys[i].value;
+                    item_element.remark = remarks[i].value;
+                    item_element.unit = splitUnit[0];
+                    item_element.invoice_number = invoiceNumbers[i].value;
+                    item_element.invoice_date = convertDDMMYYYtoMMDDYYYY(invoiceDates[i].value);
+                    inventories.push(item_element);
+                }
+                else {
+                    countInvalid++;
+                }
+            }
+            if (countInvalid > 0) {
+                alert("Please fill in issue return qty and issue return must smaller or equals issue qty.");
+                return;
+            }
+
+            $.ajax({
+                url: "/StockIssueReturn/PrepareFeedback",
+                type: "post",
+                dataType: "json",
+                async: false,
+                data: { id: $('#stock_issue_return_id').val(), models: inventories, },
+                success: function (da) {
+                    if (da.result == "success") {
+                        $.notify('Your data has been saved!', { className: 'success' });
+                        window.location.href = '@Url.Action("Index","StockIssueReturn")';
+                    } else if (da.result == "error") {
+                        $.notify(da.message, { className: 'error' });
+                    }
+                },
+                error: function (err) {
+                    $.notify('Your data is error while saving!', { className: 'error' });
+                }
+            });
+        }
+
+        function removeItemRow(row) {
+            var arrItemId = [];
+            var ind = row.parentNode.parentNode.rowIndex;
+            var isLastChild = $('#issueReturnTable tr').eq(ind).find("td:nth-child(12) a").length == 0 ? false : true;
+            var itemId = $('#issueReturnTable tr').eq(ind).attr('id');
+            var count_table_row = $('#issueReturnTable tr').length;
+            for (var i = 1; i <= count_table_row; i++) {
+                var id = $('#issueReturnTable tr').eq(i).attr('id');
+                if (id != undefined)
+                    arrItemId.push(id);
+            }
+            if (arrItemId.length == 1) {
+                return;
+            }
+            document.getElementById('issueReturnTable').deleteRow(ind);
+            if (isLastChild)
+                $('#issueReturnTable tr#' + arrItemId[arrItemId.length - 2]).find('td:nth-child(12)').html("<a href='javascript:void(0)' class='btn-sm btn-default' onclick='appendItemRow(this)'><i class='fa fa-plus-circle'></i></a>");
+            else {
+                var deleted_index = arrItemId.indexOf(itemId);
+                arrItemId.splice(deleted_index, 1);
+                for (var i = 0; i < arrItemId.length; i++) {
+                    $('tr#' + arrItemId[i] + ' td:nth-child(1)').html(Number(i) + 1);
+                }
+            }
+        }
+        function getItemDataRow(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var rowId = $('#issueReturnTable tr').eq(ind).find('input.item-code').attr('id');
+            var itemClass = $('#issueReturnTable tr').eq(ind).attr('id');
+            var itemTypeId = $('#issueReturnTable tr#type' + itemClass).find('input.type-id').val();
+            var issueId = $('#stock_issue_ref').val();
+            //var itemId;
+            autocompleted(rowId, issueId);
+
+            function autocompleted(rowId, issueId) {
+                $("#" + rowId).autocomplete({
+                    //source: '/Product/GetProductAutoSuggest',
+                    source: '@Url.Action("GetProductAutoSuggestName", "Product")',
+                    select: function (event, ui) {
+                        AutoCompleteSelectHandler(event, ui, ind, issueId);
+                        $(this).val('');
+                    }
+                });
+            }
+
+            function AutoCompleteSelectHandler(event, ui, ind, issueId) {
+                var selectedObj = ui.item;
+                var item = (selectedObj.value).split(' ');
+                itemId = selectedObj.id;
+                GetItemDataRow(ind, itemId, issueId);
+            }
+
+            function GetItemDataRow(ind, itemId, issueId) {
+                if (itemId != "") {
+                    $.ajax({
+                        url: '/StockIssue/GetIssueItems',
+                        type: "get",
+                        dataType: "json",
+                        async: false,
+                        data: { id: issueId, itemId: itemId },
+                        success: function (da) {
+                            $('#issueReturnTable tr').eq(ind).find('input.item-id').val('');
+                            $('#issueReturnTable tr').eq(ind).find('input.warehouse-id').val('');
+                            $('#issueReturnTable tr').eq(ind).find('label.warehouse-name').text('');
+                            $('#issueReturnTable tr').eq(ind).find('label.issue-qty').text(0);
+                            $('#issueReturnTable tr').eq(ind).find('input.issue-unit').text('');
+                            $('#issueReturnTable tr').eq(ind).find('input.return-qty').val(0);
+                            $('#stockIssueTable tr').eq(ind).find('select.item-unit').empty();
+                            if (da.data.length > 0) {
+                                var str
+                                if (da.data.length == 1) {
+                                    $.each(da.data, function (index, item) {
+                                        //console.log(item);
+                                        $('#issueReturnTable tr').eq(ind).find('input.item-id').val(item.product_id);
+                                        $('#issueReturnTable tr').eq(ind).find('input.warehouse-id').val(item.warehouse_id);
+                                        $('#issueReturnTable tr').eq(ind).find('label.warehouse-name').text(item.warehouseName);
+                                        $('#issueReturnTable tr').eq(ind).find('label.issue-qty').text(item.out_quantity);
+                                        $('#issueReturnTable tr').eq(ind).find('input.return-qty').val(0);
+                                        $('#issueReturnTable tr').eq(ind).find('label.item-name').text(item.itemName);
+                                        $('#issueReturnTable tr').eq(ind).find('label.issue-unit').text(item.itemUnit);
+                                        $('#issueReturnTable tr').eq(ind).find('input.item-code').text(item.itemCode);
+                                        $('#issueReturnTable tr').eq(ind).find('select.item-unit').append("<option value='" + item.itemUnit.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "'>" + item.itemUnit.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>");
+
+                                        if (item.uom.uom1_id && item.uom.uom1_qty) {
+                                            $('#issueReturnTable tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom.uom1_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom.uom1_qty + "'>" + item.uom.uom1_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>");
+                                        }
+                                        if (item.uom.uom2_id && item.uom.uom2_qty) {
+                                            $('#issueReturnTable tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom.uom2_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom.uom2_qty + "'>" + item.uom.uom2_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>");
+                                        }
+                                        if (item.uom.uom3_id && item.uom.uom3_qty) {
+                                            $('#issueReturnTable tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom.uom3_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom.uom3_qty + "'>" + item.uom.uom3_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>");
+                                        }
+                                        if (item.uom.uom4_id && item.uom.uom4_qty) {
+                                            $('#issueReturnTable tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom.uom4_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom.uom4_qty + "'>" + item.uom.uom4_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>");
+                                        }
+                                        if (item.uom5_id && item.uom5_qty) {
+                                            $('#issueReturnTable tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom.uom5_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom.uom5_qty + "'>" + item.uom.uom5_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>");
+                                        }
+                                    });
+
+                                } else {
+                                    var rowId = $('#issueReturnTable tr').eq(ind).attr('id').replace(/[^\d]/g, '');
+                                    var rowNumber = $('#issueReturnTable tr').eq(ind).find('td:first-child').text();
+                                    $.each(da.data, function (index, item) {
+                                        if (index == da.data.length - 1)
+                                            str = "<a href='javascript:void(0)' class='btn-sm btn-default' onclick='appendItemRow(this)'><i class='fa fa-plus-circle'></i></a>";
+                                        if (index == 0) {
+                                            $('#issueReturnTable tr').eq(ind).find('input.item-id').val(item.product_id);
+                                            $('#issueReturnTable tr').eq(ind).find('input.warehouse-id').val(item.warehouse_id);
+                                            $('#issueReturnTable tr').eq(ind).find('label.warehouse-name').text(item.warehouseName);
+                                            $('#issueReturnTable tr').eq(ind).find('label.issue-qty').text(item.out_quantity);
+                                            $('#issueReturnTable tr').eq(ind).find('input.return-qty').text(0);
+                                            $('#issueReturnTable tr').eq(ind).find('label.item-name').text(item.itemName);
+                                            $('#issueReturnTable tr').eq(ind).find('label.issue-unit').text(item.itemUnit);
+                                            $('#issueReturnTable tr').eq(ind).find('input.item-code').text(item.itemCode);
+                                            $('#issueReturnTable tr').eq(ind).find('td:nth-child(10)').html('');
+                                            $('#issueReturnTable tr').eq(ind).find('select.item-unit').append("<option value='" + item.itemUnit.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "'>" + item.itemUnit.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>");
+
+                                            if (item.uom.uom1_id && item.uom.uom1_qty) {
+                                                $('#issueReturnTable tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom.uom1_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom.uom1_qty + "'>" + item.uom.uom1_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>");
+                                            }
+                                            if (item.uom.uom2_id && item.uom.uom2_qty) {
+                                                $('#issueReturnTable tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom.uom2_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom.uom2_qty + "'>" + item.uom.uom2_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>");
+                                            }
+                                            if (item.uom.uom3_id && item.uom.uom3_qty) {
+                                                $('#issueReturnTable tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom.uom3_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom.uom3_qty + "'>" + item.uom.uom3_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>");
+                                            }
+                                            if (item.uom.uom4_id && item.uom.uom4_qty) {
+                                                $('#issueReturnTable tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom.uom4_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom.uom4_qty + "'>" + item.uom.uom4_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>");
+                                            }
+                                            if (item.uom5_id && item.uom5_qty) {
+                                                $('#issueReturnTable tr').eq(ind).find('select.item-unit').append("<option value='" + item.uom.uom5_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "," + item.uom.uom5_qty + "'>" + item.uom.uom5_id.replace(/(\r\n\t|\n|\r\t)/gm, "").trim() + "</option>");
+                                            }
+                                        } else if (index > 0) {
+                                            $('#issueReturnTable tr').eq(Number(ind + index - 1)).after("" +
+                                                    "<tr id='i" + (Number(rowId) + Number(index)) + "'>" +
+                                                        "<td>" + (Number(rowNumber) + Number(index)) + "</td>" +
+                                                        "<td><input type='hidden' class='item-id' value='" + item.product_id + "'/><input type='text' class='form-control item-code' id='item" + (Number(rowId) + Number(index)) + "' value='" + item.itemCode + "' onfocus='getItemDataRow(this)' placeholder='Item Code' /></td>" +
+                                                        "<td><label class='item-name'>" + item.itemName + "</label></td>" +
+                                                        "<td><label class='item-unit'>" + item.itemUnit + "</label></td>" +
+                                                        "<td><input type='hidden' class='warehouse-id' value='" + item.warehouse_id + "'/><label class='warehouse-name'>" + item.warehouseName + "</label></td>" +
+                                                        "<td><label class='issue-qty'>" + parseFloat(item.out_quantity).toFixed(2) + "</label</td>" +
+                                                        "<td><input type='number' class='form-control return-qty' placeholder='Issue Return Qty' value='" + parseFloat(0).toFixed(2) + "' onchange='checkIssueReturnQty(this)' /> </td>" +
+                                                        "<td><select class='form-control item-unit' onchange='checkIssueReturnQty(this)'></select></td>" +
+                                                        "<td><input type='text' class='form-control invoice_number'/></td>" +
+                                                        "<td>" +
+                                                            '<div style="display:inline-block !important;margin-right:5px !important;">' +
+                                                                    '<div class="input-group date" data-provide="datepicker" data-autoclose="true" style="width:150px !important;">' +
+                                                                        '<input type="text" class="form-control invoice_date" style="width:130px !important;"/>' +
+                                                                        '<div class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></div>' +
+                                                                    '</div>' +
+                                                                '</div>' +
+                                                        "</td>" +
+                                                        "<td><textarea class='form-control remark' placeholder='Remark'></textarea></td>" +
+                                                        "<td><a href='javascript:void(0)' class='btn-sm btn-default' onclick='removeItemRow(this)'><i class='fa fa-minus-circle'></i></a></td>" +
+                                                        "<td>" + str + "</td>" +
+                                                    "</tr>"
+                                                );
+                                        }
+                                    });
+                                }
+                            } else {
+                                $('#issueReturnTable tr').eq(ind).find('input.item-id').val('');
+                                $('#issueReturnTable tr').eq(ind).find('input.warehouse-id').val('');
+                                $('#issueReturnTable tr').eq(ind).find('label.warehouse-name').text('');
+                                $('#issueReturnTable tr').eq(ind).find('label.issue-qty').text(0);
+                                $('#issueReturnTable tr').eq(ind).find('input.return-qty').text(0);
+                                $('#issueReturnTable tr').eq(ind).find('label.item-name').text(' ');
+                                $('#issueReturnTable tr').eq(ind).find('label.issue-unit').text(' ');
+                                $('#issueReturnTable tr').eq(ind).find('select.item-unit').empty();
+                            }
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            $('#issueReturnTable tr').eq(ind).find('input.item-id').val('');
+                            $('#issueReturnTable tr').eq(ind).find('input.warehouse-id').val('');
+                            $('#issueReturnTable tr').eq(ind).find('label.warehouse-name').text('');
+                            $('#issueReturnTable tr').eq(ind).find('label.issue-qty').text(0);
+                            $('#issueReturnTable tr').eq(ind).find('input.return-qty').text(0);
+                            $('#issueReturnTable tr').eq(ind).find('label.item-name').text(' ');
+                            $('#issueReturnTable tr').eq(ind).find('label.issue-unit').text(' ');
+                            $('#issueReturnTable tr').eq(ind).find('select.item-unit').empty();
+                        }
+                    });
+                }
+            }
+        }
+        function checkIssueReturnQty(row) {
+            var ind = row.parentNode.parentNode.rowIndex;
+            var issueQty = $('#issueReturnTable tr').eq(ind).find('label.issue-qty').text();
+            var issueUnit = $('#issueReturnTable tr').eq(ind).find('label.issue-unit').text();
+            var issueReturnQty = $('#issueReturnTable tr').eq(ind).find('input.return-qty').val();
+            var issueReturnUnit = $('#issueReturnTable tr').eq(ind).find('select.item-unit').val();
+            //if (Number(issueQty) < Number(issueReturnQty)) {
+            //    alert("Issue return item quantity must be smaller than Issue item quantity.");
+            //    return;
+            //}
+
+            if (!issueReturnQty && !issueReturnUnit)
+                return;
+            var splitIssueReturnUnit = issueReturnUnit.split(',');
+            if (issueUnit == splitIssueReturnUnit[0]) {
+                if (issueReturnQty && Number(issueReturnQty) > Number(issueQty)) {
+                    alert("Issue Return quantity must be smaller or equal to issue quantity.");
+                    $('#issueReturnTable tr').eq(ind).find('input.return-qty').focus();
+                    $('#issueReturnTable tr').eq(ind).find('input.return-qty').val(0);
+                }
+            }
+            else {
+                var quantity = 0;
+                var selectedIndex = $('#issueReturnTable tr').eq(ind).find('select.item-unit').prop('selectedIndex');
+                if (issueQty) {
+                    if (selectedIndex == 1) {
+                        var splitElement = $('#issueReturnTable tr').eq(ind).find('select.item-unit option').eq(selectedIndex).val().split(',');
+                        quantity = issueReturnQty / splitElement[1];
+                    }
+                    else if (selectedIndex == 2) {
+                        var splitElement = $('#issueReturnTable tr').eq(ind).find('select.item-unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#issueReturnTable tr').eq(ind).find('select.item-unit option').eq(2).val().split(',');
+                        quantity = (issueReturnQty / splitElement[1]) / splitElement2[1];
+                    }
+                    else if (selectedIndex == 3) {
+                        var splitElement = $('#issueReturnTable tr').eq(ind).find('select.item-unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#issueReturnTable tr').eq(ind).find('select.item-unit option').eq(2).val().split(',');
+                        var splitElement3 = $('#issueReturnTable tr').eq(ind).find('select.item-unit option').eq(3).val().split(',');
+                        quantity = ((issueReturnQty / splitElement[1]) / splitElement3[1]) / splitElement2[1];
+                    }
+                    else if (selectedIndex == 4) {
+                        var splitElement = $('#issueReturnTable tr').eq(ind).find('select.item-unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#issueReturnTable tr').eq(ind).find('select.item-unit option').eq(2).val().split(',');
+                        var splitElement3 = $('#issueReturnTable tr').eq(ind).find('select.item-unit option').eq(3).val().split(',');
+                        var splitElement4 = $('#issueReturnTable tr').eq(ind).find('select.item-unit option').eq(4).val().split(',');
+                        quantity = ((((issueReturnQty / splitElement[1]) / splitElement4[1]) / splitElement3[1]) / splitElement2[1]);
+                    } else if (selectedIndex == 5) {
+                        var splitElement = $('#issueReturnTable tr').eq(ind).find('select.item-unit option').eq(selectedIndex).val().split(',');
+                        var splitElement2 = $('#issueReturnTable tr').eq(ind).find('select.item-unit option').eq(2).val().split(',');
+                        var splitElement3 = $('#issueReturnTable tr').eq(ind).find('select.item-unit option').eq(3).val().split(',');
+                        var splitElement4 = $('#issueReturnTable tr').eq(ind).find('select.item-unit option').eq(4).val().split(',');
+                        var splitElement5 = $('#issueReturnTable tr').eq(ind).find('select.item-unit option').eq(5).val().split(',');
+                        quantity = ((((issueReturnQty / splitElement[1]) / splitElement5[1]) / splitElement4[1]) / splitElement3[1]) / splitElement2;
+                    }
+                    if (quantity > Number(issueQty)) {
+                        alert("Issue Return quantity must be smaller or equal to issue quantity.");
+                        $('#issueReturnTable tr').eq(ind).find('input.return-qty').focus();
+                        $('#issueReturnTable tr').eq(ind).find('input.return-qty').val(0);
+                        return;
+                    }
+                }
+            }
+
+        }
+    </script>
+    }

@@ -1,0 +1,483 @@
+﻿@model BT_KimMex.Models.QuoteViewModel
+@using BT_KimMex.Class
+@using Microsoft.AspNet.Identity;
+@{
+    ViewBag.Title = "View Supplier Quote Detail";
+    string date = Convert.ToDateTime(Model.created_date).ToString("dd/MM/yyyy HH:mm");
+    decimal amount = 0;
+    string userId = User.Identity.GetUserId().ToString();
+}
+
+<div class="w3-panel w3-card-4">
+    <div class="w3-container w3-display-container">
+        <h3 class="title">@ViewBag.Title</h3>
+    </div>
+    <div class="form-horizontal">
+        <div class="row" style="margin:0 !important;">
+            @Html.HiddenFor(model => model.quote_id)
+            <div class="form-group">
+                @Html.LabelFor(model => model.created_date, new { @class = "col-md-2" })
+                <label class="col-md-10">@date</label>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.quote_no, new { @class = "col-md-2" })
+                <label class="col-md-10">@Model.quote_no</label>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2">Project:</label>
+                <label class="col-md-10">@Model.project_fullname</label>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2">Purchase Requisition Ref.:</label>
+                <label class="col-md-10">@Model.mr_number</label>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.supplier_id, new { @class = "col-md-2" })
+                <label class="col-md-10">@Model.supplier_name</label>
+            </div>
+
+            <div class="col-md-6" style="margin-top:-230px; float:right; margin-right:-1px;">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <h3>Terms & Condition</h3>
+
+                        <div class="form-group">
+                            <label class="col-md-4">Incoterms:</label>
+                            <label class="col-md-8">@Model.incoterm</label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-4">Payment:</label>
+                            <label class="col-md-8">@Model.payment</label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-4">Delivery:</label>
+                            <label class="col-md-8">@Model.delivery</label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-4">Shipment:</label>
+                            <label class="col-md-8">@Model.shipment</label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-4">wanrranty:</label>
+                            <label class="col-md-8">@Model.warranty</label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-4">Vendor Ref:</label>
+                            <label class="col-md-8">@Model.vendor_ref</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="margin:0 !important;">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Code</th>
+                            <th>Description</th>
+                            <th>Unit</th>
+                            <th>QTY</th>
+                            <th>Unit Price ($)</th>
+                            <th>Discount as (%)</th>
+                            <th>Discount as ($)</th>
+                            <th>Total ($)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int count = 1;
+                            foreach (var item in Model.quoteItems)
+                            {
+
+                                var discountAmount = item.discount_amount.HasValue ? item.discount_amount : item.price * (item.discount / 100);
+
+                                decimal totalAmount = 0;
+                                if (item.qty.HasValue)
+                                {
+                                    totalAmount = (decimal)(item.price - discountAmount) * Convert.ToDecimal(item.qty);
+
+                                }
+                                else
+                                {
+                                    var rs = BT_KimMex.Models.PurchaseRequisitionViewModel.GetPurchaseRequisitionItem(Model.mr_id).purchaseRequisitionDetails.Where(s => string.Compare(s.item_id, item.item_id) == 0).FirstOrDefault();
+                                    if (rs != null)
+                                    {
+                                        item.qty = rs.approved_qty;
+                                        totalAmount = (decimal)(item.price - discountAmount) * Convert.ToDecimal(item.qty);
+                                    }
+                                }
+                                <tr>
+                                    <td>@count</td>
+                                    <td>@item.product_code</td>
+                                    <td>@item.product_name</td>
+                                    <td>@item.unit_name</td>
+                                    <td class="text-center">@item.qty</td>
+                                    @*<td>@item.price</td>*@
+                                    <td class="text-center">@string.Format("{0:N4}", decimal.Parse(item.price.ToString()))</td>
+                                    <td class="text-center">@string.Format("{0:G2}", item.discount)</td>
+                                    <td class="text-center">@string.Format("{0:N4}", decimal.Parse(discountAmount.ToString()))</td>
+                                    <td class="text-center">@string.Format("{0:N4}", decimal.Parse(totalAmount.ToString()))</td>
+                                </tr>
+                                count++;
+                                //amount = amount +Convert.ToDecimal(item.price);
+                                amount = amount + Convert.ToDecimal(totalAmount);
+                            }
+                            var grand_total_amount_after_discount = amount - Model.lump_sum_discount_amount;
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="8" class="text-right">Grand Total ($) : </th>
+                            <th colspan="2" class="text-center">@string.Format("{0:N4}", decimal.Parse(amount.ToString()))</th>
+                        </tr>
+                        <tr>
+                            <th colspan="8" class="text-right">Lump Sum Discount Amount ($) : </th>
+                            <th colspan="2" class="text-center">@string.Format("{0:N4}", decimal.Parse(Model.lump_sum_discount_amount.ToString()))</th>
+                        </tr>
+                        <tr>
+                            <th colspan="8" class="text-right">Grand Total ($) : </th>
+                            <th colspan="2" class="text-center">@string.Format("{0:N4}", decimal.Parse(grand_total_amount_after_discount.ToString()))</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="row" style="margin:0 !important;">
+
+                <div class="form-group">
+                    @Html.Label("Supporting Document:", new { @class = "col-md-2" })
+                    <div class="col-md-10">
+                        @{
+                            var attachments = Model.attachments;
+                            foreach (var att in attachments)
+                            {
+                                <a class="title" href="/Quote/Download/?p=@(att.attachment_id+att.attachment_extension)&d=@att.attachment_name">@att.attachment_name</a><br />
+                            }
+                        }
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2">Supporting Document with Signature <span class="text-danger">** Image Only</span></label>
+                    <div class="col-md-10">
+                        @{
+                            var attachmentsWatermarks = Model.attachments;
+                            foreach (var att in attachmentsWatermarks)
+                            {
+                                
+                                if (CommonClass.isFileIsImageByExtenstion(att.attachment_extension))
+                                {
+                                    <a class="title" href="/Quote/Download/?p=@(att.attachment_id+"_watermark"+att.attachment_extension)&d=@att.attachment_name">@att.attachment_name</a><br />
+                                }
+
+                            }
+                        }
+                    </div>
+
+                </div>
+                <div class="form-group">
+                    @Html.Label("Remark:", new { @class = "col-md-2" })
+                    @{
+                        string remak = "Prepared by " + CommonFunctions.GetUserFullnamebyUserId(Model.created_by) + Environment.NewLine;
+                        //if (!string.IsNullOrEmpty(Model.updated_by))
+                        //{
+                        //    remak = remak + "Modified by " + BT_KimMex.Class.CommonClass.GetUserFullname(Model.updated_by);
+                        //}
+                        <div class="col-md-10">
+                            @{
+                                <label style="font-weight:normal !important;">@remak</label>
+                                if (!string.IsNullOrEmpty(Model.updated_by))
+                                {
+                                    string rm = "Modified by " + CommonFunctions.GetUserFullnamebyUserId(Model.updated_by);
+                                    <br /><label style="font-weight:normal !important;">@rm</label>
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+
+                    @if ((User.IsInRole(Role.SystemAdmin) || string.Compare(Model.created_by, userId) == 0) && (!Convert.ToBoolean(Model.is_quote_complete) && string.Compare(Model.quote_status, Status.cancelled) != 0))
+                    {
+                        @Html.ActionLink("Edit", "Edit", new { id = Model.quote_id }, new { @class = "w3-button w3-tiny w3-blue-grey" })
+                    }
+                    @*
+                        @if ((User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager)) && string.Compare(Model.quote_status, Status.Pending) == 0)
+                        {
+                            <a href='javascript:void(0)' class='btn btn-primary approve-promp' id='approve-promp'>Approve</a>
+                            <a href='javascript:void(0)' class='btn btn-danger reject-promp' id='reject-promp'>Reject</a>
+                            if (amount <= 3000)
+                            {
+                                <a href='javascript:void(0)' class='btn btn-warning approve-promp' id='request-check-promp'>Request TD to check</a>
+                            }
+                        }
+                        @if ((User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.TechnicalDirector)) && string.Compare(Model.quote_status, Status.CheckRequest) == 0)
+                        {
+                            <a href='javascript:void(0)' class='btn btn-primary approve-promp' id='check-approve-promp'>Approve</a>
+                            <a href='javascript:void(0)' class='btn btn-danger reject-promp' id='check-reject-promp'>Reject</a>
+                        }*@
+                    @*@Html.ActionLink("Edit", "Edit", new { id = Model.quote_id }, new { @class = "btn btn-default" })*@
+
+                    @if (string.Compare(Model.quote_status, Status.cancelled) != 0 && string.Compare(Model.quote_status, Status.MREditted) != 0)
+                    {
+                        <a href="javascript:void(0)" class="w3-button w3-tiny w3-deep-orange" id="btnCancel">Cancel</a>
+                    }
+
+                    <input type="button" value="Print" class="w3-button w3-tiny w3-teal" id="btnPrint" />
+                    @Html.ActionLink("Back", "Index", null, new { @class = "w3-button w3-tiny w3-red" })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+@section Scripts{
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function () {
+
+            $("#btnCancel").click(function (e) {
+                e.preventDefault();
+                swal({
+                    title: "Confirmation",
+                    text: "Do you want to cancel this request?",
+                    icon: "warning",
+                    buttons: true,
+                    //dangerMode: true,
+                })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $.ajax({
+                            url: "/Quote/Cancel",
+                            data: {
+                                'id': '@Model.quote_id',
+                            },
+                            type: 'GET',
+                            success: function (da) {
+                                swal("Request has been cancelled successfully.", {
+                                    icon: "success",
+                                });
+                                window.location.href = '@Url.Action("Index", "Quote")';
+                            },
+                            error: function (err) {
+                                swal("Poof! " + err, {
+                                    icon: "error",
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+
+            $("#approve-promp").click(function (e) {
+                e.preventDefault();
+                swal({
+                    title: "Confirmation",
+                    text: "Do you want to approve this request?",
+                    icon: "warning",
+                    buttons: true,
+                    //dangerMode: true,
+                })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $.ajax({
+                            url: "/Quote/Approval",
+                            data: {
+                                'id': '@Model.quote_id',
+                                'status': 'approved',
+                            },
+                            type: 'GET',
+                            success: function (da) {
+                                swal("Request has been approved successfully.", {
+                                    icon: "success",
+                                });
+                                window.location.href = '@Url.Action("Index","Quote")';
+                            },
+                            error: function (err) {
+                                swal("Poof! " + err, {
+                                    icon: "error",
+                                });
+                            }
+                        });
+
+
+
+                    } else {
+                        //swal("Your imaginary file is safe!");
+                    }
+                });
+            });
+
+            $('#check-approve-promp').click(function (e) {
+                e.preventDefault();
+                swal({
+                    title: "Confirmation",
+                    text: "Do you want to approve this request?",
+                    icon: "warning",
+                    buttons: true,
+                    //dangerMode: true,
+                })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $.ajax({
+                            url: "/Quote/Approval",
+                            data: {
+                                'id': '@Model.quote_id',
+                                'status': '@Status.Checked',
+                            },
+                            type: 'GET',
+                            success: function (da) {
+                                swal("Request has been approved successfully.", {
+                                    icon: "success",
+                                });
+                                window.location.href = '@Url.Action("Index","Quote")';
+                            },
+                            error: function (err) {
+                                swal("Poof! " + err, {
+                                    icon: "error",
+                                });
+                            }
+                        });
+
+
+
+                    } else {
+                        //swal("Your imaginary file is safe!");
+                    }
+                });
+            });
+
+            $('#reject-promp').click(function (e) {
+                e.preventDefault();
+                swal({
+                    title: "Rejection",
+                    text: "Please input your reject comment:",
+                    icon: "warning",
+                    content: "input",
+                })
+                .then((value) => {
+                    $.ajax({
+                        url: "/Quote/Approval",
+                        data: {
+                            'id': '@Model.quote_id',
+                            'status': 'rejected',
+                            'comment': value,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            swal("Request has been rejected successfully.", {
+                                icon: "success",
+                            });
+                            window.location.href = '@Url.Action("Index","Quote")';
+                        },
+                        error: function (err) {
+                            swal("Poof! " + err, {
+                                icon: "error",
+                            });
+                        }
+                    });
+                });
+            });
+
+            $('#check-reject-promp').click(function (e) {
+                e.preventDefault();
+                swal({
+                    title: "Rejection",
+                    text: "Please input your reject comment:",
+                    icon: "warning",
+                    content: "input",
+                })
+                .then((value) => {
+                    $.ajax({
+                        url: "/Quote/Approval",
+                        data: {
+                            'id': '@Model.quote_id',
+                            'status': '@Status.CheckRejected',
+                            'comment': value,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            swal("Request has been rejected successfully.", {
+                                icon: "success",
+                            });
+                            window.location.href = '@Url.Action("Index","Quote")';
+                        },
+                        error: function (err) {
+                            swal("Poof! " + err, {
+                                icon: "error",
+                            });
+                        }
+                    });
+                });
+            });
+
+            $("#request-check-promp").click(function (e) {
+                e.preventDefault();
+                swal({
+                    title: "Confirmation",
+                    text: "Do you want to request TD to check?",
+                    icon: "warning",
+                    buttons: true,
+                    //dangerMode: true,
+                })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $.ajax({
+                            url: "/Quote/Approval",
+                            data: {
+                                'id': '@Model.quote_id',
+                                'status': '@Status.CheckRequest',
+                            },
+                            type: 'GET',
+                            success: function (da) {
+                                swal("Request has been approved successfully.", {
+                                    icon: "success",
+                                });
+                                window.location.href = '@Url.Action("Index","Quote")';
+                            },
+                            error: function (err) {
+                                swal("Poof! " + err, {
+                                    icon: "error",
+                                });
+                            }
+                        });
+
+
+
+                    } else {
+                        //swal("Your imaginary file is safe!");
+                    }
+                });
+            });
+
+
+            $('#btnPrint').click(function () {
+                var id = $('#quote_id').val();
+                $.ajax({
+                    url: "@Url.Action("Print","Quote")",
+                    type: "post",
+                    dataType: "json",
+                    async: false,
+                    data: { id:id },
+                    success: function (da) {
+                        if (da.result == "success") {
+                            window.location.href = "/Quote/QuoteReport?id="+da.id;
+                        }
+                    },
+                    error: function (err) {
+                        $.notify('Your data is error while saving!', { className: 'error' });
+                    }
+                });
+            });
+        });
+    </script>
+    }
