@@ -17,6 +17,7 @@ using System.IO;
 using System.Security.Cryptography.Xml;
 using ImageResizer;
 
+
 namespace BT_KimMex.Controllers
 {
     [Authorize]
@@ -65,6 +66,16 @@ namespace BT_KimMex.Controllers
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
+
+
+            //var _emailHandler = new EmailHandler();
+            //var to_list = new List<string>();
+            //to_list.Add("chantola.rupp@gmail.com");
+            //var cc_list = new List<string>();
+            //cc_list.Add("chantola.4game@gmail.com");
+            //_emailHandler.SendEmail(to_list, "Hello Idol", 1, cc_list);
+
+
             ViewBag.ReturnUrl = returnUrl;
             /*
             HttpCookie cookie = Request.Cookies[DefaultAuthenticationTypes.ApplicationCookie];
