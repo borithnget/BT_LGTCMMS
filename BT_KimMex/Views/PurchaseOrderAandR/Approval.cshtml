@@ -102,8 +102,17 @@
                     }
                 }
             });
-
+            function enable_submit_button(is_submit) {
+                if (is_submit) {
+                    $('#btnsubmit').text("Submitting...");
+                    $('#btnsubmit').attr('disabled', true);
+                } else {
+                    $('#btnsubmit').text("Submit");
+                    $('#btnsubmit').attr('disabled', false);
+                }
+            }
             $('#btnsubmit').click(function (e) {
+                enable_submit_button(true);
                 e.preventDefault();
                 var models = [];
                 var item_element = {};

@@ -233,7 +233,7 @@
     </div>
     <div class="form-group">
         <div class="col-md-offset-2 col-md-10">
-            <input type="button" value="Submit" class="btn btn-default" onclick="prepareFeedbackItemReceived()" />
+            <input type="button" value="Submit" id="btnCreate" class="btn btn-default" onclick="prepareFeedbackItemReceived()" />
             @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-default" })
         </div>
     </div>
@@ -248,7 +248,17 @@
             });
            
         });
+        function enable_submit_button(is_submit) {
+            if (is_submit) {
+                $('#btnCreate').text("Submitting...");
+                $('#btnCreate').attr('disabled', true);
+            } else {
+                $('#btnCreate').text("Submit");
+                $('#btnCreate').attr('disabled', false);
+            }
+        }
         function prepareFeedbackItemReceived() {
+            enable_submit_button(true);
             var models = [];
             var item_element = {};
             var itemReceivedId = $('#receive_item_voucher_id').val();

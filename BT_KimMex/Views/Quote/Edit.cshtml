@@ -731,8 +731,17 @@
                          );
                         $(this).remove();
                     });
-
-                    $('#btnSubmit').click(function (e) {
+                function enable_submit_button(is_submit) {
+                    if (is_submit) {
+                        $('#btnSubmit').text("Submitting...");
+                        $('#btnSubmit').attr('disabled', true);
+                    } else {
+                        $('#btnSubmit').text("Submit");
+                        $('#btnSubmit').attr('disabled', false);
+                    }
+                }
+                $('#btnSubmit').click(function (e) {
+                    enable_submit_button(true);
                         var quoteItems = [];
                         var itemElement = {};
                         var quoteId = $('#quote_id').val();

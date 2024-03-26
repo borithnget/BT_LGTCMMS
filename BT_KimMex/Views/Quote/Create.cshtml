@@ -175,7 +175,7 @@
 
                     <div class="form-group">
                         <div class="col-md-offset-2 col-md-10">
-                            <input type="button" value="Submit" onclick="saveQuote()" class="btn btn-success" />
+                            <input type="button" value="Submit" id="btnSubmit" onclick="saveQuote()" class="btn btn-success" />
                             @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-danger" })
                         </div>
                     </div>
@@ -1594,8 +1594,17 @@
                 }
             })
         }
-
+        function enable_submit_button(is_submit) {
+            if (is_submit) {
+                $('#btnSubmit').text("Submitting...");
+                $('#btnSubmit').attr('disabled', true);
+            } else {
+                $('#btnSubmit').text("Submit");
+                $('#btnSubmit').attr('disabled', false);
+            }
+        }
         function saveQuote() {
+            enable_submit_button(true);
             var quoteItems = [];
             var itemElement = {};
             var quoteNo = $('#quote_no').text();

@@ -322,8 +322,18 @@
                     });
                 }
             });
+            function enable_submit_button(is_submit) {
+                if (is_submit) {
+                    $('#btnSave').text("Submitting...");
+                    $('#btnSave').attr('disabled', true);
+                } else {
+                    $('#btnSave').text("Submit");
+                    $('#btnSave').attr('disabled', false);
+                }
+            }
 
             $('#btnSave').click(function () {
+                enable_submit_button(true);
                 var arrIndex = [];
                 $('.transfer:checkbox:checked').each(function () {
                     var index = $(this)[0].parentNode.parentNode.rowIndex;

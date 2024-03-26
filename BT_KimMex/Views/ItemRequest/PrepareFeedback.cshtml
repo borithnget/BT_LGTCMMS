@@ -107,7 +107,17 @@
 @section scripts{
     <script type="text/javascript">
         $(function () {
+            function enable_submit_button(is_submit) {
+                if (is_submit) {
+                    $('#btn-submit').text("Submitting...");
+                    $('#btn-submit').attr('disabled', true);
+                } else {
+                    $('#btn-submit').text("Submit");
+                    $('#btn-submit').attr('disabled', false);
+                }
+            }
             $('#btn-submit').on('click', function () {
+                enable_submit_button(true);
                 // do validation here
                 var countInvalid=0;
                 var qtys = $('.ir_qty');

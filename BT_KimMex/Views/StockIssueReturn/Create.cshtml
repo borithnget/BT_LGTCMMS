@@ -73,7 +73,7 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="button" value="Submit" class="btn btn-success" onclick="saveIssueReturn()" />
+                <input type="button" value="Submit" class="btn btn-success" id="btnSubmit" onclick="saveIssueReturn()" />
                 <a href="javascript:history.back()" class="btn btn-danger">Back</a>
             </div>
         </div>
@@ -449,7 +449,17 @@
             }
 
         }
+        function enable_submit_button(is_submit) {
+            if (is_submit) {
+                $('#btnSubmit').text("Submitting...");
+                $('#btnSubmit').attr('disabled', true);
+            } else {
+                $('#btnSubmit').text("Submit");
+                $('#btnSubmit').attr('disabled', false);
+            }
+        }
         function saveIssueReturn() {
+            enable_submit_button(true);
             var inventories = [];
             var item_element = {};
             var warehouses = $('.warehouse-id');

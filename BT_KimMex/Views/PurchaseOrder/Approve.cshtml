@@ -335,8 +335,8 @@
                         @foreach(var sup in Model.supplierQuotes)
                         {
                             QuoteBySupplierAmountModel obj = PurchaseOrderViewModel.QuoteAmountBySupplier(Model.purchase_order_id,sup , Model.purchase_order_status);
-                            <th colspan="3" class="text-center">@string.Format("{0:N4}", decimal.Parse(obj.VATAmount.ToString()))</th>
-                            <th colspan="3" class="text-center">@string.Format("{0:N4}", decimal.Parse(obj.NONVATAmount.ToString()))</th>
+                            <th colspan="3" class="text-center">@string.Format("{0:N2}", decimal.Parse(obj.VATAmount.ToString()))</th>
+                            <th colspan="3" class="text-center">@string.Format("{0:N2}", decimal.Parse(obj.NONVATAmount.ToString()))</th>
                         }
                         <th colspan="3"></th>
                     </tr>
@@ -346,7 +346,7 @@
                         {
                             decimal totalAmountPerSupplier = PurchaseOrderViewModel.QuoteAmountBySupplier(Model.purchase_order_id, sup, Model.purchase_order_status).TotalAmount;
                             totalAmountPerRequest = totalAmountPerRequest + (totalAmountPerSupplier-(decimal)sup.lump_sum_discount_amount);
-                            <th colspan="6" class="text-center">@string.Format("{0:N4}", decimal.Parse(totalAmountPerSupplier.ToString()))</th>
+                            <th colspan="6" class="text-center">@string.Format("{0:N2}", decimal.Parse(totalAmountPerSupplier.ToString()))</th>
                         }
                         <th colspan="3"></th>
                     </tr>
@@ -357,7 +357,7 @@
                         @foreach (var sup in Model.supplierQuotes)
                         {
                             var lumpsumDiscountAmount = sup.lump_sum_discount_amount;
-                            <th colspan="6">@string.Format("{0:N4}", decimal.Parse(lumpsumDiscountAmount.ToString()))</th>
+                            <th colspan="6">@string.Format("{0:N2}", decimal.Parse(lumpsumDiscountAmount.ToString()))</th>
                         }
                         <th colspan="3"></th>
                     </tr>
@@ -370,14 +370,14 @@
                             decimal totalAmountPerSupplier = PurchaseOrderViewModel.QuoteAmountBySupplier(Model.purchase_order_id, sup, Model.purchase_order_status).TotalAmount;
                             //totalAmountPerRequest = totalAmountPerRequest + totalAmountPerSupplier;
                             decimal totalAmountAfterDiscount = (totalAmountPerSupplier - (decimal)sup.lump_sum_discount_amount);
-                            <th colspan="6">@string.Format("{0:N4}", decimal.Parse(totalAmountAfterDiscount.ToString()))</th>
+                            <th colspan="6">@string.Format("{0:N2}", decimal.Parse(totalAmountAfterDiscount.ToString()))</th>
                         }
                         <th colspan="3"></th>
                     </tr>
 
                     <tr style="background-color:lightgray !important;">
                         <th colspan="5" class="text-right">Grand Total Amount Per Request (USD):</th>
-                        <th colspan="@colspanfooter" class="text-center">@string.Format("{0:N4}", decimal.Parse(totalAmountPerRequest.ToString()))</th>
+                        <th colspan="@colspanfooter" class="text-center">@string.Format("{0:N2}", decimal.Parse(totalAmountPerRequest.ToString()))</th>
                         <th colspan="3"></th>
                     </tr>
                     <!-- Approved Amount -->
@@ -390,8 +390,8 @@
                             {
                                 string suppliervatid = string.Format("supplier{0}_vatamount", scount);
                                 string suppliernonvatid = string.Format("supplier{0}_nonvatamount", scount);
-                                <th colspan="3" class="text-center"><label class="sub_total_amount" id="@suppliervatid">@string.Format("{0:N4}", decimal.Parse("0"))</label></th>
-                                <th colspan="3" class="text-center"><label class="sub_total_amount"  id="@suppliernonvatid">@string.Format("{0:N4}", decimal.Parse("0"))</label></th>
+                                <th colspan="3" class="text-center"><label class="sub_total_amount" id="@suppliervatid">@string.Format("{0:N2}", decimal.Parse("0"))</label></th>
+                                <th colspan="3" class="text-center"><label class="sub_total_amount"  id="@suppliernonvatid">@string.Format("{0:N2}", decimal.Parse("0"))</label></th>
                                 scount++;
                         }
 
@@ -406,7 +406,7 @@
                             foreach (var sup in Model.supplierQuotes)
                             {
                                 string suppliersubtotal_id = string.Format("supplier{0}_subtotal", sscount);
-                                <th colspan="6" class="text-center"><label class="sub_total_amount supplier_sub_total" id="@suppliersubtotal_id" data-lumpsumdiscount="@sup.lump_sum_discount_amount">@string.Format("{0:N4}", decimal.Parse("0"))</label></th>
+                                <th colspan="6" class="text-center"><label class="sub_total_amount supplier_sub_total" id="@suppliersubtotal_id" data-lumpsumdiscount="@sup.lump_sum_discount_amount">@string.Format("{0:N2}", decimal.Parse("0"))</label></th>
 
                                 sscount++;
                             }
@@ -418,7 +418,7 @@
 
                     <tr>
                         <th colspan="5" class="text-right">Approved Grand Total Amount Per Request (USD):</th>
-                        <th colspan="@colspanfooter" class="text-center"><label id="total_approved_amount_per_request">@string.Format("{0:N4}", decimal.Parse("0"))</label></th>
+                        <th colspan="@colspanfooter" class="text-center"><label id="total_approved_amount_per_request">@string.Format("{0:N2}", decimal.Parse("0"))</label></th>
                         <th colspan="3"></th>
                     </tr>
 

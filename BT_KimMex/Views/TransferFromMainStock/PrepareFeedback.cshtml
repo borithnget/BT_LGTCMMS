@@ -248,7 +248,7 @@
 
     <div class="form-group">
         <div class="col-md-offset-2 col-md-10">
-            <input type="button" value="Submit" class="btn btn-default" onclick="submitPrepreFeedback()" />
+            <input type="button" value="Submit" class="btn btn-default" id="btnSubmit" onclick="submitPrepreFeedback()" />
             @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-default" })
         </div>
     </div>
@@ -261,7 +261,17 @@
                 $(this).datepicker('hide');
             });
         });
+        function enable_submit_button(is_submit) {
+            if (is_submit) {
+                $('#btnSubmit').text("Submitting...");
+                $('#btnSubmit').attr('disabled', true);
+            } else {
+                $('#btnSubmit').text("Submit");
+                $('#btnSubmit').attr('disabled', false);
+            }
+        }
         function submitPrepreFeedback() {
+            enable_submit_button(true);
             var arrIndex = [];
 
             $('.transfer:checkbox:checked').each(function () {

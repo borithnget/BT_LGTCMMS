@@ -184,7 +184,7 @@
                                         @Html.Raw(tnc)
                                     </td>
                                     <td><a href="javascript:void(0)" onclick="generateNewReport('@Model.purchase_order_id','@item.supplier_id')">@item.po_report_number</a></td>
-                                    <td class="text-center">@item.amount</td>
+                                    <td class="text-center">@string.Format("{0:N2}", @item.amount)</td>
                                     <td>@item.status</td>
                                 </tr>
                                 count++;

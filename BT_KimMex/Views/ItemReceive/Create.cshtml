@@ -446,7 +446,19 @@
 
                     var receivedQty = receivedQtys[i].value;
                     var receivedUnit = (receivedUnits[i].value).split(',');
-                    if (warehouse && receivedQty && Number(receivedQty) > 0) {
+                    //if (warehouse && receivedQty && Number(receivedQty) > 0) {
+                    //    var element_item = {};
+                    //    element_item.product_id = itemID;
+                    //    element_item.warehouse_id = warehouse;
+                    //    //element_item.history_id = history_id[i].value;
+                    //    element_item.in_quantity = receivedQty;
+                    //    element_item.unit = receivedUnit[0];
+                    //    element_item.supplier_id = suppliers[i].value;
+                    //    element_item.invoice_number = invoiceNumbers[i].value;
+                    //    element_item.invoice_date = convertDDMMYYYtoMMDDYYYY(invoiceDate[i].value);
+                    //    ireDetails.push(element_item);
+                    //}
+                    if (warehouse && receivedQty) {
                         var element_item = {};
                         element_item.product_id = itemID;
                         element_item.warehouse_id = warehouse;
@@ -457,7 +469,8 @@
                         element_item.invoice_number = invoiceNumbers[i].value;
                         element_item.invoice_date = convertDDMMYYYtoMMDDYYYY(invoiceDate[i].value);
                         ireDetails.push(element_item);
-                    } else if (receivedQty && Number(receivedQty) > 0 && !warehouse) {
+                    }
+                    else if (receivedQty && Number(receivedQty) > 0 && !warehouse) {
                         alert('Please select warehouse to receive item.');
                         enable_submit_button(false);
                         return;

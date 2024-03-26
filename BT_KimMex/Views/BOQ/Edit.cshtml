@@ -207,8 +207,17 @@
                  );
                 $(this).remove();
             });
-
+            function enable_submit_button(is_submit) {
+                if (is_submit) {
+                    $('#btnSave').text("Submitting...");
+                    $('#btnSave').attr('disabled', true);
+                } else {
+                    $('#btnSave').text("Save");
+                    $('#btnSave').attr('disabled', false);
+                }
+            }
             $('#btnSave').click(function () {
+                enable_submit_button(true);
                 var item_element = {};
                 var type_element = {};
                 var job_element = {};

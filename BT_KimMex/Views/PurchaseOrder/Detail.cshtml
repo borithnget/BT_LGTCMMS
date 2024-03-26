@@ -307,7 +307,7 @@
                                                     @{
                                                         decimal total = Convert.ToDecimal(sups[i].unit_price * item.po_quantity);
                                                         @*<b>@total.ToString("C")</b>*@
-                                                        <b>@string.Format("{0:N4}", decimal.Parse(total.ToString()))</b>
+                                                        <b>@string.Format("{0:N2}", decimal.Parse(total.ToString()))</b>
 
                                                     }
                                                 </td>
@@ -365,8 +365,8 @@
                         {
                             QuoteBySupplierAmountModel obj = PurchaseOrderViewModel.QuoteAmountBySupplier(Model.purchase_order_id, sup, Model.purchase_order_status);
 
-                            <th colspan="3">@string.Format("{0:N4}", decimal.Parse(obj.VATAmount.ToString()))</th>
-                            <th colspan="2">@string.Format("{0:N4}", decimal.Parse(obj.NONVATAmount.ToString()))</th>
+                            <th colspan="3">@string.Format("{0:N2}", decimal.Parse(obj.VATAmount.ToString()))</th>
+                            <th colspan="2">@string.Format("{0:N2}", decimal.Parse(obj.NONVATAmount.ToString()))</th>
                         }
 
                         @if (!isPur && string.Compare(Model.purchase_order_status, "Pending") != 0 && string.Compare(Model.purchase_order_status, Status.Rejected) != 0 && string.Compare(Model.purchase_order_status, Status.RequestCancelled) != 0 && string.Compare(Model.purchase_order_status, Status.cancelled) != 0)
@@ -383,7 +383,7 @@
                             decimal totalAmountPerSupplier = PurchaseOrderViewModel.QuoteAmountBySupplier(Model.purchase_order_id, sup, Model.purchase_order_status).TotalAmount;
                             //totalAmountPerRequest = totalAmountPerRequest + totalAmountPerSupplier;
                             totalAmountPerRequest = totalAmountPerRequest + (totalAmountPerSupplier - (decimal)sup.lump_sum_discount_amount);
-                            <th colspan="5">@string.Format("{0:N4}", decimal.Parse(totalAmountPerSupplier.ToString()))</th>
+                            <th colspan="5">@string.Format("{0:N2}", decimal.Parse(totalAmountPerSupplier.ToString()))</th>
                         }
                         @if (!isPur && string.Compare(Model.purchase_order_status, "Pending") != 0 && string.Compare(Model.purchase_order_status, Status.Rejected) != 0 && string.Compare(Model.purchase_order_status, Status.RequestCancelled) != 0 && string.Compare(Model.purchase_order_status, Status.cancelled) != 0)
                         {
@@ -397,7 +397,7 @@
                         @foreach (var sup in Model.supplierQuotes)
                         {
                             var lumpsumDiscountAmount = sup.lump_sum_discount_amount;
-                            <th colspan="5">@string.Format("{0:N4}", decimal.Parse(lumpsumDiscountAmount.ToString()))</th>
+                            <th colspan="5">@string.Format("{0:N2}", decimal.Parse(lumpsumDiscountAmount.ToString()))</th>
                         }
                         @if (!isPur && string.Compare(Model.purchase_order_status, "Pending") != 0 && string.Compare(Model.purchase_order_status, Status.Rejected) != 0 && string.Compare(Model.purchase_order_status, Status.RequestCancelled) != 0 && string.Compare(Model.purchase_order_status, Status.cancelled) != 0)
                         {
@@ -414,7 +414,7 @@
                             decimal totalAmountPerSupplier = PurchaseOrderViewModel.QuoteAmountBySupplier(Model.purchase_order_id, sup, Model.purchase_order_status).TotalAmount;
                             //totalAmountPerRequest = totalAmountPerRequest + totalAmountPerSupplier;
                             decimal totalAmountAfterDiscount = (totalAmountPerSupplier - (decimal)sup.lump_sum_discount_amount);
-                            <th colspan="5">@string.Format("{0:N4}", decimal.Parse(totalAmountAfterDiscount.ToString()))</th>
+                            <th colspan="5">@string.Format("{0:N2}", decimal.Parse(totalAmountAfterDiscount.ToString()))</th>
                         }
                         @if (!isPur && string.Compare(Model.purchase_order_status, "Pending") != 0 && string.Compare(Model.purchase_order_status, Status.Rejected) != 0 && string.Compare(Model.purchase_order_status, Status.RequestCancelled) != 0 && string.Compare(Model.purchase_order_status, Status.cancelled) != 0)
                         {
@@ -426,7 +426,7 @@
                     <!-- Total Amount per Request-->
                     <tr>
                         <th colspan="5" style="text-align:right !important;">Grand Total Amount Per Request (USD):</th>
-                        <th colspan="@colspanfoot">@string.Format("{0:N4}", decimal.Parse(totalAmountPerRequest.ToString()))</th>
+                        <th colspan="@colspanfoot">@string.Format("{0:N2}", decimal.Parse(totalAmountPerRequest.ToString()))</th>
                         @if (!isPur && string.Compare(Model.purchase_order_status, "Pending") != 0 && string.Compare(Model.purchase_order_status, Status.Rejected) != 0 && string.Compare(Model.purchase_order_status, Status.RequestCancelled) != 0 && string.Compare(Model.purchase_order_status, Status.cancelled) != 0)
                         {
                             <th colspan="6" style="background-color:yellow !important;"></th>
@@ -447,7 +447,7 @@
                         <tr>
                             <td colspan="@cspan" style="text-align:right !important;"><label style="font-weight:bold !important;">Grand Total Approved Amount (USD):</label></td>
                             @*<td style="text-align:center !important;"><label style="font-weight:bold !important;"><b>@totalAmount.ToString("C")</b></label></td>*@
-                            <td style="text-align:center !important;"><label style="font-weight:bold !important;"><b>@string.Format("{0:N4}", decimal.Parse(totalAmount.ToString()))</b></label></td>
+                            <td style="text-align:center !important;"><label style="font-weight:bold !important;"><b>@string.Format("{0:N2}", decimal.Parse(totalAmount.ToString()))</b></label></td>
                             <td colspan="2"></td>
                         </tr>
 

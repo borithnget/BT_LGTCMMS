@@ -259,8 +259,17 @@
                  );
                 $(this).remove();
             });
-
+            function enable_submit_button(is_submit) {
+                if (is_submit) {
+                    $('#btnSave').text("Submitting...");
+                    $('#btnSave').attr('disabled', true);
+                } else {
+                    $('#btnSave').text("Submit");
+                    $('#btnSave').attr('disabled', false);
+                }
+            }
             $('#btnSave').click(function () {
+                enable_submit_button(true);
                 var ir_id = $('#item_request_id').val();
                 var po_number = $('#purchase_oder_number').text();
                 var po_id = $('#purchase_order_id').val();

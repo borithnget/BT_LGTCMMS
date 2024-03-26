@@ -153,6 +153,7 @@
                             });
                         },
                         error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            enable_submit_button(false);
                             $('#customer_name').text('');
                             $('#customer_signatory').text('');
                             $('#customer_project_manager').text('');
@@ -164,6 +165,7 @@
             });
 
             $('#btnCreate').click(function () {
+                enable_submit_button(true);
                 var item_element = {};
                 var type_element = {};
                 var job_element = {};
@@ -191,6 +193,7 @@
 
                 if (project_id == null || project_id == "" || project_id == undefined) {
                     alert('Project is required!');
+                    enable_submit_button(false);
                     return;
                 }
 
@@ -366,6 +369,7 @@
                 },
                 error: function (data) {
                     alert('fail');
+                    enable_submit_button(false);
                 }
             });
         }
@@ -396,6 +400,7 @@
                 },
                 error: function (data) {
                     alert('fail');
+                    enable_submit_button(false);
                 }
             });
         }
@@ -420,6 +425,7 @@
                 },
                 error: function (data) {
                     alert('fail');
+                    enable_submit_button(false);
                 }
             });
         }
@@ -996,6 +1002,7 @@
                             $('#boq_table tbody tr').eq(ind - 1).find('input[type="hidden"].item_type_id').val('');
                             $('#boq_table tbody tr').eq(ind - 1).find('input[type="text"].item_type_description').val('');
                             $('#boq_table tbody tr').eq(ind - 1).find('label.chart-account').text('');
+                            enable_submit_button(false);
                             alert(textStatus);
                         }
                     });
@@ -1062,6 +1069,7 @@
                             });
                         },
                         error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            enable_submit_button(false);
                             alert(textStatus);
                         }
                     });
@@ -1132,6 +1140,7 @@
                         });
                     },
                     error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        enable_submit_button(false);
                         alert(textStatus);
                     }
                 });
@@ -1156,6 +1165,7 @@
                         });
                     },
                     error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        enable_submit_button(false);
                         $('#boq_table tbody tr').eq(ind - 1).find('input[type="hidden"].product_id').val('');
                         $('#boq_table tbody tr').eq(ind - 1).find('label.item_description').text('');
                         $('#boq_table tbody tr').eq(ind - 1).find('label.item_unit').text('');
@@ -1345,6 +1355,16 @@
             var sub_total = $('#sub_total').text().replace(/[^0-9\.-]+/g, "");
             $('#est_sub_total').text(total_estimate_amount.formatMoney(2));
             $("#dif_sub_total").text(Number(total_estimate_amount - sub_total).formatMoney(2));
+        }
+
+        function enable_submit_button(is_submit) {
+            if (is_submit) {
+                $('#btnCreate').text("Submitting...");
+                $('#btnCreate').attr('disabled', true);
+            } else {
+                $('#btnCreate').text("Submit");
+                $('#btnCreate').attr('disabled', false);
+            }
         }
         
     </script>
