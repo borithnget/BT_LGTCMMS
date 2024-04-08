@@ -220,6 +220,9 @@
       <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.7\lib\net45\System.Web.Mvc.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Web.Mvc.Extensions, Version=1.1.0.6, Culture=neutral, PublicKeyToken=d631f4e4b226a032, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Web.Mvc.Extensions.1.1.1.2\lib\net45\System.Web.Mvc.Extensions.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.7\lib\net45\System.Web.Razor.dll</HintPath>
       <Private>True</Private>
@@ -839,9 +842,6 @@
     <Compile Include="Models\WareHouseViewModel.cs" />
     <Compile Include="Models\WorkorderReturnedViewModel.cs" />
     <Compile Include="MoreLinq\MoreEnumerable.DistinctBy.cs" />
-    <Compile Include="obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs" />
-    <Compile Include="obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs" />
-    <Compile Include="obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reports\ReportController\Project.aspx.cs">
       <DependentUpon>Project.aspx</DependentUpon>
@@ -8865,25 +8865,6 @@
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
-    <Content Include="obj\Debug\BT_KimMex.csproj.FileListAbsolute.txt" />
-    <Content Include="obj\Debug\BT_KimMex.dll" />
-    <Content Include="obj\Debug\TempPE\DataSets.BOQ.Designer.cs.dll" />
-    <Content Include="obj\Debug\TempPE\DataSets.Inventory.Designer.cs.dll" />
-    <Content Include="obj\Debug\TempPE\DataSets.Project.Designer.cs.dll" />
-    <Content Include="obj\Debug\TempPE\DataSets.PurchaseOrder.Designer.cs.dll" />
-    <Content Include="obj\Debug\TempPE\DataSets.PurchaseOrderVsItemReceived.Designer.cs.dll" />
-    <Content Include="obj\Debug\TempPE\DataSets.Quote.Designer.cs.dll" />
-    <Content Include="obj\Debug\TempPE\DataSets.ReturnItemtoSupplier.Designer.cs.dll" />
-    <Content Include="obj\Debug\TempPE\DataSets.StockBalanceByDateandWarehouse1.Designer.cs.dll" />
-    <Content Include="obj\Debug\TempPE\DataSets.StockBalanceBywarehouse.Designer.cs.dll" />
-    <Content Include="obj\Debug\TempPE\DataSets.StockMovement.Designer.cs.dll" />
-    <Content Include="obj\Debug\TempPE\DataSets.StockUsageBySiteWithRemainBalance.Designer.cs.dll" />
-    <Content Include="obj\Debug\TempPE\Entities..Designer.cs.dll" />
-    <Content Include="obj\Debug\TempPE\Entities.Kim_mexEntities.cs.dll" />
-    <Content Include="obj\Debug\TempPE\Entities.Kim_mexEntities.Designer.cs.dll" />
-    <Content Include="obj\Debug\TempPE\Entities.Kim_mexEntitise.cs.dll" />
-    <Content Include="obj\Debug\TempPE\Entities.Kim_mexEntitise.Designer.cs.dll" />
-    <Content Include="obj\Debug\TempPE\Entities.Kim_mexEties.Designer.cs.dll" />
     <Content Include="Reports\ReportController\Project.aspx" />
     <Content Include="ReportViewerWebForm.aspx" />
     <Content Include="Scripts\bootstrap.js" />
