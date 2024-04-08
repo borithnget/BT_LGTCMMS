@@ -1,0 +1,99 @@
+﻿@using Microsoft.AspNet.Identity;
+
+@{
+    ViewBag.Title = "Warehouse Monthly Stock Balance";
+    string currentDate = DateTime.Now.ToString("MM/dd/yyyy");
+    string startDate = DateTime.Now.AddDays(-30).ToString("MM/dd/yyyy");
+    string userId = User.Identity.GetUserId();
+}
+
+    <div class="w3-panel w3-card-4">
+        <div class="w3-container w3-display-container">
+            <h3 class="title">@ViewBag.Title</h3>
+        </div>
+        <div class="w3-container">
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-horizontal">
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    <div class="row">
+                        <div class="form-group row">
+                            <div class="col-md-4">
+                                <label class="col-md-4 control-label">From Date <strong style="color:red !important">*</strong>:</label>
+                                <div class="col-md-8">
+                                    <div class="input-group date" data-provide="datepicker" style="width:280px !important;">
+                                        @*@Html.EditorFor(model => model.dateFrom, new { htmlAttributes = new { @class = "form-control", placeholder = "MM/DD/YYYY" } })*@
+                                        <input type="text" name="dateFrom" id="dateFrom" class="form-control " placeholder="MM/DD/YYYY" />
+                                        <div class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="col-md-4 control-label">To Date <strong style="color:red !important">*</strong>:</label>
+                                <div class="col-md-8">
+                                    <div class="input-group date" data-provide="datepicker" style="width:280px !important;">
+                                        @*@Html.EditorFor(model => model.dateTo, new { htmlAttributes = new { @class = "form-control", placeholder = "MM/DD/YYYY" } })*@
+                                        <input type="text" name="dateTo" id="dateTo" class="form-control " placeholder="MM/DD/YYYY" />
+                                        <div class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="col-md-4 control-label">Warehouse <strong class="text-danger">*</strong>:</label>
+                                <div class="col-md-8">
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="button" value="Generate" class="w3-button w3-green" id="btn_generate"/>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="row">
+
+                </div>
+            }
+        </div>
+    </div>
+    
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('#dateFrom').val('@startDate');
+            $('#dateTo').val('@currentDate');
+            $('div.date').on('changeDate', function () {
+                $(this).datepicker('hide');
+            });
+
+            $('#btn_generate').click(function () {
+                var dateFrom = $('#dateFrom').val();
+                var dateTo = $('#dateTo').val();
+                var warehouse = $('#warehouseId').val();
+
+
+
+            });
+
+        });
+    </script>
+    }
+
+
