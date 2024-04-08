@@ -193,7 +193,7 @@ namespace BT_KimMex.Models
                     poDetails = (from dPO in db.tb_purchase_order_detail
                                  join item in db.tb_product on dPO.item_id equals item.product_id
                                  join unit in db.tb_unit on item.product_unit equals unit.Id
-                                 orderby item.product_code
+                                 orderby dPO.ordering_number
                                  where dPO.purchase_order_id == model.purchase_order_id
                                  select new PurchaseOrderDetailViewModel()
                                  {
@@ -206,6 +206,7 @@ namespace BT_KimMex.Models
                                      product_name = item.product_name,
                                      product_unit = item.product_unit,
                                      product_unit_name = unit.Name,
+                                     ordering_number = dPO.ordering_number,
                                      unit_price = dPO.unit_price,
                                      item_status = dPO.item_status,
                                      po_quantity = dPO.po_quantity,
@@ -371,6 +372,7 @@ namespace BT_KimMex.Models
         public List<PurchaseOrderItemSupplier> poSuppliers { get; set; }
         public Nullable<decimal> discount_amount { get; set; }
         public Nullable<decimal> lump_sum_discount_amount { get; set; }
+        public Nullable<int> ordering_number { get; set; }
         //  public string PO_Unit { get; set; }
         public PurchaseOrderDetailViewModel()
         {

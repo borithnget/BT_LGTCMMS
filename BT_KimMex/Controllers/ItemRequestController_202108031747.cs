@@ -794,7 +794,8 @@ namespace BT_KimMex.Controllers
                                      remark=ir.remark,
                                      reason=ir.reason,
                                      unit_name=u.Name,
-                                     ir_item_unit=ir.ir_item_unit
+                                     ir_item_unit=ir.ir_item_unit,
+                                     ordering_numbber = ir.ordering_number
                                  }).ToList();
                     if (ddIrs.Any())
                     {
@@ -817,6 +818,7 @@ namespace BT_KimMex.Controllers
                             irItem.requested_unit = db.tb_unit.Where(w => string.Compare(w.Id, ddIr.requested_unit) == 0).Select(s => s.Name).FirstOrDefault();
                             irItem.remark = ddIr.remark;
                             irItem.reason = ddIr.reason;
+                            irItem.ordering_number = ddIr.ordering_numbber;
                             irItem.is_approved = ddIr.is_approved;
                             irItem.approved_qty = ddIr.approved_qty;
                             irItem.boq_qty = ItemRequest.GetBoqItemQty(itemRequest.ir_project_id, dIr.ir_job_category_id, ddIr.ir_item_id);

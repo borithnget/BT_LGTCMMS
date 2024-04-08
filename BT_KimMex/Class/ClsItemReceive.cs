@@ -497,6 +497,7 @@ namespace BT_KimMex.Class
                         var purchaseOrderDetails = (from dPo in db.tb_purchase_order_detail
                                                     join poSup in db.tb_po_supplier on dPo.po_detail_id equals poSup.po_detail_id
                                                     join product in db.tb_product on dPo.item_id equals product.product_id
+                                                    orderby dPo.ordering_number
                                                     where string.Compare(dPo.purchase_order_id, quoteId) == 0 && dPo.remain_quantity > 0 && string.Compare(poSup.supplier_id, supplierId) == 0 && poSup.is_selected == true && dPo.item_vat == isVAT
                                                     select new { dPo, product }).ToList();
                         foreach (var po in purchaseOrderDetails)
@@ -523,6 +524,7 @@ namespace BT_KimMex.Class
                             inv.uom = db.tb_multiple_uom.Where(x => x.product_id == inv.item_id).Select(x => new Models.ProductViewModel() { uom1_id = x.uom1_id, uom1_qty = x.uom1_qty, uom2_id = x.uom2_id, uom2_qty = x.uom2_qty, uom3_id = x.uom3_id, uom3_qty = x.uom3_qty, uom4_id = x.uom4_id, uom4_qty = x.uom4_qty, uom5_id = x.uom5_id, uom5_qty = x.uom5_qty }).FirstOrDefault();
                             inv.supplier_id = (from spo in db.tb_po_supplier join sup in db.tb_supplier on spo.supplier_id equals sup.supplier_id where string.Compare(spo.po_detail_id, inv.po_detail_id) == 0 && spo.is_selected == true select sup.supplier_id).FirstOrDefault().ToString();
                             inv.supplier_name = (from spo in db.tb_po_supplier join sup in db.tb_supplier on spo.supplier_id equals sup.supplier_id where string.Compare(spo.po_detail_id, inv.po_detail_id) == 0 && spo.is_selected == true select sup.supplier_name).FirstOrDefault().ToString();
+                            
                             inventories.Add(inv);
                         }
                     }
@@ -531,6 +533,7 @@ namespace BT_KimMex.Class
                         var purchaseOrderDetails = (from dPo in db.tb_purchase_order_detail
                                                     join poSup in db.tb_po_supplier on dPo.po_detail_id equals poSup.po_detail_id
                                                     join product in db.tb_product on dPo.item_id equals product.product_id
+                                                    orderby dPo.ordering_number
                                                     where string.Compare(dPo.purchase_order_id, quoteId) == 0 && string.Compare(poSup.supplier_id, supplierId) == 0 && poSup.is_selected == true && dPo.item_vat == isVAT
                                                     select new { dPo, product }).ToList();
                         itemReceived = (from rItem in db.tb_received_item_detail
@@ -568,7 +571,8 @@ namespace BT_KimMex.Class
                             inventories.Add(inv);
                         }
                     }
-                    inventories = inventories.OrderBy(x => x.product_code).ToList();
+                    inventories = inventories.ToList();
+                    //inventories = inventories.OrderBy(x => x.product_code).ToList();
                 }
             }catch(Exception ex)
             {

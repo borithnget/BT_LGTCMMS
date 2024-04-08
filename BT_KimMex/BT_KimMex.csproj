@@ -10385,6 +10385,7 @@
     <Content Include="Views\Sync\AdjustmentNegativeBalance.cshtml" />
     <Content Include="Views\PurchaseOrderAandR\SettingODAmountApproval.cshtml" />
     <Content Include="Views\Report\WarehouseStockBalance.cshtml" />
+
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

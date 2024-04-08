@@ -50,12 +50,12 @@
                         }
                         else
                         {
-                            @Html.DropDownList("material_request_id", new SelectList(Model.materialRequests, "ir_id", "ir_no",Model.material_request_id), new { @class = "form-control select2" })
+                            @Html.DropDownList("material_request_id", new SelectList(Model.materialRequests, "ir_id", "ir_no", Model.material_request_id), new { @class = "form-control select2" })
                         }
                     </div>
                 </div>
             </div>
-            <div class="col-md-6"> 
+            <div class="col-md-6">
 
             </div>
         </div>
@@ -78,21 +78,22 @@
                             <tr>
                                 <td colspan="6" class="text-center">No Data Available</td>
                             </tr>
-                        }else
+                        }
+                        else
                         {
                             int count = 1;
-                            foreach(var item in Model.materialRequestItems)
+                            foreach (var item in Model.materialRequestItems)
                             {
                                 string rowId = "i" + count;
                                 string itemId = "item" + count;
                                 <tr id='@rowId'>
-                                            <td>@count</td>
-                                            <td><input type='hidden' name='item_id' class='item-id' value='@item.ir_item_id'/><label class='item-code' id='@itemId'>@item.product_code</label></td>
-                                            <td><label class='item-name'>@item.product_name</label></td>
-                                            <td class='text-center'>@item.ir_qty<input type='hidden' name='item_qty' value='@item.remain_qty'/></td>
-                                            <td>@item.requested_unit <input type='hidden' name='item_unit' value='@item.ir_item_unit'/></td>
-                                            <td class='text-center'>@item.remain_qty</td>
-                                        </tr>
+                                    <td>@count</td>
+                                    <td><input type='hidden' name='item_id' class='item-id' value='@item.ir_item_id' /><label class='item-code' id='@itemId'>@item.product_code</label></td>
+                                    <td><label class='item-name'>@item.product_name</label></td>
+                                    <td class='text-center'>@item.ir_qty<input type='hidden' name='item_qty' value='@item.remain_qty' /></td>
+                                    <td>@item.requested_unit <input type='hidden' name='item_unit' value='@item.ir_item_unit' /></td>
+                                    <td class='text-center'>@item.remain_qty</td>
+                                </tr>
                                 count++;
                             }
                         }
@@ -101,7 +102,7 @@
                     </tbody>
                 </table>
             </div>
-            
+
         </div>
 
         <div class="row">
@@ -145,6 +146,7 @@
                 }
 
             });
+
 
             $('#material_request_id').change(function () {
                 var irID = $(this).val();

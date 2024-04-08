@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="db_a94f6d_lgtssModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="db_a94f6d_lgtssModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="__MigrationHistory">
           <Key>
             <PropertyRef Name="MigrationId" />
@@ -307,6 +307,7 @@ warning 6002: The table/view 'db_a94f6d_lgtss.dbo.tb_inventory_detail' does not 
           <Property Name="inventory_type" Type="varchar" MaxLength="40" />
           <Property Name="remain_quantity" Type="decimal" Precision="10" Scale="2" />
           <Property Name="reason" Type="nvarchar" MaxLength="255" />
+          <Property Name="ordering_number" Type="int" />
         </EntityType>
         <EntityType Name="tb_inventory_status">
           <Key>
@@ -967,6 +968,7 @@ warning 6002: The table/view 'db_a94f6d_lgtss.dbo.tb_inventory_detail' does not 
           <Property Name="reason" Type="nvarchar(max)" />
           <Property Name="remark" Type="nvarchar(max)" />
           <Property Name="item_status" Type="nvarchar" MaxLength="50" />
+          <Property Name="ordering_number" Type="int" />
         </EntityType>
         <EntityType Name="tb_purpose">
           <Key>
@@ -1284,6 +1286,7 @@ warning 6002: The table/view 'db_a94f6d_lgtss.dbo.tb_inventory_detail' does not 
           <Property Name="status" Type="bit" />
           <Property Name="is_return" Type="bit" />
           <Property Name="return_remain_quantity" Type="decimal" Precision="18" Scale="2" />
+          <Property Name="ordering_number" Type="int" />
         </EntityType>
         <EntityType Name="tb_stock_transfer_voucher">
           <Key>
@@ -2829,8 +2832,7 @@ warning 6002: The table/view 'db_a94f6d_lgtss.dbo.tb_inventory_detail' does not 
             <End Role="tbSiteSiteSupervisor" EntitySet="tbSiteSiteSupervisor" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="db_a94f6d_lgtssModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -3840,6 +3842,7 @@ warning 6002: The table/view 'db_a94f6d_lgtss.dbo.tb_inventory_detail' does not 
           <NavigationProperty Name="tb_product" Relationship="Self.FK_tb_purchase_requisition_detail_tb_product" FromRole="tb_purchase_requisition_detail" ToRole="tb_product" />
           <NavigationProperty Name="tb_purchase_requisition" Relationship="Self.FK_tb_purchase_requisition_detail_tb_purchase_requisition" FromRole="tb_purchase_requisition_detail" ToRole="tb_purchase_requisition" />
           <NavigationProperty Name="tb_unit" Relationship="Self.FK_tb_purchase_requisition_detail_tb_unit" FromRole="tb_purchase_requisition_detail" ToRole="tb_unit" />
+          <Property Name="ordering_number" Type="Int32" />
         </EntityType>
         <EntityType Name="tb_purpose">
           <Key>
@@ -4182,6 +4185,7 @@ warning 6002: The table/view 'db_a94f6d_lgtss.dbo.tb_inventory_detail' does not 
           <NavigationProperty Name="tb_product" Relationship="Self.FK_tb_stock_transfer_detail_tb_product" FromRole="tb_stock_transfer_detail" ToRole="tb_product" />
           <NavigationProperty Name="tb_stock_transfer_voucher" Relationship="Self.FK_tb_stock_transfer_detail_tb_stock_transfer_voucher" FromRole="tb_stock_transfer_detail" ToRole="tb_stock_transfer_voucher" />
           <NavigationProperty Name="tb_warehouse" Relationship="Self.FK_tb_stock_transfer_detail_tb_warehouse" FromRole="tb_stock_transfer_detail" ToRole="tb_warehouse" />
+          <Property Name="ordering_number" Type="Int32" />
         </EntityType>
         <EntityType Name="tb_stock_transfer_voucher">
           <Key>
@@ -4493,6 +4497,7 @@ warning 6002: The table/view 'db_a94f6d_lgtss.dbo.tb_inventory_detail' does not 
           <Property Name="inventory_type" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="remain_quantity" Type="Decimal" Precision="10" Scale="2" />
           <Property Name="reason" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="ordering_number" Type="Int32" />
         </EntityType>
         <Association Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
           <End Role="AspNetUsers" Type="Self.AspNetUser" Multiplicity="1">
@@ -6692,6 +6697,7 @@ warning 6002: The table/view 'db_a94f6d_lgtss.dbo.tb_inventory_detail' does not 
           <EntitySetMapping Name="tb_purchase_requisition_detail">
             <EntityTypeMapping TypeName="db_a94f6d_lgtssModel.tb_purchase_requisition_detail">
               <MappingFragment StoreEntitySet="tb_purchase_requisition_detail">
+                <ScalarProperty Name="ordering_number" ColumnName="ordering_number" />
                 <ScalarProperty Name="purchase_requisition_detail_id" ColumnName="purchase_requisition_detail_id" />
                 <ScalarProperty Name="purchase_requisition_id" ColumnName="purchase_requisition_id" />
                 <ScalarProperty Name="item_id" ColumnName="item_id" />
@@ -7024,6 +7030,7 @@ warning 6002: The table/view 'db_a94f6d_lgtss.dbo.tb_inventory_detail' does not 
           <EntitySetMapping Name="tb_stock_transfer_detail">
             <EntityTypeMapping TypeName="db_a94f6d_lgtssModel.tb_stock_transfer_detail">
               <MappingFragment StoreEntitySet="tb_stock_transfer_detail">
+                <ScalarProperty Name="ordering_number" ColumnName="ordering_number" />
                 <ScalarProperty Name="st_detail_id" ColumnName="st_detail_id" />
                 <ScalarProperty Name="st_ref_id" ColumnName="st_ref_id" />
                 <ScalarProperty Name="st_item_id" ColumnName="st_item_id" />
@@ -7326,6 +7333,7 @@ warning 6002: The table/view 'db_a94f6d_lgtss.dbo.tb_inventory_detail' does not 
           <EntitySetMapping Name="tb_inventory_detail">
             <EntityTypeMapping TypeName="db_a94f6d_lgtssModel.tb_inventory_detail">
               <MappingFragment StoreEntitySet="tb_inventory_detail">
+                <ScalarProperty Name="ordering_number" ColumnName="ordering_number" />
                 <ScalarProperty Name="inventory_detail_id" ColumnName="inventory_detail_id" />
                 <ScalarProperty Name="inventory_ref_id" ColumnName="inventory_ref_id" />
                 <ScalarProperty Name="inventory_item_id" ColumnName="inventory_item_id" />

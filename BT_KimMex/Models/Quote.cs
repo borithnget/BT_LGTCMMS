@@ -59,6 +59,7 @@ namespace BT_KimMex.Models
         public string show_quote_status { get; set; }
         public string pr_id { get; set; }
         public string pr_no { get; set; }
+        //public Nullable<int> ordering_number { get; set; }
 
         //public string incoterm { get; set; }
         //public string payment { get; set; }

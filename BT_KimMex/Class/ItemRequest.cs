@@ -328,7 +328,7 @@ namespace BT_KimMex.Class
                              join pr in db.tb_item_request on job.ir_id equals pr.ir_id
                              join pro in db.tb_product on item.ir_item_id equals pro.product_id
                              join u in db.tb_unit on pro.product_unit equals u.Id
-                             orderby pro.product_code
+                             orderby item.ordering_number, pro.product_code
                              where string.Compare(pr.ir_id, id) == 0 && item.is_approved == true && item.remain_qty > 0 && item.remain_qty != null
                              select new Models.ItemRequestDetail2ViewModel()
                              {
@@ -341,7 +341,8 @@ namespace BT_KimMex.Class
                                  ir_qty = item.ir_qty,
                                  ir_item_unit = item.ir_item_unit,
                                  approved_qty = item.approved_qty,
-                                 remain_qty = item.remain_qty
+                                 remain_qty = item.remain_qty,
+                                 ordering_number = item.ordering_number
                              }).ToList();
                     if (itemRequests.Any())
                     {
@@ -360,6 +361,7 @@ namespace BT_KimMex.Class
                             ir.approved_qty = item.approved_qty;
                             ir.requested_unit_id = item.ir_item_unit;
                             ir.remain_qty = item.remain_qty;
+                            ir.ordering_number = item.ordering_number;
 
                             //get from stock transfer workorder
                             //if (transferworkorders.Any())
@@ -384,7 +386,7 @@ namespace BT_KimMex.Class
                                        join pr in db.tb_item_request on job.ir_id equals pr.ir_id
                                        join pro in db.tb_product on item.ir_item_id equals pro.product_id
                                        join u in db.tb_unit on pro.product_unit equals u.Id
-                                       orderby pro.product_code
+                                       orderby item.ordering_number, pro.product_code
                                        where string.Compare(pr.ir_id, id) == 0 && item.is_approved == true
                                        select new Models.ItemRequestDetail2ViewModel()
                                        {
@@ -397,7 +399,8 @@ namespace BT_KimMex.Class
                                            ir_qty = item.ir_qty,
                                            ir_item_unit = item.ir_item_unit,
                                            approved_qty = item.approved_qty,
-                                           remain_qty = item.remain_qty
+                                           remain_qty = item.remain_qty,
+                                           ordering_number = item.ordering_number
                                        }).ToList();
                     var purchaseOrderItems = (from pod in db.tb_purchase_order_detail where string.Compare(pod.purchase_order_id, poId) == 0 select new { pod }).ToList();
                     foreach(var item in itemRequests)
@@ -418,7 +421,8 @@ namespace BT_KimMex.Class
                             ir_item_unit = ir_unit_name,
                             requested_unit_id=item.ir_item_unit,
                             approved_qty = item.approved_qty,
-                            remain_qty = item.remain_qty+poqty
+                            remain_qty = item.remain_qty+poqty,
+                            ordering_number = item.ordering_number
                         });
                     }
                 }
@@ -486,7 +490,7 @@ namespace BT_KimMex.Class
                              join job in db.tb_ir_detail1 on item.ir_detail1_id equals job.ir_detail1_id
                              join pr in db.tb_item_request on job.ir_id equals pr.ir_id
                              join pro in db.tb_product on item.ir_item_id equals pro.product_id
-                             orderby pro.product_code
+                             orderby item.ordering_number, pro.product_code
                              where string.Compare(pr.ir_id, id) == 0 && item.is_approved == true && item.remain_qty > 0 && item.remain_qty != null
                              select new Models.ItemRequestDetail2ViewModel()
                              {
@@ -498,7 +502,8 @@ namespace BT_KimMex.Class
                                  ir_qty = item.ir_qty,
                                  ir_item_unit = item.ir_item_unit,
                                  approved_qty = item.approved_qty,
-                                 remain_qty = item.remain_qty
+                                 remain_qty = item.remain_qty,
+                                 ordering_number = item.ordering_number
                              }).ToList();
                 }
                 else
@@ -507,7 +512,7 @@ namespace BT_KimMex.Class
                                         join job in db.tb_ir_detail1 on item.ir_detail1_id equals job.ir_detail1_id
                                         join pr in db.tb_item_request on job.ir_id equals pr.ir_id
                                         join pro in db.tb_product on item.ir_item_id equals pro.product_id
-                                        orderby pro.product_code
+                                        orderby item.ordering_number, pro.product_code
                                         where string.Compare(pr.ir_id, id) == 0 && item.is_approved == true
                                         select new Models.ItemRequestDetail2ViewModel()
                                         {
@@ -519,7 +524,8 @@ namespace BT_KimMex.Class
                                             ir_qty = item.ir_qty,
                                             ir_item_unit = item.ir_item_unit,
                                             approved_qty = item.approved_qty,
-                                            remain_qty = item.remain_qty
+                                            remain_qty = item.remain_qty,
+                                            ordering_number = item.ordering_number
                                         }).ToList();
                     var stockTransferItems = (from std in db.tb_stock_transfer_detail where string.Compare(std.st_ref_id, stId) == 0 select new { std }).ToList();
                     foreach (var item in itemRequests)
@@ -537,7 +543,8 @@ namespace BT_KimMex.Class
                             ir_qty = item.ir_qty,
                             ir_item_unit = item.ir_item_unit,
                             approved_qty = item.approved_qty,
-                            remain_qty = item.remain_qty + poqty
+                            remain_qty = item.remain_qty + poqty,
+                            ordering_number = item.ordering_number
                         });
                     }
                 }
@@ -771,6 +778,7 @@ namespace BT_KimMex.Class
                 {
                     ItemRequestDetail2ViewModel item = new ItemRequestDetail2ViewModel();
                     item = requestitem;
+                    item.ordering_number = requestitem.ordering_number;
                     item.remain_qty = item.approved_qty;
 
                     //get from stock transfer workorder

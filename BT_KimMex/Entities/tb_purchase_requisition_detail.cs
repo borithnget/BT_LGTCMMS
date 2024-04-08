@@ -23,6 +23,7 @@ namespace BT_KimMex.Entities
         public string reason { get; set; }
         public string remark { get; set; }
         public string item_status { get; set; }
+        public Nullable<int> ordering_number { get; set; }
     
         public virtual tb_product tb_product { get; set; }
         public virtual tb_purchase_requisition tb_purchase_requisition { get; set; }
