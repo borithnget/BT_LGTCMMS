@@ -549,6 +549,20 @@ namespace BT_KimMex.Controllers
         {
             return View(DetailPOReceivingReportResponseModel.GetDetailPOReceivingReportsList(dateFrom,dateTo));
         }
+        public ActionResult WarehouseStockBalance()
+        {
+            
+            return View();
+        }
+        public ActionResult GetWarehouseStockBalanceAJAX(string warehouseId,string dateFrom,string dateTo)
+        {
+            DateTime newDateFrom = Convert.ToDateTime(dateFrom);
+            DateTime newDateTo = Convert.ToDateTime(dateTo);
+            var results= InventoryViewModel.GetStockBalancebyWarehouse(warehouseId,newDateFrom,newDateTo);
+            var jsonResult = Json(new { data = results }, JsonRequestBehavior.AllowGet);
+            jsonResult.MaxJsonLength = int.MaxValue;
+            return jsonResult;
+        }
 
     }
 }
