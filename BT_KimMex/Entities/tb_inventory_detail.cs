@@ -30,5 +30,6 @@ namespace BT_KimMex.Entities
         public string inventory_type { get; set; }
         public Nullable<decimal> remain_quantity { get; set; }
         public string reason { get; set; }
+        public Nullable<int> ordering_number { get; set; }
     }
 }

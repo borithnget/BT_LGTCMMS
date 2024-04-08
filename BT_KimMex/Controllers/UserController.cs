@@ -116,6 +116,7 @@ namespace BT_KimMex.Controllers
 
                     string date = Convert.ToDateTime(user.created_date).ToString("dd/MM/yyyy");
                     user_role.created_date = date;
+                    user_role.signatures = GlobalMethod.GetUserSignatures(user_role.UserId);
                 }
             }
             catch (Exception ex) { }

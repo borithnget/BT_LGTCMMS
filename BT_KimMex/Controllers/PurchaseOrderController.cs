@@ -108,6 +108,7 @@ namespace BT_KimMex.Controllers
                     dPO.unit_price = 0;
                     dPO.item_status = "Pending";
                     dPO.item_vat = pDetails[i].item_vat;
+                   
                     dPO.status = true;
                     db.tb_purchase_order_detail.Add(dPO);
                     db.SaveChanges();
@@ -1629,6 +1630,7 @@ namespace BT_KimMex.Controllers
                             item_id=s.item_id,
                             price=s.price,
                             discount=s.discount,
+                            
                             discountAmount=s.discount_amount
                         }).ToList();
                         foreach (var ii in quoteSupplierItems)
@@ -1648,6 +1650,7 @@ namespace BT_KimMex.Controllers
                                 iii.warranty = i.quote.warranty;
                                 iii.vendor_ref = i.quote.vendor_ref;
                                 iii.discount = ii.discount;
+                                
                                 if (ii.discountAmount.HasValue)
                                 {
                                     iii.priceDiscount = iii.price - ii.discountAmount;

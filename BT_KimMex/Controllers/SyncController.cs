@@ -276,5 +276,42 @@ namespace BT_KimMex.Controllers
         //    return xlsxFile;
         //}
 
+        public ActionResult AdjustmentNegativeBalance(string id)
+        {
+            try
+            {
+                List<tb_inventory> results = new List<tb_inventory>();
+
+                kim_mexEntities db = new kim_mexEntities();
+                var inventories = db.tb_inventory.OrderByDescending(s => s.inventory_date).Where(s => string.Compare(s.warehouse_id, id) == 0).GroupBy(s=>s.product_id).Select(s=>new {product_id=s.Key, list = s.ToList() }).ToList();
+                foreach(var inv in inventories)
+                {
+                    var latest_qty = inv.list.OrderByDescending(s => s.inventory_date).Where(s => s.total_quantity < 0).FirstOrDefault();
+                    if (latest_qty != null)
+                    {
+                        tb_inventory inventory = new tb_inventory();
+                        inventory.inventory_id = Guid.NewGuid().ToString();
+                        inventory.inventory_date = Class.CommonClass.ToLocalTime(DateTime.Now);
+                        inventory.ref_id = string.Empty;
+                        inventory.inventory_status_id = "1";
+                        inventory.warehouse_id = "1";
+                        inventory.product_id = latest_qty.product_id;
+                        inventory.out_quantity = 0;
+                        inventory.in_quantity = 0;
+                        inventory.total_quantity = 0;
+                        inventory.remark = "Reset negative qty to zero by system.";
+                        db.tb_inventory.Add(inventory);
+                        db.SaveChanges();
+                        results.Add(latest_qty);
+                    }
+
+                }
+            }catch(Exception ex)
+            {
+
+            }
+            return View();
+        }
+
     }
 }

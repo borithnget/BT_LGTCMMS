@@ -1,9 +1,13 @@
 ﻿@model BT_KimMex.Models.PurchaseRequestViewModel
     @using BT_KimMex.Class;
+@using Microsoft.AspNet.Identity;
+
 @{
     ViewBag.Title = "Approval";
     Layout = "~/Views/Shared/_Layout.cshtml";
     BT_KimMex.Entities.kim_mexEntities db = new BT_KimMex.Entities.kim_mexEntities();
+    string userId = User.Identity.GetUserId();
+    var userSignatures = BT_KimMex.Class.GlobalMethod.GetUserSignatures(userId);
 }
 
 <h3 class="title">Purchase Order Approval</h3>
@@ -67,6 +71,36 @@
             </table>
         </div>
 
+        <!-- Signature Section -->
+        @if (userSignatures.Count() > 1)
+        {
+            int countSignature = 0;
+    <table class="table_signature">
+        @foreach(var signature in userSignatures)
+        {
+            
+            string signatureURL = string.Format("/Documents/Signature/{0}{1}", signature.attachment_id, signature.attachment_extension);
+            <tr>
+                <td>
+                    @if (countSignature == 0)
+                    {
+                        <input type="radio" name="rd_signature" value="@signature.attachment_id" checked/>
+                    }
+                    else
+                    {
+                        <input type="radio" name="rd_signature" value="@signature.attachment_id" />
+                    }
+                </td>
+                <td>
+                    <img src="@signatureURL" style="object-fit: fill; background-color: white; width: 100px; height: 100px; " class="img-responsive" id="targetImg" />
+                </td>
+            </tr>
+            countSignature++;
+        }
+    </table>
+            
+        }
+        <!-- Ending Signature Section -->
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
@@ -126,12 +160,23 @@
                     return;
                 }
 
+                //get Approved Signature
+                var signature = $('input[name=rd_signature]:checked').val();
+                if (signature == undefined) {
+                    alert("Please select signature.");
+                    return;
+                }
+                
                 $.ajax({
                     url: "@Url.Action("Approval", "PurchaseOrderAandR")",
                     type: "post",
                     dataType: "json",
                     async: false,
-                    data: { id: Id, models: models },
+                    data: {
+                        id: Id,
+                        models: models,
+                        signatureId: signature
+                    },
                     success: function (da) {
                         if (da.result == "success") {
                             alert('Your data has been submitted successfully.');

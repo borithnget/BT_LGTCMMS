@@ -170,7 +170,16 @@
                                 reaminQty = Convert.ToDecimal(item.purd.po_quantity - totalCurrentReceived);
                             }
 
-                            string warehouse = his.inventories.FirstOrDefault().warehouseName;
+                            string warehouse = string.Empty;
+                            if (his.inventories.Count() > 0)
+                            {
+                                var warehouseObj = his.inventories.FirstOrDefault();
+                                if (warehouseObj != null)
+                                {
+                                    warehouse = warehouseObj.warehouseName;
+                                }
+                                
+                            }
 
                             <tr>
                                 <td style="@border text-align: center; font-family: 'Kantumruy Pro'; vertical-align:middle !important; ">@countingNumber</td>
