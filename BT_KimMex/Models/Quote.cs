@@ -130,7 +130,7 @@ namespace BT_KimMex.Models
                 quoteItems = (from qi in db.tb_quote_detail
                               join it in db.tb_product on qi.item_id equals it.product_id
                               join u in db.tb_unit on it.product_unit equals u.Id
-                              orderby it.product_code
+                              orderby qi.ordering_number, it.product_code
                               where qi.quote_id == quote.quote_id
                               select new QuoteItemsViewModel()
                               {
@@ -190,6 +190,7 @@ namespace BT_KimMex.Models
         public string unit_name { get; set; }
         public Nullable<decimal> qty { get; set; }
         public Nullable<decimal> discount_amount { get; set; }
+        public Nullable<int> ordering_number { get; set; }
 
     }
     public class QuoteFilterResultModel

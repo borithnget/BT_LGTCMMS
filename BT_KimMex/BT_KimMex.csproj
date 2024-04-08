@@ -137,7 +137,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.QualityTools.Testing.Fakes, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.QualityTools.Testing.Fakes.16.11.230815\lib\net35\Microsoft.QualityTools.Testing.Fakes.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="Microsoft.ReportViewer.Common, Version=15.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ReportingServices.ReportViewerControl.WebForms.150.1586.0\lib\net40\Microsoft.ReportViewer.Common.dll</HintPath>
@@ -213,26 +213,27 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.3.0\lib\net45\System.Web.Helpers.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.Helpers.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Web.Mvc, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.3.0\lib\net45\System.Web.Mvc.dll</HintPath>
+    <Reference Include="System.Web.Mvc, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.7\lib\net45\System.Web.Mvc.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.Razor.3.3.0\lib\net45\System.Web.Razor.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.7\lib\net45\System.Web.Razor.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.3.0\lib\net45\System.Web.WebPages.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.3.0\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.3.0\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Windows.Forms" />
@@ -256,7 +257,7 @@
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Telegram.Bot, Version=14.6.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Telegram.Bot.14.12.0\lib\net45\Telegram.Bot.dll</HintPath>
+      <HintPath>..\packages\Telegram.Bot.14.6.0\lib\net45\Telegram.Bot.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="WebGrease">
@@ -325,7 +326,6 @@
     <Compile Include="Class\CommonClass.cs" />
     <Compile Include="Class\CommonFunctions.cs" />
     <Compile Include="Class\ConvertCurrencyToWord.cs" />
-    <Compile Include="Class\EmailHandler.cs" />
     <Compile Include="Class\EnumConstants.cs" />
     <Compile Include="Class\Exporting.cs" />
     <Compile Include="Class\GlobalMethod.cs" />
@@ -624,6 +624,9 @@
     <Compile Include="Entities\tb_po_report.cs">
       <DependentUpon>kim_mexEntities.tt</DependentUpon>
     </Compile>
+    <Compile Include="Entities\tb_po_report_cancelled.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
     <Compile Include="Entities\tb_po_report_deleted.cs">
       <DependentUpon>kim_mexEntities.tt</DependentUpon>
     </Compile>
@@ -700,6 +703,9 @@
       <DependentUpon>kim_mexEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Entities\tb_return_main_stock.cs">
+      <DependentUpon>kim_mexEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\tb_setting_od_approval.cs">
       <DependentUpon>kim_mexEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Entities\tb_site.cs">
@@ -790,7 +796,6 @@
     <Compile Include="Models\ClassViewModel.cs" />
     <Compile Include="Models\ColorViewModel.cs" />
     <Compile Include="Models\CustomerViewModel.cs" />
-    <Compile Include="Models\EmailTemplate.cs" />
     <Compile Include="Models\ErrorLogViewModel.cs" />
     <Compile Include="Models\ExcelBoQModel.cs" />
     <Compile Include="Models\Home.cs" />
@@ -840,6 +845,9 @@
     <Compile Include="Models\WareHouseViewModel.cs" />
     <Compile Include="Models\WorkorderReturnedViewModel.cs" />
     <Compile Include="MoreLinq\MoreEnumerable.DistinctBy.cs" />
+    <Compile Include="obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs" />
+    <Compile Include="obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs" />
+    <Compile Include="obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reports\ReportController\Project.aspx.cs">
       <DependentUpon>Project.aspx</DependentUpon>
@@ -848,6 +856,7 @@
     <Compile Include="Reports\ReportController\Project.aspx.designer.cs">
       <DependentUpon>Project.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Service\PurchaseOrderService.cs" />
     <Compile Include="SqlServerTypes\Loader.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Views\keyAttribute.cs" />
@@ -8021,6 +8030,10 @@
     <Content Include="bin\roslyn\System.Reflection.Metadata.dll" />
     <Content Include="bin\roslyn\vbc.exe" />
     <Content Include="bin\roslyn\VBCSCompiler.exe" />
+    <Content Include="bin\SqlServerTypes\x64\msvcr120.dll" />
+    <Content Include="bin\SqlServerTypes\x64\SqlServerSpatial140.dll" />
+    <Content Include="bin\SqlServerTypes\x86\msvcr120.dll" />
+    <Content Include="bin\SqlServerTypes\x86\SqlServerSpatial140.dll" />
     <Content Include="bin\System.Web.Helpers.dll" />
     <Content Include="bin\System.Web.Helpers.xml" />
     <Content Include="bin\System.Web.Mvc.dll" />
@@ -8846,6 +8859,16 @@
     <Content Include="Content\w3.css" />
     <Content Include="Data\Ani.gif" />
     <Content Include="default.aspx" />
+    <Content Include="Entities\kim_mexEntities.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>kim_mexEntities.edmx</DependentUpon>
+      <LastGenOutput>kim_mexEntities.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Entities\kim_mexEntities.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>kim_mexEntities.edmx</DependentUpon>
+      <LastGenOutput>kim_mexEntities.cs</LastGenOutput>
+    </Content>
     <!--<Content Include="Entities\kim_mexEntities.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>kim_mexEntities.edmx</DependentUpon>
@@ -9968,18 +9991,8 @@
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>kim_mexEntities.Designer.cs</LastGenOutput>
     </EntityDeploy>
-    <Content Include="Entities\kim_mexEntities.Context.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>kim_mexEntities.edmx</DependentUpon>
-      <LastGenOutput>kim_mexEntities.Context.cs</LastGenOutput>
-    </Content>
     <Content Include="Entities\kim_mexEntities.edmx.diagram">
       <DependentUpon>kim_mexEntities.edmx</DependentUpon>
-    </Content>
-    <Content Include="Entities\kim_mexEntities.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>kim_mexEntities.edmx</DependentUpon>
-      <LastGenOutput>kim_mexEntities.cs</LastGenOutput>
     </Content>
     <None Include="Properties\PublishProfiles\KimMex.pubxml" />
     <None Include="Properties\PublishProfiles\KimMexDeployment.pubxml" />
@@ -10015,6 +10028,18 @@
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\_references.js" />
     <Content Include="SqlServerTypes\readme.htm" />
+    <Content Include="SqlServerTypes\x64\msvcr120.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\x64\SqlServerSpatial140.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\x86\msvcr120.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\x86\SqlServerSpatial140.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Views\Shared\ReportController\BOQbyProject.aspx" />
     <Content Include="Views\Shared\ReportController\GRNreport.aspx" />
     <Content Include="Views\Shared\ReportController\ItemRequestbyProject.aspx" />
@@ -10375,8 +10400,6 @@
     <Folder Include="Documents\Signature\" />
     <Folder Include="Documents\Spacemen Signature\" />
     <Folder Include="Documents\Stock Balance\" />
-    <Folder Include="SqlServerTypes\x64\" />
-    <Folder Include="SqlServerTypes\x86\" />
     <Folder Include="Views\Color\" />
     <Folder Include="Views\CustomDuplicateItemValidation\" />
     <Folder Include="Views\DuplicateItemCode\" />
@@ -10458,10 +10481,8 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets'))" />
     <Error Condition="!Exists('..\packages\NETStandard.Library.2.0.0\build\netstandard2.0\NETStandard.Library.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NETStandard.Library.2.0.0\build\netstandard2.0\NETStandard.Library.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.QualityTools.Testing.Fakes.16.11.230815\build\Microsoft.Qualitytools.Testing.Fakes.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.QualityTools.Testing.Fakes.16.11.230815\build\Microsoft.Qualitytools.Testing.Fakes.targets'))" />
   </Target>
   <Import Project="..\packages\NETStandard.Library.2.0.0\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.0\build\netstandard2.0\NETStandard.Library.targets')" />
-  <Import Project="..\packages\Microsoft.QualityTools.Testing.Fakes.16.11.230815\build\Microsoft.Qualitytools.Testing.Fakes.targets" Condition="Exists('..\packages\Microsoft.QualityTools.Testing.Fakes.16.11.230815\build\Microsoft.Qualitytools.Testing.Fakes.targets')" />
   <!--<Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>

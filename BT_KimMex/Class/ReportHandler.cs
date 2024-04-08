@@ -323,8 +323,17 @@ namespace BT_KimMex.Class
                         status = string.Compare(obj.purchase_order_status, "Completed") == 0 ? "Approved by Director" : string.Empty;
 
                         preparedBySignature = string.IsNullOrEmpty(purchase.updated_by) ? CommonClass.GetUserSignature(purchase.created_by) : CommonClass.GetUserSignature(purchase.updated_by);
-                        checkedBySignature = CommonClass.GetUserSignature(purchase.approved_by);
+                        //checkedBySignature = CommonClass.GetUserSignature(purchase.approved_by);
                         approvedBySignature = CommonClass.GetUserSignature(purchase.checked_by);
+                        if (string.IsNullOrEmpty(purchase.approved_signature))
+                        {
+                            checkedBySignature = CommonClass.GetUserSignature(purchase.approved_by);
+                            
+                        }
+                        else
+                        {
+                            checkedBySignature = CommonClass.getUserSignaturebyAttachmentId(purchase.approved_signature);
+                        }
 
                         //Get Quote Supplier Term and Condition
                         tb_quote sup_quote = db.tb_quote
@@ -805,8 +814,18 @@ namespace BT_KimMex.Class
                         //approvedBy = db.AspNetUsers.Where(x => x.Id == purchase.approved_by).Select(x => x.UserName).FirstOrDefault();
 
                         preparedBySignature = string.IsNullOrEmpty(purchase.updated_by) ? CommonClass.GetUserSignature(purchase.created_by) : CommonClass.GetUserSignature(purchase.updated_by);
-                        checkedBySignature = CommonClass.GetUserSignature(purchase.approved_by);
+                        
+                        //checkedBySignature = CommonClass.GetUserSignature(purchase.approved_by);
                         approvedBySignature = CommonClass.GetUserSignature(purchase.checked_by);
+
+                        if (string.IsNullOrEmpty(purchase.approved_signature))
+                        {
+                            checkedBySignature = CommonClass.GetUserSignature(purchase.approved_by);
+                        }
+                        else
+                        {
+                            checkedBySignature = CommonClass.getUserSignaturebyAttachmentId(purchase.approved_signature);
+                        }
 
                         //Get Quote Supplier Term and Condition
                         tb_quote sup_quote = db.tb_quote

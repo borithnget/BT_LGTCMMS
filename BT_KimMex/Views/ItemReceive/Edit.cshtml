@@ -395,17 +395,8 @@
                 initialPurchaseOrderRefbySupplier(id);
                 $('#itemReceiveTable tbody').empty().append("<tr><td colspan='10'>No data available in table</td></tr>");
             });
-            function enable_submit_button(is_submit) {
-                if (is_submit) {
-                    $('#btnSubmit').text("Submitting...");
-                    $('#btnSubmit').attr('disabled', true);
-                } else {
-                    $('#btnSubmit').text("Submit");
-                    $('#btnSubmit').attr('disabled', false);
-                }
-            }
+
             $('#btnSubmit').click(function () {
-                enable_submit_button(true);
                 var ireNumber = $('#received_number').text();
                 var ireType = $('input[type=radio][name=receiveType]:checked').val();
                 var ireRef = $('#ref_id').val();
@@ -427,9 +418,7 @@
                 var arrAttachment = [];
 
                 if (!ireRef) {
-                    enable_submit_button(false);
                     alert("Receive Type Reference is required.");
-
                     return;
                 }
 
@@ -455,7 +444,6 @@
                         element_item.invoice_date = convertDDMMYYYtoMMDDYYYY(invoiceDate[i].value);
                         ireDetails.push(element_item);
                     } else if (receivedQty && Number(receivedQty) > 0 && !warehouse) {
-                        enable_submit_button(false);
                         alert('Please select warehouse to receive item.');
                         return;
                     }
@@ -470,7 +458,6 @@
                 }
 
                 if (ireDetails.length == 0) {
-                    enable_submit_button(false);
                     alert('Received item required.');
                     return;
                 }

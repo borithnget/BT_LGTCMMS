@@ -251,6 +251,8 @@
           <Property Name="status" Type="bit" />
           <Property Name="updated_by" Type="nvarchar" MaxLength="50" />
         </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'db_a94f6d_lgtss.dbo.tb_inventory' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="tb_inventory">
           <Key>
             <PropertyRef Name="inventory_id" />
@@ -283,6 +285,8 @@
           <Property Name="remark" Type="nvarchar(max)" />
           <Property Name="unit" Type="nvarchar" MaxLength="50" />
         </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'db_a94f6d_lgtss.dbo.tb_inventory_detail' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="tb_inventory_detail">
           <Key>
             <PropertyRef Name="inventory_detail_id" />
@@ -632,6 +636,20 @@
           <Property Name="po_report_status" Type="nvarchar" MaxLength="50" />
           <Property Name="is_invoice" Type="bit" />
         </EntityType>
+        <EntityType Name="tb_po_report_cancelled">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PONumber" Type="nvarchar" MaxLength="50" />
+          <Property Name="CreatedAt" Type="datetime" />
+          <Property Name="UpdatedAt" Type="datetime" />
+          <Property Name="CreatedBy" Type="nvarchar" MaxLength="50" />
+          <Property Name="UpdatedBy" Type="nvarchar" MaxLength="50" />
+          <Property Name="IsReuse" Type="bit" />
+          <Property Name="IsVAT" Type="bit" />
+          <Property Name="IsLPO" Type="bit" />
+        </EntityType>
         <EntityType Name="tb_po_report_deleted">
           <Key>
             <PropertyRef Name="id" />
@@ -881,6 +899,7 @@
           <Property Name="discount_percentage" Type="decimal" Precision="18" Scale="8" />
           <Property Name="discount_amount" Type="decimal" Precision="18" Scale="8" />
           <Property Name="lump_sum_discount_amount" Type="decimal" Precision="18" Scale="8" />
+          <Property Name="ordering_number" Type="int" />
         </EntityType>
         <EntityType Name="tb_purchase_request">
           <Key>
@@ -902,6 +921,7 @@
           <Property Name="checked_comment" Type="nvarchar(max)" />
           <Property Name="status" Type="bit" />
           <Property Name="is_check" Type="bit" />
+          <Property Name="approved_signature" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="tb_purchase_request_detail">
           <Key>
@@ -997,6 +1017,7 @@
           <Property Name="remark" Type="nvarchar(max)" />
           <Property Name="qty" Type="decimal" Precision="18" Scale="2" />
           <Property Name="discount_amount" Type="decimal" Precision="18" Scale="8" />
+          <Property Name="ordering_number" Type="int" />
         </EntityType>
         <EntityType Name="tb_receive_item_voucher">
           <Key>
@@ -1104,6 +1125,18 @@
           <Property Name="invoice_date" Type="datetime" />
           <Property Name="main_stock_detail_type" Type="nvarchar" MaxLength="50" />
           <Property Name="remain_quantity" Type="decimal" Precision="18" Scale="2" />
+        </EntityType>
+        <EntityType Name="tb_setting_od_approval">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ApprovalAmount" Type="money" />
+          <Property Name="IsActive" Type="bit" />
+          <Property Name="CreatedAt" Type="datetime" />
+          <Property Name="UpdatedAt" Type="datetime" />
+          <Property Name="CreatedBy" Type="nvarchar" MaxLength="50" />
+          <Property Name="UpdatedBy" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="tb_site">
           <Key>
@@ -2395,9 +2428,7 @@
           <EntitySet Name="tb_customer" EntityType="Self.tb_customer" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_error_log" EntityType="Self.tb_error_log" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_history_issue_qty" EntityType="Self.tb_history_issue_qty" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="tb_inventory" EntityType="Self.tb_inventory" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_inventory_deleted" EntityType="Self.tb_inventory_deleted" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="tb_inventory_detail" EntityType="Self.tb_inventory_detail" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_inventory_status" EntityType="Self.tb_inventory_status" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_invoice" EntityType="Self.tb_invoice" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_ir_attachment" EntityType="Self.tb_ir_attachment" Schema="dbo" store:Type="Tables" />
@@ -2420,6 +2451,7 @@
           <EntitySet Name="tb_po_invoice_document" EntityType="Self.tb_po_invoice_document" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_po_invoice_payment" EntityType="Self.tb_po_invoice_payment" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_po_report" EntityType="Self.tb_po_report" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_po_report_cancelled" EntityType="Self.tb_po_report_cancelled" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_po_report_deleted" EntityType="Self.tb_po_report_deleted" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_po_supplier" EntityType="Self.tb_po_supplier" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_position" EntityType="Self.tb_position" Schema="dbo" store:Type="Tables" />
@@ -2447,6 +2479,7 @@
           <EntitySet Name="tb_reject" EntityType="Self.tb_reject" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_return_main_stock" EntityType="Self.tb_return_main_stock" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_return_mainstock_detail" EntityType="Self.tb_return_mainstock_detail" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_setting_od_approval" EntityType="Self.tb_setting_od_approval" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_site" EntityType="Self.tb_site" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_site_manager_project" EntityType="Self.tb_site_manager_project" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_site_site_admin" EntityType="Self.tb_site_site_admin" Schema="dbo" store:Type="Tables" />
@@ -2472,6 +2505,41 @@
           <EntitySet Name="tb_workorder_returned" EntityType="Self.tb_workorder_returned" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tbSiteSiteSupervisor" EntityType="Self.tbSiteSiteSupervisor" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="transferformmainstocks" EntityType="Self.transferformmainstocks" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_inventory" EntityType="Self.tb_inventory" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [tb_inventory].[inventory_id] AS [inventory_id], 
+    [tb_inventory].[inventory_date] AS [inventory_date], 
+    [tb_inventory].[inventory_status_id] AS [inventory_status_id], 
+    [tb_inventory].[warehouse_id] AS [warehouse_id], 
+    [tb_inventory].[product_id] AS [product_id], 
+    [tb_inventory].[total_quantity] AS [total_quantity], 
+    [tb_inventory].[in_quantity] AS [in_quantity], 
+    [tb_inventory].[out_quantity] AS [out_quantity], 
+    [tb_inventory].[ref_id] AS [ref_id], 
+    [tb_inventory].[remark] AS [remark], 
+    [tb_inventory].[unit] AS [unit]
+    FROM [dbo].[tb_inventory] AS [tb_inventory]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="tb_inventory_detail" EntityType="Self.tb_inventory_detail" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [tb_inventory_detail].[inventory_detail_id] AS [inventory_detail_id], 
+    [tb_inventory_detail].[inventory_ref_id] AS [inventory_ref_id], 
+    [tb_inventory_detail].[inventory_item_id] AS [inventory_item_id], 
+    [tb_inventory_detail].[inventory_warehouse_id] AS [inventory_warehouse_id], 
+    [tb_inventory_detail].[quantity] AS [quantity], 
+    [tb_inventory_detail].[remark] AS [remark], 
+    [tb_inventory_detail].[supplier_id] AS [supplier_id], 
+    [tb_inventory_detail].[unit] AS [unit], 
+    [tb_inventory_detail].[previous_quantity] AS [previous_quantity], 
+    [tb_inventory_detail].[approved_date] AS [approved_date], 
+    [tb_inventory_detail].[item_status] AS [item_status], 
+    [tb_inventory_detail].[invoice_number] AS [invoice_number], 
+    [tb_inventory_detail].[invoice_date] AS [invoice_date], 
+    [tb_inventory_detail].[inventory_type] AS [inventory_type], 
+    [tb_inventory_detail].[remain_quantity] AS [remain_quantity], 
+    [tb_inventory_detail].[reason] AS [reason]
+    FROM [dbo].[tb_inventory_detail] AS [tb_inventory_detail]</DefiningQuery>
+          </EntitySet>
           <AssociationSet Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
             <End Role="AspNetUserClaims" EntitySet="AspNetUserClaims" />
@@ -3027,22 +3095,6 @@
           <Property Name="status" Type="Boolean" />
           <Property Name="updated_by" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
-        <EntityType Name="tb_inventory">
-          <Key>
-            <PropertyRef Name="inventory_id" />
-          </Key>
-          <Property Name="inventory_id" Type="String" MaxLength="38" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="inventory_date" Type="DateTime" Precision="3" />
-          <Property Name="inventory_status_id" Type="String" MaxLength="38" FixedLength="false" Unicode="true" />
-          <Property Name="warehouse_id" Type="String" MaxLength="38" FixedLength="false" Unicode="true" />
-          <Property Name="product_id" Type="String" MaxLength="38" FixedLength="false" Unicode="true" />
-          <Property Name="total_quantity" Type="Decimal" Precision="10" Scale="2" />
-          <Property Name="in_quantity" Type="Decimal" Precision="10" Scale="2" />
-          <Property Name="out_quantity" Type="Decimal" Precision="10" Scale="2" />
-          <Property Name="ref_id" Type="String" MaxLength="38" FixedLength="false" Unicode="true" />
-          <Property Name="remark" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="unit" Type="String" MaxLength="38" FixedLength="false" Unicode="true" />
-        </EntityType>
         <EntityType Name="tb_inventory_deleted">
           <Key>
             <PropertyRef Name="inventory_id" />
@@ -3058,27 +3110,6 @@
           <Property Name="ref_id" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="remark" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="unit" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-        </EntityType>
-        <EntityType Name="tb_inventory_detail">
-          <Key>
-            <PropertyRef Name="inventory_detail_id" />
-          </Key>
-          <Property Name="inventory_detail_id" Type="String" MaxLength="40" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="inventory_ref_id" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
-          <Property Name="inventory_item_id" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
-          <Property Name="inventory_warehouse_id" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
-          <Property Name="quantity" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="remark" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="supplier_id" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
-          <Property Name="unit" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
-          <Property Name="previous_quantity" Type="Decimal" Precision="10" Scale="2" />
-          <Property Name="approved_date" Type="DateTime" Precision="3" />
-          <Property Name="item_status" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
-          <Property Name="invoice_number" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
-          <Property Name="invoice_date" Type="DateTime" Precision="0" />
-          <Property Name="inventory_type" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
-          <Property Name="remain_quantity" Type="Decimal" Precision="10" Scale="2" />
-          <Property Name="reason" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="tb_inventory_status">
           <Key>
@@ -3430,6 +3461,20 @@
           <NavigationProperty Name="tb_supplier" Relationship="Self.FK_tb_po_report_tb_supplier" FromRole="tb_po_report" ToRole="tb_supplier" />
           <NavigationProperty Name="tb_purchase_request_detail" Relationship="Self.FK_tb_purchase_request_detail_tb_po_report" FromRole="tb_po_report" ToRole="tb_purchase_request_detail" />
         </EntityType>
+        <EntityType Name="tb_po_report_cancelled">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PONumber" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedAt" Type="DateTime" Precision="3" />
+          <Property Name="UpdatedAt" Type="DateTime" Precision="3" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="UpdatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="IsReuse" Type="Boolean" />
+          <Property Name="IsVAT" Type="Boolean" />
+          <Property Name="IsLPO" Type="Boolean" />
+        </EntityType>
         <EntityType Name="tb_po_report_deleted">
           <Key>
             <PropertyRef Name="id" />
@@ -3715,6 +3760,7 @@
           <Property Name="discount_percentage" Type="Decimal" Precision="18" Scale="8" />
           <Property Name="discount_amount" Type="Decimal" Precision="18" Scale="8" />
           <Property Name="lump_sum_discount_amount" Type="Decimal" Precision="18" Scale="8" />
+          <Property Name="ordering_number" Type="Int32" />
           <NavigationProperty Name="tb_po_supplier" Relationship="Self.FK_tb_po_supplier_tb_purchase_order_detail" FromRole="tb_purchase_order_detail" ToRole="tb_po_supplier" />
           <NavigationProperty Name="tb_purchase_order" Relationship="Self.FK_tb_purchase_order_detail_tb_purchase_order" FromRole="tb_purchase_order_detail" ToRole="tb_purchase_order" />
         </EntityType>
@@ -3738,6 +3784,7 @@
           <Property Name="checked_comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="status" Type="Boolean" />
           <Property Name="is_check" Type="Boolean" />
+          <Property Name="approved_signature" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="tb_purchase_request_detail" Relationship="Self.FK_tb_purchase_request_detail_tb_purchase_request" FromRole="tb_purchase_request" ToRole="tb_purchase_request_detail" />
         </EntityType>
         <EntityType Name="tb_purchase_request_detail">
@@ -3847,6 +3894,7 @@
           <Property Name="remark" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="qty" Type="Decimal" Precision="18" Scale="2" />
           <Property Name="discount_amount" Type="Decimal" Precision="18" Scale="8" />
+          <Property Name="ordering_number" Type="Int32" />
           <NavigationProperty Name="tb_item_quote_attachment" Relationship="Self.FK_tb_item_quote_attachment_tb_quote_detail" FromRole="tb_quote_detail" ToRole="tb_item_quote_attachment" />
           <NavigationProperty Name="tb_quote" Relationship="Self.FK_tb_quote_detail_tb_quote" FromRole="tb_quote_detail" ToRole="tb_quote" />
         </EntityType>
@@ -3963,6 +4011,18 @@
           <Property Name="main_stock_detail_type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="remain_quantity" Type="Decimal" Precision="18" Scale="2" />
           <NavigationProperty Name="tb_return_main_stock" Relationship="Self.FK_tb_return_mainstock_detail_tb_return_main_stock" FromRole="tb_return_mainstock_detail" ToRole="tb_return_main_stock" />
+        </EntityType>
+        <EntityType Name="tb_setting_od_approval">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ApprovalAmount" Type="Decimal" Precision="19" Scale="4" />
+          <Property Name="IsActive" Type="Boolean" />
+          <Property Name="CreatedAt" Type="DateTime" Precision="3" />
+          <Property Name="UpdatedAt" Type="DateTime" Precision="3" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="UpdatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="tb_site">
           <Key>
@@ -4396,6 +4456,43 @@
           <Property Name="completed_comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="is_receive_completed" Type="Boolean" />
           <NavigationProperty Name="tb_transfer_frommain_stock_detail" Relationship="Self.FK_tb_transfer_frommain_stock_detail_transferformmainstocks" FromRole="transferformmainstocks" ToRole="tb_transfer_frommain_stock_detail" />
+        </EntityType>
+        <EntityType Name="tb_inventory">
+          <Key>
+            <PropertyRef Name="inventory_id" />
+          </Key>
+          <Property Name="inventory_id" Type="String" MaxLength="38" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="inventory_date" Type="DateTime" Precision="3" />
+          <Property Name="inventory_status_id" Type="String" MaxLength="38" FixedLength="false" Unicode="true" />
+          <Property Name="warehouse_id" Type="String" MaxLength="38" FixedLength="false" Unicode="true" />
+          <Property Name="product_id" Type="String" MaxLength="38" FixedLength="false" Unicode="true" />
+          <Property Name="total_quantity" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="in_quantity" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="out_quantity" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="ref_id" Type="String" MaxLength="38" FixedLength="false" Unicode="true" />
+          <Property Name="remark" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="unit" Type="String" MaxLength="38" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="tb_inventory_detail">
+          <Key>
+            <PropertyRef Name="inventory_detail_id" />
+          </Key>
+          <Property Name="inventory_detail_id" Type="String" MaxLength="40" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="inventory_ref_id" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
+          <Property Name="inventory_item_id" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
+          <Property Name="inventory_warehouse_id" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
+          <Property Name="quantity" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="remark" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="supplier_id" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
+          <Property Name="unit" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
+          <Property Name="previous_quantity" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="approved_date" Type="DateTime" Precision="3" />
+          <Property Name="item_status" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
+          <Property Name="invoice_number" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
+          <Property Name="invoice_date" Type="DateTime" Precision="0" />
+          <Property Name="inventory_type" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="remain_quantity" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="reason" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
         </EntityType>
         <Association Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
           <End Role="AspNetUsers" Type="Self.AspNetUser" Multiplicity="1">
@@ -5265,9 +5362,7 @@
           <EntitySet Name="tb_customer" EntityType="Self.tb_customer" />
           <EntitySet Name="tb_error_log" EntityType="Self.tb_error_log" />
           <EntitySet Name="tb_history_issue_qty" EntityType="Self.tb_history_issue_qty" />
-          <EntitySet Name="tb_inventory" EntityType="Self.tb_inventory" />
           <EntitySet Name="tb_inventory_deleted" EntityType="Self.tb_inventory_deleted" />
-          <EntitySet Name="tb_inventory_detail" EntityType="Self.tb_inventory_detail" />
           <EntitySet Name="tb_inventory_status" EntityType="Self.tb_inventory_status" />
           <EntitySet Name="tb_invoice" EntityType="Self.tb_invoice" />
           <EntitySet Name="tb_ir_attachment" EntityType="Self.tb_ir_attachment" />
@@ -5290,6 +5385,7 @@
           <EntitySet Name="tb_po_invoice_document" EntityType="Self.tb_po_invoice_document" />
           <EntitySet Name="tb_po_invoice_payment" EntityType="Self.tb_po_invoice_payment" />
           <EntitySet Name="tb_po_report" EntityType="Self.tb_po_report" />
+          <EntitySet Name="tb_po_report_cancelled" EntityType="Self.tb_po_report_cancelled" />
           <EntitySet Name="tb_po_report_deleted" EntityType="Self.tb_po_report_deleted" />
           <EntitySet Name="tb_po_supplier" EntityType="Self.tb_po_supplier" />
           <EntitySet Name="tb_position" EntityType="Self.tb_position" />
@@ -5317,6 +5413,7 @@
           <EntitySet Name="tb_reject" EntityType="Self.tb_reject" />
           <EntitySet Name="tb_return_main_stock" EntityType="Self.tb_return_main_stock" />
           <EntitySet Name="tb_return_mainstock_detail" EntityType="Self.tb_return_mainstock_detail" />
+          <EntitySet Name="tb_setting_od_approval" EntityType="Self.tb_setting_od_approval" />
           <EntitySet Name="tb_site" EntityType="Self.tb_site" />
           <EntitySet Name="tb_site_manager_project" EntityType="Self.tb_site_manager_project" />
           <EntitySet Name="tb_site_site_admin" EntityType="Self.tb_site_site_admin" />
@@ -5342,6 +5439,8 @@
           <EntitySet Name="tb_workorder_returned" EntityType="Self.tb_workorder_returned" />
           <EntitySet Name="tbSiteSiteSupervisors" EntityType="Self.tbSiteSiteSupervisor" />
           <EntitySet Name="transferformmainstocks" EntityType="Self.transferformmainstock" />
+          <EntitySet Name="tb_inventory" EntityType="Self.tb_inventory" />
+          <EntitySet Name="tb_inventory_detail" EntityType="Self.tb_inventory_detail" />
           <AssociationSet Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
             <End Role="AspNetUserClaims" EntitySet="AspNetUserClaims" />
@@ -5887,23 +5986,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="tb_inventory">
-            <EntityTypeMapping TypeName="db_a94f6d_lgtssModel.tb_inventory">
-              <MappingFragment StoreEntitySet="tb_inventory">
-                <ScalarProperty Name="inventory_id" ColumnName="inventory_id" />
-                <ScalarProperty Name="inventory_date" ColumnName="inventory_date" />
-                <ScalarProperty Name="inventory_status_id" ColumnName="inventory_status_id" />
-                <ScalarProperty Name="warehouse_id" ColumnName="warehouse_id" />
-                <ScalarProperty Name="product_id" ColumnName="product_id" />
-                <ScalarProperty Name="total_quantity" ColumnName="total_quantity" />
-                <ScalarProperty Name="in_quantity" ColumnName="in_quantity" />
-                <ScalarProperty Name="out_quantity" ColumnName="out_quantity" />
-                <ScalarProperty Name="ref_id" ColumnName="ref_id" />
-                <ScalarProperty Name="remark" ColumnName="remark" />
-                <ScalarProperty Name="unit" ColumnName="unit" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="tb_inventory_deleted">
             <EntityTypeMapping TypeName="db_a94f6d_lgtssModel.tb_inventory_deleted">
               <MappingFragment StoreEntitySet="tb_inventory_deleted">
@@ -5918,28 +6000,6 @@
                 <ScalarProperty Name="ref_id" ColumnName="ref_id" />
                 <ScalarProperty Name="remark" ColumnName="remark" />
                 <ScalarProperty Name="unit" ColumnName="unit" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="tb_inventory_detail">
-            <EntityTypeMapping TypeName="db_a94f6d_lgtssModel.tb_inventory_detail">
-              <MappingFragment StoreEntitySet="tb_inventory_detail">
-                <ScalarProperty Name="inventory_detail_id" ColumnName="inventory_detail_id" />
-                <ScalarProperty Name="inventory_ref_id" ColumnName="inventory_ref_id" />
-                <ScalarProperty Name="inventory_item_id" ColumnName="inventory_item_id" />
-                <ScalarProperty Name="inventory_warehouse_id" ColumnName="inventory_warehouse_id" />
-                <ScalarProperty Name="quantity" ColumnName="quantity" />
-                <ScalarProperty Name="remark" ColumnName="remark" />
-                <ScalarProperty Name="supplier_id" ColumnName="supplier_id" />
-                <ScalarProperty Name="unit" ColumnName="unit" />
-                <ScalarProperty Name="previous_quantity" ColumnName="previous_quantity" />
-                <ScalarProperty Name="approved_date" ColumnName="approved_date" />
-                <ScalarProperty Name="item_status" ColumnName="item_status" />
-                <ScalarProperty Name="invoice_number" ColumnName="invoice_number" />
-                <ScalarProperty Name="invoice_date" ColumnName="invoice_date" />
-                <ScalarProperty Name="inventory_type" ColumnName="inventory_type" />
-                <ScalarProperty Name="remain_quantity" ColumnName="remain_quantity" />
-                <ScalarProperty Name="reason" ColumnName="reason" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -6293,6 +6353,21 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="tb_po_report_cancelled">
+            <EntityTypeMapping TypeName="db_a94f6d_lgtssModel.tb_po_report_cancelled">
+              <MappingFragment StoreEntitySet="tb_po_report_cancelled">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="PONumber" ColumnName="PONumber" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
+                <ScalarProperty Name="IsReuse" ColumnName="IsReuse" />
+                <ScalarProperty Name="IsVAT" ColumnName="IsVAT" />
+                <ScalarProperty Name="IsLPO" ColumnName="IsLPO" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="tb_po_report_deleted">
             <EntityTypeMapping TypeName="db_a94f6d_lgtssModel.tb_po_report_deleted">
               <MappingFragment StoreEntitySet="tb_po_report_deleted">
@@ -6554,6 +6629,7 @@
                 <ScalarProperty Name="discount_percentage" ColumnName="discount_percentage" />
                 <ScalarProperty Name="discount_amount" ColumnName="discount_amount" />
                 <ScalarProperty Name="lump_sum_discount_amount" ColumnName="lump_sum_discount_amount" />
+                <ScalarProperty Name="ordering_number" ColumnName="ordering_number" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -6576,6 +6652,7 @@
                 <ScalarProperty Name="checked_comment" ColumnName="checked_comment" />
                 <ScalarProperty Name="status" ColumnName="status" />
                 <ScalarProperty Name="is_check" ColumnName="is_check" />
+                <ScalarProperty Name="approved_signature" ColumnName="approved_signature" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -6677,6 +6754,7 @@
                 <ScalarProperty Name="remark" ColumnName="remark" />
                 <ScalarProperty Name="qty" ColumnName="qty" />
                 <ScalarProperty Name="discount_amount" ColumnName="discount_amount" />
+                <ScalarProperty Name="ordering_number" ColumnName="ordering_number" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -6790,6 +6868,19 @@
                 <ScalarProperty Name="invoice_date" ColumnName="invoice_date" />
                 <ScalarProperty Name="main_stock_detail_type" ColumnName="main_stock_detail_type" />
                 <ScalarProperty Name="remain_quantity" ColumnName="remain_quantity" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tb_setting_od_approval">
+            <EntityTypeMapping TypeName="db_a94f6d_lgtssModel.tb_setting_od_approval">
+              <MappingFragment StoreEntitySet="tb_setting_od_approval">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="ApprovalAmount" ColumnName="ApprovalAmount" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -7212,6 +7303,45 @@
                 <ScalarProperty Name="completed_date" ColumnName="completed_date" />
                 <ScalarProperty Name="completed_comment" ColumnName="completed_comment" />
                 <ScalarProperty Name="is_receive_completed" ColumnName="is_receive_completed" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tb_inventory">
+            <EntityTypeMapping TypeName="db_a94f6d_lgtssModel.tb_inventory">
+              <MappingFragment StoreEntitySet="tb_inventory">
+                <ScalarProperty Name="inventory_id" ColumnName="inventory_id" />
+                <ScalarProperty Name="inventory_date" ColumnName="inventory_date" />
+                <ScalarProperty Name="inventory_status_id" ColumnName="inventory_status_id" />
+                <ScalarProperty Name="warehouse_id" ColumnName="warehouse_id" />
+                <ScalarProperty Name="product_id" ColumnName="product_id" />
+                <ScalarProperty Name="total_quantity" ColumnName="total_quantity" />
+                <ScalarProperty Name="in_quantity" ColumnName="in_quantity" />
+                <ScalarProperty Name="out_quantity" ColumnName="out_quantity" />
+                <ScalarProperty Name="ref_id" ColumnName="ref_id" />
+                <ScalarProperty Name="remark" ColumnName="remark" />
+                <ScalarProperty Name="unit" ColumnName="unit" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tb_inventory_detail">
+            <EntityTypeMapping TypeName="db_a94f6d_lgtssModel.tb_inventory_detail">
+              <MappingFragment StoreEntitySet="tb_inventory_detail">
+                <ScalarProperty Name="inventory_detail_id" ColumnName="inventory_detail_id" />
+                <ScalarProperty Name="inventory_ref_id" ColumnName="inventory_ref_id" />
+                <ScalarProperty Name="inventory_item_id" ColumnName="inventory_item_id" />
+                <ScalarProperty Name="inventory_warehouse_id" ColumnName="inventory_warehouse_id" />
+                <ScalarProperty Name="quantity" ColumnName="quantity" />
+                <ScalarProperty Name="remark" ColumnName="remark" />
+                <ScalarProperty Name="supplier_id" ColumnName="supplier_id" />
+                <ScalarProperty Name="unit" ColumnName="unit" />
+                <ScalarProperty Name="previous_quantity" ColumnName="previous_quantity" />
+                <ScalarProperty Name="approved_date" ColumnName="approved_date" />
+                <ScalarProperty Name="item_status" ColumnName="item_status" />
+                <ScalarProperty Name="invoice_number" ColumnName="invoice_number" />
+                <ScalarProperty Name="invoice_date" ColumnName="invoice_date" />
+                <ScalarProperty Name="inventory_type" ColumnName="inventory_type" />
+                <ScalarProperty Name="remain_quantity" ColumnName="remain_quantity" />
+                <ScalarProperty Name="reason" ColumnName="reason" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

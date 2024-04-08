@@ -263,6 +263,24 @@ namespace BT_KimMex.Class
             }
             return userId;
         }
+        public static string getUserSignaturebyAttachmentId(string id)
+        {
+            string signatureUrl = string.Empty;
+            try
+            {
+                kim_mexEntities db = new kim_mexEntities();
+                var attachment = db.tb_attachment.Find(id);
+                if (attachment != null)
+                {
+                    signatureUrl= string.Format("/Documents/Signature/{0}{1}", attachment.attachment_id, attachment.attachment_extension);
+                }
+                  
+            }catch(Exception ex)
+            {
+
+            }
+            return signatureUrl;
+        }
         public static List<RejectViewModel> GetRejectByRequest(string id)
         {
             List<RejectViewModel> rejects = new List<RejectViewModel>();

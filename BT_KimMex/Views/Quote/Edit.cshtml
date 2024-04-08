@@ -137,10 +137,13 @@
                                     string rowId = "i" + count.ToString();
                                     string controlId = "item" + count;
                                     //string price = string.Format("{0:G29}", decimal.Parse(item.price.ToString()));
-                                    string price = string.Format("{0:N4}", decimal.Parse(item.price.ToString()));
+                                    string price = string.Format("{0:N4}", decimal.Parse(item.price.ToString())).Replace(',',' ');
+                                    price=string.Format("{0:0.0000}", item.price);
+                                    //decimal price = Convert.ToDecimal(item.price, new System.Globalization.CultureInfo("en-GB"));
                                     string discount = string.Format("{0:G29}", decimal.Parse(item.discount.HasValue?item.discount.ToString():string.Format("0")));
                                     //var discountAmount = item.price * (item.discount / 100);
                                     var discountAmount = item.discount_amount;
+                                    string discountAmountStr=string.Format("{0:0.0000}", item.discount_amount);
 
                                     if (item.qty.HasValue)
                                     {
@@ -157,38 +160,45 @@
                                         }
                                     }
 
-                                    <tr id='@rowId' class="hoverSelectEdit">
-                                        <td>@count</td>
-                                        @*hidden*@
-                                        <td>
-                                            @item.product_code
-                                        <input type='hidden' class='item-id' value="@item.item_id" />
-                                            <input type="hidden" class="quote_detail_id" name="quote_detail_id[]" value="@item.quote_detail_id"/>
-                                        @*<input type='text' class='form-control item-code' placeholder='Item Code' onfocus='getItemDataRow(this)' id='@controlId' value="@item.product_code" />*@
-                                        </td>
-                                        <td><label class='item-name'>@item.product_name</label></td>
-                                        <td><label class='item-unit'>@item.unit_name</label></td>
-                                        <td class="text-center"><label class='item-qty'>@item.qty</label></td>
-                                        <td><input type='number' class='form-control unit-price' value='@price' onchange='validateFloatKeyPress(this);' onKeyPress='if(this.value.length==8) return false;' /></td>
-                                        <td><input type='number' class='form-control discount' value='@discount' onchange='onchangeDiscount(this)' /></td>
-                                        <td><input type='number' class='form-control discount_amount' onchange='onchangeDiscountAmount(this)' value='@string.Format("{0:N4}", decimal.Parse(discountAmount.ToString()))' /></td>
-                                        <td class="text-center"><label class='item_total_amount'>@string.Format("{0:N4}", decimal.Parse(totalAmount.ToString()))</label></td>
-                                        @*<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='removeItemRow(this)'><span class='glyphicon glyphicon-trash'></span></a></td>
-                                        <td>
-                                            @if (count == Model.quoteItems.Count())
-                                            {
-                                                <a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='appendItemRow(this)'><span class='glyphicon glyphicon-plus'></span></a>
-                                            }
+                                                        <tr id='@rowId' class="hoverSelectEdit">
+                                                            <td>@count</td>
+                                                            @*hidden*@
+                                                            <td>
+                                                                @item.product_code
+                                                                <input type='hidden' class='item-id' value="@item.item_id" />
+                                                                <input type="hidden" class="quote_detail_id" name="quote_detail_id[]" value="@item.quote_detail_id" />
+                                                                @*<input type='text' class='form-control item-code' placeholder='Item Code' onfocus='getItemDataRow(this)' id='@controlId' value="@item.product_code" />*@
+                                                            </td>
+                                                            <td><label class='item-name'>@item.product_name</label></td>
+                                                            <td><label class='item-unit'>@item.unit_name</label></td>
+                                                            <td class="text-center"><label class='item-qty'>@item.qty</label></td>
+                                                            <td>
+                                                                <input type='number' class='form-control unit-price' value='@price' onchange='validateFloatKeyPress(this);' onKeyPress='if(this.value.length==8) return false;' min="1" max="16" style="padding:0px !important;" />
+                                                                <input type='hidden' class='unit-price-full' value='@price' />
+                                                            </td>
+                                                            <td><input type='number' class='form-control discount' value='@discount' onchange='onchangeDiscount(this)' /></td>
+                                                            @*<td><input type='number' class='form-control discount_amount' onchange='onchangeDiscountAmount(this)' value='@string.Format("{0:N4}", decimal.Parse(discountAmount.ToString()))' /></td>*@
+                                                        <td>
+                                                            <input type='number' class='form-control discount_amount' onchange='onchangeDiscountAmount(this)' value='@discountAmountStr' />
+                                                            <input type='hidden' class='discount_amount_full' value='@discountAmountStr' />
+                                                        </td>
+                                                            <td class="text-center"><label class='item_total_amount'>@string.Format("{0:N4}", decimal.Parse(totalAmount.ToString()))</label></td>
+                                                            @*<td><a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='removeItemRow(this)'><span class='glyphicon glyphicon-trash'></span></a></td>
+        <td>
+            @if (count == Model.quoteItems.Count())
+            {
+                <a href='javascript:void(0)' class='btn btn-default btn-sm' onclick='appendItemRow(this)'><span class='glyphicon glyphicon-plus'></span></a>
+            }
 
-                                        </td>*@
+        </td>*@
 
-                                        @*<td hidden>
-                                            <a href='javascript:void(0)' id="@item.item_id" class="editItemFromQuots select-link edit-promp">Edit Item</a>
-                                        </td>*@
+                                                            @*<td hidden>
+            <a href='javascript:void(0)' id="@item.item_id" class="editItemFromQuots select-link edit-promp">Edit Item</a>
+        </td>*@
 
-                                        @*<td><a href="javascript:void(0)" id="@item.item_id" class="getbyID">Edit</a> </td>'*@
+                                                            @*<td><a href="javascript:void(0)" id="@item.item_id" class="getbyID">Edit</a> </td>'*@
 
-                                    </tr>
+                                                        </tr>
                                     count++;
                                     amount = amount + Convert.ToDecimal(totalAmount);
                                 }
@@ -731,17 +741,8 @@
                          );
                         $(this).remove();
                     });
-                function enable_submit_button(is_submit) {
-                    if (is_submit) {
-                        $('#btnSubmit').text("Submitting...");
-                        $('#btnSubmit').attr('disabled', true);
-                    } else {
-                        $('#btnSubmit').text("Submit");
-                        $('#btnSubmit').attr('disabled', false);
-                    }
-                }
-                $('#btnSubmit').click(function (e) {
-                    enable_submit_button(true);
+
+                    $('#btnSubmit').click(function (e) {
                         var quoteItems = [];
                         var itemElement = {};
                         var quoteId = $('#quote_id').val();
@@ -939,11 +940,31 @@
                     $('#grand_total_after_amount').text(ReplaceNumberWithCommas(parseFloat(grand_total_after_discount).toFixed(4)));
                 }
 
+                //function onchangeDiscount(el) {
+                //    var v = parseFloat(el.value) / 100;
+                //    var ind = el.parentNode.parentNode.rowIndex;
+                //    var unitPrice = parseFloat($('#quoteTable tr').eq(ind).find('input.unit-price').val());
+                //    $('#quoteTable tr').eq(ind).find('input.discount_amount').val(ReplaceNumberWithCommas(parseFloat(v * unitPrice).toFixed(4)));
+
+                //    var qty = Number($('#quoteTable tr').eq(ind).find('label.item-qty').text());
+                //    var discountAmount = $('#quoteTable tr').eq(ind).find('input.discount_amount').val();
+
+                //    calculateTotal(ind, unitPrice, discountAmount, qty);
+
+                //}
+
                 function onchangeDiscount(el) {
-                    var v = parseFloat(el.value) / 100;
+                    var v = parseFloat(el.value)/100;
                     var ind = el.parentNode.parentNode.rowIndex;
-                    var unitPrice = parseFloat($('#quoteTable tr').eq(ind).find('input.unit-price').val());
-                    $('#quoteTable tr').eq(ind).find('input.discount_amount').val(ReplaceNumberWithCommas(parseFloat(v * unitPrice).toFixed(4)));
+                    //var unitPrice = parseFloat($('#quoteTable tr').eq(ind).find('input.unit-price').val());
+                    var unitPrice = parseFloat($('#quoteTable tr').eq(ind).find('input.unit-price-full').val());
+                    var discountAmount1 = ReplaceNumberWithCommas(parseFloat(v * unitPrice).toFixed(4));
+                    discountAmount1=discountAmount1.replace(/\,/g,''); // 1125, but a string, so convert it to number
+                    //discountAmount1=parseInt(discountAmount1,10);
+                    console.log(discountAmount1)
+                    //$('#quoteTable tr').eq(ind).find('input.discount_amount').val(ReplaceNumberWithCommas(parseFloat(v * unitPrice).toFixed(4)));
+                    $('#quoteTable tr').eq(ind).find('input.discount_amount').val(discountAmount1);
+                    $('#quoteTable tr').eq(ind).find('input.discount_amount_full').val(ReplaceNumberWithCommas(parseFloat(v * unitPrice)));
 
                     var qty = Number($('#quoteTable tr').eq(ind).find('label.item-qty').text());
                     var discountAmount = $('#quoteTable tr').eq(ind).find('input.discount_amount').val();

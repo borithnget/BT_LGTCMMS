@@ -436,7 +436,7 @@ namespace BT_KimMex.Class
                                     join pr in db.tb_purchase_requisition on mr.ir_id equals pr.material_request_id
                                     join pro in db.tb_product on item.ir_item_id equals pro.product_id
                                     join u in db.tb_unit on pro.product_unit equals u.Id
-                                    orderby pro.product_code
+                                    orderby item.ordering_number, pro.product_code
                                     where string.Compare(pr.purchase_requisition_id, prId) == 0 && item.is_approved == true && item.remain_qty > 0 && item.remain_qty != null
                                     select new Models.ItemRequestDetail2ViewModel()
                                     {
@@ -449,7 +449,8 @@ namespace BT_KimMex.Class
                                         ir_qty = item.ir_qty,
                                         ir_item_unit = item.ir_item_unit,
                                         approved_qty = item.approved_qty,
-                                        remain_qty = item.remain_qty
+                                        remain_qty = item.remain_qty,
+                                        ordering_number=item.ordering_number,
                                     }).ToList();
                 if (itemRequests.Any())
                 {
@@ -467,7 +468,7 @@ namespace BT_KimMex.Class
                         ir.approved_qty = item.approved_qty;
                         ir.requested_unit_id = item.ir_item_unit;
                         ir.remain_qty = item.remain_qty;
-
+                        ir.ordering_number = item.ordering_number;
                         items.Add(ir);
                     }
                 }

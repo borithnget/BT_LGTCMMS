@@ -200,17 +200,8 @@
                     }
                 }
             });
-            function enable_submit_button(is_submit) {
-                if (is_submit) {
-                    $('#btnApprove').text("Submitting...");
-                    $('#btnApprove').attr('disabled', true);
-                } else {
-                    $('#btnApprove').text("Submit");
-                    $('#btnApprove').attr('disabled', false);
-                }
-            }
+
             $('#btnApprove').click(function () {
-                enable_submit_button(true);
                 var item_element = {};
                 var itemRequestDetail = [];
                 var irId = $('#ir_id').val();

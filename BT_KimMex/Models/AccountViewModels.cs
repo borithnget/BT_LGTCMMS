@@ -111,6 +111,7 @@ namespace BT_KimMex.Models
         [Display(Name ="Date:")]
         public string created_date { get; set; }
         public string user_signature { get; set; }
+        public string[] user_signatures { get; set; }
     }
 
     public class ResetPasswordViewModel
@@ -165,12 +166,19 @@ namespace BT_KimMex.Models
         [Display(Name = "Date:")]
         public string created_date { get; set; }
         public string user_signature { get; set; }
+        public List<AttachmentViewModel> signatures { get; set; }
+        public string[] user_signatures { get; set; }
 
         public static UserViewModel GetUserDetailById(string id)
         {
             UserViewModel user = new UserViewModel();
             user = GlobalMethod.GetUserInfomationDetail(id);
+           
             return user;
+        }
+        public UserUpdateViewModel()
+        {
+            signatures = new List<AttachmentViewModel>();
         }
     }
 

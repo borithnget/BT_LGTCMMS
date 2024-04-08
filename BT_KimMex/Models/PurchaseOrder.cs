@@ -682,6 +682,20 @@ namespace BT_KimMex.Models
                         select pod).FirstOrDefault();
             }
         }
+    
+        public static tb_po_report_cancelled GetPOReportCancelled(bool isVAT, bool isLOP)
+        {
+            tb_po_report_cancelled result = new tb_po_report_cancelled();
+            try
+            {
+                kim_mexEntities db = new kim_mexEntities();
+                result = db.tb_po_report_cancelled.Where(s => s.IsReuse == false && s.IsLPO == isLOP && s.IsVAT == isVAT).FirstOrDefault();
+            }catch(Exception ex)
+            {
+
+            }
+            return result;
+        }
     }
     public class PurchaseOrderReportGenerateModel
     {
@@ -1064,6 +1078,15 @@ namespace BT_KimMex.Models
                         model.createdBySignature =string.IsNullOrEmpty(createdBySignature)?string.Empty: string.Format("{0}{1}",EnumConstants.domainName,createdBySignature);
                         model.approvedBySignature = string.IsNullOrEmpty(CommonClass.GetUserSignature(purchase.approved_by)) ? string.Empty : string.Format("{0}{1}", EnumConstants.domainName, CommonClass.GetUserSignature(purchase.approved_by));
                         model.checkedBySignature= string.IsNullOrEmpty(CommonClass.GetUserSignature(purchase.checked_by)) ? string.Empty : string.Format("{0}{1}", EnumConstants.domainName, CommonClass.GetUserSignature(purchase.checked_by));
+
+                        if (string.IsNullOrEmpty(purchase.approved_signature))
+                        {
+                            model.approvedBySignature = string.Empty;
+                        }
+                        else
+                        {
+                            model.approvedBySignature = string.Format("{0}{1}", EnumConstants.domainName, CommonClass.getUserSignaturebyAttachmentId(purchase.approved_signature)); 
+                        }
 
                         model.isPO = isPO;
                         model.isQuote = isQuote;

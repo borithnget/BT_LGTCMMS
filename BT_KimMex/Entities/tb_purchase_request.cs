@@ -36,6 +36,7 @@ namespace BT_KimMex.Entities
         public string checked_comment { get; set; }
         public Nullable<bool> status { get; set; }
         public Nullable<bool> is_check { get; set; }
+        public string approved_signature { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tb_purchase_request_detail> tb_purchase_request_detail { get; set; }

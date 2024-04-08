@@ -1464,6 +1464,11 @@ public static ClassTypeViewModel GetClassTypeItem(string id)
                     model.project_short_name = obj.proj.project_full_name;
                     model.purchase_request_status = obj.po.purchase_request_status;
                     model.purchase_order_id = obj.po.purchase_order_id;
+                    if (!string.IsNullOrEmpty(model.purchase_order_id))
+                    {
+                        model.poDetails = PurchaseOrderReportViewModel.GetPOReportbyPurchaseOrderId(model.pruchase_request_id);
+
+                    }
                     models.Add(model);
                 }
 
@@ -1616,6 +1621,158 @@ public static ClassTypeViewModel GetClassTypeItem(string id)
                     {
                         model.poDetails = PurchaseOrderReportViewModel.GetPOReportbyPurchaseOrderId(model.pruchase_request_id);
 
+                    }
+
+                    models.Add(model);
+                }
+
+                models = models.OrderByDescending(s => s.purchase_request_number).ToList();
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return models;
+        }
+        public static List<PurchaseRequestViewModel> GetPurchaseOrderMyApprovalList(bool isAdmin, bool isFinance, bool isAccount, bool isOperationDirector, string userId, string status)
+        {
+            List<PurchaseRequestViewModel> models = new List<PurchaseRequestViewModel>();
+            try
+            {
+                kim_mexEntities db = new kim_mexEntities();
+                
+                List<PurchaseOrderFilterResult> results = new List<PurchaseOrderFilterResult>();
+
+                if (string.Compare(status, "0") == 0)
+                {
+                    if (isAdmin || ((isFinance || isAccount) && isOperationDirector))
+                    {
+                        var objs = (from po in db.tb_purchase_request
+                                    join quote in db.tb_purchase_order on po.purchase_order_id equals quote.purchase_order_id into pquote
+                                    from quote in pquote.DefaultIfEmpty()
+                                    join pr in db.tb_purchase_requisition on quote.item_request_id equals pr.purchase_requisition_id into ppr
+                                    from pr in ppr.DefaultIfEmpty()
+                                    join mr in db.tb_item_request on pr.material_request_id equals mr.ir_id into pmr
+                                    from mr in pmr.DefaultIfEmpty()
+                                    join proj in db.tb_project on mr.ir_project_id equals proj.project_id
+                                    orderby po.created_date descending
+                                    where po.status == true && ((string.Compare(po.purchase_request_status, Status.Pending) == 0 || string.Compare(po.purchase_request_status, Status.Approved) == 0) || (string.Compare(po.approved_by, userId) == 0 || string.Compare(po.checked_by, userId) == 0)) 
+                                    select new PurchaseOrderFilterResult() { po = po, quote = quote, mr = mr, proj = proj }).ToList();
+
+                        results.AddRange(objs);
+                    }
+                    else
+                    {
+                        if (isFinance || isAccount)
+                        {
+                            var objs = (from po in db.tb_purchase_request
+                                        join quote in db.tb_purchase_order on po.purchase_order_id equals quote.purchase_order_id into pquote
+                                        from quote in pquote.DefaultIfEmpty()
+                                        join pr in db.tb_purchase_requisition on quote.item_request_id equals pr.purchase_requisition_id into ppr
+                                        from pr in ppr.DefaultIfEmpty()
+                                        join mr in db.tb_item_request on pr.material_request_id equals mr.ir_id into pmr
+                                        from mr in pmr.DefaultIfEmpty()
+                                        join proj in db.tb_project on mr.ir_project_id equals proj.project_id
+                                        orderby po.created_date descending
+                                        where po.status == true && (string.Compare(po.purchase_request_status, Status.Pending) == 0 || string.Compare(po.approved_by, userId) == 0) 
+                                        select new PurchaseOrderFilterResult() { po = po, quote = quote, mr = mr, proj = proj }).ToList();
+                            results.AddRange(objs);
+                        }
+
+                        if (isOperationDirector)
+                        {
+                            var objs = (from po in db.tb_purchase_request
+                                        join quote in db.tb_purchase_order on po.purchase_order_id equals quote.purchase_order_id into pquote
+                                        from quote in pquote.DefaultIfEmpty()
+                                        join pr in db.tb_purchase_requisition on quote.item_request_id equals pr.purchase_requisition_id into ppr
+                                        from pr in ppr.DefaultIfEmpty()
+                                        join mr in db.tb_item_request on pr.material_request_id equals mr.ir_id into pmr
+                                        from mr in pmr.DefaultIfEmpty()
+                                        join proj in db.tb_project on mr.ir_project_id equals proj.project_id
+                                        orderby po.created_date descending
+                                        where po.status == true && (string.Compare(po.purchase_request_status, Status.Approved) == 0 || string.Compare(po.checked_by, userId) == 0) 
+                                        select new PurchaseOrderFilterResult() { po = po, quote = quote, mr = mr, proj = proj }).ToList();
+                            results.AddRange(objs);
+                        }
+
+                    }
+
+                }
+                else
+                {
+                    if (isAdmin || ((isFinance || isAccount) && isOperationDirector))
+                    {
+                        var objs = (from po in db.tb_purchase_request
+                                    join quote in db.tb_purchase_order on po.purchase_order_id equals quote.purchase_order_id into pquote
+                                    from quote in pquote.DefaultIfEmpty()
+                                    join pr in db.tb_purchase_requisition on quote.item_request_id equals pr.purchase_requisition_id into ppr
+                                    from pr in ppr.DefaultIfEmpty()
+                                    join mr in db.tb_item_request on pr.material_request_id equals mr.ir_id into pmr
+                                    from mr in pmr.DefaultIfEmpty()
+                                    join proj in db.tb_project on mr.ir_project_id equals proj.project_id
+                                    orderby po.created_date descending
+                                    where po.status == true && ((string.Compare(po.purchase_request_status, Status.Pending) == 0 || string.Compare(po.purchase_request_status, Status.Approved) == 0) || (string.Compare(po.approved_by, userId) == 0 || string.Compare(po.checked_by, userId) == 0)) 
+                                    && string.Compare(po.purchase_request_status, status) == 0
+                                    select new PurchaseOrderFilterResult() { po = po, quote = quote, mr = mr, proj = proj }).ToList();
+
+                        results.AddRange(objs);
+                    }
+                    else
+                    {
+                        if (isFinance || isAccount)
+                        {
+                            var objs = (from po in db.tb_purchase_request
+                                        join quote in db.tb_purchase_order on po.purchase_order_id equals quote.purchase_order_id into pquote
+                                        from quote in pquote.DefaultIfEmpty()
+                                        join pr in db.tb_purchase_requisition on quote.item_request_id equals pr.purchase_requisition_id into ppr
+                                        from pr in ppr.DefaultIfEmpty()
+                                        join mr in db.tb_item_request on pr.material_request_id equals mr.ir_id into pmr
+                                        from mr in pmr.DefaultIfEmpty()
+                                        join proj in db.tb_project on mr.ir_project_id equals proj.project_id
+                                        orderby po.created_date descending
+                                        where po.status == true && (string.Compare(po.purchase_request_status, Status.Pending) == 0 || string.Compare(po.approved_by, userId) == 0) 
+                                        && string.Compare(po.purchase_request_status, status) == 0
+                                        select new PurchaseOrderFilterResult() { po = po, quote = quote, mr = mr, proj = proj }).ToList();
+                            results.AddRange(objs);
+                        }
+
+                        if (isOperationDirector)
+                        {
+                            var objs = (from po in db.tb_purchase_request
+                                        join quote in db.tb_purchase_order on po.purchase_order_id equals quote.purchase_order_id into pquote
+                                        from quote in pquote.DefaultIfEmpty()
+                                        join pr in db.tb_purchase_requisition on quote.item_request_id equals pr.purchase_requisition_id into ppr
+                                        from pr in ppr.DefaultIfEmpty()
+                                        join mr in db.tb_item_request on pr.material_request_id equals mr.ir_id into pmr
+                                        from mr in pmr.DefaultIfEmpty()
+                                        join proj in db.tb_project on mr.ir_project_id equals proj.project_id
+                                        orderby po.created_date descending
+                                        where po.status == true && (string.Compare(po.purchase_request_status, Status.Approved) == 0 || string.Compare(po.checked_by, userId) == 0) 
+                                        && string.Compare(po.purchase_request_status, status) == 0
+                                        select new PurchaseOrderFilterResult() { po = po, quote = quote, mr = mr, proj = proj }).ToList();
+                            results.AddRange(objs);
+                        }
+
+                    }
+                }
+
+                foreach (var obj in results.DistinctBy(s => s).ToList())
+                {
+                    PurchaseRequestViewModel model = new PurchaseRequestViewModel();
+                    model.pruchase_request_id = obj.po.pruchase_request_id;
+                    model.purchase_request_number = obj.po.purchase_request_number;
+                    model.str_created_date = Convert.ToDateTime(obj.po.created_date).ToString("dd/MM/yyyy");
+                    model.created_by = GetUserFullnamebyUserId(obj.po.created_by);
+                    model.quote_number = obj.quote.purchase_oder_number;
+                    model.mr_id = obj.mr.ir_id;
+                    model.mr_number = obj.mr.ir_no;
+                    model.project_short_name = obj.proj.project_full_name;
+                    model.purchase_request_status = obj.po.purchase_request_status;
+                    model.purchase_order_id = obj.po.purchase_order_id;
+
+                    if (!string.IsNullOrEmpty(model.purchase_order_id))
+                    {
+                        model.poDetails = PurchaseOrderReportViewModel.GetPOReportbyPurchaseOrderId(model.pruchase_request_id);
                     }
 
                     models.Add(model);

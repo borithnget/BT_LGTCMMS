@@ -255,18 +255,9 @@
                     '<input type="file" class="form-control" name="attachment_reference" id="attachment_reference" />'
                     );
             });
-            function enable_submit_button(is_submit) {
-                if (is_submit) {
-                    $('#btnSave').text("Submitting...");
-                    $('#btnSave').attr('disabled', true);
-                } else {
-                    $('#btnSave').text("Submit");
-                    $('#btnSave').attr('disabled', false);
-                }
-            }
+
             $('#btnSave').click(function (e) {
                 e.preventDefault();
-                enable_submit_button(true);
                 var item_element = {};
                 var job_element = {};
                 var type_element = {};

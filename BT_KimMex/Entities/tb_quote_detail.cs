@@ -28,6 +28,7 @@ namespace BT_KimMex.Entities
         public string remark { get; set; }
         public Nullable<decimal> qty { get; set; }
         public Nullable<decimal> discount_amount { get; set; }
+        public Nullable<int> ordering_number { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tb_item_quote_attachment> tb_item_quote_attachment { get; set; }

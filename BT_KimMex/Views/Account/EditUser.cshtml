@@ -119,12 +119,24 @@
                     </div>
                     <div class="col-lg-4 col-md-4 col-xs-12 col-sm-12">
                         <div class="form-group row">
-                            <input type="file" id="signature_file" class="form-control imageBrowes" accept="image/*" />
+                            <input type="file" id="signature_file" class="form-control imageBrowes" accept="image/*" multiple/>
                             <input type="hidden" class="form-control" name="user_signature" id="file-path" value="@Model.user_signature">
                             <div id="imgPreview" class="thumbnail">
                                 @if (String.IsNullOrEmpty(Model.user_signature))
                                 {
-                                    <img src="@Url.Content("~/Assets/img/profile-picture.jpg")" style=" background-color:white; width: 250px;height: 250px; object-fit:fill;" class="img-responsive" id="targetImg" />
+                                    if (Model.signatures.Count() == 0)
+                                    {
+                                        <img src="@Url.Content("~/Assets/img/profile-picture.jpg")" style=" background-color:white; width: 250px;height: 250px; object-fit:fill;" class="img-responsive" id="targetImg" />
+                                    }
+                                    else
+                                    {
+                                        foreach (var signature in Model.signatures)
+                                        {
+                                            string userSignature = string.Format("/Documents/Signature/{0}{1}", signature.attachment_id, signature.attachment_extension);
+                                            <img src="@userSignature" style="object-fit: fill; background-color: white; width: 100px; height: 100px; " class="img-responsive" id="targetImg" />
+                                            <input type='hidden' name='user_signatures[]' value='@signature.attachment_id' />
+                                        }
+                                    }
                                 }
                                 else
                                 {
@@ -146,7 +158,9 @@
         $(function () {
             $("#signature_file").change(function (e) {
                 e.preventDefault();
-                readURL(this);
+                //readURL(this);
+                //$("#imgPreview").empty();
+                UploadUserSignatureMultiple();
             });
         })
         function readURL(input) {
@@ -205,6 +219,43 @@
                 }
             }
         }
+
+        function UploadUserSignatureMultiple() {
+
+            var form_data = new FormData();
+            var file_input = document.getElementById('signature_file');
+            if (file_input.files.length > 0) {
+                for (var i = 0; i < file_input.files.length; i++) {
+                    form_data = new FormData();
+                    form_data.append(file_input.files[i].name, file_input.files[i]);
+                    $.ajax({
+                        url: '@Url.Action("UploadUserMultipleSignature", "Account")',
+                        type: "POST",
+                        data: form_data,
+                        async: false,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (da) {                           
+                            if (da.attachment) {
+                                var attachment = da.attachment;
+                                //console.log(attachment);
+                                var image_path = "/Documents/Signature/" + attachment.attachment_id + attachment.attachment_extension;
+                                $('#imgPreview').append("<img src='" + image_path + "' data-id='" + attachment.attachment_id + "' style='background-color: white; width: 100 %; height: auto;'  class='img-responsive user_signature'/>" +
+                                    "<input type='hidden' name='user_signatures[]' value='"+attachment.attachment_id+"'/>");
+                            }
+                            //if (da.result == "success")
+                            //    arrAttachment.push(da.attachment_id);
+                        },
+                        error: function (xhr, error, status) {
+                            console.log(error, status);
+                        }
+                    });
+                }
+            }
+
+        }
+
     </script>
     }
 

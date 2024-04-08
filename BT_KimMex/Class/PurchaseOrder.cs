@@ -33,8 +33,66 @@ namespace BT_KimMex.Class
                     }
                     //if (countVATItem > 0) SaveVATPONumber(id, supplier.supplier_id);
                     //if (countNonVATItem > 0) SaveNonVATPONumber(id, supplier.supplier_id);
-                    if (countVATItem > 0) GeneratePOReportNumber(id, supplier.supplier_id,true,Convert.ToBoolean(sup.is_local));
-                    if (countNonVATItem > 0) GeneratePOReportNumber(id, supplier.supplier_id, false, Convert.ToBoolean(sup.is_local));
+                    if (countVATItem > 0)
+                    {
+                        var getPOCancelled = PurchaseOrderReportViewModel.GetPOReportCancelled(true, Convert.ToBoolean(sup.is_local));
+                        if (getPOCancelled == null)
+                        {
+                            GeneratePOReportNumber(id, supplier.supplier_id, true, Convert.ToBoolean(sup.is_local));
+                        }
+                        else
+                        {
+                            tb_po_report poReport = new tb_po_report();
+                            poReport.po_report_id = Guid.NewGuid().ToString();
+                            poReport.po_report_number = getPOCancelled.PONumber;
+                            poReport.po_ref_id = id;
+                            poReport.po_supplier_id = supplier.supplier_id;
+                            poReport.created_date = DateTime.Now;
+                            poReport.vat_status = true;
+                            poReport.is_lpo = Convert.ToBoolean(sup.is_local);
+                            db.tb_po_report.Add(poReport);
+                            db.SaveChanges();
+                            //Update Cancel PO to reuse
+                            tb_po_report_cancelled poCancelled = db.tb_po_report_cancelled.Find(getPOCancelled.Id);
+                            if (poCancelled != null)
+                            {
+                                poCancelled.IsReuse = true;
+                                poCancelled.UpdatedAt = CommonClass.ToLocalTime(DateTime.Now);
+                                db.SaveChanges();
+                            }
+                        }
+                    }
+
+                    if (countNonVATItem > 0)
+                    {
+                        var getPOCancelled = PurchaseOrderReportViewModel.GetPOReportCancelled(true, Convert.ToBoolean(sup.is_local));
+                        if (getPOCancelled == null)
+                        {
+                            GeneratePOReportNumber(id, supplier.supplier_id, false, Convert.ToBoolean(sup.is_local));
+                        }
+                        else
+                        {
+                            tb_po_report poReport = new tb_po_report();
+                            poReport.po_report_id = Guid.NewGuid().ToString();
+                            poReport.po_report_number = getPOCancelled.PONumber;
+                            poReport.po_ref_id = id;
+                            poReport.po_supplier_id = supplier.supplier_id;
+                            poReport.created_date = DateTime.Now;
+                            poReport.vat_status = false;
+                            poReport.is_lpo = Convert.ToBoolean(sup.is_local);
+                            db.tb_po_report.Add(poReport);
+                            db.SaveChanges();
+                            //Update Cancel PO to reuse
+                            tb_po_report_cancelled poCancelled = db.tb_po_report_cancelled.Find(getPOCancelled.Id);
+                            if (poCancelled != null)
+                            {
+                                poCancelled.IsReuse = true;
+                                poCancelled.UpdatedAt = CommonClass.ToLocalTime(DateTime.Now);
+                                db.SaveChanges();
+                            }
+                        }
+                        
+                    }
                 }
             }
         }

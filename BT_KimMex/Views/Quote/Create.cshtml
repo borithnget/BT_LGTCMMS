@@ -175,7 +175,7 @@
 
                     <div class="form-group">
                         <div class="col-md-offset-2 col-md-10">
-                            <input type="button" value="Submit" id="btnSubmit" onclick="saveQuote()" class="btn btn-success" />
+                            <input type="button" value="Submit" onclick="saveQuote()" class="btn btn-success" />
                             @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-danger" })
                         </div>
                     </div>
@@ -519,7 +519,7 @@
                                 $('#quoteTable tbody').append("" +
                                     "<tr id='i" + Number(Number(rowNumber) + 1) + "'>" +
                                     "<td>" + Number(Number(rowNumber) + 1) + "</td>" +
-                                    "<td><input type='hidden' class='item-id' value='" + item.ir_item_id + "'/><label class='item-code' id='item" + Number(Number(rowNumber) + 1) + "'>" + item.product_code + "</label></td>" +
+                                    "<td><input type='hidden' class='item-id' value='" + item.ir_item_id + "'/><input type='hidden' class='ordering_number' value='"+item.ordering_number+"'/><label class='item-code' id='item" + Number(Number(rowNumber) + 1) + "'>" + item.product_code + "</label></td>" +
                                     "<td><label class='item-name'>" + item.product_name + "</label></td>" +
                                     "<td><label class='item-unit'>" + item.ir_item_unit + "</label></td>" +
                                     "<td class='text-center'><label class='item-qty'>" + item.remain_qty + "</label></td>" +
@@ -527,7 +527,7 @@
                                     "<input type='hidden' class='unit-price-full' value='0'/>" +
                                     "</td>" +
                                     "<td><input type='number' class='form-control discount' onchange='onchangeDiscount(this)' value='0'/></td>" +
-                                    "<td><input type='number' class='form-control discount_amount' onchange='onchangeDiscountAmount(this)' value='0'/>" +
+                                    "<td><input type='number' class='form-control discount_amount' onchange='onchangeDiscountAmount(this)' value='0' min='0' max='20'/>" +
                                     "<input type='hidden' class='discount_amount_full' value='0'/>" +
                                     "</td>" +
                                     "<td class='text-center'><label class='item_total_amount'>" + parseFloat(0).toFixed(4) + "</label></td>" +
@@ -1594,17 +1594,8 @@
                 }
             })
         }
-        function enable_submit_button(is_submit) {
-            if (is_submit) {
-                $('#btnSubmit').text("Submitting...");
-                $('#btnSubmit').attr('disabled', true);
-            } else {
-                $('#btnSubmit').text("Submit");
-                $('#btnSubmit').attr('disabled', false);
-            }
-        }
+
         function saveQuote() {
-            enable_submit_button(true);
             var quoteItems = [];
             var itemElement = {};
             var quoteNo = $('#quote_no').text();
@@ -1616,6 +1607,7 @@
             var qtys = $('.item-qty');
             var unitPriceFulls = $('.unit-price-full');
             var DiscountAmountFulls = $('.discount_amount_full');
+            var orderingNumbers = $('.ordering_number');
             //var DiscountAmountFulls = $('.discount_amount');
             //var unitPrices = $('.unit-price');
             var countInvalid = 0;
@@ -1640,7 +1632,8 @@
                     itemElement.price = unitPriceFulls[i].value;
                     itemElement.discount = discounts[i].value;
                     itemElement.qty = Number(qtys[i].innerHTML);
-                    itemElement.discount_amount =parseFloat(DiscountAmountFulls[i].value).toFixed(8);
+                    itemElement.discount_amount = parseFloat(DiscountAmountFulls[i].value).toFixed(8);
+                    itemElement.ordering_number = parseInt(orderingNumbers[i].value);
                     quoteItems.push(itemElement);
                 }
             }
@@ -1648,6 +1641,7 @@
                 alert("Please fill in all items unit price.");
                 return;
             }
+
 
             var form_data = new FormData();
             var file_input = document.getElementById('attachment_reference');
@@ -1784,7 +1778,12 @@
             var ind = el.parentNode.parentNode.rowIndex;
             //var unitPrice = parseFloat($('#quoteTable tr').eq(ind).find('input.unit-price').val());
             var unitPrice = parseFloat($('#quoteTable tr').eq(ind).find('input.unit-price-full').val());
-            $('#quoteTable tr').eq(ind).find('input.discount_amount').val(ReplaceNumberWithCommas(parseFloat(v * unitPrice).toFixed(4)));
+            var discountAmount1 = ReplaceNumberWithCommas(parseFloat(v * unitPrice).toFixed(4));
+            discountAmount1=discountAmount1.replace(/\,/g,''); // 1125, but a string, so convert it to number
+            //discountAmount1=parseInt(discountAmount1,10);
+            console.log(discountAmount1)
+            //$('#quoteTable tr').eq(ind).find('input.discount_amount').val(ReplaceNumberWithCommas(parseFloat(v * unitPrice).toFixed(4)));
+            $('#quoteTable tr').eq(ind).find('input.discount_amount').val(discountAmount1);
             $('#quoteTable tr').eq(ind).find('input.discount_amount_full').val(ReplaceNumberWithCommas(parseFloat(v * unitPrice)));
 
             var qty = Number($('#quoteTable tr').eq(ind).find('label.item-qty').text());

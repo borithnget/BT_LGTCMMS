@@ -549,11 +549,6 @@ namespace BT_KimMex.Controllers
         {
             return View(DetailPOReceivingReportResponseModel.GetDetailPOReceivingReportsList(dateFrom,dateTo));
         }
-        public ActionResult WarehouseStockBalance()
-        {
-            var results = InventoryViewModel.GetStockBalancebyWarehouse("3c88cdbf-2205-412d-a61e-2ad161a49187",Convert.ToDateTime("2023-01-01"),Convert.ToDateTime("2023-03-01"));
-            return View();
-        }
 
     }
 }

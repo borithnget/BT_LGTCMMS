@@ -168,7 +168,7 @@
 
     <div class="form-group">
         <div class="col-md-offset-2 col-md-10">
-            <input type="button" value="Submit" class="btn btn-default" id="btnSubmit" onclick="prepareFeedbackItemReturn()" />
+            <input type="button" value="Submit" class="btn btn-default" onclick="prepareFeedbackItemReturn()" />
             @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-default" })
         </div>
     </div>
@@ -182,18 +182,7 @@
                 $(this).datepicker('hide');
             });
         });
-
-        function enable_submit_button(is_submit) {
-            if (is_submit) {
-                $('#btnSubmit').text("Submitting...");
-                $('#btnSubmit').attr('disabled', true);
-            } else {
-                $('#btnSubmit').text("Submit");
-                $('#btnSubmit').attr('disabled', false);
-            }
-        }
         function prepareFeedbackItemReturn() {
-            enable_submit_button(true);
             var inventories = [];
             var item_element = {};
             var warehouses = $('.warehouse');

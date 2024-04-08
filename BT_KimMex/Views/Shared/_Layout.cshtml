@@ -471,21 +471,20 @@
                                         @*<li>@Html.ActionLink("Stock Balance by warehouse", "StockBalanceBywarehouse", "Report")</li>*@
 
                                         <li>@Html.ActionLink("Stock Balance Monthly", "StockBalanceByDateandWarehouse", "Report")</li>
-                                        <li>@Html.ActionLink("Warehouse Stock Balance Monthly", "WarehouseStockBalance", "Report")</li>
                                         @*<li>@Html.ActionLink("Detail PO Receiving", "DetailPurchaseOrderReceiving", "Report")</li>*@
                                     }
                                     @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.SiteSupervisor) || User.IsInRole(Role.SiteStockKeeper))
                                     {
                                         <li>@Html.ActionLink("Work Order Isuse VS Work Order Return", "WorkOrderIsuseVSWorkOrderReturn", "Report")</li>
                                     }
-                                    @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.FinanceManager) || User.IsInRole(Role.AccountingManager) || User.IsInRole(Role.ProcurementManager))
+                                    @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.FinanceManager) || User.IsInRole(Role.AccountingManager)|| User.IsInRole(Role.ProcurementManager))
                                     {
                                         <li>@Html.ActionLink("Purchase Order for Finance", "PurchaseOrder", "Report", new { id = 1 }, htmlAttributes: null)</li>
                                     }
                                     @if (User.IsInRole(Role.SiteStockKeeper))
                                     {
                                         @*<li>@Html.ActionLink("Stock Balance Monthly", "StockBalanceByDateandWarehouseStockKeeper", "Report")</li>*@
-                                        <li>@Html.ActionLink("Stock Balance Monthly", "StockBalanceByDateandWarehouse", "Report", new { id = 1 }, htmlAttributes: null)</li>
+                                        <li>@Html.ActionLink("Stock Balance Monthly", "StockBalanceByDateandWarehouse", "Report", new { id=1 }, htmlAttributes: null)</li>
                                     }
                                 </ul>
                             </li>
@@ -552,6 +551,7 @@
                                             <li>@Html.ActionLink("Position", "Index", "Position")</li>
                                             <li>@Html.ActionLink("Site", "Index", "Site")</li>
                                             <li>@Html.ActionLink("Warehouse", "Index", "WareHouse")</li>
+                                            <li>@Html.ActionLink("OD Amount Approval", "SettingODAmountApproval", "PurchaseOrderAandR")</li>
                                         }
                                         @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser))
                                         {

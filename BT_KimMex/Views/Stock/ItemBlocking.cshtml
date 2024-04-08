@@ -91,17 +91,8 @@
                 //console.log(mr_cut_id);
                 $('#cancelRequestModal').modal('show');
             });
-            function enable_submit_button(is_submit) {
-                if (is_submit) {
-                    $('#btn-cancel-yes').text("Submitting...");
-                    $('#btn-cancel-yes').attr('disabled', true);
-                } else {
-                    $('#btn-cancel-yes').text("Yes");
-                    $('#btn-cancel-yes').attr('disabled', false);
-                }
-            }
+
             $('#btn-cancel-yes').click(function () {
-                enable_submit_button(true);
                 if (item_blocking_id != '') {
                     $.ajax({
                         url: "/Stock/ItemBlockingDeactive",

@@ -8,7 +8,6 @@ namespace BT_KimMex.Models
 {
     public class StockBalanceBywarehouse
     {
-        
     }
     public class StockBalanceBywarehouseViewModel
     {

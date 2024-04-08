@@ -181,17 +181,8 @@
                 }
 
             });
-            function enable_submit_button(is_submit) {
-                if (is_submit) {
-                    $('#btnCreate').text("Submitting...");
-                    $('#btnCreate').attr('disabled', true);
-                } else {
-                    $('#btnCreate').text("Submit");
-                    $('#btnCreate').attr('disabled', false);
-                }
-            }
+
             $('#btnCreate').click(function (sel,name) {
-                enable_submit_button(true);
                 var ir_id = $('#item_request_id').val();
                 var po_number = $('#purchase_oder_number').text();
                 var items = $('.item_id');

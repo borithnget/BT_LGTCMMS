@@ -76,6 +76,9 @@ namespace BT_KimMex.Controllers
             {
                 int count = 0;
                 int countOverAmount = 0;
+
+                decimal odApprovalAmount = PurchaseOrderAandRViewModel.GetDOApprovalSettingLatest();
+
                 tb_purchase_request po = new tb_purchase_request();
                 po.pruchase_request_id = Guid.NewGuid().ToString();
                 po.purchase_request_number = this.GenerateApprovalNumber();
@@ -102,7 +105,7 @@ namespace BT_KimMex.Controllers
 
                     db.tb_purchase_request_detail.Add(pod);
                     db.SaveChanges();
-                    if (pod.amount > 3000)
+                    if (pod.amount >= odApprovalAmount)
                         countOverAmount++;
                     count++;
 
@@ -119,6 +122,12 @@ namespace BT_KimMex.Controllers
                 {
                     tb_purchase_request pr = db.tb_purchase_request.Find(po.pruchase_request_id);
                     pr.is_check = true;
+                    db.SaveChanges();
+                }
+                else
+                {
+                    tb_purchase_request pr = db.tb_purchase_request.Find(po.pruchase_request_id);
+                    pr.is_check = false;
                     db.SaveChanges();
                 }
                 tb_purchase_order poo = db.tb_purchase_order.Find(po_number);
@@ -257,7 +266,7 @@ namespace BT_KimMex.Controllers
             return View(PurchaseRequestViewModel.GetPurchaseOrderItem(id));
         }
         [HttpPost]
-        public ActionResult Approval(string id,List<PurchaseRequestDetailViewModel> models)
+        public ActionResult Approval(string id,List<PurchaseRequestDetailViewModel> models, string signatureId)
         {
             try
             {
@@ -294,6 +303,7 @@ namespace BT_KimMex.Controllers
                 po.purchase_request_status = countItemVoid == models.Count()? Status.Rejected : po.is_check == true ? Status.Approved : Status.Completed;
                 po.approved_by = User.Identity.GetUserId().ToString();
                 po.approved_date =CommonClass.ToLocalTime(DateTime.Now);
+                po.approved_signature = signatureId;
                 db.SaveChanges();
 
                 var poo = db.tb_purchase_order.Where(s => string.Compare(s.purchase_order_id, po.purchase_order_id) == 0).FirstOrDefault();
@@ -471,6 +481,10 @@ namespace BT_KimMex.Controllers
                 }
                 #endregion
 
+                #region Update PO Report Status
+
+                #endregion
+
                 return Json(new { result = "success" }, JsonRequestBehavior.AllowGet);
             }
             catch(Exception ex)
@@ -499,7 +513,7 @@ namespace BT_KimMex.Controllers
             {
                 List<PurchaseRequestViewModel> data = new List<PurchaseRequestViewModel>();
                 data = CommonFunctions.GetPurchaseOrderMyApprovalList(User.IsInRole(Role.SystemAdmin), User.IsInRole(Role.FinanceManager),User.IsInRole(Role.AccountingManager),User.IsInRole(Role.OperationDirector) , User.Identity.GetUserId().ToString(),dateRange,status);
-
+                //data = CommonFunctions.GetPurchaseOrderMyApprovalList(User.IsInRole(Role.SystemAdmin), User.IsInRole(Role.FinanceManager), User.IsInRole(Role.AccountingManager), User.IsInRole(Role.OperationDirector), User.Identity.GetUserId().ToString(), status);
                 return Json(new { data = data }, JsonRequestBehavior.AllowGet);
 
             }
@@ -1023,6 +1037,14 @@ namespace BT_KimMex.Controllers
 
                 CommonClass.SubmitProcessWorkflow(CommonClass.GetSytemMenuIdbyControllerName(this.GetControllerName()), po.pruchase_request_id, po.purchase_request_status, po.updated_by, po.updated_date,comment);
 
+                #region Update PO Report Number
+                var poDetails = db.tb_purchase_request_detail.Where(s => string.Compare(s.purchase_request_id, po.pruchase_request_id) == 0).ToList();
+                foreach(var poDetail in poDetails)
+                {
+                    PurchaseOrderAandRViewModel.UpdatePoReportbyRequestCancelled(poDetail.po_report_id, User.Identity.GetUserId());
+                }
+                #endregion
+
                 return Json(new { result = "success" }, JsonRequestBehavior.AllowGet);
             }
         }
@@ -1395,6 +1417,46 @@ namespace BT_KimMex.Controllers
             }
             return Json(new { isSuccess = isSuccess, message = message }, JsonRequestBehavior.AllowGet);
         }
+        public ActionResult SettingODAmountApproval()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult SettingODAmountApproval(decimal amount)
+        {
+            AJAXResultModel result = new AJAXResultModel();
+            try
+            {
+                kim_mexEntities db = new kim_mexEntities();
+                tb_setting_od_approval lastest = db.tb_setting_od_approval.OrderByDescending(s => s.CreatedAt).FirstOrDefault();
+                if (lastest != null)
+                {
+                    lastest.IsActive = false;
+                    lastest.UpdatedAt = CommonClass.ToLocalTime(DateTime.Now);
+                    lastest.UpdatedBy = User.Identity.GetUserId();
+                    db.SaveChanges();
+                }
+                tb_setting_od_approval settingAproval = new tb_setting_od_approval();
+                settingAproval.ApprovalAmount = amount;
+                settingAproval.IsActive = true;
+                settingAproval.UpdatedAt = CommonClass.ToLocalTime(DateTime.Now);
+                settingAproval.CreatedAt = CommonClass.ToLocalTime(DateTime.Now);
+                settingAproval.CreatedBy = User.Identity.GetUserId();
+                settingAproval.UpdatedBy = User.Identity.GetUserId();
+                db.tb_setting_od_approval.Add(settingAproval);
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                result.isSuccess = false;
+                result.message = ex.Message;
+            }
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
 
+        public ActionResult GetODTApprovalTableAJAX()
+        {
+            return Json(new { data = PurchaseOrderAandRViewModel.GetODApprovalSettingList() }, JsonRequestBehavior.AllowGet);
+        }
     }
 }
