@@ -10357,6 +10357,8 @@
     <Content Include="Views\ProductCategory\UpdateProductCategoryViaExcel.cshtml" />
     <Content Include="Views\User\ResetSignature.cshtml" />
     <Content Include="Views\Sync\ConvertXLStoXLSX.cshtml" />
+    <Content Include="Views\Sync\AdjustmentNegativeBalance.cshtml" />
+    <Content Include="Views\PurchaseOrderAandR\SettingODAmountApproval.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

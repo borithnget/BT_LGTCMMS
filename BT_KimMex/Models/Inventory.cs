@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using MoreLinq;
 
 namespace BT_KimMex.Models
 {
@@ -92,6 +93,75 @@ namespace BT_KimMex.Models
             }
             return models;
         }
+
+        public static List<Models.InventoryViewModel> GetStockBalancebyWarehouse(string id,DateTime dateFrom,DateTime dateTo)
+        {
+            List<Models.InventoryViewModel> models = new List<Models.InventoryViewModel>();
+            List<Models.InventoryViewModel> inventories = new List<Models.InventoryViewModel>();
+            using (Entities.kim_mexEntities db = new Entities.kim_mexEntities())
+            {
+                DateTime newDateFrom = new DateTime(dateFrom.Year, dateFrom.Month, dateFrom.Day, 0, 0, 0);
+                DateTime newDateTo = dateTo.AddDays(1).AddMilliseconds(-1);
+                List<Models.InventoryViewModel> orginalItems = new List<Models.InventoryViewModel>();
+                List<Models.InventoryViewModel> items = new List<Models.InventoryViewModel>();
+                List<Models.InventoryViewModel> items1 = new List<Models.InventoryViewModel>();
+
+                items1 = db.tb_inventory.OrderBy(x => x.product_id).ThenByDescending(x => x.inventory_date)
+                    .Where(x => string.Compare(x.warehouse_id, id) == 0 && x.inventory_date>=newDateFrom && x.inventory_date<=newDateTo )
+                    .Select(x => new Models.InventoryViewModel()
+                {
+                    inventory_date = x.inventory_date,
+                    product_id = x.product_id,
+                    warehouse_id = x.warehouse_id,
+                    total_quantity = x.total_quantity,
+                    in_quantity = x.in_quantity,
+                    out_quantity = x.out_quantity,
+                    inventory_status_id = x.inventory_status_id,
+                }).ToList();
+
+                #region new enhance speed
+                var groupItems = items1.GroupBy(s => s.product_id).Select(s => new { key = s.Key, item = s.OrderByDescending(x => x.inventory_date).FirstOrDefault() }).ToList();
+                foreach (var item in groupItems)
+                {
+                    var product = Class.CommonClass.GetProductDetail(item.item.product_id);
+                    Models.InventoryViewModel iitem = new Models.InventoryViewModel();
+                    iitem.inventory_date = item.item.inventory_date;
+                    iitem.product_id = item.item.product_id;
+                    iitem.itemCode = product.product_code;
+                    iitem.itemName = product.product_name;
+                    iitem.itemUnit = product.product_unit;
+                    iitem.itemUnitName = db.tb_unit.Find(iitem.itemUnit).Name;
+                    iitem.warehouse_id = item.item.warehouse_id;
+                    iitem.total_quantity = item.item.total_quantity;
+                    //if (iitem.total_quantity > 0)
+                    models.Add(iitem);
+
+                    items1.RemoveAll(s => string.Compare(s.product_id, item.item.product_id) == 0);
+                }
+                foreach (var item in items1)
+                {
+                    var product = Class.CommonClass.GetProductDetail(item.product_id);
+                    Models.InventoryViewModel iitem = new Models.InventoryViewModel();
+                    iitem.inventory_date = item.inventory_date;
+                    iitem.product_id = item.product_id;
+                    iitem.itemCode = product.product_code;
+                    iitem.itemName = product.product_name;
+                    iitem.itemUnit = product.product_unit;
+                    iitem.itemUnitName = db.tb_unit.Find(iitem.itemUnit).Name;
+                    iitem.warehouse_id = item.warehouse_id;
+                    iitem.total_quantity = item.total_quantity;
+                    //if (iitem.total_quantity > 0)
+                    models.Add(iitem);
+                }
+                #endregion
+
+                
+
+                inventories = models.OrderBy(x => x.itemCode).ToList().DistinctBy(s => s.product_id).ToList();
+            }
+            return inventories;
+        }
+
     }
     public class InventoryDetailViewModel
     {
