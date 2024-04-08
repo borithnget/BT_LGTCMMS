@@ -1,4 +1,6 @@
-﻿// T4 code generation is enabled for model 'D:\BOKOR TECHNOLOGY\SOURCE CODE\BT_CMMS_Enhancement\BT_CMMS\BT_KimMex\Entities\kim_mexEntities.edmx'. 
+
+// T4 code generation is enabled for model 'D:\Bokor\BT_LGTCMMS\BT_KimMex\Entities\kim_mexEntities.edmx'. 
+
 // To enable legacy code generation, change the value of the 'Code Generation Strategy' designer
 // property to 'Legacy ObjectContext'. This property is available in the Properties Window when the model
 // is open in the designer.

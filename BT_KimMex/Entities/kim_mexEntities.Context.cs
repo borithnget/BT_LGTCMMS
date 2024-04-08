@@ -18,7 +18,6 @@ namespace BT_KimMex.Entities
         public kim_mexEntities()
             : base("name=kim_mexEntities")
         {
-            this.Configuration.LazyLoadingEnabled= false;
         }
     
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -45,9 +44,7 @@ namespace BT_KimMex.Entities
         public virtual DbSet<tb_customer> tb_customer { get; set; }
         public virtual DbSet<tb_error_log> tb_error_log { get; set; }
         public virtual DbSet<tb_history_issue_qty> tb_history_issue_qty { get; set; }
-        public virtual DbSet<tb_inventory> tb_inventory { get; set; }
         public virtual DbSet<tb_inventory_deleted> tb_inventory_deleted { get; set; }
-        public virtual DbSet<tb_inventory_detail> tb_inventory_detail { get; set; }
         public virtual DbSet<tb_inventory_status> tb_inventory_status { get; set; }
         public virtual DbSet<tb_invoice> tb_invoice { get; set; }
         public virtual DbSet<tb_ir_attachment> tb_ir_attachment { get; set; }
@@ -70,6 +67,7 @@ namespace BT_KimMex.Entities
         public virtual DbSet<tb_po_invoice_document> tb_po_invoice_document { get; set; }
         public virtual DbSet<tb_po_invoice_payment> tb_po_invoice_payment { get; set; }
         public virtual DbSet<tb_po_report> tb_po_report { get; set; }
+        public virtual DbSet<tb_po_report_cancelled> tb_po_report_cancelled { get; set; }
         public virtual DbSet<tb_po_report_deleted> tb_po_report_deleted { get; set; }
         public virtual DbSet<tb_po_supplier> tb_po_supplier { get; set; }
         public virtual DbSet<tb_position> tb_position { get; set; }
@@ -97,6 +95,7 @@ namespace BT_KimMex.Entities
         public virtual DbSet<tb_reject> tb_reject { get; set; }
         public virtual DbSet<tb_return_main_stock> tb_return_main_stock { get; set; }
         public virtual DbSet<tb_return_mainstock_detail> tb_return_mainstock_detail { get; set; }
+        public virtual DbSet<tb_setting_od_approval> tb_setting_od_approval { get; set; }
         public virtual DbSet<tb_site> tb_site { get; set; }
         public virtual DbSet<tb_site_manager_project> tb_site_manager_project { get; set; }
         public virtual DbSet<tb_site_site_admin> tb_site_site_admin { get; set; }
@@ -122,5 +121,7 @@ namespace BT_KimMex.Entities
         public virtual DbSet<tb_workorder_returned> tb_workorder_returned { get; set; }
         public virtual DbSet<tbSiteSiteSupervisor> tbSiteSiteSupervisors { get; set; }
         public virtual DbSet<transferformmainstock> transferformmainstocks { get; set; }
+        public virtual DbSet<tb_inventory> tb_inventory { get; set; }
+        public virtual DbSet<tb_inventory_detail> tb_inventory_detail { get; set; }
     }
 }

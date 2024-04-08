@@ -472,6 +472,7 @@
 
                                         <li>@Html.ActionLink("Stock Balance Monthly", "StockBalanceByDateandWarehouse", "Report")</li>
                                         @*<li>@Html.ActionLink("Detail PO Receiving", "DetailPurchaseOrderReceiving", "Report")</li>*@
+                                <li>@Html.ActionLink("Warehouse Stock Balance Monthly", "WarehouseStockBalance", "Report")</li>
                                     }
                                     @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.ProjectManager) || User.IsInRole(Role.SiteManager) || User.IsInRole(Role.SiteSupervisor) || User.IsInRole(Role.SiteStockKeeper))
                                     {
@@ -551,6 +552,7 @@
                                             <li>@Html.ActionLink("Position", "Index", "Position")</li>
                                             <li>@Html.ActionLink("Site", "Index", "Site")</li>
                                             <li>@Html.ActionLink("Warehouse", "Index", "WareHouse")</li>
+                                            <li>@Html.ActionLink("OD Amount Approval", "SettingODAmountApproval", "PurchaseOrderAandR")</li>
                                         }
                                         @if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser))
                                         {

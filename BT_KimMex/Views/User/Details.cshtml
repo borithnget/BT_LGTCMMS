@@ -51,7 +51,18 @@
                         <div id="imgPreview" class="thumbnail">
                             @if (string.IsNullOrEmpty(Model.user_signature))
                             {
-                                <img src="@Url.Content("~/Assets/img/profile-picture.jpg")" style="object-fit:cover; background-color:white; width: 100px;height: 100px;" class="img-responsive" id="targetImg" />
+                                if (Model.signatures.Count() == 0)
+                                {
+                                    <img src="@Url.Content("~/Assets/img/profile-picture.jpg")" style="object-fit:cover; background-color:white; width: 100px;height: 100px;" class="img-responsive" id="targetImg" />
+                                }
+                                else
+                                {
+                                    foreach (var signature in Model.signatures)
+                                                {
+                                                    string userSignature = string.Format("/Documents/Signature/{0}{1}", signature.attachment_id, signature.attachment_extension);
+                                        <img src="@userSignature" style="object-fit: fill; background-color: white; width: 100px; height: 100px; " class="img-responsive" id="targetImg" />
+                                    }
+                                }
                             }
                             else
                             {

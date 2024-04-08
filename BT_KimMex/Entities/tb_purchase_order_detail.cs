@@ -36,6 +36,7 @@ namespace BT_KimMex.Entities
         public Nullable<decimal> discount_percentage { get; set; }
         public Nullable<decimal> discount_amount { get; set; }
         public Nullable<decimal> lump_sum_discount_amount { get; set; }
+        public Nullable<int> ordering_number { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tb_po_supplier> tb_po_supplier { get; set; }

@@ -229,6 +229,17 @@ namespace BT_KimMex.Controllers
                         user_detail.user_signature = model.user_signature;
                         db.tb_user_detail.Add(user_detail);
                         db.SaveChanges();
+
+                        for(int i = 0; i < model.user_signatures.Count(); i++)
+                        {
+                            string attachmentId = model.user_signatures[i];
+                            tb_attachment signature = db.tb_attachment.Find(attachmentId);
+                            if (signature != null)
+                            {
+                                signature.attachment_ref_id = user.Id;
+                                db.SaveChanges();
+                            }
+                        }
                         
                         return RedirectToAction("Index", "User");
                     }
@@ -276,6 +287,8 @@ namespace BT_KimMex.Controllers
 
                     string date = Convert.ToDateTime(user.created_date).ToString("dd/MM/yyyy");
                     user_role.created_date = date;
+
+                    user_role.signatures = GlobalMethod.GetUserSignatures(user_role.UserID);
                 }
                 using (kim_mexEntities db = new kim_mexEntities())
                 {
@@ -333,6 +346,22 @@ namespace BT_KimMex.Controllers
                     user_detail.updated_date = Class.CommonClass.ToLocalTime(DateTime.Now);
                     user_detail.user_signature = model.user_signature;
                     db.SaveChanges();
+
+                    for (int i = 0; i < model.user_signatures.Count(); i++)
+                    {
+                        string attachmentId = model.user_signatures[i];
+                        tb_attachment signature = db.tb_attachment.Find(attachmentId);
+                        if (signature != null)
+                        {
+                            if (string.IsNullOrEmpty(signature.attachment_ref_id))
+                            {
+                                signature.attachment_ref_id = user.Id;
+                                db.SaveChanges();
+                            }
+                            
+                        }
+                    }
+
                     return RedirectToAction("Index", "User");
                 }
                 AddErrors(result);
@@ -757,6 +786,33 @@ namespace BT_KimMex.Controllers
                 return Json(new { SignaturePath = string.Empty }, JsonRequestBehavior.AllowGet);
             }
 
+        }
+
+        public JsonResult UploadUserMultipleSignature()
+        {
+            using (kim_mexEntities db = new kim_mexEntities())
+            {
+                tb_attachment attachment = new tb_attachment();
+                var file = Request.Files[0];
+                if (file != null && file.ContentLength > 0)
+                {
+                    var file_name = Path.GetFileName(file.FileName);
+                    var file_extension = Path.GetExtension(file_name);
+                    var file_id = Guid.NewGuid().ToString();
+                    var file_path = Path.Combine(Server.MapPath("~/Documents/Signature/"), file_id + file_extension);
+                    file.SaveAs(file_path);
+                    attachment.attachment_id = file_id;
+                    attachment.attachment_name = file_name;
+                    attachment.attachment_extension = file_extension;
+                    attachment.attachment_path = file_path;
+                    attachment.attachment_ref_type = "Quote";
+                    db.tb_attachment.Add(attachment);
+                    db.SaveChanges();
+                    
+                }
+
+                return Json(new { attachment }, JsonRequestBehavior.AllowGet);
+            }
         }
 
         #region Helpers

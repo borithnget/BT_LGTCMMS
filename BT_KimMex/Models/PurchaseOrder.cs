@@ -193,7 +193,7 @@ namespace BT_KimMex.Models
                     poDetails = (from dPO in db.tb_purchase_order_detail
                                  join item in db.tb_product on dPO.item_id equals item.product_id
                                  join unit in db.tb_unit on item.product_unit equals unit.Id
-                                 orderby item.product_code
+                                 orderby dPO.ordering_number
                                  where dPO.purchase_order_id == model.purchase_order_id
                                  select new PurchaseOrderDetailViewModel()
                                  {
@@ -206,6 +206,7 @@ namespace BT_KimMex.Models
                                      product_name = item.product_name,
                                      product_unit = item.product_unit,
                                      product_unit_name = unit.Name,
+                                     ordering_number = dPO.ordering_number,
                                      unit_price = dPO.unit_price,
                                      item_status = dPO.item_status,
                                      po_quantity = dPO.po_quantity,
@@ -371,6 +372,7 @@ namespace BT_KimMex.Models
         public List<PurchaseOrderItemSupplier> poSuppliers { get; set; }
         public Nullable<decimal> discount_amount { get; set; }
         public Nullable<decimal> lump_sum_discount_amount { get; set; }
+        public Nullable<int> ordering_number { get; set; }
         //  public string PO_Unit { get; set; }
         public PurchaseOrderDetailViewModel()
         {
@@ -681,6 +683,20 @@ namespace BT_KimMex.Models
                         where string.Compare(pod.po_report_id, poReportId) == 0
                         select pod).FirstOrDefault();
             }
+        }
+    
+        public static tb_po_report_cancelled GetPOReportCancelled(bool isVAT, bool isLOP)
+        {
+            tb_po_report_cancelled result = new tb_po_report_cancelled();
+            try
+            {
+                kim_mexEntities db = new kim_mexEntities();
+                result = db.tb_po_report_cancelled.Where(s => s.IsReuse == false && s.IsLPO == isLOP && s.IsVAT == isVAT).FirstOrDefault();
+            }catch(Exception ex)
+            {
+
+            }
+            return result;
         }
     }
     public class PurchaseOrderReportGenerateModel
@@ -1064,6 +1080,15 @@ namespace BT_KimMex.Models
                         model.createdBySignature =string.IsNullOrEmpty(createdBySignature)?string.Empty: string.Format("{0}{1}",EnumConstants.domainName,createdBySignature);
                         model.approvedBySignature = string.IsNullOrEmpty(CommonClass.GetUserSignature(purchase.approved_by)) ? string.Empty : string.Format("{0}{1}", EnumConstants.domainName, CommonClass.GetUserSignature(purchase.approved_by));
                         model.checkedBySignature= string.IsNullOrEmpty(CommonClass.GetUserSignature(purchase.checked_by)) ? string.Empty : string.Format("{0}{1}", EnumConstants.domainName, CommonClass.GetUserSignature(purchase.checked_by));
+
+                        if (string.IsNullOrEmpty(purchase.approved_signature))
+                        {
+                            model.approvedBySignature = string.Empty;
+                        }
+                        else
+                        {
+                            model.approvedBySignature = string.Format("{0}{1}", EnumConstants.domainName, CommonClass.getUserSignaturebyAttachmentId(purchase.approved_signature)); 
+                        }
 
                         model.isPO = isPO;
                         model.isQuote = isQuote;

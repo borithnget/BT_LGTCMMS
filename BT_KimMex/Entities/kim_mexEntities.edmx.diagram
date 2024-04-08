@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="7aa87fc9e3234f2bb218ef60eec22590" Name="Diagram1">
+      <Diagram DiagramId="3f092d3790a74f89b1311d33dc5da481" Name="Diagram1">
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.C__MigrationHistory" Width="1.5" PointX="3.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.AspNetRole" Width="1.5" PointX="11.75" PointY="2.375" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.AspNetUserClaim" Width="1.5" PointX="16.25" PointY="1" IsExpanded="true" />
@@ -12,49 +12,48 @@
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.AspNetUser" Width="1.5" PointX="14" PointY="1.375" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.Purchase_OrderAandR" Width="1.5" PointX="16.75" PointY="6.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_attachment" Width="1.5" PointX="3.75" PointY="3.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_boq_detail1" Width="1.5" PointX="9" PointY="51" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_boq_detail2" Width="1.5" PointX="11.25" PointY="51.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_boq_detail3" Width="1.5" PointX="13.5" PointY="51.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_boq_detail1" Width="1.5" PointX="9" PointY="51.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_boq_detail2" Width="1.5" PointX="11.25" PointY="51.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_boq_detail3" Width="1.5" PointX="13.5" PointY="51.875" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_brand" Width="1.5" PointX="6.75" PointY="11.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_build_of_quantity" Width="1.5" PointX="3.75" PointY="60.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_build_of_quantity_detail" Width="1.5" PointX="6" PointY="64.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_class" Width="1.5" PointX="6.75" PointY="46.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_build_of_quantity" Width="1.5" PointX="3.75" PointY="61.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_build_of_quantity_detail" Width="1.5" PointX="6" PointY="65.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_class" Width="1.5" PointX="6.75" PointY="47.375" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_class_type" Width="1.5" PointX="4.5" PointY="7.5" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_color" Width="1.5" PointX="3.75" PointY="11.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_customer" Width="1.5" PointX="1.5" PointY="37.875" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_error_log" Width="1.5" PointX="18.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_history_issue_qty" Width="1.5" PointX="18.75" PointY="4.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_inventory" Width="1.5" PointX="18.75" PointY="7.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_inventory_deleted" Width="1.5" PointX="18.75" PointY="11.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_inventory_detail" Width="1.5" PointX="20.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_inventory_status" Width="1.5" PointX="18.75" PointY="15.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_inventory_deleted" Width="1.5" PointX="18.75" PointY="7.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_inventory_status" Width="1.5" PointX="18.75" PointY="11.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_invoice" Width="1.5" PointX="9" PointY="7.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_ir_attachment" Width="1.5" PointX="20.75" PointY="5.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_ir_attachment" Width="1.5" PointX="18.75" PointY="14.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_ir_detail1" Width="1.5" PointX="9" PointY="40.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_ir_detail2" Width="1.5" PointX="11.25" PointY="21.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_ire_attachment" Width="1.5" PointX="14.25" PointY="34.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_item_blocking" Width="1.5" PointX="20.75" PointY="8.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_item_blocking_detail" Width="1.5" PointX="20.75" PointY="12.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_item_blocking" Width="1.5" PointX="20.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_item_blocking_detail" Width="1.5" PointX="20.75" PointY="4.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_item_quote_attachment" Width="1.5" PointX="7.5" PointY="16.625" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_item_request" Width="1.5" PointX="1.5" PointY="4.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_item_return" Width="1.5" PointX="21.75" PointY="16.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_item_return" Width="1.5" PointX="20.75" PointY="8.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_job_category" Width="1.5" PointX="6.75" PointY="40.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_material_request_history" Width="1.5" PointX="21.75" PointY="21.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_mr_cut_off" Width="1.5" PointX="3.75" PointY="55.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_mr_cut_off_detail" Width="1.5" PointX="6" PointY="55.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_mr_related_status" Width="1.5" PointX="22.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_material_request_history" Width="1.5" PointX="21.75" PointY="13.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_mr_cut_off" Width="1.5" PointX="3.75" PointY="56.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_mr_cut_off_detail" Width="1.5" PointX="6" PointY="56.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_mr_related_status" Width="1.5" PointX="21.75" PointY="20.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_multiple_uom" Width="1.5" PointX="11.25" PointY="27.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_po_attachment" Width="1.5" PointX="3" PointY="51.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_po_invoice" Width="1.5" PointX="22.75" PointY="4.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_po_invoice_document" Width="1.5" PointX="22.75" PointY="10.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_po_invoice_payment" Width="1.5" PointX="23.75" PointY="14.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_po_attachment" Width="1.5" PointX="3" PointY="52.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_po_invoice" Width="1.5" PointX="22.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_po_invoice_document" Width="1.5" PointX="22.75" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_po_invoice_payment" Width="1.5" PointX="22.75" PointY="10.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_po_report" Width="1.5" PointX="3" PointY="23" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_po_report_cancelled" Width="1.5" PointX="23.75" PointY="13.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_po_report_deleted" Width="1.5" PointX="23.75" PointY="17.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_po_supplier" Width="1.5" PointX="6" PointY="22.625" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_position" Width="1.5" PointX="13.75" PointY="13.625" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_procress_workflow" Width="1.5" PointX="18.75" PointY="23.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_product" Width="1.5" PointX="9" PointY="20.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_product_category" Width="1.5" PointX="9" PointY="46.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_product_category" Width="1.5" PointX="9" PointY="47.125" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_product_class" Width="1.5" PointX="6.75" PointY="7.375" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_product_detail" Width="1.5" PointX="14.25" PointY="23" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_product_size" Width="1.5" PointX="6.75" PointY="32.125" IsExpanded="true" />
@@ -62,45 +61,48 @@
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_project" Width="1.5" PointX="1.5" PointY="28.875" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_project_pm" Width="1.5" PointX="3.75" PointY="38.375" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_purchase_order" Width="1.5" PointX="0.75" PointY="47.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_purchase_order_detail" Width="1.5" PointX="3.75" PointY="32.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_purchase_request" Width="1.5" PointX="3" PointY="46.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_purchase_order_detail" Width="1.5" PointX="3.75" PointY="32.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_purchase_request" Width="1.5" PointX="3" PointY="46.5" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_purchase_request_detail" Width="1.5" PointX="5.25" PointY="28.25" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_purchase_requisition" Width="1.5" PointX="0.75" PointY="13.625" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_purchase_requisition_detail" Width="1.5" PointX="14.25" PointY="18" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_purpose" Width="1.5" PointX="1.5" PointY="2" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_quote" Width="1.5" PointX="3" PointY="15.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_quote_detail" Width="1.5" PointX="5.25" PointY="16.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_quote_detail" Width="1.5" PointX="5.25" PointY="16.125" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_receive_item_voucher" Width="1.5" PointX="12" PointY="33.125" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_received_item_detail" Width="1.5" PointX="14.25" PointY="27.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_received_status" Width="1.5" PointX="24.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_reject" Width="1.5" PointX="24.75" PointY="3.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_return_main_stock" Width="1.5" PointX="16.75" PointY="18.125" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_return_mainstock_detail" Width="1.5" PointX="19" PointY="18.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_setting_od_approval" Width="1.5" PointX="24.75" PointY="6.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_site" Width="1.5" PointX="1.5" PointY="41.875" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_site_manager_project" Width="1.5" PointX="3.75" PointY="40.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_site_site_admin" Width="1.5" PointX="24.75" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_site_site_admin" Width="1.5" PointX="24.75" PointY="10.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_spacemen_attachment" Width="1.5" PointX="3.75" PointY="43.375" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_stock_adjustment" Width="1.5" PointX="9" PointY="10.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_stock_damage" Width="1.5" PointX="24.75" PointY="9.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_stock_issue" Width="1.5" PointX="3.75" PointY="68.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_stock_damage" Width="1.5" PointX="20.75" PointY="24.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_stock_issue" Width="1.5" PointX="3.75" PointY="69.5" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_stock_issue_return" Width="1.5" PointX="25.75" PointY="13.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_stock_keeper_warehouse" Width="1.5" PointX="9" PointY="31" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_stock_transfer_detail" Width="1.5" PointX="11.25" PointY="16.625" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_stock_transfer_voucher" Width="1.5" PointX="9" PointY="0.875" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_sub_group" Width="1.5" PointX="25.75" PointY="19.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_supplier" Width="1.5" PointX="0.75" PointY="21.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_system_menu" Width="1.5" PointX="25.75" PointY="23.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_system_menu_action" Width="1.5" PointX="26.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_system_menu" Width="1.5" PointX="22.75" PointY="25.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_system_menu_action" Width="1.5" PointX="25.75" PointY="23.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_transfer_frommain_stock_detail" Width="1.5" PointX="14" PointY="7.625" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_unit" Width="1.5" PointX="6.75" PointY="35.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_user_deleted" Width="1.5" PointX="26.75" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_user_deleted" Width="1.5" PointX="26.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_user_detail" Width="1.5" PointX="16" PointY="13" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_warehouse" Width="1.5" PointX="6.75" PointY="1.375" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_warehouse_qaqc" Width="1.5" PointX="9" PointY="33.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_workorder_planning" Width="1.5" PointX="26.75" PointY="7.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_workorder_returned" Width="1.5" PointX="6" PointY="68.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tbSiteSiteSupervisor" Width="1.5" PointX="3.75" PointY="65.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_workorder_planning" Width="1.5" PointX="26.75" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_workorder_returned" Width="1.5" PointX="6" PointY="69.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tbSiteSiteSupervisor" Width="1.5" PointX="3.75" PointY="66.75" IsExpanded="true" />
         <EntityTypeShape EntityType="db_a94f6d_lgtssModel.transferformmainstock" Width="1.5" PointX="11.75" PointY="7.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_inventory" Width="1.5" PointX="26.75" PointY="8.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="db_a94f6d_lgtssModel.tb_inventory_detail" Width="1.5" PointX="27.75" PointY="12.75" IsExpanded="true" />
         <AssociationConnector Association="db_a94f6d_lgtssModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" ManuallyRouted="false" />
         <AssociationConnector Association="db_a94f6d_lgtssModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" ManuallyRouted="false" />
         <AssociationConnector Association="db_a94f6d_lgtssModel.FK_tb_boq_detail1_tb_build_of_quantity" ManuallyRouted="false" />

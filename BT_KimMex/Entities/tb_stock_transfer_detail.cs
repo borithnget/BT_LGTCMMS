@@ -28,6 +28,7 @@ namespace BT_KimMex.Entities
         public Nullable<bool> status { get; set; }
         public Nullable<bool> is_return { get; set; }
         public Nullable<decimal> return_remain_quantity { get; set; }
+        public Nullable<int> ordering_number { get; set; }
     
         public virtual tb_product tb_product { get; set; }
         public virtual tb_stock_transfer_voucher tb_stock_transfer_voucher { get; set; }

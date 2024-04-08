@@ -112,6 +112,30 @@ namespace BT_KimMex.Class
                 ErrorLog.ErrorLogger.LogEntry(EnumConstants.ErrorType.Error, "GlobalMethod.cs", "GetUserInfomationDetail", ex.StackTrace, ex.Message); }
             return user;
         }
+        
+        public static List<AttachmentViewModel> GetUserSignatures(string userId)
+        {
+            List<AttachmentViewModel> signatures = new List<AttachmentViewModel>();
+            try
+            {
+                kim_mexEntities db = new kim_mexEntities();
+                signatures = db.tb_attachment.Where(s=>string.Compare(s.attachment_ref_id,userId)==0).Select(s => new AttachmentViewModel()
+                {
+                    attachment_id=s.attachment_id,
+                    attachment_name=s.attachment_name,
+                    attachment_path=s.attachment_path,
+                    attachment_extension=s.attachment_extension,
+                    attachment_ref_id=s.attachment_ref_id,
+                    attachment_ref_type=s.attachment_ref_type,
+                }).ToList() ;
+
+            }catch(Exception ex)
+            {
+
+            }
+            return signatures;
+        }
+
         public static List<tb_project> GetProjectDropdownlist()
         {
             List<tb_project> projects = new List<tb_project>();

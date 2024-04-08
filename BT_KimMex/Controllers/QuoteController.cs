@@ -125,6 +125,7 @@ namespace BT_KimMex.Controllers
                             dQuote.qty = item.qty;
                             //dQuote.discount_amount =decimal.Parse(decimal.Parse(item.discount_amount.ToString()).ToString("0.##################"));
                             dQuote.discount_amount =Convert.ToDecimal(decimal.Parse(item.discount_amount.ToString()).ToString("G29"));
+                            dQuote.ordering_number = item.ordering_number;
                             db.tb_quote_detail.Add(dQuote);
                             db.SaveChanges();
                         }

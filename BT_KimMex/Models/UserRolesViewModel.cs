@@ -32,9 +32,11 @@ namespace BT_KimMex.Models
         public string created_date { get; set; }
         public string user_signature { get; set; }
         public UserViewModel userDetail { get; set; }
+        public List<AttachmentViewModel> signatures { get; set; }
         public UserRolesViewModel()
         {
             userDetail = new UserViewModel();
+            signatures = new List<AttachmentViewModel>();
         }
     }
     public class PositionViewModel
@@ -58,6 +60,11 @@ namespace BT_KimMex.Models
         public string position_name { get; set; }
         public Nullable<System.DateTime> created_date { get; set; }
         public string user_signature { get; set; }
+        public List<AttachmentViewModel> signatures { get; set; }
+        public UserViewModel()
+        {
+            signatures = new List<AttachmentViewModel>();
+        }
     }
 
 }

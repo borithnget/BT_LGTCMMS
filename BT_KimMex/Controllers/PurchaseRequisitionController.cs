@@ -142,6 +142,7 @@ namespace BT_KimMex.Controllers
                     detail.approved_qty = Convert.ToDecimal(item_qty[i]);
                     detail.remain_qty = Convert.ToDecimal(item_qty[i]);
                     detail.item_status = Status.WaitingApproval;
+                    detail.ordering_number = i+1;
                     db.tb_purchase_requisition_detail.Add(detail);
                     db.SaveChanges();
                 }
@@ -488,27 +489,28 @@ namespace BT_KimMex.Controllers
             using(kim_mexEntities db=new kim_mexEntities())
             {
                 PurchaseRequisitionViewModel model = new PurchaseRequisitionViewModel();
-                model= (from pr in db.tb_purchase_requisition
-                        join mr in db.tb_item_request on pr.material_request_id equals mr.ir_id
-                        join pro in db.tb_project on mr.ir_project_id equals pro.project_id
-                        where string.Compare(pr.purchase_requisition_id,id)==0
-                        select new PurchaseRequisitionViewModel()
-                        {
-                            purchase_requisition_id = pr.purchase_requisition_id,
-                            purchase_requisition_number = pr.purchase_requisition_number,
-                            material_request_id = pr.material_request_id,
-                            materail_request_number = mr.ir_no,
-                            created_at = pr.updated_at,
-                            project_id = mr.ir_project_id,
-                            project_fullname = pro.project_full_name,
-                            created_by = pr.created_by,
-                            purchase_requisition_status = pr.purchase_requisition_status,
-                            is_quote_complete=pr.is_quote_complete,
-                        }).FirstOrDefault();
+                model = (from pr in db.tb_purchase_requisition
+                         join mr in db.tb_item_request on pr.material_request_id equals mr.ir_id
+                         join pro in db.tb_project on mr.ir_project_id equals pro.project_id
+                         where string.Compare(pr.purchase_requisition_id, id) == 0
+                         select new PurchaseRequisitionViewModel()
+                         {
+                             purchase_requisition_id = pr.purchase_requisition_id,
+                             purchase_requisition_number = pr.purchase_requisition_number,
+                             material_request_id = pr.material_request_id,
+                             materail_request_number = mr.ir_no,
+                             created_at = pr.updated_at,
+                             project_id = mr.ir_project_id,
+                             project_fullname = pro.project_full_name,
+                             created_by = pr.created_by,
+                             purchase_requisition_status = pr.purchase_requisition_status,
+                             is_quote_complete = pr.is_quote_complete,
+                         }
+                        ).FirstOrDefault();
                 model.purchaseRequisitionDetails = (from prd in db.tb_purchase_requisition_detail
                                                     join item in db.tb_product on prd.item_id equals item.product_id
                                                     join unit in db.tb_unit on prd.item_unit equals unit.Id
-                                                    orderby item.product_code
+                                                    orderby prd.ordering_number
                                                     where string.Compare(prd.purchase_requisition_id, model.purchase_requisition_id) == 0
                                                     select new PurchaseRequisitionDetailViewModel()
                                                     {
@@ -524,6 +526,7 @@ namespace BT_KimMex.Controllers
                                                         reason=prd.reason,
                                                         remark=prd.remark,
                                                         item_status=prd.item_status,
+                                                        
                                                     }).ToList();
                 model.processWorkflow = ProcessWorkflowModel.GetProcessWorkflowByRefId(model.purchase_requisition_id);
 

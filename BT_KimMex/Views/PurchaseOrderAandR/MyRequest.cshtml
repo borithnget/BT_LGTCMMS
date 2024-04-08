@@ -111,22 +111,7 @@
                 "columns": [
         { "data": "pruchase_request_id" },
         { "data": "str_created_date" },
-        //{ "data": "purchase_request_number" },
-                    {
-                        "render": function (data, type, full, meta) {
-                            console.log(full);
-                            var po_number = "";
-                            $.each(full.poDetails, function (index, item) {
-                                if (index == full.poDetails.length - 1)
-                                    po_number = po_number + '<a href="javascript:void(0)" class="link_po_report" data-quoteid="' + full.purchase_order_id + '" data-supplier="' + item.supplier_id + '">' + item.po_report_number + '</a>';
-                                else {
-                                    po_number = po_number + '<a href="javascript:void(0)" class="link_po_report" data-quoteid="' + full.purchase_order_id + '" data-supplier="' + item.supplier_id + '">' + item.po_report_number + '</a>' + "/";
-                                }
-                            });
-                            return po_number;
-                            //return '<a href="/PurchaseOrderAandR/Details/' + full.pruchase_request_id + '">' + full.purchase_request_number + '</a>';
-                        }
-                    },
+        { "data": "purchase_request_number" },
         { "data": "created_by" },
         { "data": "quote_number" },
         {

@@ -1,0 +1,112 @@
+﻿
+@{
+    ViewBag.Title = "Setting OD Amount Approval";
+}
+
+    <div class="row" style="padding:10px !important;">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                @ViewBag.Title
+            </div>
+
+            <div class="panel-body">
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                <div class="col-md-12 row">
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="col-md-2">
+                                Amount ><strong class="text-danger">*</strong>:
+                            </label>
+                            <div class="col-md-10">
+                                <input type="number" class="form-control" step="any" min="0" value="0" id="approval_amount" name="approval_amount" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-offset-2 col-md-10">
+                                <button type="button" id="btnCreate" class="btn btn-success">Submit</button>
+                                <a href="javascript:history.back()" class="btn btn-danger">Back</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="table">
+                                <thead>
+                                    <tr>
+                                        <th>Amount</th>
+                                        
+                                        <th>Created At</th>
+                                        <th>Updated At</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+                
+                    
+                }
+            </div>
+        </div>
+    </div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+
+            initailTable();
+
+            $('#btnCreate').click(function () {
+                $(this).attr('disabled', true);
+                $.ajax({
+                    url: '@Url.Action("SettingODAmountApproval", "PurchaseOrderAandR")',
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        amount: $('#approval_amount').val(),
+                    },
+                    success: function (da) {
+                        //var result = da.result;
+                        console.log(da);
+                        if (da.isSuccess == true) {
+                            alert("Your data has been saved successfully.");
+                            window.location.reload();
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        console.log(textStatus);
+                    }
+                });
+            });
+        });
+
+        function initailTable() {
+            var t = $('#table').DataTable({
+                "bDestroy": true,
+                "ajax": {
+                    "url": "/PurchaseOrderAandR/GetODTApprovalTableAJAX",
+                    "type": "GET",
+                    "dataType": "json",
+                },
+                "columns": [
+                    { "data": "ApprovalAmount" },
+                   
+                    { "data": "CreatedAt" },
+                   { "data": "UpdatedAt" },
+                ],
+                "order": [[2, "desc"]],
+            });
+            //t.on('order.dt search.dt', function () {
+            //    t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+            //        cell.innerHTML = i + 1;
+            //    });
+            //}).draw();
+        }
+    </script>
+    }
