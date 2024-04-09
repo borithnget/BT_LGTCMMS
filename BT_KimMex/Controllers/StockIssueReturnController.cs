@@ -1340,13 +1340,14 @@ namespace BT_KimMex.Controllers
                 var inventoryDetails = (from invd in db.tb_inventory_detail
                                         join item in db.tb_product on invd.inventory_item_id equals item.product_id
                                         join warehouse in db.tb_warehouse on invd.inventory_warehouse_id equals warehouse.warehouse_id
-                                        orderby item.product_code
+                                        orderby invd.ordering_number
                                         where invd.inventory_ref_id == id
                                         select new InventoryDetailViewModel()
                                         {
                                             inventory_detail_id = invd.inventory_detail_id,
                                             inventory_ref_id = invd.inventory_ref_id,
                                             inventory_item_id = invd.inventory_item_id,
+                                            ordering_number = invd.ordering_number,
                                             itemCode = item.product_code,
                                             itemName = item.product_name,
                                             itemUnit = item.product_unit,
@@ -1371,6 +1372,7 @@ namespace BT_KimMex.Controllers
                     inventoryDetail.inventory_item_id = inventory.inventory_item_id;
                     inventoryDetail.itemCode = inventory.itemCode;
                     inventoryDetail.itemName = inventory.itemName;
+                    inventoryDetail.ordering_number = inventory.ordering_number;
                     inventoryDetail.itemUnit = inventory.itemUnit;
                     inventoryDetail.inventory_warehouse_id = inventory.inventory_warehouse_id;
                     inventoryDetail.warehouseName = inventory.warehouseName;
@@ -1481,6 +1483,7 @@ namespace BT_KimMex.Controllers
                     inventory.inventory_status_id = "5";
                     inventory.warehouse_id = inv.inventory_warehouse_id;
                     inventory.product_id = inv.inventory_item_id;
+                    
                     inventory.out_quantity = 0;
                     inventory.in_quantity =CommonClass.ConvertMultipleUnit(inv.inventory_item_id,inv.unit,Convert.ToDecimal(inv.quantity));
                     inventory.total_quantity = totalQty + inventory.in_quantity;

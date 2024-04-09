@@ -454,6 +454,8 @@ namespace BT_KimMex.Controllers
                             inv.status = "false";
                         }
                     }
+
+                    var remainRequestItem = remainRequestItems.FirstOrDefault(item => item.ir_item_id == inv.product_id);
                    
                     tb_stock_transfer_detail stDetail = new tb_stock_transfer_detail();
                     stDetail.st_detail_id = Guid.NewGuid().ToString();
@@ -468,6 +470,8 @@ namespace BT_KimMex.Controllers
                     stDetail.remain_quantity = Class.CommonClass.ConvertMultipleUnit(stDetail.st_item_id, stDetail.unit, Convert.ToDecimal(inv.out_quantity));
                     stDetail.return_remain_quantity = Class.CommonClass.ConvertMultipleUnit(stDetail.st_item_id, stDetail.unit, Convert.ToDecimal(inv.out_quantity));
                     stDetail.item_status =Status.Pending;
+                    if(remainRequestItem != null)
+                        stDetail.ordering_number = remainRequestItem.ordering_number;
                     db.tb_stock_transfer_detail.Add(stDetail);
                     db.SaveChanges();
                     if (Convert.ToBoolean(stDetail.status))

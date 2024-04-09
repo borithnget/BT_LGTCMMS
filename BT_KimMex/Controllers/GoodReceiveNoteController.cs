@@ -277,12 +277,14 @@ namespace BT_KimMex.Controllers
                                           join punit in db.tb_unit on product.product_unit equals punit.Id
                                           join iunit in db.tb_unit on detail.unit equals iunit.Id
                                           join wh in db.tb_warehouse on detail.inventory_warehouse_id equals wh.warehouse_id
+                                          orderby detail.ordering_number
                                           where string.Compare(detail.inventory_ref_id, id) == 0
                                           select new InventoryViewModel()
                                           {
                                               inventory_id = detail.inventory_detail_id,
                                               product_id = detail.inventory_item_id,
                                               itemCode = product.product_code,
+                                              ordering_number = detail.ordering_number,
                                               itemName = product.product_name,
                                               itemUnit = product.product_unit,
                                               itemUnitName = punit.Name,

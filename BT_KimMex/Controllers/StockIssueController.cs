@@ -195,6 +195,7 @@ namespace BT_KimMex.Controllers
                         inventoryDetail.remain_quantity = Class.CommonClass.ConvertMultipleUnit(inventoryDetail.inventory_item_id, inventoryDetail.unit, Convert.ToDecimal(inv.out_quantity));
                         inventoryDetail.item_status = Status.Pending;
                         inventoryDetail.inventory_type = "2";
+                        inventoryDetail.ordering_number = inventoryDetail.ordering_number;
                         db.tb_inventory_detail.Add(inventoryDetail);
                         db.SaveChanges();
 

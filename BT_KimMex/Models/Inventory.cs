@@ -60,6 +60,7 @@ namespace BT_KimMex.Models
         public tb_inventory inventory { get; set; }
         public tb_product product { get; set; }
         public tb_unit unitEntity { get; set; }
+        public Nullable<int> ordering_number {  get; set; }
         public InventoryViewModel()
         {
             uom = new ProductViewModel();
@@ -124,6 +125,7 @@ namespace BT_KimMex.Models
         public Nullable<decimal> total_quantity { get; set; }
         public Nullable<decimal> item_labour_hour { get; set; }
         public Nullable<DateTime> inventory_date { get; set; }
+        public Nullable<int> ordering_number { get; set; }
         public InventoryDetailViewModel()
         {
             uom = new ProductViewModel();

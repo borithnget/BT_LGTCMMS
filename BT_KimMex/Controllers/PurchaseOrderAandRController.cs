@@ -102,6 +102,7 @@ namespace BT_KimMex.Controllers
                     pod.vat_amount = Convert.ToDecimal(vat_amount[count]);
                     pod.status = Status.Pending;
                     pod.outstanding_amount= Convert.ToDecimal(amount[count]);
+                    
 
                     db.tb_purchase_request_detail.Add(pod);
                     db.SaveChanges();
