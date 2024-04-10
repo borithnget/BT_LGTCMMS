@@ -180,6 +180,7 @@ namespace BT_KimMex.Controllers
                 CommonClass.AutoGenerateStockInvoiceNumber(issueReturn.stock_issue_return_id, model.inventories);
                 foreach (var inv in model.inventories)
                 {
+                    var remains = remain.FirstOrDefault(item => item.product_id == inv.product_id);
                     if (!string.IsNullOrEmpty(inv.warehouse_id) && !string.IsNullOrEmpty(inv.product_id) && inv.total_quantity >= Class.CommonClass.ConvertMultipleUnit(inv.product_id, inv.unit, Convert.ToDecimal(inv.in_quantity))) //&& inv.total_quantity >= inv.in_quantity
                     {
                         tb_inventory_detail inventoryDetail = new tb_inventory_detail();
@@ -195,6 +196,8 @@ namespace BT_KimMex.Controllers
                         inventoryDetail.invoice_number = CommonClass.GetInvoiceNumber(issueReturn.stock_issue_return_id, inventoryDetail.inventory_warehouse_id, inventoryDetail.invoice_date);
                         inventoryDetail.inventory_type = "5";
                         inventoryDetail.remain_quantity = inv.in_quantity;
+                        if (remains != null)
+                            inventoryDetail.ordering_number = remains.ordering_number;
                         db.tb_inventory_detail.Add(inventoryDetail);
                         db.SaveChanges();
                     }

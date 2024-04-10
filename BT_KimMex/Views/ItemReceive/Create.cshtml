@@ -424,6 +424,7 @@
                 var ireDetails = [];
                 var arrAttachment = [];
                 var warehouse = $('#warehouse_id').val();
+                var ordering_number = $('#ordering_number').val();
                 var sendingDate = $('#sending_date').val();
                 var returningDate = $('#returning_date').val();
 
@@ -620,6 +621,7 @@
             var receivedType = $('#receive_type').val();
             $('#itemReceiveTable').empty();
             $('#warehouse_id').val('');
+            $('ordering_number').val('');
             $('#warehouse_name').text('');
             $('#lblProjectName').text('');
             if (stID == null || stID == "" || stID == undefined) {

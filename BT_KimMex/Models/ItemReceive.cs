@@ -183,6 +183,7 @@ namespace BT_KimMex.Models
         public string ir_id { get; set; }
         public string history_id { get; set; }
         public string history_name { get; set; }
+        public Nullable<int> ordering_number { get; set; }
     }
 
     public class ItemReceiveHistoryViewModel

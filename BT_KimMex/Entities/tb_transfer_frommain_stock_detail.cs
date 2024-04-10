@@ -27,6 +27,7 @@ namespace BT_KimMex.Entities
         public string item_status { get; set; }
         public string remark { get; set; }
         public Nullable<decimal> received_remain_quantity { get; set; }
+        public Nullable<int> ordering_number { get; set; }
     
         public virtual transferformmainstock transferformmainstock { get; set; }
     }

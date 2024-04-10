@@ -1057,6 +1057,7 @@
           <Property Name="item_status" Type="nvarchar" MaxLength="50" />
           <Property Name="remark" Type="nvarchar(max)" />
           <Property Name="completed" Type="bit" Nullable="false" />
+          <Property Name="ordering_number" Type="int" />
         </EntityType>
         <EntityType Name="tb_received_status">
           <Key>
@@ -1393,6 +1394,7 @@
           <Property Name="item_status" Type="nvarchar" MaxLength="50" />
           <Property Name="remark" Type="nvarchar(max)" />
           <Property Name="received_remain_quantity" Type="decimal" Precision="18" Scale="2" />
+          <Property Name="ordering_number" Type="int" />
         </EntityType>
         <EntityType Name="tb_unit">
           <Key>
@@ -3909,6 +3911,7 @@
           <NavigationProperty Name="tb_product" Relationship="Self.FK_tb_received_item_detail_tb_product" FromRole="tb_received_item_detail" ToRole="tb_product" />
           <NavigationProperty Name="tb_receive_item_voucher" Relationship="Self.FK_tb_received_item_detail_tb_receive_item_voucher" FromRole="tb_received_item_detail" ToRole="tb_receive_item_voucher" />
           <NavigationProperty Name="tb_warehouse" Relationship="Self.FK_tb_received_item_detail_tb_warehouse" FromRole="tb_received_item_detail" ToRole="tb_warehouse" />
+          <Property Name="ordering_number" Type="Int32" />
         </EntityType>
         <EntityType Name="tb_received_status">
           <Key>
@@ -4268,6 +4271,7 @@
           <Property Name="remark" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="received_remain_quantity" Type="Decimal" Precision="18" Scale="2" />
           <NavigationProperty Name="transferformmainstock" Relationship="Self.FK_tb_transfer_frommain_stock_detail_transferformmainstocks" FromRole="tb_transfer_frommain_stock_detail" ToRole="transferformmainstocks" />
+          <Property Name="ordering_number" Type="Int32" />
         </EntityType>
         <EntityType Name="tb_unit">
           <Key>
@@ -6755,6 +6759,7 @@
           <EntitySetMapping Name="tb_received_item_detail">
             <EntityTypeMapping TypeName="db_a94f6d_lgtssModel.tb_received_item_detail">
               <MappingFragment StoreEntitySet="tb_received_item_detail">
+                <ScalarProperty Name="ordering_number" ColumnName="ordering_number" />
                 <ScalarProperty Name="ri_detail_id" ColumnName="ri_detail_id" />
                 <ScalarProperty Name="ri_ref_id" ColumnName="ri_ref_id" />
                 <ScalarProperty Name="ri_item_id" ColumnName="ri_item_id" />
@@ -7111,6 +7116,7 @@
           <EntitySetMapping Name="tb_transfer_frommain_stock_detail">
             <EntityTypeMapping TypeName="db_a94f6d_lgtssModel.tb_transfer_frommain_stock_detail">
               <MappingFragment StoreEntitySet="tb_transfer_frommain_stock_detail">
+                <ScalarProperty Name="ordering_number" ColumnName="ordering_number" />
                 <ScalarProperty Name="st_detail_id" ColumnName="st_detail_id" />
                 <ScalarProperty Name="status" ColumnName="status" />
                 <ScalarProperty Name="st_ref_id" ColumnName="st_ref_id" />

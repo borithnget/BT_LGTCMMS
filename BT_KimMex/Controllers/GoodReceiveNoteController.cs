@@ -227,6 +227,7 @@ namespace BT_KimMex.Controllers
                                           join tunit in db.tb_unit on detail.unit equals tunit.Id
                                           join unit in db.tb_unit on item.product_unit equals unit.Id
                                           join wh in db.tb_warehouse on detail.st_warehouse_id equals wh.warehouse_id
+                                          orderby detail.ordering_number
                                           where string.Compare(detail.st_ref_id, id) == 0
                                           select new InventoryViewModel()
                                           {
@@ -244,6 +245,7 @@ namespace BT_KimMex.Controllers
                                                 warehouseName=wh.warehouse_name,
                                                 from_warehouse_id=EnumConstants.WORKSHOP,
                                                 from_warehouse_name="Workshop",
+                                                ordering_number = detail.ordering_number,
 
                                           }).ToList();
                 return model;

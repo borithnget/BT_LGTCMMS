@@ -219,6 +219,8 @@ namespace BT_KimMex.Models
         public string ir_status { get; set; }
         public string ir_id { get; set; }
         public Nullable<bool> is_return { get; set; }
+        public Nullable<int> ordering_number { get; set; }
+
     }
     public class StockTransferFilterResult
     {
