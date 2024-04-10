@@ -18,6 +18,7 @@ namespace BT_KimMex.Entities
         public kim_mexEntities()
             : base("name=kim_mexEntities")
         {
+            this.Configuration.LazyLoadingEnabled = false;
         }
     
         protected override void OnModelCreating(DbModelBuilder modelBuilder)

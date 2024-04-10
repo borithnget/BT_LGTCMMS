@@ -440,7 +440,7 @@ namespace BT_KimMex.Class
                                     join pr in db.tb_purchase_requisition on mr.ir_id equals pr.material_request_id
                                     join pro in db.tb_product on item.ir_item_id equals pro.product_id
                                     join u in db.tb_unit on pro.product_unit equals u.Id
-                                    orderby item.ordering_number, pro.product_code
+                                    orderby item.ordering_number
                                     where string.Compare(pr.purchase_requisition_id, prId) == 0 && item.is_approved == true && item.remain_qty > 0 && item.remain_qty != null
                                     select new Models.ItemRequestDetail2ViewModel()
                                     {
@@ -490,7 +490,7 @@ namespace BT_KimMex.Class
                              join job in db.tb_ir_detail1 on item.ir_detail1_id equals job.ir_detail1_id
                              join pr in db.tb_item_request on job.ir_id equals pr.ir_id
                              join pro in db.tb_product on item.ir_item_id equals pro.product_id
-                             orderby item.ordering_number, pro.product_code
+                             orderby item.ordering_number
                              where string.Compare(pr.ir_id, id) == 0 && item.is_approved == true && item.remain_qty > 0 && item.remain_qty != null
                              select new Models.ItemRequestDetail2ViewModel()
                              {
@@ -512,7 +512,7 @@ namespace BT_KimMex.Class
                                         join job in db.tb_ir_detail1 on item.ir_detail1_id equals job.ir_detail1_id
                                         join pr in db.tb_item_request on job.ir_id equals pr.ir_id
                                         join pro in db.tb_product on item.ir_item_id equals pro.product_id
-                                        orderby item.ordering_number, pro.product_code
+                                        orderby item.ordering_number
                                         where string.Compare(pr.ir_id, id) == 0 && item.is_approved == true
                                         select new Models.ItemRequestDetail2ViewModel()
                                         {

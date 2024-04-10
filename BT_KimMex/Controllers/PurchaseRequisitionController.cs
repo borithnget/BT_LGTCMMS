@@ -129,12 +129,16 @@ namespace BT_KimMex.Controllers
             db.SaveChanges();
 
             CommonClass.SubmitProcessWorkflow(CommonClass.GetSytemMenuIdbyControllerName(controllerName), purchaseRequisition.purchase_requisition_id, purchaseRequisition.purchase_requisition_status, purchaseRequisition.created_by, purchaseRequisition.created_at);
-
+            
             if (item_id.Count() > 0)
             {
                 for (int i = 0; i < item_id.Count(); i++)
                 {
+                    
                     tb_purchase_requisition_detail detail = new tb_purchase_requisition_detail();
+
+             
+
                     detail.purchase_requisition_detail_id = Guid.NewGuid().ToString();
                     detail.purchase_requisition_id = purchaseRequisition.purchase_requisition_id;
                     detail.item_id = item_id[i];
@@ -143,6 +147,7 @@ namespace BT_KimMex.Controllers
                     detail.remain_qty = Convert.ToDecimal(item_qty[i]);
                     detail.item_status = Status.WaitingApproval;
                     detail.ordering_number = i+1;
+                    //detail.ordering_number = MaterialmaterialRequestItem.ordering_number;
                     db.tb_purchase_requisition_detail.Add(detail);
                     db.SaveChanges();
                 }

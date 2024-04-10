@@ -251,8 +251,6 @@
           <Property Name="status" Type="bit" />
           <Property Name="updated_by" Type="nvarchar" MaxLength="50" />
         </EntityType>
-        <!--Errors Found During Generation:
-warning 6002: The table/view 'db_a94f6d_lgtss.dbo.tb_inventory' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="tb_inventory">
           <Key>
             <PropertyRef Name="inventory_id" />
@@ -285,8 +283,6 @@ warning 6002: The table/view 'db_a94f6d_lgtss.dbo.tb_inventory' does not have a 
           <Property Name="remark" Type="nvarchar(max)" />
           <Property Name="unit" Type="nvarchar" MaxLength="50" />
         </EntityType>
-        <!--Errors Found During Generation:
-warning 6002: The table/view 'db_a94f6d_lgtss.dbo.tb_inventory_detail' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="tb_inventory_detail">
           <Key>
             <PropertyRef Name="inventory_detail_id" />
@@ -2431,7 +2427,9 @@ warning 6002: The table/view 'db_a94f6d_lgtss.dbo.tb_inventory_detail' does not 
           <EntitySet Name="tb_customer" EntityType="Self.tb_customer" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_error_log" EntityType="Self.tb_error_log" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_history_issue_qty" EntityType="Self.tb_history_issue_qty" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_inventory" EntityType="Self.tb_inventory" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_inventory_deleted" EntityType="Self.tb_inventory_deleted" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_inventory_detail" EntityType="Self.tb_inventory_detail" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_inventory_status" EntityType="Self.tb_inventory_status" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_invoice" EntityType="Self.tb_invoice" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_ir_attachment" EntityType="Self.tb_ir_attachment" Schema="dbo" store:Type="Tables" />
@@ -2508,41 +2506,6 @@ warning 6002: The table/view 'db_a94f6d_lgtss.dbo.tb_inventory_detail' does not 
           <EntitySet Name="tb_workorder_returned" EntityType="Self.tb_workorder_returned" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tbSiteSiteSupervisor" EntityType="Self.tbSiteSiteSupervisor" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="transferformmainstocks" EntityType="Self.transferformmainstocks" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="tb_inventory" EntityType="Self.tb_inventory" store:Type="Tables" store:Schema="dbo">
-            <DefiningQuery>SELECT 
-    [tb_inventory].[inventory_id] AS [inventory_id], 
-    [tb_inventory].[inventory_date] AS [inventory_date], 
-    [tb_inventory].[inventory_status_id] AS [inventory_status_id], 
-    [tb_inventory].[warehouse_id] AS [warehouse_id], 
-    [tb_inventory].[product_id] AS [product_id], 
-    [tb_inventory].[total_quantity] AS [total_quantity], 
-    [tb_inventory].[in_quantity] AS [in_quantity], 
-    [tb_inventory].[out_quantity] AS [out_quantity], 
-    [tb_inventory].[ref_id] AS [ref_id], 
-    [tb_inventory].[remark] AS [remark], 
-    [tb_inventory].[unit] AS [unit]
-    FROM [dbo].[tb_inventory] AS [tb_inventory]</DefiningQuery>
-          </EntitySet>
-          <EntitySet Name="tb_inventory_detail" EntityType="Self.tb_inventory_detail" store:Type="Tables" store:Schema="dbo">
-            <DefiningQuery>SELECT 
-    [tb_inventory_detail].[inventory_detail_id] AS [inventory_detail_id], 
-    [tb_inventory_detail].[inventory_ref_id] AS [inventory_ref_id], 
-    [tb_inventory_detail].[inventory_item_id] AS [inventory_item_id], 
-    [tb_inventory_detail].[inventory_warehouse_id] AS [inventory_warehouse_id], 
-    [tb_inventory_detail].[quantity] AS [quantity], 
-    [tb_inventory_detail].[remark] AS [remark], 
-    [tb_inventory_detail].[supplier_id] AS [supplier_id], 
-    [tb_inventory_detail].[unit] AS [unit], 
-    [tb_inventory_detail].[previous_quantity] AS [previous_quantity], 
-    [tb_inventory_detail].[approved_date] AS [approved_date], 
-    [tb_inventory_detail].[item_status] AS [item_status], 
-    [tb_inventory_detail].[invoice_number] AS [invoice_number], 
-    [tb_inventory_detail].[invoice_date] AS [invoice_date], 
-    [tb_inventory_detail].[inventory_type] AS [inventory_type], 
-    [tb_inventory_detail].[remain_quantity] AS [remain_quantity], 
-    [tb_inventory_detail].[reason] AS [reason]
-    FROM [dbo].[tb_inventory_detail] AS [tb_inventory_detail]</DefiningQuery>
-          </EntitySet>
           <AssociationSet Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
             <End Role="AspNetUserClaims" EntitySet="AspNetUserClaims" />

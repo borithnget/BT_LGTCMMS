@@ -108,7 +108,7 @@ namespace BT_KimMex.Controllers
                     dPO.unit_price = 0;
                     dPO.item_status = "Pending";
                     dPO.item_vat = pDetails[i].item_vat;
-                   
+                    dPO.ordering_number = i+1;
                     dPO.status = true;
                     db.tb_purchase_order_detail.Add(dPO);
                     db.SaveChanges();
