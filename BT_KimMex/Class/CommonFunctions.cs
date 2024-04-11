@@ -1464,6 +1464,10 @@ public static ClassTypeViewModel GetClassTypeItem(string id)
                     model.project_short_name = obj.proj.project_full_name;
                     model.purchase_request_status = obj.po.purchase_request_status;
                     model.purchase_order_id = obj.po.purchase_order_id;
+                    if (!string.IsNullOrEmpty(model.purchase_order_id))
+                    {
+                        model.poDetails = PurchaseOrderReportViewModel.GetPOReportbyPurchaseOrderId(model.pruchase_request_id);
+                    }
                     models.Add(model);
                 }
 
