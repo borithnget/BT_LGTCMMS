@@ -583,6 +583,7 @@ namespace BT_KimMex.Models
                                join purs in db.tb_po_supplier on purd.po_detail_id equals purs.po_detail_id
                                join prod in db.tb_product on purd.item_id equals prod.product_id
                                join unit in db.tb_unit on purd.po_unit equals unit.Id
+                               orderby purd.ordering_number
                                where string.Compare(purd.purchase_order_id, model.po_ref_id) == 0 && string.Compare(purd.item_status, "approved") == 0
                                && purs.is_selected == true && string.Compare(purs.supplier_id, model.po_supplier_id) == 0 && purd.item_vat == model.vat_status
                                select new PurchaseOrderDetailItemEntityModel  {
