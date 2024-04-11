@@ -85,6 +85,7 @@ namespace BT_KimMex.Class
                                join wah in db.tb_warehouse on inv.warehouse_id equals wah.warehouse_id
                                //join type in db.tb_brand on item.brand_id equals type.brand_id
                                //orderby item.product_code
+                               orderby inv.ordering_number
                                where string.Compare(inv.ref_id, id) == 0
                                select new InventoryViewModel()
                                {
@@ -861,7 +862,7 @@ namespace BT_KimMex.Class
                 var inventoryList = (from inv in db.tb_received_item_detail
                                      join item in db.tb_product on inv.ri_item_id equals item.product_id
                                      join wah in db.tb_warehouse on inv.ri_warehouse_id equals wah.warehouse_id
-                                     orderby item.product_code
+                                     orderby inv.ordering_number
                                      where string.Compare(inv.ri_ref_id, itemReceive.receive_item_voucher_id) == 0
                                      select new
                                      {
@@ -881,6 +882,7 @@ namespace BT_KimMex.Class
                                          supplier_id = inv.supplier_id,
                                          item_status = inv.item_status,
                                          remark = inv.remark,
+                                         ordering_number = inv.ordering_number,
                                          completed = inv.completed,
                                          //out_quantity = inv.out_quantity
                                      }
@@ -901,6 +903,7 @@ namespace BT_KimMex.Class
                     inventory.unitName = db.tb_unit.Find(inventory.unit).Name;
                     inventory.item_status = inv.item_status;
                     inventory.invoice_number = inv.invoice_number;
+                    inventory.ordering_number = inv.ordering_number;
                     inventory.invoice_date = inv.inovice_date;
                     inventory.supplier_id = inv.supplier_id;
                     //if(!string.IsNullOrEmpty(inventory.supplier_id))
@@ -910,6 +913,7 @@ namespace BT_KimMex.Class
                     {
                         inventory.total_quantity = Inventory.GetStockTransferItemQty(itemReceive.ref_id, inventory.product_id);
                         inventory.supplier_name = db.tb_warehouse.Where(x => string.Compare(x.warehouse_id, inventory.supplier_id) == 0).Select(x => x.warehouse_name).FirstOrDefault().ToString();
+                        
 
                         var receivedHistory = db.tb_receive_item_voucher.Where(s => s.status == true && string.Compare(s.ref_id, itemReceive.ref_id) == 0).ToList();
                         inventory.totalReceived = receivedHistory.Count();
@@ -929,6 +933,7 @@ namespace BT_KimMex.Class
                     else if(string.Compare(itemReceive.received_type,"Stock Return") == 0)
                     {
                         inventory.supplier_name = db.tb_warehouse.Where(x => string.Compare(x.warehouse_id, inventory.supplier_id) == 0).Select(x => x.warehouse_name).FirstOrDefault().ToString();
+                        
                     }
                     else
                     {

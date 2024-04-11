@@ -266,6 +266,7 @@
           <Property Name="ref_id" Type="nvarchar" MaxLength="38" />
           <Property Name="remark" Type="nvarchar" MaxLength="100" />
           <Property Name="unit" Type="nvarchar" MaxLength="38" />
+          <Property Name="ordering_number" Type="int" />
         </EntityType>
         <EntityType Name="tb_inventory_deleted">
           <Key>
@@ -4443,6 +4444,7 @@
           <Property Name="ref_id" Type="String" MaxLength="38" FixedLength="false" Unicode="true" />
           <Property Name="remark" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <Property Name="unit" Type="String" MaxLength="38" FixedLength="false" Unicode="true" />
+          <Property Name="ordering_number" Type="Int32" />
         </EntityType>
         <EntityType Name="tb_inventory_detail">
           <Key>
@@ -7285,6 +7287,7 @@
           <EntitySetMapping Name="tb_inventory">
             <EntityTypeMapping TypeName="db_a94f6d_lgtssModel.tb_inventory">
               <MappingFragment StoreEntitySet="tb_inventory">
+                <ScalarProperty Name="ordering_number" ColumnName="ordering_number" />
                 <ScalarProperty Name="inventory_id" ColumnName="inventory_id" />
                 <ScalarProperty Name="inventory_date" ColumnName="inventory_date" />
                 <ScalarProperty Name="inventory_status_id" ColumnName="inventory_status_id" />

@@ -331,6 +331,12 @@ namespace BT_KimMex.Controllers
                 return Json(new { result = "success" }, JsonRequestBehavior.AllowGet);
             }
         }
+
+        private int? GetOrderingNumberTransferWorkshop()
+        {
+            throw new NotImplementedException();
+        }
+
         public ActionResult Detail(string id)
         {
             if (string.IsNullOrEmpty(id))
