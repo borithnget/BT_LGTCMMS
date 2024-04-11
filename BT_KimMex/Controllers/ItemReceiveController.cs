@@ -332,10 +332,7 @@ namespace BT_KimMex.Controllers
             }
         }
 
-        private int? GetOrderingNumberTransferWorkshop()
-        {
-            throw new NotImplementedException();
-        }
+
 
         public ActionResult Detail(string id)
         {

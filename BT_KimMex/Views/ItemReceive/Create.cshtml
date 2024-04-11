@@ -424,7 +424,7 @@
                 var ireDetails = [];
                 var arrAttachment = [];
                 var warehouse = $('#warehouse_id').val();
-                //var ordering_number = $('.ordering_number');
+                var ordering_number = $('.ordering_number');
                 var sendingDate = $('#sending_date').val();
                 var returningDate = $('#returning_date').val();
 
@@ -446,7 +446,7 @@
                     //var warehouse = warehouses[i].value;
 
                     var receivedQty = receivedQtys[i].value;
-                    // var ordering_number = ordering_number[i].value;
+                    var orderingNumber = ordering_number[i].value;
                     var receivedUnit = (receivedUnits[i].value).split(',');
                     if (warehouse && receivedQty && Number(receivedQty) > 0) {
                         var element_item = {};
@@ -456,7 +456,7 @@
                         element_item.in_quantity = receivedQty;
                         element_item.unit = receivedUnit[0];
                         element_item.supplier_id = suppliers[i].value;
-                        //element_item.ordering_number = ordering_number;
+                        element_item.ordering_number = orderingNumber;
                         element_item.invoice_number = invoiceNumbers[i].value;
                         element_item.invoice_date = convertDDMMYYYtoMMDDYYYY(invoiceDate[i].value);
                         ireDetails.push(element_item);
@@ -746,7 +746,8 @@
                                 } else {
                                     $('#itemReceiveTable').append("" +
                                         "<tr>" +
-                                            "<td>" + Number(index + 1) + "</td>" +
+                                        "<td>" + Number(index + 1) + "</td>" +
+                                     
                                             "<td><input type='hidden' class='item_id' value='" + item.product_id + "'/>" + item.itemCode + "</td>" +
                                             "<td>" + item.itemName + "</td>" +
                                             "<td><label class='request_qty'>" + item.total_quantity + "</label> <input type='hidden' class='request_unit' value='" + item.unit + "'/> <label class=''>" + item.unitName + "</label></td>" + //item.itemUnit
@@ -966,7 +967,7 @@
                         $('#lblProjectName').text(da.data.project_fullname);
                         $('#warehouse_id').val(da.data.warehouse_id);
                         $('#warehouse_name').text(da.data.warehouse_name);
-                        $('#ordering_number').val(da.data.ordering_number);
+                        //$('#ordering_number').val(da.data.ordering_number);
                         $('#itemReceiveTable').empty();
                         var rowHeader = "";
 
@@ -1005,7 +1006,7 @@
                             
                             $('#itemReceiveTable').append("" +
                                         "<tr>" +
-                                            "<td>" + Number(index + 1) + "</td>" +
+                                "<td> <input type='hidden' class='ordering_number' value = '" + item.ordering_number + "'/>" + Number(index + 1) + "</td>" +
                                             "<td><input type='hidden' class='item_id' value='" + item.product_id + "'/>" + item.itemCode + "</td>" +
                                             "<td>" + item.itemName + "</td>" +
                                             "<td><label class='request_qty'>" + item.total_quantity + "</label> <input type='hidden' class='request_unit' value='" + item.unit + "'/> <label class=''>" + item.unitName + "</label></td>" + //item.itemUnit
@@ -1083,8 +1084,8 @@
                             }
 
                             $('#itemReceiveTable').append("" +
-                                        "<tr>" +
-                                            "<td>" + Number(index + 1) + "</td>" +
+                                "<tr>" +
+                                "<td><input type='hidden' class= 'ordering_number' value= '" + item.ordering_number +"'</input>" + Number(index + 1) + "</td>" +
                                             "<td><input type='hidden' class='item_id' value='" + item.product_id + "'/>" + item.itemCode + "</td>" +
                                             "<td>" + item.itemName + "</td>" +
                                             "<td><label class='request_qty'>" + item.total_quantity + "</label> <input type='hidden' class='request_unit' value='" + item.unit + "'/> <label class=''>" + item.unitName + "</label></td>" + //item.itemUnit
