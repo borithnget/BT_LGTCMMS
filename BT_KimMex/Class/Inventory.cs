@@ -84,7 +84,7 @@ namespace BT_KimMex.Class
                                //join std in db.tb_stock_transfer_detail on item.product_id equals std.st_item_id //new add
                                join wah in db.tb_warehouse on inv.warehouse_id equals wah.warehouse_id
                                //join type in db.tb_brand on item.brand_id equals type.brand_id
-                               orderby item.product_code
+                               //orderby item.product_code
                                where string.Compare(inv.ref_id, id) == 0
                                select new InventoryViewModel()
                                {
@@ -977,6 +977,7 @@ namespace BT_KimMex.Class
                     inventory.total_quantity = po.po_quantity;
                     inventory.out_quantity = po.quantity;
                     inventory.remain_quantity = po.remain_quantity;
+                    inventory.ordering_number = po.ordering_number;
                     inventory.uom1_id = db.tb_multiple_uom.Where(m => m.product_id == po.item_id).Select(x => x.uom1_id).FirstOrDefault();
                     inventory.uom2_id = db.tb_multiple_uom.Where(m => m.product_id == po.item_id).Select(x => x.uom2_id).FirstOrDefault();
                     inventory.uom3_id = db.tb_multiple_uom.Where(m => m.product_id == po.item_id).Select(x => x.uom3_id).FirstOrDefault();
@@ -1309,6 +1310,7 @@ namespace BT_KimMex.Class
              join product in db.tb_product on detail.inventory_item_id equals product.product_id
              join punit in db.tb_unit on product.product_unit equals punit.Id
              join iunit in db.tb_unit on detail.unit equals iunit.Id
+             orderby detail.ordering_number
              join wh in db.tb_warehouse on detail.inventory_warehouse_id equals wh.warehouse_id
              where string.Compare(detail.inventory_ref_id, id) == 0
              select new InventoryViewModel()
@@ -1321,6 +1323,7 @@ namespace BT_KimMex.Class
                  itemUnitName = punit.Name,
                  warehouse_id = detail.inventory_warehouse_id,
                  out_quantity = detail.quantity,
+                 ordering_number = detail.ordering_number,
                  remain_quantity = detail.remain_quantity,
                  unit = detail.unit,
                  unitName = iunit.Name,
