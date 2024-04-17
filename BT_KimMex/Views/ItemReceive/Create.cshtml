@@ -565,6 +565,7 @@
                     },
                     error: function (err) {
                         alert('Your data is error while saving.');
+                        enable_submit_button(false);
                     }
                 });
 
@@ -746,7 +747,7 @@
                                 } else {
                                     $('#itemReceiveTable').append("" +
                                         "<tr>" +
-                                        "<td>" + Number(index + 1) + "</td>" +
+                                        "<td><input type='hidden' class='ordering_number' value = '" + item.ordering_number + "'/>" + Number(index + 1) + "</td>" +
                                      
                                             "<td><input type='hidden' class='item_id' value='" + item.product_id + "'/>" + item.itemCode + "</td>" +
                                             "<td>" + item.itemName + "</td>" +
@@ -923,7 +924,7 @@
                                     
                                     $('#itemReceiveTable').append("" +
                                             "<tr>" +
-                                                "<td>" + Number(index + 1) + "</td>" +
+                                        "<td><input type='hidden' class='ordering_number' value = '" + item.ordering_number + "'/>" + Number(index + 1) + "</td>" +
                                                 "<td><input type='hidden' class='item_id' value='" + item.item_id + "'/>" + item.product_code + "</td>" +
                                                 "<td>" + item.product_name + "</td>" +
                                                 "<td><label class='po_qty'>" + item.po_quantity + "</label> <input type='hidden' class='request_unit' value='" + item.item_unit + "'/> <label class=''>" + item.item_unit_name + "</label> <input type='hidden' class='unit_level' value='" + item.unitLevel + "'/> </td>" +// item.product_unit

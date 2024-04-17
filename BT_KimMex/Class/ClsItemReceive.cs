@@ -573,8 +573,8 @@ namespace BT_KimMex.Class
                             inventories.Add(inv);
                         }
                     }
-                    inventories = inventories.ToList();
-                    //inventories = inventories.OrderBy(x => x.product_code).ToList();
+                    //inventories = inventories.ToList();
+                    inventories = inventories.OrderBy(x => x.ordering_number).ToList();
                 }
             }catch(Exception ex)
             {

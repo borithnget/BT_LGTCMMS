@@ -81,6 +81,7 @@
                     },
                     error: function (XMLHttpRequest, textStatus, errorThrown) {
                         console.log(textStatus);
+                        $('#btnCreate').attr('disabled', false);
                     }
                 });
             });

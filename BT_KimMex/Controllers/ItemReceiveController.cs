@@ -144,30 +144,7 @@ namespace BT_KimMex.Controllers
                     temp.invoice_date = inv.invoice_date == null ? Class.CommonClass.ToLocalTime(DateTime.Now).Date : inv.invoice_date;
                     temp.invoice_number = CommonClass.GetInvoiceNumber(itemReceive.receive_item_voucher_id, temp.ri_warehouse_id, temp.invoice_date);
                     temp.supplier_id = inv.supplier_id;
-                    if (string.Compare(model.received_type, "Purchase Order") == 0)
-                    {
-                        List<PurchaseOrderDetailViewModel> remainQuantities = new List<PurchaseOrderDetailViewModel>();
-                        //remainQuantities = this.GetRemainItemByPurchaseOrder(model.ref_id,model.receive_item_voucher_id);
-                        remainQuantities = Class.ClsItemReceive.GetReceivedRemainItembyPurchaseOrder(model.ref_id, model.supplier_id, model.po_report_number, model.receive_item_voucher_id);
-                        var remainRequestItem = remainQuantities.FirstOrDefault(item => item.item_id == inv.product_id);
-                        temp.ordering_number = remainRequestItem.ordering_number;
-
-                    }
-                    else if (string.Compare(model.received_type, "Stock Transfer") == 0)
-                    {
-                        List<InventoryViewModel> remainQuantities = new List<InventoryViewModel>();
-                        remainQuantities = this.GetRemainByStockTransfer(model.ref_id);
-                        var remainRequestItem = remainQuantities.FirstOrDefault(item => item.product_id == inv.product_id);
-                        temp.ordering_number = remainRequestItem.ordering_number;
-                    }
-                    else if (string.Compare(itemReceive.received_type, "Transfer Workshop") == 0)
-                    {
-                        temp.ordering_number = inv.ordering_number;
-                    }
-                    else if (string.Compare(itemReceive.received_type, "Stock Return") == 0)
-                    {
-                        temp.ordering_number = inv.ordering_number;
-                    }
+                    temp.ordering_number = inv.ordering_number;
                     db.tb_received_item_detail.Add(temp);
                     db.SaveChanges();
                 }
