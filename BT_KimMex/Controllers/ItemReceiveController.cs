@@ -112,6 +112,8 @@ namespace BT_KimMex.Controllers
                 db.SaveChanges();
                 Class.CommonClass.AutoGenerateStockInvoiceNumber(itemReceive.receive_item_voucher_id, inventories);
 
+
+
                 foreach(var inv in inventories)
                 {
                     /* update workflow
@@ -142,6 +144,7 @@ namespace BT_KimMex.Controllers
                     temp.invoice_date = inv.invoice_date == null ? Class.CommonClass.ToLocalTime(DateTime.Now).Date : inv.invoice_date;
                     temp.invoice_number = CommonClass.GetInvoiceNumber(itemReceive.receive_item_voucher_id, temp.ri_warehouse_id, temp.invoice_date);
                     temp.supplier_id = inv.supplier_id;
+                    temp.ordering_number = inv.ordering_number;
                     db.tb_received_item_detail.Add(temp);
                     db.SaveChanges();
                 }
@@ -305,6 +308,9 @@ namespace BT_KimMex.Controllers
                 return Json(new { result = "success" }, JsonRequestBehavior.AllowGet);
             }
         }
+
+
+
         public ActionResult Detail(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -430,19 +436,21 @@ namespace BT_KimMex.Controllers
 
                 foreach (var inv in inventories)
                 {
-                    //tb_inventory inventory = new tb_inventory();
-                    //decimal totalQty = Convert.ToDecimal(db.tb_inventory.OrderByDescending(m => m.inventory_date).Where(m => m.product_id == inv.product_id && m.warehouse_id == inv.warehouse_id).Select(m => m.total_quantity).FirstOrDefault());
-                    //inventory.inventory_id = Guid.NewGuid().ToString();
-                    //inventory.inventory_date = Class.CommonClass.ToLocalTime(DateTime.Now);
-                    //inventory.inventory_status_id = "7";
-                    //inventory.warehouse_id = inv.warehouse_id;
-                    //inventory.product_id = inv.product_id;
-                    //inventory.total_quantity = totalQty + inv.in_quantity;
-                    //inventory.in_quantity = inv.in_quantity;
-                    //inventory.out_quantity = 0;
-                    //inventory.ref_id = itemReceive.receive_item_voucher_id;
-                    //db.tb_inventory.Add(inventory);
-                    //db.SaveChanges();
+                    
+                        
+                        //tb_inventory inventory = new tb_inventory();
+                        //decimal totalQty = Convert.ToDecimal(db.tb_inventory.OrderByDescending(m => m.inventory_date).Where(m => m.product_id == inv.product_id && m.warehouse_id == inv.warehouse_id).Select(m => m.total_quantity).FirstOrDefault());
+                        //inventory.inventory_id = Guid.NewGuid().ToString();
+                        //inventory.inventory_date = Class.CommonClass.ToLocalTime(DateTime.Now);
+                        //inventory.inventory_status_id = "7";
+                        //inventory.warehouse_id = inv.warehouse_id;
+                        //inventory.product_id = inv.product_id;
+                        //inventory.total_quantity = totalQty + inv.in_quantity;
+                        //inventory.in_quantity = inv.in_quantity;
+                        //inventory.out_quantity = 0;
+                        //inventory.ref_id = itemReceive.receive_item_voucher_id;
+                        //db.tb_inventory.Add(inventory);
+                        //db.SaveChanges();
                     tb_received_item_detail temp = new tb_received_item_detail();
                     temp.ri_detail_id = Guid.NewGuid().ToString();
                     temp.ri_ref_id = itemReceive.receive_item_voucher_id;
@@ -454,6 +462,8 @@ namespace BT_KimMex.Controllers
                     temp.invoice_date = inv.invoice_date == null ? Class.CommonClass.ToLocalTime(DateTime.Now).Date : inv.invoice_date;
                     temp.invoice_number = CommonClass.GetInvoiceNumber(itemReceive.receive_item_voucher_id,temp.ri_warehouse_id,temp.invoice_date);
                     temp.supplier_id = inv.supplier_id;
+
+                    
                     db.tb_received_item_detail.Add(temp);
                     db.SaveChanges();
                 }
@@ -1459,15 +1469,18 @@ namespace BT_KimMex.Controllers
                 if (string.IsNullOrEmpty(receivedId))
                 {
                     transferItems = (from transfer in db.tb_stock_transfer_detail
+                                     orderby transfer.ordering_number
                                      where string.Compare(transfer.st_ref_id, tranferId) == 0 && transfer.remain_quantity > 0
-                                     select new Models.StockTransferItemViewModel{ st_detail_id=transfer.st_detail_id,st_item_id=transfer.st_item_id,quantity=transfer.remain_quantity,itemUnit=transfer.unit }).ToList();
+                                     select new Models.StockTransferItemViewModel{ st_detail_id=transfer.st_detail_id,st_item_id=transfer.st_item_id,quantity=transfer.remain_quantity,itemUnit=transfer.unit, ordering_number=transfer.ordering_number }).ToList();
                 }
                 else
                 {
                     transferItems = (from transfer in db.tb_stock_transfer_detail
+                                     orderby transfer.ordering_number
                                      where string.Compare(transfer.st_ref_id, tranferId) == 0
-                                     select new Models.StockTransferItemViewModel() { st_detail_id = transfer.st_detail_id, st_item_id = transfer.st_item_id, quantity = transfer.remain_quantity, itemUnit = transfer.unit }).ToList();
+                                     select new Models.StockTransferItemViewModel() { st_detail_id = transfer.st_detail_id, st_item_id = transfer.st_item_id, quantity = transfer.remain_quantity, itemUnit = transfer.unit, ordering_number=transfer.ordering_number }).ToList();
                     receivedItems = (from received in db.tb_received_item_detail
+                                     orderby received.ordering_number
                                      where string.Compare(received.ri_ref_id, receivedId) == 0 && string.Compare(received.item_status, "approved") != 0
                                      select new Models.ItemReceivedDetailViewModel() {ri_detail_id=received.ri_detail_id,ri_item_id=received.ri_item_id,quantity=received.quantity,unit=received.unit }).ToList();
                 }
@@ -1482,6 +1495,7 @@ namespace BT_KimMex.Controllers
                     inventory.product_id = transferItem.st_item_id;
                     inventory.itemName = db.tb_product.Where(x => string.Compare(x.product_id, inventory.product_id) == 0).Select(x => x.product_name).FirstOrDefault().ToString();
                     inventory.total_quantity = transferItem.quantity + receivedQuantity;
+                    inventory.ordering_number = transferItem.ordering_number;
                     inventories.Add(inventory);
                 }
 
@@ -1541,6 +1555,7 @@ namespace BT_KimMex.Controllers
                     {
                         var purchaseOrderDetails = (from dPo in db.tb_purchase_order_detail
                                                     join product in db.tb_product on dPo.item_id equals product.product_id
+                                                    orderby dPo.ordering_number
                                                     where string.Compare(dPo.purchase_order_id, poId) == 0 && (string.Compare(dPo.item_status, "approved") == 0 || string.Compare(dPo.item_status, "Pending") == 0) && dPo.remain_quantity > 0
                                                     select new { dPo, product }).ToList();
                         foreach (var po in purchaseOrderDetails)
@@ -1570,6 +1585,7 @@ namespace BT_KimMex.Controllers
                     {
                         var purchaseOrderDetails = (from dPo in db.tb_purchase_order_detail
                                                     join product in db.tb_product on dPo.item_id equals product.product_id
+                                                    orderby dPo.ordering_number
                                                     where string.Compare(dPo.purchase_order_id, poId) == 0 && (string.Compare(dPo.item_status, "approved") == 0 || string.Compare(dPo.item_status, "Pending") == 0)
                                                     select new { dPo, product }).ToList();
                         var receivedItems = db.tb_received_item_detail.Where(x => string.Compare(x.ri_ref_id, receivedId) == 0).ToList();
@@ -1651,7 +1667,7 @@ namespace BT_KimMex.Controllers
                     }
                     */
                     #endregion
-                    inventories = inventories.OrderBy(x => x.product_code).ToList();
+                    inventories = inventories.ToList();
                 }
             }catch(Exception ex)
             {

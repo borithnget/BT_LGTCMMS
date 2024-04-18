@@ -454,6 +454,8 @@ namespace BT_KimMex.Controllers
                             inv.status = "false";
                         }
                     }
+
+                    var remainRequestItem = remainRequestItems.FirstOrDefault(item => item.ir_item_id == inv.product_id);
                    
                     tb_stock_transfer_detail stDetail = new tb_stock_transfer_detail();
                     stDetail.st_detail_id = Guid.NewGuid().ToString();
@@ -468,6 +470,8 @@ namespace BT_KimMex.Controllers
                     stDetail.remain_quantity = Class.CommonClass.ConvertMultipleUnit(stDetail.st_item_id, stDetail.unit, Convert.ToDecimal(inv.out_quantity));
                     stDetail.return_remain_quantity = Class.CommonClass.ConvertMultipleUnit(stDetail.st_item_id, stDetail.unit, Convert.ToDecimal(inv.out_quantity));
                     stDetail.item_status =Status.Pending;
+                    if(remainRequestItem != null)
+                        stDetail.ordering_number = remainRequestItem.ordering_number;
                     db.tb_stock_transfer_detail.Add(stDetail);
                     db.SaveChanges();
                     if (Convert.ToBoolean(stDetail.status))
@@ -607,6 +611,8 @@ namespace BT_KimMex.Controllers
                         inv.status = "false";
                     }
 
+                    var remainRequestItem = remainRequestItems.FirstOrDefault(item => item.ir_item_id == inv.product_id);
+
                     stDetail.st_detail_id = Guid.NewGuid().ToString();
                     stDetail.st_ref_id = sTransfer.stock_transfer_id;
                     stDetail.st_item_id = inv.product_id;
@@ -617,6 +623,8 @@ namespace BT_KimMex.Controllers
                     stDetail.invoice_date = inv.invoice_date != null ? Class.CommonClass.ToLocalTime(DateTime.Now) : inv.inventory_date;
                     stDetail.invoice_number = Class.CommonClass.GetInvoiceNumber(sTransfer.stock_transfer_id,stDetail.st_warehouse_id,stDetail.invoice_date); //string.IsNullOrEmpty(inv.invoice_number)?Class.StockTransfer.GenerateInvoiceNumber(stDetail.st_warehouse_id,Convert.ToDateTime(stDetail.invoice_date)):inv.invoice_number;
                     stDetail.item_status = "pending";
+                    if (remainRequestItem != null)
+                        stDetail.ordering_number = remainRequestItem.ordering_number;
                     db.tb_stock_transfer_detail.Add(stDetail);
                     db.SaveChanges();
                 }
@@ -2426,6 +2434,7 @@ namespace BT_KimMex.Controllers
                 var inventories = (from inv in db.tb_stock_transfer_detail
                                    join wah in db.tb_warehouse on inv.st_warehouse_id equals wah.warehouse_id
                                    join pro in db.tb_product on inv.st_item_id equals pro.product_id
+                                   orderby inv.ordering_number
                                    where inv.st_ref_id == sTransfer.stock_transfer_id
                                    select new InventoryViewModel()
                                    {
@@ -2613,6 +2622,7 @@ namespace BT_KimMex.Controllers
                     inventory.product_id = inv.st_item_id;
                     inventory.out_quantity = Class.CommonClass.ConvertMultipleUnit(inv.st_item_id,inv.unit,Convert.ToDecimal(inv.quantity));
                     inventory.in_quantity = 0;
+                    inventory.ordering_number = inv.ordering_number;
                     inventory.total_quantity = totalQty - inventory.out_quantity;
                     db.tb_inventory.Add(inventory);
                     db.SaveChanges();

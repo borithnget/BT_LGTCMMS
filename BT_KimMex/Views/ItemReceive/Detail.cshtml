@@ -500,6 +500,7 @@
                             }
                             $('.success-message').html(err.statusText);
                             $.notify('Your data has been error while approving!', { className: 'error' });
+                            enable_submit_button('approve-confirm', false);
                         }
                     });
                 }
@@ -541,6 +542,7 @@
                             }
                             $('.success-message').html(err.statusText);
                             $.notify('Your data has been error while rejecting!', { className: 'error' });
+                            enable_submit_button('reject-confirm', false);
                         }
                     });
                 }
@@ -580,6 +582,7 @@
                             }
                             $('.success-message').html(err.statusText);
                             $.notify('Your data has been error while approving!', { className: 'error' });
+                            enable_submit_button('btn-cancel-yes', false);
                         }
                     });
                 }

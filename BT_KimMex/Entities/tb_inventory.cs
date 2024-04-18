@@ -25,5 +25,6 @@ namespace BT_KimMex.Entities
         public string ref_id { get; set; }
         public string remark { get; set; }
         public string unit { get; set; }
+        public Nullable<int> ordering_number { get; set; }
     }
 }

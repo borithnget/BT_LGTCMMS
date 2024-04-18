@@ -107,7 +107,7 @@ namespace BT_KimMex.Controllers
                     #region updated when have workflow
                     #endregion
 
-                    
+                    var remainRequestItem = remainRequestItems.FirstOrDefault(item => item.ir_item_id == inv.product_id);
 
                     tb_transfer_frommain_stock_detail stDetail = new tb_transfer_frommain_stock_detail();
                     stDetail.st_detail_id = Guid.NewGuid().ToString();
@@ -122,6 +122,8 @@ namespace BT_KimMex.Controllers
                     stDetail.remain_quantity = Class.CommonClass.ConvertMultipleUnit(stDetail.st_item_id, stDetail.unit, Convert.ToDecimal(inv.out_quantity));
                     stDetail.received_remain_quantity = Class.CommonClass.ConvertMultipleUnit(stDetail.st_item_id, stDetail.unit, Convert.ToDecimal(inv.out_quantity));
                     stDetail.item_status = "pending";
+                    if (remainRequestItem != null)
+                        stDetail.ordering_number = remainRequestItem.ordering_number;
                     db.tb_transfer_frommain_stock_detail.Add(stDetail);
                     db.SaveChanges();
                 }

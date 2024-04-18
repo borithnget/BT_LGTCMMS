@@ -424,6 +424,7 @@
                 var ireDetails = [];
                 var arrAttachment = [];
                 var warehouse = $('#warehouse_id').val();
+                var ordering_number = $('.ordering_number');
                 var sendingDate = $('#sending_date').val();
                 var returningDate = $('#returning_date').val();
 
@@ -445,6 +446,7 @@
                     //var warehouse = warehouses[i].value;
 
                     var receivedQty = receivedQtys[i].value;
+                    var orderingNumber = ordering_number[i].value;
                     var receivedUnit = (receivedUnits[i].value).split(',');
                      //if (warehouse && receivedQty && Number(receivedQty) > 0) {
                     //    var element_item = {};
@@ -466,6 +468,7 @@
                         element_item.in_quantity = receivedQty;
                         element_item.unit = receivedUnit[0];
                         element_item.supplier_id = suppliers[i].value;
+                        element_item.ordering_number = orderingNumber;
                         element_item.invoice_number = invoiceNumbers[i].value;
                         element_item.invoice_date = convertDDMMYYYtoMMDDYYYY(invoiceDate[i].value);
                         ireDetails.push(element_item);
@@ -575,6 +578,7 @@
                     },
                     error: function (err) {
                         alert('Your data is error while saving.');
+                        enable_submit_button(false);
                     }
                 });
 
@@ -633,6 +637,7 @@
             var receivedType = $('#receive_type').val();
             $('#itemReceiveTable').empty();
             $('#warehouse_id').val('');
+            $('ordering_number').val('');
             $('#warehouse_name').text('');
             $('#lblProjectName').text('');
             if (stID == null || stID == "" || stID == undefined) {
@@ -755,7 +760,8 @@
                                 } else {
                                     $('#itemReceiveTable').append("" +
                                         "<tr>" +
-                                            "<td>" + Number(index + 1) + "</td>" +
+                                        "<td><input type='hidden' class='ordering_number' value = '" + item.ordering_number + "'/>" + Number(index + 1) + "</td>" +
+                                     
                                             "<td><input type='hidden' class='item_id' value='" + item.product_id + "'/>" + item.itemCode + "</td>" +
                                             "<td>" + item.itemName + "</td>" +
                                             "<td><label class='request_qty'>" + item.total_quantity + "</label> <input type='hidden' class='request_unit' value='" + item.unit + "'/> <label class=''>" + item.unitName + "</label></td>" + //item.itemUnit
@@ -931,7 +937,7 @@
                                     
                                     $('#itemReceiveTable').append("" +
                                             "<tr>" +
-                                                "<td>" + Number(index + 1) + "</td>" +
+                                        "<td><input type='hidden' class='ordering_number' value = '" + item.ordering_number + "'/>" + Number(index + 1) + "</td>" +
                                                 "<td><input type='hidden' class='item_id' value='" + item.item_id + "'/>" + item.product_code + "</td>" +
                                                 "<td>" + item.product_name + "</td>" +
                                                 "<td><label class='po_qty'>" + item.po_quantity + "</label> <input type='hidden' class='request_unit' value='" + item.item_unit + "'/> <label class=''>" + item.item_unit_name + "</label> <input type='hidden' class='unit_level' value='" + item.unitLevel + "'/> </td>" +// item.product_unit
@@ -975,6 +981,7 @@
                         $('#lblProjectName').text(da.data.project_fullname);
                         $('#warehouse_id').val(da.data.warehouse_id);
                         $('#warehouse_name').text(da.data.warehouse_name);
+                        //$('#ordering_number').val(da.data.ordering_number);
                         $('#itemReceiveTable').empty();
                         var rowHeader = "";
 
@@ -1013,7 +1020,7 @@
                             
                             $('#itemReceiveTable').append("" +
                                         "<tr>" +
-                                            "<td>" + Number(index + 1) + "</td>" +
+                                "<td> <input type='hidden' class='ordering_number' value = '" + item.ordering_number + "'/>" + Number(index + 1) + "</td>" +
                                             "<td><input type='hidden' class='item_id' value='" + item.product_id + "'/>" + item.itemCode + "</td>" +
                                             "<td>" + item.itemName + "</td>" +
                                             "<td><label class='request_qty'>" + item.total_quantity + "</label> <input type='hidden' class='request_unit' value='" + item.unit + "'/> <label class=''>" + item.unitName + "</label></td>" + //item.itemUnit
@@ -1091,8 +1098,8 @@
                             }
 
                             $('#itemReceiveTable').append("" +
-                                        "<tr>" +
-                                            "<td>" + Number(index + 1) + "</td>" +
+                                "<tr>" +
+                                "<td><input type='hidden' class= 'ordering_number' value= '" + item.ordering_number +"'</input>" + Number(index + 1) + "</td>" +
                                             "<td><input type='hidden' class='item_id' value='" + item.product_id + "'/>" + item.itemCode + "</td>" +
                                             "<td>" + item.itemName + "</td>" +
                                             "<td><label class='request_qty'>" + item.total_quantity + "</label> <input type='hidden' class='request_unit' value='" + item.unit + "'/> <label class=''>" + item.unitName + "</label></td>" + //item.itemUnit

@@ -26,6 +26,7 @@ namespace BT_KimMex.Entities
         public string item_status { get; set; }
         public string remark { get; set; }
         public bool completed { get; set; }
+        public Nullable<int> ordering_number { get; set; }
     
         public virtual tb_product tb_product { get; set; }
         public virtual tb_receive_item_voucher tb_receive_item_voucher { get; set; }

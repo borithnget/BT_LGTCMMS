@@ -85,6 +85,7 @@ namespace BT_KimMex.Class
                                join wah in db.tb_warehouse on inv.warehouse_id equals wah.warehouse_id
                                //join type in db.tb_brand on item.brand_id equals type.brand_id
                                //orderby item.product_code
+                               orderby inv.ordering_number
                                where string.Compare(inv.ref_id, id) == 0
                                select new InventoryViewModel()
                                {
@@ -115,7 +116,8 @@ namespace BT_KimMex.Class
                 var fd = (from std in db.tb_stock_transfer_detail join stv in db.tb_stock_transfer_voucher on std.st_ref_id equals stv.stock_transfer_id 
                           join pro in db.tb_product on std.st_item_id equals pro.product_id
                           join war in db.tb_warehouse on std.st_warehouse_id equals war.warehouse_id
-                          join uni in db.tb_unit on pro.product_unit equals uni.Id                         
+                          join uni in db.tb_unit on pro.product_unit equals uni.Id  
+                          orderby std.ordering_number
                           where std.st_item_id == itemId && std.item_status == "approved" && std.status == true && stv.stock_transfer_id == id && std.quantity != 0 select new { std, stv, pro, war, uni }).ToList();
 
                 inventories = fd.Select(x => new InventoryViewModel() { 
@@ -125,6 +127,7 @@ namespace BT_KimMex.Class
                            warehouseName = x.war.warehouse_name,
                            out_quantity = x.std.quantity,
                            in_quantity = x.std.quantity,
+                           ordering_number = x.std.ordering_number,
                            itemUnit = x.std.unit,
                            warehouse_id = x.std.st_warehouse_id,
                            itemUnitName = x.uni.Name,
@@ -292,7 +295,7 @@ namespace BT_KimMex.Class
                                         join item in db.tb_product on invd.inventory_item_id equals item.product_id
                                         //join unit in db.tb_unit on item.product_unit equals unit.Id
                                         join warehouse in db.tb_warehouse on invd.inventory_warehouse_id equals warehouse.warehouse_id
-                                        orderby item.product_code
+                                        orderby invd.ordering_number
                                         where invd.inventory_ref_id == id
                                         select new InventoryDetailViewModel()
                                         {
@@ -313,7 +316,9 @@ namespace BT_KimMex.Class
                                             invoice_number = invd.invoice_number,
                                             remain_quantity = invd.remain_quantity,
                                             item_labour_hour=item.labour_hour,
-                                            unit_price=(decimal)item.unit_price
+                                            unit_price=(decimal)item.unit_price,
+                                            ordering_number = invd.ordering_number,
+
                                         }).ToList();
                 foreach (var inventory in inventoryDetails)
                 {
@@ -331,6 +336,7 @@ namespace BT_KimMex.Class
                     inventoryDetail.warehouseName = inventory.warehouseName;
                     inventoryDetail.quantity = inventory.quantity;
                     inventoryDetail.remark = inventory.remark;
+                    inventoryDetail.ordering_number = inventory.ordering_number;
                     inventoryDetail.stock_balance = sb;
                     inventoryDetail.supplier_id = inventory.supplier_id;
                     inventoryDetail.supplier_name = db.tb_supplier.Where(x => x.supplier_id == inventoryDetail.supplier_id).Select(x => x.supplier_name).FirstOrDefault();
@@ -344,6 +350,7 @@ namespace BT_KimMex.Class
                     inventoryDetail.total_quantity = db.tb_history_issue_qty.Where(s => string.Compare(s.inventory_detail_id, inventoryDetail.inventory_detail_id) == 0).Select(s => s.issue_qty).Sum();
                     inventoryDetail.item_labour_hour = inventory.item_labour_hour;
                     inventoryDetail.unit_price = inventory.unit_price;
+                    inventoryDetail.ordering_number = inventory.ordering_number;
                     inventoryItemDetails.Add(inventoryDetail);
                 }
             }
@@ -545,8 +552,7 @@ namespace BT_KimMex.Class
                     var models = (from transfer in db.tb_stock_transfer_detail
                                   join item in db.tb_product on transfer.st_item_id equals item.product_id
                                   join wh in db.tb_warehouse on transfer.st_warehouse_id equals wh.warehouse_id
-                                  //orderby item.product_code
-                                  //orderby transfer.ordering_number, item.product_code
+                                  orderby transfer.ordering_number
                                   //where string.Compare(transfer.st_ref_id, id) == 0 && transfer.remain_quantity > 0
                                   where string.Compare(transfer.st_ref_id, id) == 0
                                   select new Models.InventoryViewModel()
@@ -607,7 +613,7 @@ namespace BT_KimMex.Class
                     transferItems = (from transfer in db.tb_stock_transfer_detail
                                      join item in db.tb_product on transfer.st_item_id equals item.product_id
                                      join wh in db.tb_warehouse on transfer.st_warehouse_id equals wh.warehouse_id
-                                     //orderby transfer.ordering_number
+                                     orderby transfer.ordering_number
                                      //orderby item.product_code
                                      where string.Compare(transfer.st_ref_id, id) == 0
                                      select new Models.InventoryViewModel()
@@ -856,7 +862,7 @@ namespace BT_KimMex.Class
                 var inventoryList = (from inv in db.tb_received_item_detail
                                      join item in db.tb_product on inv.ri_item_id equals item.product_id
                                      join wah in db.tb_warehouse on inv.ri_warehouse_id equals wah.warehouse_id
-                                     orderby item.product_code
+                                     orderby inv.ordering_number
                                      where string.Compare(inv.ri_ref_id, itemReceive.receive_item_voucher_id) == 0
                                      select new
                                      {
@@ -876,6 +882,7 @@ namespace BT_KimMex.Class
                                          supplier_id = inv.supplier_id,
                                          item_status = inv.item_status,
                                          remark = inv.remark,
+                                         ordering_number = inv.ordering_number,
                                          completed = inv.completed,
                                          //out_quantity = inv.out_quantity
                                      }
@@ -896,6 +903,7 @@ namespace BT_KimMex.Class
                     inventory.unitName = db.tb_unit.Find(inventory.unit).Name;
                     inventory.item_status = inv.item_status;
                     inventory.invoice_number = inv.invoice_number;
+                    inventory.ordering_number = inv.ordering_number;
                     inventory.invoice_date = inv.inovice_date;
                     inventory.supplier_id = inv.supplier_id;
                     //if(!string.IsNullOrEmpty(inventory.supplier_id))
@@ -905,6 +913,7 @@ namespace BT_KimMex.Class
                     {
                         inventory.total_quantity = Inventory.GetStockTransferItemQty(itemReceive.ref_id, inventory.product_id);
                         inventory.supplier_name = db.tb_warehouse.Where(x => string.Compare(x.warehouse_id, inventory.supplier_id) == 0).Select(x => x.warehouse_name).FirstOrDefault().ToString();
+                        
 
                         var receivedHistory = db.tb_receive_item_voucher.Where(s => s.status == true && string.Compare(s.ref_id, itemReceive.ref_id) == 0).ToList();
                         inventory.totalReceived = receivedHistory.Count();
@@ -924,6 +933,7 @@ namespace BT_KimMex.Class
                     else if(string.Compare(itemReceive.received_type,"Stock Return") == 0)
                     {
                         inventory.supplier_name = db.tb_warehouse.Where(x => string.Compare(x.warehouse_id, inventory.supplier_id) == 0).Select(x => x.warehouse_name).FirstOrDefault().ToString();
+                        
                     }
                     else
                     {
@@ -972,6 +982,7 @@ namespace BT_KimMex.Class
                     inventory.total_quantity = po.po_quantity;
                     inventory.out_quantity = po.quantity;
                     inventory.remain_quantity = po.remain_quantity;
+                    inventory.ordering_number = po.ordering_number;
                     inventory.uom1_id = db.tb_multiple_uom.Where(m => m.product_id == po.item_id).Select(x => x.uom1_id).FirstOrDefault();
                     inventory.uom2_id = db.tb_multiple_uom.Where(m => m.product_id == po.item_id).Select(x => x.uom2_id).FirstOrDefault();
                     inventory.uom3_id = db.tb_multiple_uom.Where(m => m.product_id == po.item_id).Select(x => x.uom3_id).FirstOrDefault();
@@ -1244,6 +1255,7 @@ namespace BT_KimMex.Class
              join tunit in db.tb_unit on detail.unit equals tunit.Id
              join unit in db.tb_unit on item.product_unit equals unit.Id
              join wh in db.tb_warehouse on detail.st_warehouse_id equals wh.warehouse_id
+             orderby detail.ordering_number
              where string.Compare(detail.st_ref_id, id) == 0
              select new InventoryViewModel()
              {
@@ -1258,6 +1270,7 @@ namespace BT_KimMex.Class
                  remain_quantity = detail.received_remain_quantity,
                  unit = detail.unit,
                  unitName = tunit.Name,
+                 ordering_number = detail.ordering_number,
                  warehouseName = wh.warehouse_name,
                  from_warehouse_id = EnumConstants.WORKSHOP,
                  from_warehouse_name = "Workshop",
@@ -1302,6 +1315,7 @@ namespace BT_KimMex.Class
              join product in db.tb_product on detail.inventory_item_id equals product.product_id
              join punit in db.tb_unit on product.product_unit equals punit.Id
              join iunit in db.tb_unit on detail.unit equals iunit.Id
+             orderby detail.ordering_number
              join wh in db.tb_warehouse on detail.inventory_warehouse_id equals wh.warehouse_id
              where string.Compare(detail.inventory_ref_id, id) == 0
              select new InventoryViewModel()
@@ -1314,6 +1328,7 @@ namespace BT_KimMex.Class
                  itemUnitName = punit.Name,
                  warehouse_id = detail.inventory_warehouse_id,
                  out_quantity = detail.quantity,
+                 ordering_number = detail.ordering_number,
                  remain_quantity = detail.remain_quantity,
                  unit = detail.unit,
                  unitName = iunit.Name,
@@ -1558,7 +1573,7 @@ namespace BT_KimMex.Class
                     var objs = (from inv in db.tb_stock_transfer_detail
                                 join wah in db.tb_warehouse on inv.st_warehouse_id equals wah.warehouse_id
                                 join item in db.tb_product on inv.st_item_id equals item.product_id
-                                orderby item.product_code
+                                orderby inv.ordering_number
                                 where string.Compare(inv.st_ref_id, id) == 0 && inv.status == true
                                 select new InventoryViewModel()
                                 {
@@ -1566,6 +1581,7 @@ namespace BT_KimMex.Class
                                     //inventory_date = inv.inventory_date,
                                     product_id = inv.st_item_id,
                                     itemName = item.product_name,
+                                    ordering_number = inv.ordering_number,
                                     itemCode = item.product_code,
                                     itemUnit = item.product_unit,
                                     //itemUnitName = db.tb_unit.Find(item.product_unit).Name,
@@ -1585,6 +1601,7 @@ namespace BT_KimMex.Class
                         model.product_id = obj.product_id;
                         model.itemName = obj.itemName;
                         model.itemCode = obj.itemCode;
+                        model.ordering_number = obj.ordering_number;
                         model.itemUnit = obj.itemUnit;
                         model.itemUnitName = db.tb_unit.Find(obj.itemUnit).Name;
                         model.warehouse_id = obj.warehouse_id;
@@ -1605,7 +1622,7 @@ namespace BT_KimMex.Class
                         var objs = (from inv in db.tb_stock_transfer_detail
                                     join wah in db.tb_warehouse on inv.st_warehouse_id equals wah.warehouse_id
                                     join item in db.tb_product on inv.st_item_id equals item.product_id
-                                    orderby item.product_code
+                                    orderby inv.ordering_number
                                     where string.Compare(inv.st_ref_id, id) == 0
                                     select new InventoryViewModel()
                                     {
@@ -1614,6 +1631,7 @@ namespace BT_KimMex.Class
                                         product_id = inv.st_item_id,
                                         itemName = item.product_name,
                                         itemCode = item.product_code,
+                                        ordering_number = inv.ordering_number,
                                         itemUnit = item.product_unit,
                                         itemUnitName = inv.unit,
                                         warehouse_id = inv.st_warehouse_id,
@@ -1638,6 +1656,7 @@ namespace BT_KimMex.Class
                             model.itemName = obj.itemName;
                             model.itemCode = obj.itemCode;
                             model.itemUnit = obj.itemUnit;
+                            model.ordering_number = obj.ordering_number;
                             model.warehouse_id = obj.warehouse_id;
                             model.warehouseName = obj.warehouseName;
                             model.total_quantity = obj.total_quantity;
@@ -1653,7 +1672,7 @@ namespace BT_KimMex.Class
                         var objs = (from inv in db.tb_inventory_detail
                                     join wah in db.tb_warehouse on inv.inventory_warehouse_id equals wah.warehouse_id
                                     join item in db.tb_product on inv.inventory_item_id equals item.product_id
-                                    orderby inv.ordering_number, item.product_code
+                                    orderby inv.ordering_number
                                     where string.Compare(inv.inventory_ref_id, id) == 0 && inv.remain_quantity > 0
                                     select new InventoryViewModel()
                                     {
@@ -1661,6 +1680,7 @@ namespace BT_KimMex.Class
                                         //inventory_date = inv.inventory_date,
                                         product_id = inv.inventory_item_id,
                                         itemName = item.product_name,
+                                        ordering_number = inv.ordering_number,
                                         itemCode = item.product_code,
                                         itemUnit = item.product_unit,
                                         warehouse_id = inv.inventory_warehouse_id,
@@ -1678,6 +1698,7 @@ namespace BT_KimMex.Class
                             model.inventory_id = obj.inventory_id;
                             model.product_id = obj.product_id;
                             model.itemName = obj.itemName;
+                            model.ordering_number = obj.ordering_number;
                             model.itemCode = obj.itemCode;
                             model.itemUnit = obj.itemUnit;
                             model.warehouse_id = obj.warehouse_id;
@@ -1738,7 +1759,7 @@ namespace BT_KimMex.Class
                     var objs = (from inv in db.tb_stock_transfer_detail
                                 join wah in db.tb_warehouse on inv.st_warehouse_id equals wah.warehouse_id
                                 join item in db.tb_product on inv.st_item_id equals item.product_id
-                                orderby inv.ordering_number, item.product_code
+                                orderby inv.ordering_number
                                 where string.Compare(inv.st_ref_id, id) == 0 && inv.status == true && inv.return_remain_quantity > 0
                                 select new InventoryViewModel()
                                 {
@@ -1785,7 +1806,7 @@ namespace BT_KimMex.Class
                         var objs = (from inv in db.tb_stock_transfer_detail
                                     join wah in db.tb_warehouse on inv.st_warehouse_id equals wah.warehouse_id
                                     join item in db.tb_product on inv.st_item_id equals item.product_id
-                                    orderby inv.ordering_number, item.product_code
+                                    orderby inv.ordering_number
                                     where string.Compare(inv.st_ref_id, id) == 0
                                     select new InventoryViewModel()
                                     {
@@ -1833,7 +1854,7 @@ namespace BT_KimMex.Class
                         var objs = (from inv in db.tb_inventory_detail
                                     join wah in db.tb_warehouse on inv.inventory_warehouse_id equals wah.warehouse_id
                                     join item in db.tb_product on inv.inventory_item_id equals item.product_id
-                                    orderby inv.ordering_number, item.product_code
+                                    orderby inv.ordering_number
                                     where string.Compare(inv.inventory_ref_id, id) == 0 && inv.remain_quantity > 0
                                     select new InventoryViewModel()
                                     {

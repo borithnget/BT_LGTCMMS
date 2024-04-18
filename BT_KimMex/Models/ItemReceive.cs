@@ -49,6 +49,7 @@ namespace BT_KimMex.Models
         public string checked_by { get; set; }
         public string project_full_name { get; set; }
         public string warehouse_id { get; set; }
+        public int? ordering_number { get; set; }
         public string ref_number_date { get; set; }
         public string project_so_number { get; set; }
         public Nullable<System.DateTime> approved_date { get; set; }
@@ -183,6 +184,7 @@ namespace BT_KimMex.Models
         public string ir_id { get; set; }
         public string history_id { get; set; }
         public string history_name { get; set; }
+        public Nullable<int> ordering_number { get; set; }
     }
 
     public class ItemReceiveHistoryViewModel

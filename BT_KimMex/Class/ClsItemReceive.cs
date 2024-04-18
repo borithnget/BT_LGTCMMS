@@ -404,7 +404,7 @@ namespace BT_KimMex.Class
                 var receivedItems = (from rItem in db.tb_received_item_detail
                                      join item in db.tb_product on rItem.ri_item_id equals item.product_id
                                      join warehouse in db.tb_warehouse on rItem.ri_warehouse_id equals warehouse.warehouse_id
-                                     orderby item.product_code
+                                     orderby rItem.ordering_number
                                      where string.Compare(rItem.ri_ref_id, itemReceived.receive_item_voucher_id) == 0
                                      select new { rItem, item, warehouse }).ToList();
                 foreach(var receivedItem in receivedItems)
@@ -521,6 +521,7 @@ namespace BT_KimMex.Class
                             inv.po_quantity = po.dPo.po_quantity;
                             inv.quantity = po.dPo.remain_quantity;
                             inv.remain_quantity = po.dPo.remain_quantity;
+                            inv.ordering_number = po.dPo.ordering_number;
                             inv.uom = db.tb_multiple_uom.Where(x => x.product_id == inv.item_id).Select(x => new Models.ProductViewModel() { uom1_id = x.uom1_id, uom1_qty = x.uom1_qty, uom2_id = x.uom2_id, uom2_qty = x.uom2_qty, uom3_id = x.uom3_id, uom3_qty = x.uom3_qty, uom4_id = x.uom4_id, uom4_qty = x.uom4_qty, uom5_id = x.uom5_id, uom5_qty = x.uom5_qty }).FirstOrDefault();
                             inv.supplier_id = (from spo in db.tb_po_supplier join sup in db.tb_supplier on spo.supplier_id equals sup.supplier_id where string.Compare(spo.po_detail_id, inv.po_detail_id) == 0 && spo.is_selected == true select sup.supplier_id).FirstOrDefault().ToString();
                             inv.supplier_name = (from spo in db.tb_po_supplier join sup in db.tb_supplier on spo.supplier_id equals sup.supplier_id where string.Compare(spo.po_detail_id, inv.po_detail_id) == 0 && spo.is_selected == true select sup.supplier_name).FirstOrDefault().ToString();
@@ -552,6 +553,7 @@ namespace BT_KimMex.Class
                             inv.purchase_order_id = po.dPo.purchase_order_id;
                             inv.item_id = po.dPo.item_id;
                             inv.product_name = po.product.product_name;
+                            inv.ordering_number = po.dPo.ordering_number;
                             inv.product_code = po.product.product_code;
                             inv.product_unit = po.product.product_unit;
                             inv.product_unit_name = db.tb_unit.Find(po.product.product_unit).Name;
@@ -571,8 +573,8 @@ namespace BT_KimMex.Class
                             inventories.Add(inv);
                         }
                     }
-                    inventories = inventories.ToList();
-                    //inventories = inventories.OrderBy(x => x.product_code).ToList();
+                    //inventories = inventories.ToList();
+                    inventories = inventories.OrderBy(x => x.ordering_number).ToList();
                 }
             }catch(Exception ex)
             {

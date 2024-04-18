@@ -944,6 +944,7 @@ namespace BT_KimMex.Class
                     item.warehouse_id = inv.warehouse_id;
                     item.invoice_number = inv.invoice_number;
                     item.invoice_date = inv.invoice_date == null ? Class.CommonClass.ToLocalTime(DateTime.Now.Date) : inv.invoice_date;
+                    item.ordering_number = inv.ordering_number;
                     items.Add(item);
                 }
 
