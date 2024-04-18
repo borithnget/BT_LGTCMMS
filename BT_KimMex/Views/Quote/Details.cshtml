@@ -83,6 +83,7 @@
                             <th>Description</th>
                             <th>Unit</th>
                             <th>QTY</th>
+                            <th>Supplier Item Name</th>
                             <th>Unit Price ($)</th>
                             <th>Discount as (%)</th>
                             <th>Discount as ($)</th>
@@ -118,6 +119,7 @@
                                     <td>@item.product_name</td>
                                     <td>@item.unit_name</td>
                                     <td class="text-center">@item.qty</td>
+                                    <td>@item.supplier_item_name</td>
                                     @*<td>@item.price</td>*@
                                     <td class="text-center">@string.Format("{0:N4}", decimal.Parse(item.price.ToString()))</td>
                                     <td class="text-center">@string.Format("{0:G2}", item.discount)</td>

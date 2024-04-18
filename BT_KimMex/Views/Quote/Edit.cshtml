@@ -110,6 +110,7 @@
                                 <th>Description</th>
                                 <th>Unit</th>
                                 <th>QTY</th>
+                                <th>Supplier Item Name</th>
                                 <th>Unit Price ($)</th>
                                 <th class="text-center">Discount (%) <input type='number' step='any' class='form-control' value='0' onchange='changeDiscount(this)' style="width:80px !important;margin:0 auto!important;" id="thead_discount" /></th>
                                 <th class="text-center">Dis. ($) </th>
@@ -172,6 +173,7 @@
                                                             <td><label class='item-name'>@item.product_name</label></td>
                                                             <td><label class='item-unit'>@item.unit_name</label></td>
                                                             <td class="text-center"><label class='item-qty'>@item.qty</label></td>
+                                                            <td><textarea class='form-control supplier_item_name'>@item.supplier_item_name</textarea></td>
                                                             <td>
                                                                 <input type='number' class='form-control unit-price' value='@price' onchange='validateFloatKeyPress(this);' onKeyPress='if(this.value.length==8) return false;' min="1" max="16" style="padding:0px !important;" />
                                                                 <input type='hidden' class='unit-price-full' value='@price' />
@@ -742,7 +744,18 @@
                         $(this).remove();
                     });
 
-                    $('#btnSubmit').click(function (e) {
+                                function enable_submit_button(is_submit) {
+                    if (is_submit) {
+                        $('#btnSubmit').text("Submitting...");
+                        $('#btnSubmit').attr('disabled', true);
+                    } else {
+                        $('#btnSubmit').text("Submit");
+                        $('#btnSubmit').attr('disabled', false);
+                    }
+                }
+
+                $('#btnSubmit').click(function (e) {
+                        enable_submit_button(true);
                         var quoteItems = [];
                         var itemElement = {};
                         var quoteId = $('#quote_id').val();
@@ -753,7 +766,8 @@
                         var discounts = $('.discount');
                         var quoteDetailIds = $('.quote_detail_id');
                         var qtys = $('.item-qty');
-                        var DiscountAmountFulls = $('.discount_amount');
+                    var DiscountAmountFulls = $('.discount_amount');
+                    var supplierItemNames = $('.supplier_item_name');
                         var countInvalid = 0;
                         var arrAttachment = [];
                         //if (!supplierId) {
@@ -773,6 +787,7 @@
                                 itemElement.discount = discounts[i].value;
                                 itemElement.qty = Number(qtys[i].innerHTML);
                                 itemElement.discount_amount = parseFloat(DiscountAmountFulls[i].value).toFixed(8);
+                                itemElement.supplier_item_name = supplier_item_name[i].value;
                                 quoteItems.push(itemElement);
                             }
                         }

@@ -432,7 +432,7 @@ namespace BT_KimMex.Class
                                             dtr["SupplierTelephone"] = supplierPhone;
                                             dtr["SupplierEmail"] = supplierEmail;
                                             dtr["ItemCode"] = item.product_code;
-                                            dtr["ItemName"] = item.product_name;
+                                            dtr["ItemName"] = string.IsNullOrEmpty(item.supplier_item_name)?item.product_name:item.supplier_item_name;
                                             dtr["ItemUnit"] = db.tb_unit.Find(item.po_unit).Name;                                          
                                             dtr["podetailid"] = item.po_detail_id;
                                             dtr["POQquantity"] = Convert.ToDouble(item.po_quantity);
@@ -920,7 +920,7 @@ namespace BT_KimMex.Class
                                             dtr["SupplierTelephone"] = supplierPhone;
                                             dtr["SupplierEmail"] = supplierEmail;
                                             dtr["ItemCode"] = item.product_code;
-                                            dtr["ItemName"] = item.product_name;
+                                            dtr["ItemName"] = string.IsNullOrEmpty(item.supplier_item_name) ? item.product_name : item.supplier_item_name;
                                             dtr["ItemUnit"] = db.tb_unit.Find(item.po_unit).Name;
                                             dtr["itemvat"] = Convert.ToBoolean(item.item_vat);
                                             dtr["podetailid"] = item.po_detail_id;
@@ -8467,6 +8467,212 @@ namespace BT_KimMex.Class
                 }
             }
             catch (Exception e) { }
+        }
+
+        public static void GenerateStockBalanceMonthlyByWarehouse(ReportViewer rv, string reportPath,string warerhouseId,DateTime dateFrom,DateTime dateTo)
+        {
+            try
+            {
+                DataTable tb = new DataTable();
+                DataRow dtr;
+                using(kim_mexEntities db=new kim_mexEntities())
+                {
+                    DataColumn col = new DataColumn();
+                    col.ColumnName = "dateinventory";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "itemName";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "itemUnit";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "warehouseName";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "unit_price";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "date";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "itemCode";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "bigbalance";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "in_receive";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "in_issue_return";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "out_return";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "out_transfer";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "out_damage";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "out_issue";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "total_in";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "total_out";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "ending_balance";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "inventory_status_id";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "stock_status_id";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "warehouse_id";
+                    tb.Columns.Add(col);
+
+                    //Rathana Add 24.04.2019
+
+                    col = new DataColumn();
+                    col.ColumnName = "IN";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "transfer_in";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "adjust_increase";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "adjust_decrease";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "internal_usage";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "sela";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "amount";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "upd_price";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "projectName";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "labour_hour";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "start_date";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "end_date";
+                    tb.Columns.Add(col);
+                    col = new DataColumn();
+                    col.ColumnName = "generate_date";
+                    tb.Columns.Add(col);
+
+                    DateTime newDateFrom = Convert.ToDateTime(dateFrom);
+                    DateTime newDateTo = Convert.ToDateTime(dateTo);
+                    //var results= InventoryViewModel.GetStockBalancebyWarehouse(warehouseId,newDateFrom,newDateTo);
+                    var results = InventoryViewModel.GetStockBalanceWarehouseV2(warerhouseId, newDateFrom, newDateTo);
+                    foreach(var rs in results)
+                    {
+                        tb_warehouse warehouse= db.tb_warehouse.Where(x => x.warehouse_id == warerhouseId).FirstOrDefault();
+                        dtr = tb.NewRow();
+                        dtr["date"] = Convert.ToDateTime(DateTime.Now).ToString("dd-MM-yyyy");
+                        dtr["warehouseName"] = string.IsNullOrEmpty(warerhouseId) ? string.Empty : warehouse.warehouse_name;
+                        
+
+                        //update formula
+
+
+                        dtr["itemCode"] = rs.itemCode;
+                        dtr["itemName"] = rs.itemName;
+                        dtr["itemUnit"] = rs.itemUnit;
+                        dtr["labour_hour"] = rs.labourHour;
+                        dtr["bigbalance"] = rs.bigBalance;
+                        //update formula
+                        dtr["ending_balance"] = rs.endingBalance;
+                        dtr["ending_balance"] =Convert.ToDecimal(rs.bigBalance + rs.totalIn) - Convert.ToDecimal(rs.totalOut);
+                        dtr["in_receive"] = rs.inReceivedBalance;
+                        dtr["in_issue_return"] = rs.inIssueReturnBalance;
+                        dtr["out_return"] = rs.outReturnBalance;
+                        dtr["out_transfer"] = rs.outTransferBalance;
+                        dtr["out_damage"] = rs.outDamageBalance;
+                        dtr["out_issue"] = rs.outIssueBalance;
+                        //dtr["total_in"] =  + item.IssueReturnBalance;
+                        //dtr["total_out"] = item.ReturnBalance + item.TransferBalance + item.DamangeBalance + item.IssueBalance;
+                        dtr["total_in"] = rs.totalIn;
+                        dtr["total_out"] = rs.totalOut;
+
+                        //Rathana Add 24.04.2019
+                        double adjustentQuantity =Convert.ToDouble(rs.endingBalance) - Convert.ToDouble(rs.inReceivedBalance);
+                        if (adjustentQuantity > 0)
+                        {
+                            dtr["adjust_increase"] = adjustentQuantity;
+                            dtr["adjust_decrease"] = 0;
+                        }
+                        else
+                        {
+                            dtr["adjust_decrease"] = -(adjustentQuantity);
+                            dtr["adjust_increase"] = 0;
+                        }
+                        dtr["transfer_in"] = rs.inTransfer;
+                        dtr["IN"] = rs.inn;
+                        dtr["unit_price"] = rs.unitPrice;
+                        dtr["amount"] =Convert.ToDecimal(rs.endingBalance) * Convert.ToDecimal(rs.unitPrice);
+
+                        //if (project == "All")
+                        //{
+                        //    dtr["projectName"] = "All";
+                        //}
+                        //else
+                        //{
+
+                        //    dtr["projectName"] = projectObj.project_full_name;
+                        //}
+                        dtr["generate_date"] = CommonClass.ToLocalTime(DateTime.Now).ToString("dd-MMM-yyyy");
+                        dtr["start_date"] = CommonClass.ToLocalTime(dateFrom).ToString("dd-MMM-yyyy");
+                        dtr["end_date"] = CommonClass.ToLocalTime(dateTo).ToString("dd-MMM-yyyy");
+
+                        tb_project project = db.tb_project.Where(s => string.Compare(s.project_id, warehouse.warehouse_project_id) == 0).FirstOrDefault();
+                        if (project != null)
+                        {
+                            dtr["projectName"] = project.project_full_name;
+                        }
+
+                        tb.Rows.Add(dtr);
+                    }
+
+                    rv.ProcessingMode = ProcessingMode.Local;
+                    rv.SizeToReportContent = true;
+                    rv.Width = Unit.Percentage(100);
+                    rv.Height = Unit.Percentage(100);
+
+                    rv.LocalReport.ReportPath = reportPath;
+
+                    rv.ShowPrintButton = true;
+                    rv.ShowRefreshButton = true;
+
+                    rv.LocalReport.DataSources.Clear();
+                    ReportDataSource rdc = new ReportDataSource("StockBalanceByDateandWarehouse", tb);
+                    rv.LocalReport.DataSources.Add(rdc);
+                    rv.LocalReport.Refresh();
+                }
+            }
+            catch(Exception ex)
+            {
+
+            }
         }
         
         //kosal

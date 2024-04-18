@@ -16,6 +16,7 @@ using System.Web.Security;
 using System.IO;
 using System.Security.Cryptography.Xml;
 using ImageResizer;
+using System.Web.Helpers;
 
 namespace BT_KimMex.Controllers
 {
@@ -65,6 +66,16 @@ namespace BT_KimMex.Controllers
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
+
+
+            //var _emailHandler = new EmailHandler();
+            //var to_list = new List<string>();
+            //to_list.Add("chantola.rupp@gmail.com");
+            //var cc_list = new List<string>();
+            //cc_list.Add("chantola.4game@gmail.com");
+            //_emailHandler.SendEmail(to_list, "Hello Idol", 1, cc_list);
+
+
             ViewBag.ReturnUrl = returnUrl;
             /*
             HttpCookie cookie = Request.Cookies[DefaultAuthenticationTypes.ApplicationCookie];
@@ -813,6 +824,26 @@ namespace BT_KimMex.Controllers
 
                 return Json(new { attachment }, JsonRequestBehavior.AllowGet);
             }
+        }
+        [HttpPost]
+        public ActionResult DeleteUserSignature(string id)
+        {
+            AJAXResultModel result = new AJAXResultModel();
+            try
+            {
+                kim_mexEntities db = new kim_mexEntities();
+                tb_attachment attachment = db.tb_attachment.Find(id);
+                if(attachment != null)
+                {
+                    db.tb_attachment.Remove(attachment);
+                    db.SaveChanges();
+                }
+            }catch(Exception ex)
+            {
+                result.isSuccess = false;
+                result.message = ex.Message;
+            }
+            return Json(new {result=result},JsonRequestBehavior.AllowGet);
         }
 
         #region Helpers

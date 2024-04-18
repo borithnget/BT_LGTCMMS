@@ -82,7 +82,7 @@
         <div class="row">
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-10">
-                    <input type="button" value="Submit" class="w3-button w3-tiny w3-teal" onclick="approvalMRCutOff()" />
+                    <input type="button" value="Submit" class="w3-button w3-tiny w3-teal" id="btnSubmit" onclick="approvalMRCutOff()" />
                     @Html.ActionLink("Back", "Index", null, new { @class = "w3-button w3-tiny w3-red" })
                 </div>
             </div>
@@ -112,7 +112,18 @@
             });
         });
 
+                function enable_submit_button(is_submit) {
+            if (is_submit) {
+                $('#btnSubmit').text("Submitting...");
+                $('#btnSubmit').attr('disabled', true);
+            } else {
+                $('#btnSubmit').text("Submit");
+                $('#btnSubmit').attr('disabled', false);
+            }
+        }
+
         function approvalMRCutOff() {
+            enable_submit_button(true);
             var models = [];
             var item_element = {};
             var countInvalidStatus = 0;

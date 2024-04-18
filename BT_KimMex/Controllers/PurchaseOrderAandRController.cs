@@ -1048,6 +1048,28 @@ namespace BT_KimMex.Controllers
                 return Json(new { result = "success" }, JsonRequestBehavior.AllowGet);
             }
         }
+        [HttpPost]
+        public ActionResult CancelPO(string poId, string poReportid)
+        {
+            AJAXResultModel result = new AJAXResultModel();
+            try
+            {
+                kim_mexEntities db = new kim_mexEntities();
+                PurchaseOrderAandRViewModel.UpdatePoReportbyRequestCancelled(poReportid, User.Identity.GetUserId());
+                tb_purchase_request_detail poDetail = db.tb_purchase_request_detail.Where(s => string.Compare(s.purchase_request_id, poId) == 0 && string.Compare(s.po_report_id, poReportid) == 0).FirstOrDefault();
+                if (poDetail != null)
+                {
+                    poDetail.status = Status.cancelled;
+                    db.SaveChanges();
+                }
+            }
+            catch(Exception ex)
+            {
+                result.isSuccess = false;
+                result.message = ex.Message;
+            }
+            return Json(new { result = result }, JsonRequestBehavior.AllowGet);
+        }
 
         [HttpPost]
         public ActionResult ApproveByCO(int id)

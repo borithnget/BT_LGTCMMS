@@ -1,8 +1,8 @@
-﻿@model BT_KimMex.Models.TransferFromMainStockViewModel 
+﻿@model BT_KimMex.Models.TransferFromMainStockViewModel
 @using BT_KimMex.Class
 @{
     ViewBag.Title = "Detail";
-    string date =CommonClass.ToLocalTime(Convert.ToDateTime(Model.created_date)).ToString("dd/MM/yyyy");
+    string date = CommonClass.ToLocalTime(Convert.ToDateTime(Model.created_date)).ToString("dd/MM/yyyy");
     bool isMSC = false;
     bool isCFO = false;
     bool isAdmin = false;
@@ -38,7 +38,7 @@
     </div>
 
     <div class="form-horizontal">
-        
+
         <div class="row">
             <div class="form-group">
                 @Html.Label("Date:", new { @class = "control-label col-md-2" })
@@ -144,11 +144,14 @@
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 @{
-                    if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser))
+
+
+                    if (User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.Purchaser) )
                     {
-                        if (string.Compare(Model.stock_transfer_status, Status.Pending) == 0)
+                        if (string.Compare(Model.stock_transfer_status, Status.Rejected) != 0 && string.Compare(Model.stock_transfer_status, Status.CheckRejected) != 0)
                         {
                             @*@Html.ActionLink("Edit", "Edit", new { id = Model.stock_transfer_id }, new { @class = "w3-button w3-tiny w3-green" })*@
+                            <button type="button" class="w3-button w3-tiny w3-deep-orange" id="btn-cancel">Request Cancel </button>
                         }
                         else if (string.Compare(Model.stock_transfer_status, Status.PendingFeedback) == 0)
                         {
@@ -271,7 +274,7 @@
 </div>
 
 @section Scripts{
-<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js" type="text/javascript"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js" type="text/javascript"></script>
     <script type="text/javascript">
         $(function () {
 
@@ -501,6 +504,37 @@
             $('#btn_show_history').click(function (e) {
                 $('#showHistoryModal').modal('show');
             });
+            $('#btn-cancel').click(function () {
+                swal({
+                    title: "Request Cancel",
+                    text: "Please input your cancel comment:",
+                    icon: "warning",
+                    content: "input",
+                })
+                .then((value) => {
+                    $.ajax({
+                        url: "/TransferFromMainStock/RequestCancel",
+                        data: {
+                            'id': '@Model.stock_transfer_id',
+                            //'status': 'rejected',
+                            'comment': value,
+                        },
+                        type: 'GET',
+                        success: function (da) {
+                            swal("Request has been submitted successfully.", {
+                                icon: "success",
+                            });
+                            window.location.href = '@Url.Action("Index", "TransferFromMainStock")';
+                        },
+                        error: function (err) {
+                            swal("Poof! " + err, {
+                                icon: "error",
+                            });
+                        }
+                    });
+                });
+            });
+
 
         });
     </script>

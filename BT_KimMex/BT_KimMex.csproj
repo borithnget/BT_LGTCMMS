@@ -329,6 +329,7 @@
     <Compile Include="Class\CommonClass.cs" />
     <Compile Include="Class\CommonFunctions.cs" />
     <Compile Include="Class\ConvertCurrencyToWord.cs" />
+    <Compile Include="Class\EmailHandler.cs" />
     <Compile Include="Class\EnumConstants.cs" />
     <Compile Include="Class\Exporting.cs" />
     <Compile Include="Class\GlobalMethod.cs" />
@@ -799,6 +800,7 @@
     <Compile Include="Models\ClassViewModel.cs" />
     <Compile Include="Models\ColorViewModel.cs" />
     <Compile Include="Models\CustomerViewModel.cs" />
+    <Compile Include="Models\EmailTemplate.cs" />
     <Compile Include="Models\ErrorLogViewModel.cs" />
     <Compile Include="Models\ExcelBoQModel.cs" />
     <Compile Include="Models\Home.cs" />
@@ -972,6 +974,13 @@
     </Compile>
     <Compile Include="Views\Shared\ReportController\StockBalanceBywarehouse.aspx.designer.cs">
       <DependentUpon>StockBalanceBywarehouse.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\StockBalanceMonthlyWarehouse.aspx.cs">
+      <DependentUpon>StockBalanceMonthlyWarehouse.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Views\Shared\ReportController\StockBalanceMonthlyWarehouse.aspx.designer.cs">
+      <DependentUpon>StockBalanceMonthlyWarehouse.aspx</DependentUpon>
     </Compile>
     <Compile Include="Views\Shared\ReportController\StockMovement.aspx.cs">
       <DependentUpon>StockMovement.aspx</DependentUpon>
@@ -10037,6 +10046,7 @@
     <Content Include="Views\Shared\ReportController\StockBalanceByDateandWarehouse.aspx" />
     <Content Include="Views\Shared\ReportController\StockBalanceByDateandWarehouseStockKeeper.aspx" />
     <Content Include="Views\Shared\ReportController\StockBalanceBywarehouse.aspx" />
+    <Content Include="Views\Shared\ReportController\StockBalanceMonthlyWarehouse.aspx" />
     <Content Include="Views\Shared\ReportController\StockMovement.aspx" />
     <Content Include="Views\Shared\ReportController\StockUsageBySiteWithRemainBalance.aspx" />
     <Content Include="Views\Shared\ReportController\WorkOrderIsuseVSWorkOrderReturn.aspx" />
@@ -10366,7 +10376,6 @@
     <Content Include="Views\Sync\AdjustmentNegativeBalance.cshtml" />
     <Content Include="Views\PurchaseOrderAandR\SettingODAmountApproval.cshtml" />
     <Content Include="Views\Report\WarehouseStockBalance.cshtml" />
-
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

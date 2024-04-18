@@ -131,6 +131,7 @@ namespace BT_KimMex.Controllers
                                 sPo.discount_percentage = poSupplier[j].discount_percentage;
                             sPo.discount_amount = poSupplier[j].discount_amount;
                             sPo.lumpsum_discount_amount = poSupplier[j].lump_sum_discount_amount;
+                            sPo.supplier_item_name = poSupplier[j].supplier_item_name;
                                 db.tb_po_supplier.Add(sPo);
                                 db.SaveChanges();
                             }
@@ -378,7 +379,7 @@ namespace BT_KimMex.Controllers
                         poDetail.original_price = pos.original_price;
                         poDetail.discount_percentage = pos.discount_percentage;
                         poDetail.discount_amount = pos.discount_amount;
-                        
+                        poDetail.supplier_item_name = pos.supplier_item_name;
 
                         //update product price
                         var products = db.tb_purchase_order_detail.Where(x => x.item_id == poDetail.item_id && poDetail.item_status == "approved").ToList();
@@ -1629,10 +1630,11 @@ namespace BT_KimMex.Controllers
                             supplier_name=i.supplier.supplier_name,
                             item_id=s.item_id,
                             price=s.price,
-                            discount=s.discount,
-                            
-                            discountAmount=s.discount_amount
+                            discount=s.discount,       
+                            discountAmount=s.discount_amount,
+                            supplier_item_name=s.supplier_item_name,
                         }).ToList();
+
                         foreach (var ii in quoteSupplierItems)
                         {
                             var isItemQuoteExist = items.Where(s => string.Compare(ii.item_id, s.ir_item_id) == 0).FirstOrDefault();
@@ -1662,6 +1664,7 @@ namespace BT_KimMex.Controllers
 
                                 iii.discountAmount = ii.discountAmount;
                                 iii.lump_sum_discount_amount = supplier.lump_sum_discount_amount;
+                                iii.supplier_item_name = ii.supplier_item_name;
                                 quotes.Add(iii);
                             }                           
                         }

@@ -80,6 +80,7 @@ namespace BT_KimMex.Class
                                          original_price=dPO.original_price,
                                          discount_percentage=dPO.discount_percentage,
                                          lump_sum_discount_amount=dPO.lump_sum_discount_amount,
+                                         supplier_item_name=dPO.supplier_item_name,
                                      }).ToList();
                         foreach (var pod in poDetails)
                         {
@@ -89,7 +90,22 @@ namespace BT_KimMex.Class
                                     join sup in db.tb_supplier on pos.supplier_id equals sup.supplier_id
                                     orderby pos.sup_number
                                     where pos.po_detail_id == pod.po_detail_id && pos.is_selected == true
-                                    select new PurchaseOrderItemSupplier() { po_supplier_id = pos.po_supplier_id, po_detail_id = pos.po_detail_id, unit_price = pos.unit_price, supplier_id = sup.supplier_id, supplier_name = sup.supplier_name, sup_number = pos.sup_number, is_selected = pos.is_selected, Reason = pos.Reason, po_quantity = pos.po_qty, supplier_address = sup.supplier_address, supplier_phone = sup.supplier_phone, supplier_email = sup.supplier_email, discount = sup.discount }).FirstOrDefault();
+                                    select new PurchaseOrderItemSupplier() { 
+                                        po_supplier_id = pos.po_supplier_id, 
+                                        po_detail_id = pos.po_detail_id, 
+                                        unit_price = pos.unit_price, 
+                                        supplier_id = sup.supplier_id, 
+                                        supplier_name = sup.supplier_name, 
+                                        sup_number = pos.sup_number, 
+                                        is_selected = pos.is_selected, 
+                                        Reason = pos.Reason, 
+                                        po_quantity = pos.po_qty, 
+                                        supplier_address = sup.supplier_address, 
+                                        supplier_phone = sup.supplier_phone, 
+                                        supplier_email = sup.supplier_email, 
+                                        discount = sup.discount ,
+                                        supplier_item_name=pos.supplier_item_name,
+                                    }).FirstOrDefault();
                             //pod.poSuppliers = pois;
                             poSuppliers.Add(pois);
                             pod.poSuppliers.Add(pois);
@@ -130,6 +146,7 @@ namespace BT_KimMex.Class
                                          original_price = dPO.original_price,
                                          discount_percentage = dPO.discount_percentage,
                                          lump_sum_discount_amount=dPO.lump_sum_discount_amount,
+                                         supplier_item_name=dPO.supplier_item_name,
                                      }).ToList();
                         foreach (var pod in poDetails)
                         {
@@ -139,7 +156,22 @@ namespace BT_KimMex.Class
                                     join sup in db.tb_supplier on pos.supplier_id equals sup.supplier_id
                                     orderby pos.sup_number
                                     where pos.po_detail_id == pod.po_detail_id && pos.is_selected == true
-                                    select new PurchaseOrderItemSupplier() { po_supplier_id = pos.po_supplier_id, po_detail_id = pos.po_detail_id, unit_price = pos.unit_price, supplier_id = sup.supplier_id, supplier_name = sup.supplier_name, sup_number = pos.sup_number, is_selected = pos.is_selected, Reason = pos.Reason, po_quantity = pos.po_qty, supplier_address = sup.supplier_address, supplier_phone = sup.supplier_phone, supplier_email = sup.supplier_email, discount = sup.discount }).FirstOrDefault();
+                                    select new PurchaseOrderItemSupplier() { 
+                                        po_supplier_id = pos.po_supplier_id, 
+                                        po_detail_id = pos.po_detail_id, 
+                                        unit_price = pos.unit_price, 
+                                        supplier_id = sup.supplier_id,
+                                        supplier_name = sup.supplier_name,
+                                        sup_number = pos.sup_number, 
+                                        is_selected = pos.is_selected,
+                                        Reason = pos.Reason, 
+                                        po_quantity = pos.po_qty, 
+                                        supplier_address = sup.supplier_address,
+                                        supplier_phone = sup.supplier_phone, 
+                                        supplier_email = sup.supplier_email, 
+                                        discount = sup.discount ,
+                                        supplier_item_name=pos.supplier_item_name,
+                                    }).FirstOrDefault();
                             //pod.poSuppliers = pois;
                             poSuppliers.Add(pois);
                             pod.poSuppliers.Add(pois);
@@ -180,6 +212,7 @@ namespace BT_KimMex.Class
                                          original_price = dPO.original_price,
                                          discount_percentage = dPO.discount_percentage,
                                          lump_sum_discount_amount = dPO.lump_sum_discount_amount,
+                                         supplier_item_name=dPO.supplier_item_name,
                                      }).ToList();
                         foreach (var pod in poDetails)
                         {
@@ -189,7 +222,19 @@ namespace BT_KimMex.Class
                                     join sup in db.tb_supplier on pos.supplier_id equals sup.supplier_id
                                     orderby pos.sup_number
                                     where pos.po_detail_id == pod.po_detail_id && pos.is_selected == true
-                                    select new PurchaseOrderItemSupplier() { po_supplier_id = pos.po_supplier_id, po_detail_id = pos.po_detail_id, unit_price = pos.unit_price, supplier_id = sup.supplier_id, supplier_name = sup.supplier_name, sup_number = pos.sup_number, is_selected = pos.is_selected, Reason = pos.Reason, po_quantity = pos.po_qty, supplier_address = sup.supplier_address, supplier_phone = sup.supplier_phone, supplier_email = sup.supplier_email, discount = sup.discount }).FirstOrDefault();
+                                    select new PurchaseOrderItemSupplier() { 
+                                        po_supplier_id = pos.po_supplier_id, 
+                                        po_detail_id = pos.po_detail_id, 
+                                        unit_price = pos.unit_price, 
+                                        supplier_id = sup.supplier_id, 
+                                        supplier_name = sup.supplier_name, 
+                                        sup_number = pos.sup_number, 
+                                        is_selected = pos.is_selected, 
+                                        Reason = pos.Reason,
+                                        po_quantity = pos.po_qty, 
+                                        supplier_address = sup.supplier_address, supplier_phone = sup.supplier_phone, supplier_email = sup.supplier_email, discount = sup.discount,
+                                    supplier_item_name=pos.supplier_item_name,
+                                    }).FirstOrDefault();
                             //pod.poSuppliers = pois;
                             poSuppliers.Add(pois);
                             pod.poSuppliers.Add(pois);

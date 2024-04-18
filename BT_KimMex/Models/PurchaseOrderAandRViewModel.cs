@@ -207,5 +207,11 @@ namespace BT_KimMex.Models
         public Nullable<System.DateTime> UpdatedAt { get; set; }
         public string CreatedBy { get; set; }
         public string UpdatedBy { get; set; }
+
+        public string CreatedAtText
+        {
+            get { return Convert.ToDateTime(CreatedAt).ToString("yyyy/MM/dd HH:mm"); }
+            set { CreatedAtText = value; }
+        }
     }
 }

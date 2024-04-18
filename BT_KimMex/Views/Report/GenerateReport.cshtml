@@ -57,6 +57,10 @@
             {
                 @Html.Partial("ReportController/WorkOrderIsuseVSWorkOrderReturn")
             }
+            else if (Request.QueryString["reportType"].ToString() == "StockBalanceMonthyWarehouse")
+            {
+                @Html.Partial("ReportController/StockBalanceMonthlyWarehouse")
+            }
         </div>
         @*<div class="col-md-6" style="padding-top:0 !important;">
             <a href='javascript:void(0)' class='btn btn-sm' onclick="printReport('ReportViewer1')" style="margin-right:-10px !important;"><i class="fa fa-print fa-lg" aria-hidden="true" style="color:blue"></i></a>

@@ -155,7 +155,7 @@
     </div>
     <div class="form-group">
         <div class="col-md-offset-2 col-md-10">
-            <input type="button" value="Submit" class="btn btn-default" onclick="approveFeedbackStockTransfer()" />
+            <input type="button" value="Submit" class="btn btn-default" id="btnSubmit" onclick="approveFeedbackStockTransfer()" />
             @*@Html.ActionLink("Back", "Index", null, new { @class = "btn btn-default" })*@
             <a href="javascript:history.back()" class="btn btn-default">Back</a>
         </div>
@@ -163,7 +163,17 @@
 </div>
 
 <script type="text/javascript">
+    function enable_submit_button(is_submit) {
+        if (is_submit) {
+            $('#btnSubmit').text("Submitting...");
+            $('#btnSubmit').attr('disabled', true);
+        } else {
+            $('#btnSubmit').text("Submit");
+            $('#btnSubmit').attr('disabled', false);
+        }
+    }
     function approveFeedbackStockTransfer() {
+        enable_submit_button(true);
         var models = [];
         var item_element = {};
         var countInvalidStatus = 0;

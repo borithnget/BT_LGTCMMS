@@ -1450,7 +1450,7 @@ namespace BT_KimMex.Controllers
                     {
                         return Json(JsonRequestBehavior.AllowGet);
                     }
-                    return Json(new { result = "success", data = getWarehouse }, JsonRequestBehavior.AllowGet);
+                    return Json(new { result = "success", data =WareHouseViewModel.ConvertEntityToModel(getWarehouse) }, JsonRequestBehavior.AllowGet);
                 }
                 else
                     return Json(new { result = "error", message = "No warehouse available for this request." }, JsonRequestBehavior.AllowGet);
@@ -1777,6 +1777,34 @@ namespace BT_KimMex.Controllers
             }
             
         }
+
+        public ActionResult RequestCancel(string id, string comment)
+        {
+            using (kim_mexEntities db = new kim_mexEntities())
+            {
+
+                transferformmainstock transferFromMS = db.transferformmainstocks.Find(id);
+                transferFromMS.stock_transfer_status = Status.RequestCancelled;
+                transferFromMS.updated_by = User.Identity.GetUserId();
+                transferFromMS.updated_date = DateTime.Now;
+                transferFromMS.checked_comment = comment;
+                db.SaveChanges();
+
+                tb_reject reject = new tb_reject();
+                reject.reject_id = Guid.NewGuid().ToString();
+                reject.ref_id = transferFromMS.stock_transfer_id;
+                reject.ref_type = "Transfer From Workshop";
+                reject.comment = comment;
+                reject.rejected_by = User.Identity.GetUserId();
+                reject.rejected_date = Class.CommonClass.ToLocalTime(DateTime.Now);
+                db.tb_reject.Add(reject);
+                db.SaveChanges();
+
+                return Json(new { result = "success" }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+
 
     }
 }

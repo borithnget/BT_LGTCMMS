@@ -28,6 +28,7 @@ namespace BT_KimMex.Entities
         public Nullable<decimal> discount_percentage { get; set; }
         public Nullable<decimal> discount_amount { get; set; }
         public Nullable<decimal> lumpsum_discount_amount { get; set; }
+        public string supplier_item_name { get; set; }
     
         public virtual tb_purchase_order_detail tb_purchase_order_detail { get; set; }
         public virtual tb_supplier tb_supplier { get; set; }

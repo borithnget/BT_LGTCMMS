@@ -59,6 +59,7 @@ namespace BT_KimMex.Models
         public string show_quote_status { get; set; }
         public string pr_id { get; set; }
         public string pr_no { get; set; }
+        public string supplier_item_name { get; set; }
         //public Nullable<int> ordering_number { get; set; }
 
         //public string incoterm { get; set; }
@@ -145,7 +146,8 @@ namespace BT_KimMex.Models
                                   remark = qi.remark,
                                   unit_name = u.Name,
                                   qty = qi.qty,
-                                  discount_amount = qi.discount_amount ?? 0
+                                  discount_amount = qi.discount_amount ?? 0,
+                                  supplier_item_name=qi.supplier_item_name,
                               }).ToList();
                 quote.quoteItems = quoteItems;
                 quote.attachments = Class.Inventory.GetAttachments(quote.quote_id);
@@ -192,6 +194,7 @@ namespace BT_KimMex.Models
         public Nullable<decimal> qty { get; set; }
         public Nullable<decimal> discount_amount { get; set; }
         public Nullable<int> ordering_number { get; set; }
+        public string supplier_item_name { get; set; }
 
     }
     public class QuoteFilterResultModel

@@ -1,10 +1,10 @@
 ﻿@model BT_KimMex.Models.WorkorderReturnedViewModel
-    @using Microsoft.AspNet.Identity;
-    @using BT_KimMex.Class;
+@using Microsoft.AspNet.Identity;
+@using BT_KimMex.Class;
 @{
     ViewBag.Title = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    string userid = User.Identity.GetUserId() ;
+    string userid = User.Identity.GetUserId();
 }
 
 <h3 class="title">View Work Order Return Detail</h3>
@@ -48,9 +48,9 @@
                 </tr>
             </thead>
             <tbody>
-                @{ 
+                @{
                     int count = 1;
-                    foreach(var item in Model.inventoryDetails)
+                    foreach (var item in Model.inventoryDetails)
                     {
                         decimal total_issued_qty = Convert.ToDecimal(BT_KimMex.Class.WorkOrderIssue.GetWorkOrderIssueItembyItemId(Model.workorder_issued_id, item.inventory_item_id).Sum(s => s.issue_qty));
                         <tr>
@@ -83,12 +83,12 @@
                     <button class="w3-button w3-tiny w3-deep-orange" id="btn-cancel">Request Cancel</button>
                 }
             }
-            @if ((User.IsInRole(Role.SystemAdmin)||User.IsInRole(Role.QAQCOfficer)) && (string.Compare(Model.workorder_returned_status,Status.Pending)==0 || string.Compare(Model.workorder_returned_status, Status.Feedbacked) == 0))
+            @if ((User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.QAQCOfficer)) && (string.Compare(Model.workorder_returned_status, Status.Pending) == 0 || string.Compare(Model.workorder_returned_status, Status.Feedbacked) == 0))
             {
                 <a href="@Url.Action("ApproveFeedback","WorkOrderReturned",new { id = Model.workorder_returned_id })" class="w3-button w3-tiny w3-teal">Approve/ Feedback</a>
             }
 
-            @if((User.IsInRole(Role.SystemAdmin)||User.IsInRole(Role.SiteStockKeeper)) && string.Compare(Model.workorder_returned_status, Status.Approved) == 0)
+            @if ((User.IsInRole(Role.SystemAdmin) || User.IsInRole(Role.SiteStockKeeper)) && string.Compare(Model.workorder_returned_status, Status.Approved) == 0)
             {
                 <a href="javascript:void(0)" class="w3-button w3-tiny w3-teal" id="btn-approve">Approve</a>
                 <a href="javascript:void(0)" class="w3-button w3-tiny w3-deep-orange" id="btn-reject">Reject</a>
@@ -106,7 +106,8 @@
 </div>
 
 @section scripts{
-<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js" type="text/javascript"></script>
+    @*<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js" type="text/javascript"></script>*@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
     <script type="text/javascript">
         $(function () {
 
@@ -287,4 +288,4 @@
 
         });
     </script>
-    }
+}

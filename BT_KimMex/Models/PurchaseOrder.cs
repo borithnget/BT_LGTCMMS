@@ -373,6 +373,7 @@ namespace BT_KimMex.Models
         public Nullable<decimal> discount_amount { get; set; }
         public Nullable<decimal> lump_sum_discount_amount { get; set; }
         public Nullable<int> ordering_number { get; set; }
+        public string supplier_item_name { get; set; }
         //  public string PO_Unit { get; set; }
         public PurchaseOrderDetailViewModel()
         {
@@ -410,6 +411,7 @@ namespace BT_KimMex.Models
         public Nullable<decimal> discount_percentage { get; set; }
         public Nullable<decimal> discount_amount { get; set; }
         public Nullable<decimal> lump_sum_discount_amount { get; set; }
+        public string supplier_item_name { get; set; }
         public List<PurchaseOrderDetailViewModel> items { get; set; }
         public List<PurchaseOrderReportViewModel> reports { get; set; }
         public PurchaseOrderItemSupplier()
@@ -533,8 +535,8 @@ namespace BT_KimMex.Models
                               created_date=por.created_date,
                               vat_status=por.vat_status,
                               is_completed=por.is_completed,
-                              supplier_entity=suplier,
-                              quote_entity=quote,
+                              //supplier_entity=suplier,
+                              //quote_entity=quote,
                               //created_at_text=Convert.ToDateTime(por.created_date).ToString("yyyy/MM/dd"),
                           }).ToList();
                        
@@ -571,11 +573,11 @@ namespace BT_KimMex.Models
                                      created_date = por.created_date,
                                      vat_status = por.vat_status,
                                      is_completed = por.is_completed,
-                                     supplier_entity = suplier,
-                                     quote_entity = quote,
-                                     mr=mr,
-                                     pr=pr,
-                                     project_entity= proj,
+                                     //supplier_entity = suplier,
+                                     //quote_entity = quote,
+                                     //mr=mr,
+                                     //pr=pr,
+                                     //project_entity= proj,
                                      //created_at_text=Convert.ToDateTime(por.created_date).ToString("yyyy/MM/dd"),
                                  }).FirstOrDefault();
                 model.items = (from purd in db.tb_purchase_order_detail
@@ -670,7 +672,9 @@ namespace BT_KimMex.Models
                                        amount = pod.amount,
                                        supplier_id = supplier.supplier_id,
                                        supplier_name = supplier.supplier_name,
-                                       supplier_quote = quote_sup
+                                       supplier_quote = quote_sup,
+                                       
+
                                    }).DistinctBy(s => s.pr_detail_id).ToList();
                 return models;
             }
@@ -1009,7 +1013,7 @@ namespace BT_KimMex.Models
                                         PurchaseOrderReportGenerateItemsModel poItem = new PurchaseOrderReportGenerateItemsModel();                                       
 
                                         poItem.ItemCode = item.product_code;
-                                        poItem.ItemName = item.product_name;
+                                        poItem.ItemName = string.IsNullOrEmpty(item.supplier_item_name) ? item.product_name : item.supplier_item_name; 
                                         poItem.ItemUnit = db.tb_unit.Find(item.po_unit).Name;
                                         poItem.itemvat = Convert.ToBoolean(item.item_vat).ToString();
                                         poItem.podetailid = item.po_detail_id;

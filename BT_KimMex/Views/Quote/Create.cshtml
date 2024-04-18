@@ -132,8 +132,10 @@
                                     <th>No.</th>
                                     <th>Code</th>
                                     <th>Description</th>
+
                                     <th>Unit</th>
                                     <th>QTY</th>
+                                    <th>Supplier Item Name</th>
                                     <th>Unit Price($)</th>
                                     <th class="text-center">Dis. (%) <input type='number' step='any' class='form-control' value='0' onchange='changeDiscount(this)' style="width:80px !important;margin:0 auto!important;" id="thead_discount" /></th>
                                     <th class="text-center">Dis. ($) </th>
@@ -175,7 +177,7 @@
 
                     <div class="form-group">
                         <div class="col-md-offset-2 col-md-10">
-                            <input type="button" value="Submit" onclick="saveQuote()" class="btn btn-success" />
+                            <input type="button" value="Submit" id="btnSubmit" onclick="saveQuote()" class="btn btn-success" />
                             @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-danger" })
                         </div>
                     </div>
@@ -523,6 +525,7 @@
                                     "<td><label class='item-name'>" + item.product_name + "</label></td>" +
                                     "<td><label class='item-unit'>" + item.ir_item_unit + "</label></td>" +
                                     "<td class='text-center'><label class='item-qty'>" + item.remain_qty + "</label></td>" +
+                                    "<td><textarea  class='form-control supplier_item_name' >"+item.product_name+"</textarea></td>" +
                                     "<td><input type='number' class='form-control unit-price' value='0' onchange='validateFloatKeyPress(this);' onKeyPress='if(this.value.length==8) return false;'/>" +
                                     "<input type='hidden' class='unit-price-full' value='0'/>" +
                                     "</td>" +
@@ -1595,7 +1598,18 @@
             })
         }
 
+                function enable_submit_button(is_submit) {
+            if (is_submit) {
+                $('#btnSubmit').text("Submitting...");
+                $('#btnSubmit').attr('disabled', true);
+            } else {
+                $('#btnSubmit').text("Submit");
+                $('#btnSubmit').attr('disabled', false);
+            }
+        }
+
         function saveQuote() {
+            enable_submit_button(true);
             var quoteItems = [];
             var itemElement = {};
             var quoteNo = $('#quote_no').text();
@@ -1608,20 +1622,24 @@
             var unitPriceFulls = $('.unit-price-full');
             var DiscountAmountFulls = $('.discount_amount_full');
             var orderingNumbers = $('.ordering_number');
+            var supplierItemNames = $('.supplier_item_name');
             //var DiscountAmountFulls = $('.discount_amount');
             //var unitPrices = $('.unit-price');
             var countInvalid = 0;
             var arrAttachment = [];
             if (!mrId) {
                 alert("Marterial Request is required.");
+                enable_submit_button(false);
                 return;
             }
             if (!supplierId) {
                 alert("Supplier is required.");
+                enable_submit_button(false);
                 return;
             }
             if (items.length == 0) {
                 alert("Items are required.");
+                enable_submit_button(false);
                 return;
             }
             for (var i = 0; i < items.length; i++) {
@@ -1634,11 +1652,13 @@
                     itemElement.qty = Number(qtys[i].innerHTML);
                     itemElement.discount_amount = parseFloat(DiscountAmountFulls[i].value).toFixed(8);
                     itemElement.ordering_number = parseInt(orderingNumbers[i].value);
+                    itemElement.supplier_item_name = supplierItemNames[i].value;
                     quoteItems.push(itemElement);
                 }
             }
             if (quoteItems.length == 0) {
                 alert("Please fill in all items unit price.");
+                enable_submit_button(false);
                 return;
             }
 

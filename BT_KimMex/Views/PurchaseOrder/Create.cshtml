@@ -182,7 +182,18 @@
 
             });
 
-            $('#btnCreate').click(function (sel,name) {
+                        function enable_submit_button(is_submit) {
+                if (is_submit) {
+                    $('#btnCreate').text("Submitting...");
+                    $('#btnCreate').attr('disabled', true);
+                } else {
+                    $('#btnCreate').text("Submit");
+                    $('#btnCreate').attr('disabled', false);
+                }
+            }
+
+            $('#btnCreate').click(function (sel, name) {
+                enable_submit_button(true);
                 var ir_id = $('#item_request_id').val();
                 var po_number = $('#purchase_oder_number').text();
                 var items = $('.item_id');
@@ -291,6 +302,7 @@
                             var supprice = $('#soprice' + arrSup[j]).val();
                             var supdiscount = $('#sdiscount' + arrSup[j]).val();
                             var supdiscountprice = $('#sdiscount' + arrSup[j]).attr('data-disprice');
+                            var supsupplieritemname = $('#ssupplieritemname' + arrSup[j]).val();
 
                             //var vatvalue;
                             //{
@@ -315,7 +327,8 @@
                             po_supplier.original_price = supoprice;
                             po_supplier.discount_percentage = supdiscount;
                             po_supplier.discount_amount = supdiscountprice;
-                            po_supplier.lump_sum_discount_amount =parseFloat(lumpsumdiscountamount).toFixed(8);
+                            po_supplier.lump_sum_discount_amount = parseFloat(lumpsumdiscountamount).toFixed(8);
+                            po_supplier.supplier_item_name = supsupplieritemname;
                             poSuppliers.push(po_supplier);
                             c++;
                             console.log(po_supplier);
@@ -562,6 +575,7 @@
                                             var sup_price_cls = "sup" + Number(count) + "_unit_price";
                                             var sup_oprice_cls = "sup" + Number(count) + "_original_price";
                                             var sup_discount_cls = "sup" + Number(count) + "_discount_percentage";
+                                            var sup_supplier_item_name_cls = "sup" + Number(count) + "_supplier_item_name";
 
                                             var sup_select_id = "sselect" + Number(index + 1) + count;
                                             var sup_name_id = "sname" + Number(index + 1) + count;
@@ -569,7 +583,8 @@
                                             var sup_price_id = "sprice" + Number(index + 1) + count;
                                             var name = "itemvat" + Number(index + 1) + count;
                                             var sup_oprice = "soprice" + Number(index + 1) + count;
-                                            var sup_discount ="sdiscount" +Number(index + 1) + count;
+                                            var sup_discount = "sdiscount" + Number(index + 1) + count;
+                                            var sup_supplier_item_name = "ssupplieritemname" + Number(index + 1) + count;
 
                                             suppliers = suppliers + "<td><input type='checkbox' name='" + sup_select_cls + "' class='selected_supplier " + sup_select_cls + "' id='" + sup_select_id + "' value='" + Number(index + 1) + count + "' onclick='select_supplier(this)' data-price='" + Number(item1.priceDiscount) + "' data-qty='" + Number(item.remain_qty) + "'/></td>" +
                                                 "<td><input type='checkbox' id='" + sup_vat + "' class='" + sup_vat_cls + " select_vat' name='" + sup_vat_cls + "' value='" + Number(index + 1) + count + "' onclick='select_vat_supplier(this)'/><input type='hidden' id='" + sup_name_id + "' class='" + sup_name_cls + "' value='" + item1.supplier_id + "' data-lumpsumdiscount='" + item1.lump_sum_discount_amount + "'/></td>" +
@@ -583,7 +598,8 @@
                                                 "<td>" +
                                                     "<input class='" + sup_oprice_cls + "' type='hidden' id='" + sup_oprice + "' value='" + Number(item1.priceDiscount) + "'/>" +
                                                     "<input class='" + sup_discount_cls + "' type='hidden' id='" + sup_discount + "' value='" + Number(item1.discount) + "' data-disprice='" + parseFloat(item1.discountAmount == null ? 0 : item1.discountAmount) + "'/>" +
-                                                    "<label class='" + sup_price_cls + "' id='" + sup_price_id + "'>" + parseFloat(item1.price).toFixed(4) + "</label>" +
+                                                    "<input class='"+sup_supplier_item_name_cls+"' type='hidden' id='"+sup_supplier_item_name+"' value='"+item1.supplier_item_name+"' />"+
+                                                "<label class='" + sup_price_cls + "' id='" + sup_price_id + "'>" + parseFloat(item1.price).toFixed(4) + "</label>" +
                                                 "</td>" +
                                                 "<td><label>" + Number(item1.discount) + "</lable></td>" +
                                                 "<td style='text-align:left !important; font-size:10px !important;'>" + tnc + "</td>";

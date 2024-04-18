@@ -122,27 +122,44 @@
                             <input type="file" id="signature_file" class="form-control imageBrowes" accept="image/*" multiple/>
                             <input type="hidden" class="form-control" name="user_signature" id="file-path" value="@Model.user_signature">
                             <div id="imgPreview" class="thumbnail">
-                                @if (String.IsNullOrEmpty(Model.user_signature))
+                                @if (Model.signatures.Count() == 0)
                                 {
-                                    if (Model.signatures.Count() == 0)
+                                    if (String.IsNullOrEmpty(Model.user_signature))
                                     {
                                         <img src="@Url.Content("~/Assets/img/profile-picture.jpg")" style=" background-color:white; width: 250px;height: 250px; object-fit:fill;" class="img-responsive" id="targetImg" />
                                     }
                                     else
                                     {
-                                        foreach (var signature in Model.signatures)
-                                        {
-                                            string userSignature = string.Format("/Documents/Signature/{0}{1}", signature.attachment_id, signature.attachment_extension);
-                                            <img src="@userSignature" style="object-fit: fill; background-color: white; width: 100px; height: 100px; " class="img-responsive" id="targetImg" />
-                                            <input type='hidden' name='user_signatures[]' value='@signature.attachment_id' />
-                                        }
+                                        <img src="@Model.user_signature" style=" background-color:white; width: 250px;height: 250px; object-fit:fill;" class="img-responsive" id="targetImg" />
+
                                     }
+
                                 }
                                 else
                                 {
-                                    <img src="@Model.user_signature" style=" background-color:white; width: 250px;height: 250px; object-fit:fill;" class="img-responsive" id="targetImg" />
+                            <table class="table table-bordered">
+                                @foreach (var signature in Model.signatures)
+                                {
+                                    <tr>
+                                        <td>
+                                            @{
+                                                string userSignature = string.Format("/Documents/Signature/{0}{1}", signature.attachment_id, signature.attachment_extension);
+                                                <img src="@userSignature" style="object-fit: fill; background-color: white; width: 100px; height: 100px; " class="img-responsive" id="targetImg" />
+                                                <input type='hidden' name='user_signatures[]' value='@signature.attachment_id' />
+                                            }
 
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="javascript:void(0)" class="btn btn-sm btn-danger btn_remove_attachment" data-id="@signature.attachment_id"><i class="fa fa-trash"></i></a>
+                                        </td>
+                                        
+                                    </tr>
+                                    
                                 }
+                            </table>
+                                    
+                                }
+
 
                             </div>
                         </div>
@@ -153,6 +170,8 @@
     </div>
 </div>
 
+
+
 @section scripts{
     <script type="text/javascript">
         $(function () {
@@ -162,7 +181,38 @@
                 //$("#imgPreview").empty();
                 UploadUserSignatureMultiple();
             });
-        })
+
+            $('.btn_remove_attachment').click(function () {
+
+                var attachmentId = $(this).attr('data-id');
+                var result = confirm("Do you want to delete this signature?");
+                if (result) {
+                    //Logic to delete the item
+                    $.ajax({
+                        url: "/Account/DeleteUserSignature",
+                        type: "post",
+                        dataType: "json",
+                        async: false,
+                        data: { id: attachmentId },
+                        success: function (da) {
+
+                            if (da.result.isSuccess == true) {
+                                $.notify('Your data has been saved.', { className: 'success' });
+                                window.location.reload();
+                            } else {
+                                alert(da.result.message);
+                            }
+                        },
+                        error: function (err) {
+                            $.notify('Your data is error while saving!', { className: 'error' });
+                        }
+                    });
+                }
+
+            });
+
+        });
+
         function readURL(input) {
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
@@ -236,7 +286,7 @@
                         cache: false,
                         contentType: false,
                         processData: false,
-                        success: function (da) {                           
+                        success: function (da) {
                             if (da.attachment) {
                                 var attachment = da.attachment;
                                 //console.log(attachment);

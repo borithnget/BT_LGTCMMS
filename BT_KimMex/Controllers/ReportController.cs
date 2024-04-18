@@ -554,11 +554,17 @@ namespace BT_KimMex.Controllers
             
             return View();
         }
-        public ActionResult GetWarehouseStockBalanceAJAX(string warehouseId,string dateFrom,string dateTo)
+        [HttpPost]
+        public ActionResult WarehouseStockBalance(string warehouse_id, string dateFrom, string dateTo)
+        {
+            return RedirectToAction("GenerateReport", new { reportType = "StockBalanceMonthyWarehouse", dateFrom = dateFrom, dateTo = dateTo, WarehouseId = warehouse_id });
+        }
+        public ActionResult GetWarehouseStockBalanceAJAX(string  warehouseId, string dateFrom,string dateTo)
         {
             DateTime newDateFrom = Convert.ToDateTime(dateFrom);
             DateTime newDateTo = Convert.ToDateTime(dateTo);
-            var results= InventoryViewModel.GetStockBalancebyWarehouse(warehouseId,newDateFrom,newDateTo);
+            //var results= InventoryViewModel.GetStockBalancebyWarehouse(warehouseId,newDateFrom,newDateTo);
+            var results = InventoryViewModel.GetStockBalanceWarehouseV2(warehouseId, newDateFrom, newDateTo);
             var jsonResult = Json(new { data = results }, JsonRequestBehavior.AllowGet);
             jsonResult.MaxJsonLength = int.MaxValue;
             return jsonResult;

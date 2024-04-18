@@ -206,7 +206,7 @@
 
                     if ((isAdmin || isPCH))
                     {
-                        if (string.Compare(Model.stock_transfer_status, Status.Pending) == 0)
+                        if (string.Compare(Model.stock_transfer_status, Status.Rejected) != 0)
                         {
                             @*@Html.ActionLink("Edit", "Edit", new { id = Model.stock_transfer_id }, new { @class = "btn btn-success" })*@
                             @*<a href="javascript:void(0)" id="@Model.stock_transfer_id" class="btn btn-danger delete-promp">Delete</a>*@

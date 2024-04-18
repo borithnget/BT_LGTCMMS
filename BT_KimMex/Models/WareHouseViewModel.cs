@@ -113,6 +113,16 @@ namespace BT_KimMex.Models
         {
             warehouseQAQCs = new List<WarehouseQAQCViewModel>();
         }
+        public static WareHouseViewModel ConvertEntityToModel(tb_warehouse enity)
+        {
+            return new WareHouseViewModel()
+            {
+                warehouse_id=enity.warehouse_id,
+                warehouse_name=enity.warehouse_name,
+                warehouse_site_id=enity.warehouse_site_id,
+                warehouse_project_id=enity.warehouse_project_id
+            };
+        }
     }
 
     public class WarehouseQAQCViewModel

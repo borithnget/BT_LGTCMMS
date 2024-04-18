@@ -323,7 +323,7 @@
                 @{
                     if (isAdmin || isSM)//&& (Model.received_status == "Pending" || Model.received_status == "Rejected")
                     {
-                        if (string.Compare(Model.received_status, "pending") == 0)
+                        if (string.Compare(Model.received_status, Status.Rejected) != 0)
                         {
                             @*@Html.ActionLink("Edit", "Edit", new { id = Model.receive_item_voucher_id }, new { @class = "btn btn-primary", style="margin-right:10px !important;" })*@
                             <a href="javascript:void(0)" class="w3-button w3-tiny w3-deep-orange" id="btn-cancel-request">Request Cancel </a>

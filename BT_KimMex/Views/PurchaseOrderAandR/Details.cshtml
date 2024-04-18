@@ -1,11 +1,11 @@
 ﻿@model BT_KimMex.Models.PurchaseRequestViewModel
-    @using BT_KimMex.Class;
+@using BT_KimMex.Class;
 @using Microsoft.AspNet.Identity;
 @{
     ViewBag.Title = "Details";
     var supplier_name = ViewBag.supplier_name;
     var amount = ViewBag.Amount;
-    string date =Convert.ToDateTime(Model.updated_date).ToString("dd/MM/yyyy");
+    string date = Convert.ToDateTime(Model.updated_date).ToString("dd/MM/yyyy");
     string userid = User.Identity.GetUserId().ToString();
     BT_KimMex.Entities.kim_mexEntities db = new BT_KimMex.Entities.kim_mexEntities();
     var remarks = Model.processFlow.Where(s => string.Compare(s.status, Status.RequestCancelled) == 0 || string.Compare(s.status, Status.Rejected) == 0 || string.Compare(s.status, Status.CancelledMR) == 0).ToList();
@@ -26,9 +26,9 @@
         height: auto !important;
     }
 
-      #purchaseOrderTable thead th{
-        text-align:center !important;
-        vertical-align:middle !important;
+    #purchaseOrderTable thead th {
+        text-align: center !important;
+        vertical-align: middle !important;
     }
 </style>
 @*<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />*@
@@ -75,8 +75,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @{ 
-                                        foreach(var his in poHistories)
+                                    @{
+                                        foreach (var his in poHistories)
                                         {
                                             <tr>
                                                 <td><a href="@Url.Action("Details","PurchaseOrderAandR",new { id = his.pruchase_request_id })" target="_blank">@Convert.ToDateTime(his.created_date).ToString("dd/MM/yyyy HH:mm")</a></td>
@@ -91,7 +91,7 @@
                     }
                 </div>
             </div>
-            
+
 
             @*<div class="form-group">
                     <label class="col-md-2">Num : </label>
@@ -109,45 +109,46 @@
                             <th>PO Number</th>
                             <th>Total Amount after VAT ($)</th>
                             <th>Status</th>
+                            <th>Action</th>
                     </thead>
                     <tbody>
                         @{
-                                        int count = 1;
-                                        foreach (var item in Model.poDetails)
-                                        {
-                                            var prId = db.tb_purchase_order.Where(s => string.Compare(s.purchase_order_id, Model.purchase_order_id) == 0).FirstOrDefault();
-                                            var supplierQuote = db.tb_quote.OrderByDescending(s => s.created_date)
-                                                .Where(s => s.status == true && string.Compare(s.quote_status, Status.cancelled) != 0
-                                                && string.Compare(s.mr_id,prId.item_request_id)== 0 && string.Compare(s.supplier_id,item.supplier_id)==0 ).FirstOrDefault();
-                                            string tnc = "<ul style='margin:0px !important;padding:0px !important;margin-left:7px !important;'​>";
-                                            if (supplierQuote != null)
-                                            {
-                                                if (!string.IsNullOrEmpty(supplierQuote.incoterm))
-                                                {
-                                                    tnc = string.Format("{0}<li>Incoterms: {1}</li>", tnc, supplierQuote.incoterm);
-                                                }
-                                                if (!string.IsNullOrEmpty(item.supplier_quote.payment))
-                                                {
-                                                    tnc = string.Format("{0}<li>Payment: {1}</li>", tnc, supplierQuote.payment);
-                                                }
-                                                if (!string.IsNullOrEmpty(item.supplier_quote.delivery))
-                                                {
-                                                    tnc = string.Format("{0}<li>Delivery: {1}</li>", tnc, supplierQuote.delivery);
-                                                }
-                                                if (!string.IsNullOrEmpty(item.supplier_quote.shipment))
-                                                {
-                                                    tnc = string.Format("{0}<li>Shipment: {1}</li>", tnc, supplierQuote.shipment);
-                                                }
-                                                if (!string.IsNullOrEmpty(item.supplier_quote.warranty))
-                                                {
-                                                    tnc = string.Format("{0}<li>Wanrranty: {1}</li>", tnc, supplierQuote.warranty);
-                                                }
-                                                if (!string.IsNullOrEmpty(item.supplier_quote.vendor_ref))
-                                                {
-                                                    tnc = string.Format("{0}<li>Vendor Ref.: {1}</li>", tnc, supplierQuote.vendor_ref);
-                                                }
-                                                tnc = string.Format("{0}{1}", tnc, "</ul>");
-                                            }
+                            int count = 1;
+                            foreach (var item in Model.poDetails)
+                            {
+                                var prId = db.tb_purchase_order.Where(s => string.Compare(s.purchase_order_id, Model.purchase_order_id) == 0).FirstOrDefault();
+                                var supplierQuote = db.tb_quote.OrderByDescending(s => s.created_date)
+                                    .Where(s => s.status == true && string.Compare(s.quote_status, Status.cancelled) != 0
+                                    && string.Compare(s.mr_id, prId.item_request_id) == 0 && string.Compare(s.supplier_id, item.supplier_id) == 0).FirstOrDefault();
+                                string tnc = "<ul style='margin:0px !important;padding:0px !important;margin-left:7px !important;'​>";
+                                if (supplierQuote != null)
+                                {
+                                    if (!string.IsNullOrEmpty(supplierQuote.incoterm))
+                                    {
+                                        tnc = string.Format("{0}<li>Incoterms: {1}</li>", tnc, supplierQuote.incoterm);
+                                    }
+                                    if (!string.IsNullOrEmpty(item.supplier_quote.payment))
+                                    {
+                                        tnc = string.Format("{0}<li>Payment: {1}</li>", tnc, supplierQuote.payment);
+                                    }
+                                    if (!string.IsNullOrEmpty(item.supplier_quote.delivery))
+                                    {
+                                        tnc = string.Format("{0}<li>Delivery: {1}</li>", tnc, supplierQuote.delivery);
+                                    }
+                                    if (!string.IsNullOrEmpty(item.supplier_quote.shipment))
+                                    {
+                                        tnc = string.Format("{0}<li>Shipment: {1}</li>", tnc, supplierQuote.shipment);
+                                    }
+                                    if (!string.IsNullOrEmpty(item.supplier_quote.warranty))
+                                    {
+                                        tnc = string.Format("{0}<li>Wanrranty: {1}</li>", tnc, supplierQuote.warranty);
+                                    }
+                                    if (!string.IsNullOrEmpty(item.supplier_quote.vendor_ref))
+                                    {
+                                        tnc = string.Format("{0}<li>Vendor Ref.: {1}</li>", tnc, supplierQuote.vendor_ref);
+                                    }
+                                    tnc = string.Format("{0}{1}", tnc, "</ul>");
+                                }
                                 //if (item.supplier_quote != null)
                                 //{
                                 //    if (!string.IsNullOrEmpty(item.supplier_quote.incoterm))
@@ -184,12 +185,13 @@
                                         @Html.Raw(tnc)
                                     </td>
                                     <td><a href="javascript:void(0)" onclick="generateNewReport('@Model.purchase_order_id','@item.supplier_id')">@item.po_report_number</a></td>
-                                    <td class="text-center">@item.amount</td>
+                                    <td class="text-center">@string.Format("{0:N2}", @item.amount)</td>
                                     <td>@item.status</td>
+                                    <td class="text-center"><a href="javascript:void(0)" class="btn btn-danger btn_cancel_po" data-reportid="@item.po_report_id">Cancel PO</a></td>
                                 </tr>
                                 count++;
                             }
-                            }
+                        }
                     </tbody>
                 </table>
             </div>
@@ -231,7 +233,7 @@
                     }
 
                     @if (string.Compare(Model.purchase_request_status, Status.Approved) == 0 || string.Compare(Model.purchase_request_status, Status.Completed) == 0 || string.Compare(Model.purchase_request_status, Status.MREditted) == 0)
-                {
+                    {
                         <a href="/PurchaseOrder/GenerateReport/@Model.purchase_order_id" class="w3-button w3-tiny w3-orange"><span class="glyphicon glyphicon-th-list"></span> Generate</a>
                     }
 
@@ -242,7 +244,7 @@
 
         </div>
 
-                            }
+    }
 
 </div>
 
@@ -272,30 +274,30 @@
 
 <!-- reject project modal popup-->
 @*<div class="modal fade" id="myModal" tabindex="=-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header alert alert-danger">
-                <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
-            </div>
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header alert alert-danger">
+                    <h4 class="modal-title" id="myModalLabel">Comfirmation</h4>
+                </div>
 
-            <div class="modal-body">
-                <p class="success-message">Are you sure to Reject this item?</p>
-                <div class="form-group row">
-                    <label class="col-md-2">Comment:</label>
-                    <div class="col-md-10">
-                        <textarea class="form-control" rows="5" id="request-cancel-comment"></textarea>
+                <div class="modal-body">
+                    <p class="success-message">Are you sure to Reject this item?</p>
+                    <div class="form-group row">
+                        <label class="col-md-2">Comment:</label>
+                        <div class="col-md-10">
+                            <textarea class="form-control" rows="5" id="request-cancel-comment"></textarea>
+                        </div>
                     </div>
-                </div> 
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-default reject-confirm">Yes</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">
-                    No
-                </button>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default reject-confirm">Yes</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        No
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
-</div>*@
+    </div>*@
 
 
 <!-- cancel project modal popup-->
@@ -307,14 +309,15 @@
             </div>
 
             <div class="modal-body">
-                <input type="hidden" id="cancel-type"/>
+                <input type="hidden" id="cancel-type" />
+                <input type="hidden" id="po-report-id" />
                 <p class="success-message ">Are you sure to <span id="sp-cancel-text">Cancel</span>  this request?</p>
                 <div class="form-group row">
                     <label class="col-md-2">Comment:</label>
                     <div class="col-md-10">
                         <textarea class="form-control" rows="5" id="request-cancel-comment"></textarea>
                     </div>
-                </div>  
+                </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-default cancel-confirm">Yes</button>
@@ -374,8 +377,9 @@
 
 @section Scripts{
 
-<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js" type="text/javascript"></script>
-    
+    @*<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js" type="text/javascript"></script>*@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js" ></script>
+
     <script type="text/javascript">
         $(function () {
             var po_id = GetURLParameter();
@@ -617,7 +621,44 @@
                             }
                         });
 
-                    } else if (canceltype == '@Status.CheckRejected') {
+                    }
+                    else if (canceltype == '@Status.cancelled') {
+                        $.ajax({
+                            url: "/PurchaseOrderAandR/CancelPO",
+                            data: {
+                                'poId': po_id,
+                                //'suppliers': [],
+                                //'comment': $("#request-cancel-comment").val(),
+                                'poReportid': $('#po-report-id').val(),
+                            },
+                            type: 'POST',
+                            success: function (da) {
+                                console.log(da);
+                                if ($('.modal-header').hasClass('alert-danger')) {
+                                    $('.modal-header').removeClass('alert-danger').addClass('alert-success');
+                                    $('.delete-confirm').css('display', 'none');
+                                }
+                                $('#cancelModal').modal('hide');
+                                if (da.result.isSuccess == true) {
+                                    $.notify('Your data has been cancelled.', { className: 'success' });
+                                    window.location.reload();
+                                }
+
+                                else {
+                                    $.notify('Your data has been error while approving.', { className: 'error' });
+                                }
+                            },
+                            error: function (err) {
+                                if (!$('.modal-header').hasClass('alert-danger')) {
+                                    $('.modal-header').removeClass('alert-success').addClass('alert-danger');
+                                    $('.approve-confirm').css('display', 'none');
+                                }
+                                $('.success-message').html(err.statusText);
+                                $.notify('Your data has been error while cancelling!', { className: 'error' });
+                            }
+                        });
+                    }
+                    else if (canceltype == '@Status.CheckRejected') {
                         $.ajax({
                             url: "/PurchaseOrderAandR/CheckApproval",
                             data: {
@@ -727,6 +768,13 @@
                 }
             });
 
+            $('.btn_cancel_po').click(function (e) {
+                var po_report_id = $(this).attr('data-reportid');
+                $('#cancel-type').val('@Status.cancelled');
+                $('#cancelModal').modal('show');
+                $('#po-report-id').val(po_report_id);
+                //alert(po_report_id);
+            });
 
             function InitPOSupplierDataTabl() {
                 var po_id = $('#purchase_order_id').val();
